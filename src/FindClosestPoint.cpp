@@ -25,11 +25,8 @@ ConstraintProximity findClosestElement(const defaulttype::Vector3 & T, BaseGeome
     double minDist = 0;
 
     for(unsigned e=0;e<geo->getNbElements();e++) {
-        ConstraintProximity pinfo = geo->projectPoint(e,T);
-
-        defaulttype::Vector3 Q = pinfo.getPosition();
-
-        double dist = (Q-T).norm();
+        ConstraintProximity pinfo;
+        double dist = geo->projectPoint(e,T,pinfo);;
 
         if ((e==0) || (dist < minDist)) {
             min_pinfo = pinfo;
@@ -47,12 +44,8 @@ ConstraintProximity findClosestProximity(const defaulttype::Vector3 & P,BaseGeom
     for(std::set<unsigned>::iterator it=triangleSet.begin();it!=triangleSet.end();++it) {
         unsigned tri = *it;
 
-        ConstraintProximity pinfo = geo->projectPoint(tri,P);
-
-        defaulttype::Vector3 Q = pinfo.getPosition();
-
-        //1.0 + 0.1 i.e. 0.1 is to avoid zero
-        double dist = (Q-P).norm();
+        ConstraintProximity pinfo;
+        double dist = geo->projectPoint(tri,P,pinfo);
 
         if ((it==triangleSet.begin()) || (dist < minDist)) {
             min_pinfo = pinfo;

@@ -19,9 +19,6 @@ public:
     //
     static ConstraintProximity findClosestProximity(const defaulttype::Vector3 & T, BaseGeometry * geo);
 
-    static ConstraintNormal createConstraint(defaulttype::Vector3 N1);
-
-    static ConstraintNormal createFrameConstraint(defaulttype::Vector3 N1);
 };
 
 } // namespace controller
