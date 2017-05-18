@@ -21,6 +21,7 @@ set(SOURCE_FILES
      src/initCollisionAlgorithmPlugin.cpp
      src/AABBDecorator.cpp
      src/FindClosestPoint.cpp
+     src/BindPointCloud.cpp
 )
 
 file(GLOB_RECURSE SCENES_FILES
