@@ -24,7 +24,7 @@ ConstraintProximity findClosestElement(const defaulttype::Vector3 & T, BaseGeome
     ConstraintProximity min_pinfo;
     double minDist = 0;
 
-    for(unsigned e=0;e<geo->getNbElements();e++) {
+    for(int e=0;e<geo->getNbElements();e++) {
         ConstraintProximity pinfo;
         double dist = geo->projectPoint(e,T,pinfo);;
 
