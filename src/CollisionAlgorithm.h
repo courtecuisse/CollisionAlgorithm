@@ -16,7 +16,7 @@ namespace behavior {
 class CollisionAlgorithm {
 public:
 
-    static ConstraintProximity findClosestProximity(const defaulttype::Vector3 & T, BaseGeometry * geo);
+    static ConstraintProximity findClosestProximity(const ConstraintProximity &T, BaseGeometry * geo);
 
     static void pointCloudBinding(const helper::vector<defaulttype::Vector3> & p1, const helper::vector<defaulttype::Vector3> & p2 , helper::vector<int> & bindId, double minDist = 0.0);
 

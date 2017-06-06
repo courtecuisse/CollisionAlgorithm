@@ -56,6 +56,10 @@ public:
 
     virtual void prepareDetection();
 
+    virtual int getNbElements();
+
+    virtual std::unique_ptr<BaseConstraintIterator> getIterator(const ConstraintProximity & P);
+
     defaulttype::Vector3 m_Bmin,m_Bmax,m_cellSize;
     helper::vector<helper::vector<helper::vector<helper::vector<unsigned> > > >  m_triangleboxes;
 };

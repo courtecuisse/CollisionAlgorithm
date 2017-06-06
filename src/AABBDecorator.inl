@@ -27,6 +27,15 @@ AABBDecorator::AABBDecorator()
     this->f_listening.setValue(true);
 }
 
+int AABBDecorator::getNbElements() {
+    return this->getTopology()->getNbTriangles();
+}
+
+std::unique_ptr<BaseConstraintIterator> AABBDecorator::getIterator(const ConstraintProximity & /*P*/) {
+    std::unique_ptr<BaseConstraintIterator> foo (new DefaultConstraintIterator(this));
+    return foo;
+}
+
 void AABBDecorator::prepareDetection() {
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
 
