@@ -14,7 +14,7 @@ namespace core {
 namespace behavior {
 
 
-class CollisionFilter {
+class CollisionFilter : public core::objectmodel::BaseObject {
 public:
     virtual bool filter(const ConstraintProximity & from,const ConstraintProximity & dst) = 0;
 

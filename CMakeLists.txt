@@ -15,6 +15,8 @@ set(HEADER_FILES
      src/AABBDecorator.h
      src/AABBDecorator.inl
      src/CollisionAlgorithm.h
+     src/NormalFilter.h
+     src/NormalFilter.inl
 )
 
 set(SOURCE_FILES
@@ -22,6 +24,7 @@ set(SOURCE_FILES
      src/AABBDecorator.cpp
      src/FindClosestPoint.cpp
      src/BindPointCloud.cpp
+     src/NormalFilter.cpp
 )
 
 file(GLOB_RECURSE SCENES_FILES

@@ -9,6 +9,11 @@
 #include <math.h>
 #include <sofa/defaulttype/Vec.h>
 #include "AABBDecorator.h"
+#include <sofa/core/ObjectFactory.h>
+#include <sofa/core/visual/VisualParams.h>
+#include <SofaOpenglVisual/OglModel.h>
+#include <math.h>
+#include <assert.h>     /* assert */
 
 namespace sofa {
 
@@ -33,11 +38,11 @@ ConstraintProximity CollisionAlgorithm::findClosestProximity(const ConstraintPro
         ConstraintProximity pinfo(geo,e);
         double dist = geo->projectPoint(P,pinfo);
 
-        if (filter && ! filter->filter(T,pinfo)) continue;
-
-        if (dist < minDist) {
-            min_pinfo = pinfo;
-            minDist = dist;
+        if (! filter || filter->filter(T,pinfo)) {
+            if (dist < minDist) {
+                min_pinfo = pinfo;
+                minDist = dist;
+            }
         }
 
         iterator->next();
@@ -45,6 +50,11 @@ ConstraintProximity CollisionAlgorithm::findClosestProximity(const ConstraintPro
 
     return min_pinfo;
 }
+
+
+
+
+
 
 } // namespace controller
 
