@@ -20,6 +20,7 @@ namespace behavior {
 #define min3(a,b,c) std::min(std::min(a,b),c)
 #define max3(a,b,c) std::max(std::max(a,b),c)
 
+
 AABBDecorator::AABBDecorator()
 : d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox","Number of bbox subdivision"))
 , d_drawBbox(initData(&d_drawBbox, false,"drawBbox","Draw Bbox"))
@@ -27,17 +28,15 @@ AABBDecorator::AABBDecorator()
     this->f_listening.setValue(true);
 }
 
-int AABBDecorator::getNbElements() {
-    return this->getTopology()->getNbTriangles();
-}
-
-std::unique_ptr<BaseConstraintIterator> AABBDecorator::getIterator(const ConstraintProximity & /*P*/) {
-    std::unique_ptr<BaseConstraintIterator> foo (new DefaultConstraintIterator(this));
+std::unique_ptr<BaseConstraintIterator> AABBDecorator::getIterator(const ConstraintProximity & P) {
+    std::unique_ptr<BaseConstraintIterator> foo (new AABBIterator(this,P));
     return foo;
 }
 
 void AABBDecorator::prepareDetection() {
-    helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
+    if (this->getGeometry() == NULL) return;
+
+    helper::ReadAccessor<Data <VecCoord> > x = *this->getGeometry()->getMstate()->read(core::VecCoordId::position());
 
     m_Bmin = x[0];
     m_Bmax = x[0];
@@ -66,8 +65,9 @@ void AABBDecorator::prepareDetection() {
         }
     }
 
-    for (int t=0;t<this->getTopology()->getNbTriangles();t++) {
-        const topology::Triangle tri = this->getTopology()->getTriangle(t);
+
+    for (int t=0;t<this->getGeometry()->getTopology()->getNbTriangles();t++) {
+        const topology::Triangle tri = this->getGeometry()->getTopology()->getTriangle(t);
 
         //Compute Bezier Positions
         defaulttype::Vector3 p0 = x[tri[0]];
@@ -111,8 +111,6 @@ void AABBDecorator::reinit() {
             m_triangleboxes[i][j].resize(d_nbox.getValue()[2]+1);
         }
     }
-
-    prepareDetection();
 }
 
 void AABBDecorator::draw(const core::visual::VisualParams * /*vparams*/) {

@@ -13,10 +13,17 @@ namespace core {
 
 namespace behavior {
 
+
+class CollisionFilter {
+public:
+    virtual bool filter(const ConstraintProximity & from,const ConstraintProximity & dst) = 0;
+
+};
+
 class CollisionAlgorithm {
 public:
 
-    static ConstraintProximity findClosestProximity(const ConstraintProximity &T, BaseGeometry * geo);
+    static ConstraintProximity findClosestProximity(const ConstraintProximity &T, BaseGeometry * geo, CollisionFilter * filter = NULL);
 
     static void pointCloudBinding(const helper::vector<defaulttype::Vector3> & p1, const helper::vector<defaulttype::Vector3> & p2 , helper::vector<int> & bindId, double minDist = 0.0);
 
