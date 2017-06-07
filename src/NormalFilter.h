@@ -42,9 +42,11 @@ namespace behavior {
 
 class NormalFilter : public CollisionFilter {
 public:
-    bool filter(const ConstraintProximity &from, const ConstraintProximity &dst) {
-        return dot(from.getNormal(),dst.getNormal())>0.3;
-    }
+    Data<double> d_angle;
+
+    NormalFilter();
+
+    bool filter(const ConstraintProximity &from, const ConstraintProximity &dst);
 };
 
 
