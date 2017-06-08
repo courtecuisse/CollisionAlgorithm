@@ -55,7 +55,7 @@ void CollisionAlgorithm::pointCloudBinding(const helper::vector<defaulttype::Vec
 
 //            printf("MIN DIST %f    p=%f    %d\n",closestDist,minDist,closestId);
 
-            if ((minDist!=0) && (closestDist < minDist)) closestId = -1;
+            if ((minDist!=0) && (closestDist > minDist)) closestId = -1;
 
 //            printf("CLOSEST ID %d\n",closestId);
 
