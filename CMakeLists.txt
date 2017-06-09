@@ -17,6 +17,9 @@ set(HEADER_FILES
      src/CollisionAlgorithm.h
      src/NormalFilter.h
      src/NormalFilter.inl
+     src/TriangleNonLinearGeometry.h
+     src/BezierTriangleGeometry.h
+     src/BezierTriangleGeometry.inl
 )
 
 set(SOURCE_FILES
@@ -25,6 +28,8 @@ set(SOURCE_FILES
      src/FindClosestPoint.cpp
      src/BindPointCloud.cpp
      src/NormalFilter.cpp
+     src/NewtonIteration.cpp
+     src/BezierTriangleGeometry.cpp
 )
 
 file(GLOB_RECURSE SCENES_FILES

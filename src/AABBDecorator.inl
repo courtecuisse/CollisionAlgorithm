@@ -28,15 +28,21 @@ AABBDecorator::AABBDecorator()
     this->f_listening.setValue(true);
 }
 
-std::unique_ptr<BaseConstraintIterator> AABBDecorator::getIterator(const ConstraintProximity & P) {
-    std::unique_ptr<BaseConstraintIterator> foo (new AABBIterator(this,P));
-    return foo;
+BaseConstraintIteratorPtr AABBDecorator::getIterator(const ConstraintProximityPtr & P) {
+    return BaseConstraintIteratorPtr(new AABBIterator(this,P));
 }
 
 void AABBDecorator::prepareDetection() {
-    if (this->getGeometry() == NULL) return;
+    sofa::core::behavior::MechanicalState<DataTypes> * state;
+    topology::TopologyContainer * topology;
 
-    helper::ReadAccessor<Data <VecCoord> > x = *this->getGeometry()->getMstate()->read(core::VecCoordId::position());
+    this->getContext()->get(topology);
+    this->getContext()->get(state);
+
+    if (topology == NULL) return;
+    if (state == NULL) return;
+
+    helper::ReadAccessor<Data <VecCoord> > x = state->read(core::VecCoordId::position());
 
     m_Bmin = x[0];
     m_Bmax = x[0];
@@ -66,8 +72,8 @@ void AABBDecorator::prepareDetection() {
     }
 
 
-    for (int t=0;t<this->getGeometry()->getTopology()->getNbTriangles();t++) {
-        const topology::Triangle tri = this->getGeometry()->getTopology()->getTriangle(t);
+    for (int t=0;t<topology->getNbTriangles();t++) {
+        const topology::Triangle tri = topology->getTriangle(t);
 
         //Compute Bezier Positions
         defaulttype::Vector3 p0 = x[tri[0]];

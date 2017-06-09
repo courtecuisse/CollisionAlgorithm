@@ -16,45 +16,34 @@
 * along with this library; if not, write to the Free Software Foundation,     *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.          *
 *******************************************************************************
-*                               SOFA :: Modules                               *
+*                               SOFA :: Plugins                               *
 *                                                                             *
 * Authors: The SOFA Team and external contributors (see Authors.txt)          *
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_NORMALFILTER_H
-#define SOFA_COMPONENT_NORMALFILTER_H
 
-#include "ConstraintGeometry.h"
-#include <sofa/core/behavior/ForceField.h>
-#include <sofa/core/behavior/MechanicalState.h>
-#include <sofa/core/objectmodel/Data.h>
-#include <sofa/defaulttype/VecTypes.h>
-#include <SofaConstraint/BilateralInteractionConstraint.h>
-#include "ConstraintProximity.h"
-#include "CollisionAlgorithm.h"
+#include <sofa/core/ObjectFactory.h>
+#include "BezierTriangleGeometry.inl"
 
-namespace sofa {
+namespace sofa
+{
 
-namespace core {
+namespace core
+{
 
-namespace behavior {
+namespace behavior
+{
 
-class NormalFilter : public CollisionFilter {
-public:
-    Data<double> d_angle;
+using namespace sofa::defaulttype;
 
-    NormalFilter();
+SOFA_DECL_CLASS(BezierTriangleGeometry)
 
-    bool filter(const ConstraintProximityPtr &from, const ConstraintProximityPtr &dst);
-};
-
-
-} // namespace forcefield
+int BezierTriangleGeometryClass = core::RegisterObject("Solver toticulated system objects")
+.add<BezierTriangleGeometry >();
+} // namespace controller
 
 } // namespace component
 
 } // namespace sofa
 
-
-#endif // NeedleLinearDescription_H

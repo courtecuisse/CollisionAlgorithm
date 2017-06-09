@@ -20,8 +20,8 @@ namespace behavior {
 NormalFilter::NormalFilter()
 : d_angle(initData(&d_angle, -1.0,"angle","Draw Bbox")) {}
 
-bool NormalFilter::filter(const ConstraintProximity &from, const ConstraintProximity &dst) {
-    return dot(from.getNormal(),dst.getNormal())>=d_angle.getValue();
+bool NormalFilter::filter(const ConstraintProximityPtr &from, const ConstraintProximityPtr &dst) {
+    return dot(from->getNormal(),dst->getNormal())>=d_angle.getValue();
 }
 
 } //controller

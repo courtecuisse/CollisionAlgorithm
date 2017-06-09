@@ -21,28 +21,33 @@ namespace core {
 
 namespace behavior {
 
-#define min3(a,b,c) std::min(std::min(a,b),c)
-#define max3(a,b,c) std::max(std::max(a,b),c)
+ConstraintProximityPtr CollisionAlgorithm::findClosestProximity(const ConstraintProximityPtr &T, BaseGeometry * geo) {
+    BaseDecorator * decorator = NULL;
+    geo->getContext()->get(decorator, core::objectmodel::BaseContext::Local);
 
-ConstraintProximity CollisionAlgorithm::findClosestProximity(const ConstraintProximity &T, BaseGeometry * geo, CollisionFilter * filter) {
-    ConstraintProximity min_pinfo;
+    BaseConstraintIteratorPtr iterator = (decorator == NULL) ? geo->getIterator() : decorator->getIterator(T);
+
+    ConstraintProximityPtr min_pinfo = NULL;
 
     double minDist = std::numeric_limits<double>::max();
 
-    std::unique_ptr<BaseConstraintIterator> iterator = geo->getIterator(T);
+    helper::vector<CollisionFilter *> filters;
+    geo->getContext()->get<CollisionFilter>(&filters, core::objectmodel::BaseContext::Local);
 
-    const defaulttype::Vector3 P = T.getPosition();
+    const defaulttype::Vector3 P = T->getPosition();
     while(! iterator->end(min_pinfo)) {
         int e = iterator->getElement();
 
-        ConstraintProximity pinfo(geo,e);
-        double dist = geo->projectPoint(P,pinfo);
+        ConstraintProximityPtr pinfo = geo->projectPoint(P,e);
+        double dist = geo->getDistance(T,pinfo);
 
-        if (! filter || filter->filter(T,pinfo)) {
-            if (dist < minDist) {
-                min_pinfo = pinfo;
-                minDist = dist;
+        if (dist < minDist) {
+            for (unsigned i=0;i<filters.size();i++) {
+                if (! filters[i]->filter(T,pinfo)) break;
             }
+
+            min_pinfo = pinfo;
+            minDist = dist;
         }
 
         iterator->next();
@@ -50,9 +55,6 @@ ConstraintProximity CollisionAlgorithm::findClosestProximity(const ConstraintPro
 
     return min_pinfo;
 }
-
-
-
 
 
 

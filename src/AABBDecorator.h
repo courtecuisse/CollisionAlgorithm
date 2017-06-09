@@ -25,6 +25,7 @@
 #ifndef SOFA_COMPONENT_AABBDECORATOR_H
 #define SOFA_COMPONENT_AABBDECORATOR_H
 
+#include "CollisionAlgorithm.h"
 #include "ConstraintGeometry.h"
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
@@ -42,19 +43,22 @@ namespace behavior {
 #define min3(a,b,c) std::min(std::min(a,b),c)
 #define max3(a,b,c) std::max(std::max(a,b),c)
 
-class AABBDecorator : public BaseDecorator
+class AABBDecorator : public core::BehaviorModel, public BaseDecorator
 {
 public:
-    SOFA_CLASS(AABBDecorator , BaseDecorator);
+    SOFA_CLASS(AABBDecorator , core::BehaviorModel);
+
+    typedef sofa::defaulttype::Vec3dTypes DataTypes;
+    typedef DataTypes::VecCoord VecCoord;
 
     class AABBIterator : public BaseConstraintIterator {
     public :
 
-        AABBIterator(AABBDecorator * deco,const ConstraintProximity & src) {
+        AABBIterator(AABBDecorator * deco,const ConstraintProximityPtr & src) {
             m_decorator = deco;
             d = 0;
 
-            defaulttype::Vector3 T = src.getPosition();
+            defaulttype::Vector3 T = src->getPosition();
 
             cbox[0] = floor((T[0] - m_decorator->m_Bmin[0])/m_decorator->m_cellSize[0]);
             cbox[1] = floor((T[1] - m_decorator->m_Bmin[1])/m_decorator->m_cellSize[1]);
@@ -86,10 +90,9 @@ public:
                     for (int k=-d;k<=d;k++) {
                         if (cbox[2]+k < 0 || cbox[2]+k > m_decorator->d_nbox.getValue()[2]) continue;
 
-                        if (sqrt(i * i + j*j + k*k) > d) continue;
+                        if (i!=d && j!=d && k!=d) continue; // already seen
 
                         const helper::vector<unsigned> & triangles = m_decorator->m_triangleboxes[cbox[0] + i][cbox[1] + j][cbox[2] + k];
-
                         for (unsigned t=0;t<triangles.size();t++) m_selectTriangle.insert(triangles[t]);
                     }
                 }
@@ -98,17 +101,13 @@ public:
             m_setIterator = m_selectTriangle.begin();
         }
 
-        bool end(const ConstraintProximity & E) {
+        bool end(const ConstraintProximityPtr & E = NULL) {
             if (d>=m_max) return true;
-
             if (m_selectTriangle.empty() || (m_setIterator == m_selectTriangle.end())) {
-                if (E.size()) return true; // the proximity is not empty i.e. we fond a closer bindind
-
+                if (E != NULL) return true; // the proximity is not empty i.e. we already fond a closer bindind
                 d++;// we look for boxed located at d+1
-
                 fillTriangleSet(d);
             }
-
             return false;
         }
 
@@ -141,7 +140,11 @@ public:
 
     virtual void prepareDetection();
 
-    std::unique_ptr<BaseConstraintIterator> getIterator(const ConstraintProximity & P);
+    BaseConstraintIteratorPtr getIterator(const ConstraintProximityPtr & P = NULL);
+
+    void updatePosition(SReal /*dt*/) {
+        prepareDetection();
+    }
 
 protected:
     defaulttype::Vector3 m_Bmin,m_Bmax,m_cellSize;
