@@ -23,7 +23,7 @@
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
 
-#include "NormalFilter.inl"
+#include "Filters.h"
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <SofaOpenglVisual/OglModel.h>
@@ -46,6 +46,11 @@ SOFA_DECL_CLASS(NormalFilter)
 
 int NormalFilterClass = core::RegisterObject("Triangle liear interpolation")
 .add<NormalFilter >();
+
+SOFA_DECL_CLASS(DistanceFilter)
+
+int DistanceFilterClass = core::RegisterObject("Triangle liear interpolation")
+.add<DistanceFilter >();
 
 } // namespace controller
 

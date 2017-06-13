@@ -15,8 +15,7 @@ set(HEADER_FILES
      src/AABBDecorator.h
      src/AABBDecorator.inl
      src/CollisionAlgorithm.h
-     src/NormalFilter.h
-     src/NormalFilter.inl
+     src/Filters.h
      src/TriangleNonLinearGeometry.h
      src/BezierTriangleGeometry.h
      src/BezierTriangleGeometry.inl
@@ -27,7 +26,7 @@ set(SOURCE_FILES
      src/AABBDecorator.cpp
      src/FindClosestPoint.cpp
      src/BindPointCloud.cpp
-     src/NormalFilter.cpp
+     src/Filters.cpp
      src/NewtonIteration.cpp
      src/BezierTriangleGeometry.cpp
 )

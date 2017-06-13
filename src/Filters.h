@@ -22,8 +22,8 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_NORMALFILTER_H
-#define SOFA_COMPONENT_NORMALFILTER_H
+#ifndef SOFA_COMPONENT_FILTERS_H
+#define SOFA_COMPONENT_FILTERS_H
 
 #include "ConstraintGeometry.h"
 #include <sofa/core/behavior/ForceField.h>
@@ -44,9 +44,25 @@ class NormalFilter : public CollisionFilter {
 public:
     Data<double> d_angle;
 
-    NormalFilter();
+    NormalFilter()
+    : d_angle(initData(&d_angle, -1.0,"angle","Draw Bbox")) {}
 
-    bool filter(const ConstraintProximityPtr &from, const ConstraintProximityPtr &dst);
+    bool filter(const ConstraintProximityPtr &from, const ConstraintProximityPtr &dst) {
+        return dot(from->getNormal(),dst->getNormal())>=d_angle.getValue();
+    }
+
+};
+
+class DistanceFilter : public CollisionFilter {
+public:
+    Data<double> d_dist;
+
+    DistanceFilter()
+        : d_dist(initData(&d_dist, std::numeric_limits<double>::max(),"dist","Draw Bbox")) {}
+
+    bool filter(const ConstraintProximityPtr &from, const ConstraintProximityPtr &dst) {
+        return (from->getPosition() - dst->getPosition()).norm() < d_dist.getValue();
+    }
 };
 
 
