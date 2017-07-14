@@ -105,14 +105,11 @@ ConstraintProximity findClosestElement(const defaulttype::Vector3 & T, BaseGeome
 }
 
 ConstraintProximity CollisionAlgorithm::findClosestProximity(const defaulttype::Vector3 & T, BaseGeometry * geo) {
-    AABBDecorator * aabb_decorator;
-    geo->getContext()->get(aabb_decorator);
-
-    ConstraintProximity res;
-    if (aabb_decorator == NULL) res = findClosestElement(T,geo);
-    else res = findClosestElement(T,geo,aabb_decorator);
-
-    return res;
+    if (AABBDecorator * aabb_decorator = dynamic_cast<AABBDecorator * >(geo->getDecorator())) {
+        return findClosestElement(T,geo,aabb_decorator);
+    } else {
+        return findClosestElement(T,geo);
+    }
 }
 
 } // namespace controller

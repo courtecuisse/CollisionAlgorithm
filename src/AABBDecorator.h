@@ -38,10 +38,10 @@ namespace core {
 
 namespace behavior {
 
-class AABBDecorator : public BaseConstraintGeometry
+class AABBDecorator : public BaseDecorator
 {
 public:
-    SOFA_CLASS(AABBDecorator , BaseConstraintGeometry);
+    SOFA_CLASS(AABBDecorator , BaseDecorator);
 
     AABBDecorator();
 
