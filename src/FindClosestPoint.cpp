@@ -22,13 +22,14 @@ namespace behavior {
 
 ConstraintProximity findClosestElement(const defaulttype::Vector3 & T, BaseGeometry * geo) {
     ConstraintProximity min_pinfo;
-    double minDist = 0;
+    double minDist = std::numeric_limits<double>::max();
 
     for(int e=0;e<geo->getNbElements();e++) {
         ConstraintProximity pinfo;
         double dist = geo->projectPoint(e,T,pinfo);;
 
-        if ((e==0) || (dist < minDist)) {
+        if (dist < minDist) {
+
             min_pinfo = pinfo;
             minDist = dist;
         }
