@@ -71,7 +71,7 @@ void CollisionAlgorithm::pointCloudBinding(const helper::vector<defaulttype::Vec
 
             if (C == -1) { // the point has not yet been associated
                 C = i;
-            } else { // the point is already associated
+            } else if (C != (int) i) { // the point is already associated
                 int & A = bindId[C]; // previous binded point in p1
 
                 change = true; // we retry the binding because two points are associated with the same point
