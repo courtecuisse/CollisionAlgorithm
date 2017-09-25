@@ -55,7 +55,7 @@ void CollisionAlgorithm::pointCloudBinding(const helper::vector<defaulttype::Vec
 
 //            printf("MIN DIST %f    p=%f    %d\n",closestDist,minDist,closestId);
 
-            if ((minDist!=0) && (closestDist < minDist)) closestId = -1;
+            if ((minDist!=0) && (closestDist > minDist)) closestId = -1;
 
 //            printf("CLOSEST ID %d\n",closestId);
 
@@ -71,7 +71,7 @@ void CollisionAlgorithm::pointCloudBinding(const helper::vector<defaulttype::Vec
 
             if (C == -1) { // the point has not yet been associated
                 C = i;
-            } else { // the point is already associated
+            } else if (C != (int) i) { // the point is already associated
                 int & A = bindId[C]; // previous binded point in p1
 
                 change = true; // we retry the binding because two points are associated with the same point
