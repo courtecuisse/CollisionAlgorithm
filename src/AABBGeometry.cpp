@@ -23,7 +23,7 @@
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
 
-#include "AABBDecorator.inl"
+#include "AABBGeometry.inl"
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <SofaOpenglVisual/OglModel.h>
@@ -42,10 +42,10 @@ namespace behavior
 
 using namespace sofa::defaulttype;
 
-SOFA_DECL_CLASS(AABBDecorator)
+SOFA_DECL_CLASS(AABBGeometry)
 
-int AABBDecoratorClass = core::RegisterObject("Triangle liear interpolation")
-.add<AABBDecorator >();
+int AABBGeometryClass = core::RegisterObject("Triangle liear interpolation")
+.add<AABBGeometry >();
 } // namespace controller
 
 } // namespace component

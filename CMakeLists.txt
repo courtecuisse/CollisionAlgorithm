@@ -10,25 +10,34 @@ find_package(SofaGeneral REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-set(HEADER_FILES      
-     src/initCollisionAlgorithmPlugin.h
-     src/AABBDecorator.h
-     src/AABBDecorator.inl
-     src/CollisionAlgorithm.h
-     src/Filters.h
-     src/TriangleNonLinearGeometry.h
-     src/BezierTriangleGeometry.h
-     src/BezierTriangleGeometry.inl
+#set(HEADER_FILES
+#     src/initCollisionAlgorithmPlugin.h
+#     src/AABBDecorator.h
+#     src/AABBDecorator.inl
+#     src/CollisionAlgorithm.h
+#     src/Filters.h
+#     src/TriangleNonLinearGeometry.h
+#     src/BezierTriangleGeometry.h
+#     src/BezierTriangleGeometry.inl
+#)
+
+#set(SOURCE_FILES
+#     src/initCollisionAlgorithmPlugin.cpp
+#     src/AABBDecorator.cpp
+#     src/FindClosestPoint.cpp
+#     src/BindPointCloud.cpp
+#     src/Filters.cpp
+#     src/NewtonIteration.cpp
+#     src/BezierTriangleGeometry.cpp
+#)
+
+file(GLOB_RECURSE HEADER_FILES
+    "src/*.h"
+    "src/*.inl"
 )
 
-set(SOURCE_FILES
-     src/initCollisionAlgorithmPlugin.cpp
-     src/AABBDecorator.cpp
-     src/FindClosestPoint.cpp
-     src/BindPointCloud.cpp
-     src/Filters.cpp
-     src/NewtonIteration.cpp
-     src/BezierTriangleGeometry.cpp
+file(GLOB_RECURSE SOURCE_FILES
+    "src/*.cpp"
 )
 
 file(GLOB_RECURSE SCENES_FILES

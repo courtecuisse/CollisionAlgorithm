@@ -25,7 +25,7 @@
 #ifndef SOFA_COMPONENT_BEZIERTRIANGLEGEOMETRY_H
 #define SOFA_COMPONENT_BEZIERTRIANGLEGEOMETRY_H
 
-#include "TriangleNonLinearGeometry.h"
+#include "TriangleGeometry.h"
 
 namespace sofa {
 
@@ -33,12 +33,12 @@ namespace core {
 
 namespace behavior {
 
-class BezierTriangleGeometry : public TriangleNonLinearGeometry
+class BezierTriangleGeometry : public TriangleGeometry
 {
 public:
     SOFA_CLASS(BezierTriangleGeometry , TriangleGeometry );
 
-    typedef TriangleNonLinearGeometry Inherit;
+    typedef TriangleGeometry Inherit;
     typedef typename Inherit::TriangleInfo TriangleInfo;
 
     typedef typename defaulttype::Vector2 Vector2;
@@ -48,19 +48,38 @@ public:
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::VecDeriv VecDeriv;
 
+    Data <unsigned> d_nonlin_max_it;
+    Data <double> d_nonlin_tolerance;
+    Data <double> d_nonlin_threshold;
+    Data <unsigned> d_draw_tesselation;
+
     BezierTriangleGeometry();
 
-    class BezierConstraintProximity : public TriangleConstraintProximity {
+    class BezierConstraintProximity : public ConstraintProximity {
     public:
-        BezierConstraintProximity(const BezierTriangleGeometry * geo, unsigned eid, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3)
-        : TriangleConstraintProximity(geo,eid,p1,f1,p2,f2,p3,f3) {}
+        friend class BezierTriangleGeometry;
+
+        BezierConstraintProximity(const BezierTriangleGeometry * geo, unsigned eid, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3) : ConstraintProximity(geo) {
+            m_eid = eid;
+
+            m_pid.resize(3);
+            m_fact.resize(3);
+
+            m_pid[0] = p1;
+            m_fact[0] = f1;
+
+            m_pid[1] = p2;
+            m_fact[1] = f2;
+
+            m_pid[2] = p3;
+            m_fact[2] = f3;
+        }
 
         ////Bezier triangle are computed according to :
         ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
         defaulttype::Vector3 getPosition() const {
-            const BezierTriangleInfo & tbinfo = ((BezierTriangleGeometry*)m_cg)->m_beziertriangle_info[m_eid];
-
-            const helper::ReadAccessor<Data <VecCoord> >& x = *m_cg->getMstate()->read(core::VecCoordId::position());
+            const BezierTriangleInfo & tbinfo = ((BezierTriangleGeometry *)m_geo)->m_beziertriangle_info[m_eid];
+            const helper::ReadAccessor<Data <VecCoord> > & x = ((BezierTriangleGeometry *)m_geo)->getMstate()->read(core::VecCoordId::position());
 
             const Vector3 & p300 = x[m_pid[2]];
             const Vector3 & p030 = x[m_pid[1]];
@@ -82,22 +101,20 @@ public:
                    tbinfo.p111 * 6*fact_w*fact_u*fact_v;
         }
 
-
-
-        Vector3 getFreePosition() const {
+        defaulttype::Vector3 getFreePosition() const {
             double fact_w = m_fact[2];
             double fact_u = m_fact[1];
             double fact_v = m_fact[0];
 
-            const helper::ReadAccessor<Data <VecCoord> >& xfree = *m_cg->getMstate()->read(core::VecCoordId::freePosition());
+            const helper::ReadAccessor<Data <VecCoord> > & x = ((BezierTriangleGeometry *)m_geo)->getMstate()->read(core::VecCoordId::freePosition());
 
-            const Vector3 & p300_Free = xfree[m_pid[2]];
-            const Vector3 & p030_Free = xfree[m_pid[1]];
-            const Vector3 & p003_Free = xfree[m_pid[0]];
+            const Vector3 & p300_Free = x[m_pid[2]];
+            const Vector3 & p030_Free = x[m_pid[1]];
+            const Vector3 & p003_Free = x[m_pid[0]];
 
-            const Vector3 & n200_Free = ((BezierTriangleGeometry*)m_cg)->m_pointNormal[m_pid[2]];
-            const Vector3 & n020_Free = ((BezierTriangleGeometry*)m_cg)->m_pointNormal[m_pid[1]];
-            const Vector3 & n002_Free = ((BezierTriangleGeometry*)m_cg)->m_pointNormal[m_pid[0]];
+            const Vector3 & n200_Free = ((BezierTriangleGeometry *)m_geo)->m_pointNormal[m_pid[2]];
+            const Vector3 & n020_Free = ((BezierTriangleGeometry *)m_geo)->m_pointNormal[m_pid[1]];
+            const Vector3 & n002_Free = ((BezierTriangleGeometry *)m_geo)->m_pointNormal[m_pid[0]];
 
             double w12_free = dot(p030_Free - p300_Free,n200_Free);
             double w21_free = dot(p300_Free - p030_Free,n020_Free);
@@ -131,13 +148,12 @@ public:
                    p111_Free * 6*fact_w*fact_u*fact_v;
         }
 
+        Vector3 getNormal() {
+            const BezierTriangleInfo & tbinfo = ((BezierTriangleGeometry *)m_geo)->m_beziertriangle_info[m_eid];
 
-        Vector3 getNormal() const {
-            const BezierTriangleInfo & tbinfo = ((BezierTriangleGeometry*)m_cg)->m_beziertriangle_info[m_eid];
-
-            const Vector3 &n200 = ((BezierTriangleGeometry*)m_cg)->m_pointNormal[m_pid[2]];
-            const Vector3 &n020 = ((BezierTriangleGeometry*)m_cg)->m_pointNormal[m_pid[1]];
-            const Vector3 &n002 = ((BezierTriangleGeometry*)m_cg)->m_pointNormal[m_pid[0]];
+            const Vector3 &n200 = ((BezierTriangleGeometry *)m_geo)->m_pointNormal[m_pid[2]];
+            const Vector3 &n020 = ((BezierTriangleGeometry *)m_geo)->m_pointNormal[m_pid[1]];
+            const Vector3 &n002 = ((BezierTriangleGeometry *)m_geo)->m_pointNormal[m_pid[0]];
 
             double fact_w = m_fact[2];
             double fact_u = m_fact[1];
@@ -155,11 +171,40 @@ public:
 
             return N1;
         }
+
+        void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) {
+            DataMatrixDeriv & c_d = *cId[m_geo->getMstate()].write();
+            MatrixDeriv & c = *c_d.beginEdit();
+            MatrixDerivRowIterator c_it1 = c.writeLine(cline);
+            c_it1.addCol(m_pid[0],N*m_fact[0]);
+            c_it1.addCol(m_pid[1],N*m_fact[1]);
+            c_it1.addCol(m_pid[2],N*m_fact[2]);
+            c_d.endEdit();
+        }
+
+        void getControlPoints(helper::vector<defaulttype::Vector3> & controlPoints) {
+            const helper::ReadAccessor<Data <VecCoord> > & x = m_geo->getMstate()->read(core::VecCoordId::position());
+            controlPoints.push_back(x[m_pid[0]]);
+            controlPoints.push_back(x[m_pid[1]]);
+            controlPoints.push_back(x[m_pid[2]]);
+        }
+
+        void refineToClosestPoint(const Coord & P) {
+            m_geo->projectPoint(P,this);
+        }
+
+        unsigned m_eid;
     };
 
-    virtual void prepareDetection();
+    void prepareDetection();
 
     ConstraintProximityPtr getNonLinearTriangleProximity(unsigned eid, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3) const;
+
+    ConstraintProximityPtr getElementProximity(unsigned eid) const;
+
+    void draw(const core::visual::VisualParams * vparams);
+
+    void projectPoint(const defaulttype::Vector3 & s,BezierConstraintProximity * pinfo) const;
 
 private :
     typedef struct {
@@ -168,6 +213,10 @@ private :
     } BezierTriangleInfo;
 
     helper::vector<BezierTriangleInfo> m_beziertriangle_info;
+
+    void tesselate(const core::visual::VisualParams * vparams, unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C);
+
+    ConstraintProximityPtr newtonTriangularIterations(const defaulttype::Vector3 & P,unsigned eid,const ConstraintProximityPtr & pfrom,unsigned max_it, double tolerance, double threshold);
 
 };
 

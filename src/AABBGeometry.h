@@ -22,17 +22,17 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_FILTERS_H
-#define SOFA_COMPONENT_FILTERS_H
+#ifndef SOFA_COMPONENT_AABBGeometry_H
+#define SOFA_COMPONENT_AABBGeometry_H
 
-#include "ConstraintGeometry.h"
+#include "CollisionAlgorithm.h"
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
 #include <sofa/defaulttype/VecTypes.h>
 #include <SofaConstraint/BilateralInteractionConstraint.h>
 #include "ConstraintProximity.h"
-#include "CollisionAlgorithm.h"
+#include "CollisionDetectionAlgorithm.h"
 
 namespace sofa {
 
@@ -40,30 +40,70 @@ namespace core {
 
 namespace behavior {
 
-class NormalFilter : public CollisionFilter {
+class AABBGeometry : public BaseGeometry, public BroadPhase
+{
 public:
-    Data<double> d_angle;
+    SOFA_CLASS(AABBGeometry , BaseGeometry);
 
-    NormalFilter()
-    : d_angle(initData(&d_angle, -1.0,"angle","Draw Bbox")) {}
+    typedef sofa::defaulttype::Vec3dTypes DataTypes;
+    typedef DataTypes::VecCoord VecCoord;
 
-    bool filter(const ConstraintProximityPtr &from, const ConstraintProximityPtr &dst) {
-        return dot(from->getNormal(),dst->getNormal())>=d_angle.getValue();
-    }
+    Data<defaulttype::Vec3i> d_nbox;
+    Data<std::string> d_geometry;
 
+    class ElementAABBIterator : public ElementIterator {
+    public:
+        ElementAABBIterator(std::set<int> set) {
+            m_selectedElements = set;
+            it = m_selectedElements.begin();
+        }
+
+        void next() {
+            it++;
+        }
+
+        bool end() {
+            return it == m_selectedElements.end();
+        }
+
+        unsigned getId() {
+            return *it;
+        }
+
+    private:
+        std::set<int> m_selectedElements;
+        std::set<int>::iterator it;
+    };
+
+    AABBGeometry();
+
+    void draw(const core::visual::VisualParams */*vparams*/);
+
+    void init();
+
+    void prepareDetection();
+
+    virtual ElementIteratorPtr getCloseElementsIterator(const ConstraintProximityPtr P);
+
+    virtual int getNbElements() const ;
+
+    virtual ConstraintProximityPtr getElementProximity(unsigned eid) const;
+
+protected:
+    defaulttype::Vector3 m_Bmin,m_Bmax,m_cellSize;
+    helper::vector<helper::vector<helper::vector<helper::vector<unsigned> > > >  m_indexedElement;
+    BaseGeometry * m_geo;
+
+    void fillTriangleSet(int d,defaulttype::Vec3i cbox,std::vector<int> & selectTriangles);
+
+    void getCloseElements(const ConstraintProximityPtr pinfo, std::set<int> & selectElements);
+
+    void getCloseElements(defaulttype::Vec3i cbox, std::vector<int> & selectElements);
 };
 
-class DistanceFilter : public CollisionFilter {
-public:
-    Data<double> d_dist;
 
-    DistanceFilter()
-        : d_dist(initData(&d_dist, std::numeric_limits<double>::max(),"dist","Draw Bbox")) {}
 
-    bool filter(const ConstraintProximityPtr &from, const ConstraintProximityPtr &dst) {
-        return (from->getPosition() - dst->getPosition()).norm() < d_dist.getValue();
-    }
-};
+
 
 
 } // namespace forcefield

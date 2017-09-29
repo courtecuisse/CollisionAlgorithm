@@ -23,10 +23,9 @@
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
 
-#include "Filters.h"
+#include "CollisionDetectionAlgorithm.inl"
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <SofaOpenglVisual/OglModel.h>
 #include <math.h>
 #include <assert.h>     /* assert */
 
@@ -40,18 +39,11 @@ namespace core
 namespace behavior
 {
 
-using namespace sofa::defaulttype;
+SOFA_DECL_CLASS(CollisionDetectionAlgorithm)
 
-SOFA_DECL_CLASS(NormalFilter)
-
-int NormalFilterClass = core::RegisterObject("Triangle liear interpolation")
-.add<NormalFilter >();
-
-SOFA_DECL_CLASS(DistanceFilter)
-
-int DistanceFilterClass = core::RegisterObject("Triangle liear interpolation")
-.add<DistanceFilter >();
-
+int CollisionDetectionAlgorithmClass = core::RegisterObject("Triangle liear interpolation")
+.add<CollisionDetectionAlgorithm >()
+;
 } // namespace controller
 
 } // namespace component

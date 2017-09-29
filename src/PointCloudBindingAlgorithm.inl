@@ -1,14 +1,13 @@
-#ifndef SOFA_COMPONENT_CONSTRAINT_FINDCLOSESTALGO_H
-#define SOFA_COMPONENT_CONSTRAINT_FINDCLOSESTALGO_H
+#ifndef SOFA_COMPONENT_CONSTRAINT_BINDPOINTNALGORITHM_INL
+#define SOFA_COMPONENT_CONSTRAINT_BINDPOINTNALGORITHM_INL
 
-#include "CollisionAlgorithm.h"
+#include "PointCloudBindingAlgorithm.h"
 #include "ConstraintProximity.h"
 #include <sofa/defaulttype/SolidTypes.h>
 #include <sofa/core/behavior/BaseController.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <math.h>
 #include <sofa/defaulttype/Vec.h>
-#include "AABBDecorator.h"
 
 namespace sofa {
 
@@ -16,12 +15,26 @@ namespace core {
 
 namespace behavior {
 
+PointCloudBindingAlgorithm::PointCloudBindingAlgorithm()
+: d_maxDist(initData(&d_maxDist, "maxDist", "Collision detection algorithm")) {
 
-void CollisionAlgorithm::pointCloudBinding(const helper::vector<defaulttype::Vector3> & p1, const helper::vector<defaulttype::Vector3> & p2 , helper::vector<int> & bindId, double minDist) {
+}
+
+void PointCloudBindingAlgorithm::processAlgorithm(BaseGeometry * geoFrom,BaseGeometry * geoTo,helper::vector<PariProximity> & output) {
+    if (geoFrom == NULL) return;
+    if (geoTo == NULL) return;
+
+    if (geoFrom->getNbElements() == 0) return;
+    if (geoTo->getNbElements() == 0) return;
+
+    helper::vector<defaulttype::Vector3> p1;
+    helper::vector<defaulttype::Vector3> p2;
+    for (int i=0;i<geoFrom->getNbElements();i++) p1.push_back(geoFrom->getElementProximity(i)->getPosition());
+    for (int i=0;i<geoTo->getNbElements();i++) p1.push_back(geoTo->getElementProximity(i)->getPosition());
+
+
+    helper::vector<int> bindId;
     bindId.resize(p1.size(),-1);
-
-    if (p1.empty()) return;
-    if (p2.empty()) return;
 
     bool change = true;
 
@@ -55,7 +68,7 @@ void CollisionAlgorithm::pointCloudBinding(const helper::vector<defaulttype::Vec
 
 //            printf("MIN DIST %f    p=%f    %d\n",closestDist,minDist,closestId);
 
-            if ((minDist!=0) && (closestDist > minDist)) closestId = -1;
+            if ((d_maxDist.getValue()!=0) && (closestDist > d_maxDist.getValue())) closestId = -1;
 
 //            printf("CLOSEST ID %d\n",closestId);
 
@@ -89,8 +102,16 @@ void CollisionAlgorithm::pointCloudBinding(const helper::vector<defaulttype::Vec
         }
     }
 
-//    std::cout << "BIND=" << bindId << std::endl;
-//    std::cout << "IBIND=" << invBind << std::endl;
+
+    for (unsigned i=0;i<bindId.size();i++) {
+        if (bindId[i] == -1) continue;
+
+        PariProximity pair;
+        pair.first = geoFrom->getElementProximity(bindId[i]);
+        pair.second = geoTo->getElementProximity(invBind[i]);
+
+        output.push_back(pair);
+    }
 }
 
 } // namespace controller
