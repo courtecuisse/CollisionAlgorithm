@@ -105,30 +105,25 @@ ConstraintElementPtr IntersectionContourGeometry::getElement(unsigned i) const {
 
 void IntersectionContourGeometry::prepareDetection() {
     m_intersection.clear();
-    m_crs.clear();
 
     helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
 
-    m_crs.push_back(0);
-    for (unsigned p=0;p<d_planePos.getValue().size();p++) {
-        defaulttype::Vector3 Z(0,0,1);
-        Vector3 pointOnPlane = d_planePos.getValue()[p].getCenter();
-        Vector3 planeNormal = d_planePos.getValue()[p].getOrientation().rotate(Z);
+    defaulttype::Vector3 Z(0,0,1);
+    Vector3 pointOnPlane = d_planePos.getValue().getCenter();
+    Vector3 planeNormal = d_planePos.getValue().getOrientation().rotate(Z);
 
-        double d=dot(planeNormal,pointOnPlane);
+    double d=dot(planeNormal,pointOnPlane);
 
-        //inspect the plane edge intersection
-        for(int i=0;i<this->getTopology()->getNbEdges();i++) {
-            const core::topology::BaseMeshTopology::Edge &e = this->getTopology()->getEdge(i);
+    //inspect the plane edge intersection
+    for(int i=0;i<this->getTopology()->getNbEdges();i++) {
+        const core::topology::BaseMeshTopology::Edge &e = this->getTopology()->getEdge(i);
 
-            Vector3 p1 = x[e[0]];
-            Vector3 p2 = x[e[1]];
+        Vector3 p1 = x[e[0]];
+        Vector3 p2 = x[e[1]];
 
-            double alpha=1.0 - (d-dot(planeNormal,p1))/(dot(planeNormal,p2-p1));
+        double alpha=1.0 - (d-dot(planeNormal,p1))/(dot(planeNormal,p2-p1));
 
-            if (alpha>=0 && alpha<=1) m_intersection.push_back(IntersectionEdgeInfo(e[0],e[1],alpha));
-        }
-        m_crs.push_back(m_intersection.size());
+        if (alpha>=0 && alpha<=1) m_intersection.push_back(IntersectionEdgeInfo(e[0],e[1],alpha));
     }
 }
 

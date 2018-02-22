@@ -29,7 +29,7 @@ public:
         typedef defaulttype::Vector3 Vector3;
         typedef defaulttype::Rigid3dTypes::Coord Ridig;
 
-        Data<helper::vector<Ridig> > d_planePos;
+        Data<Ridig > d_planePos;
 
         IntersectionContourGeometry();
 
@@ -55,7 +55,6 @@ public:
     protected:
 
         helper::vector<IntersectionEdgeInfo> m_intersection;
-        helper::vector<unsigned> m_crs; // compressed row sparse
 
 };
 
