@@ -38,6 +38,10 @@ public :
         return m_geo->getPos(ie.p1,vid) * ie.alpha + m_geo->getPos(ie.p2,vid) * (1.0 - ie.alpha);
     }
 
+    defaulttype::Vector3 getNormal() const {
+//        return m_geo->getPos(ie.p1,vid) * ie.alpha + m_geo->getPos(ie.p2,vid) * (1.0 - ie.alpha);
+    }
+
     void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) {
         DataMatrixDeriv & c_d = *cId[m_geo->getMstate()].write();
         MatrixDeriv & c = *c_d.beginEdit();

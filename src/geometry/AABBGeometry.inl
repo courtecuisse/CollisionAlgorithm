@@ -1,12 +1,9 @@
-﻿#ifndef SOFA_COMPONENT_AABBGeometry_INL
-#define SOFA_COMPONENT_AABBGeometry_INL
+﻿#pragma once
 
-#include "geometry/AABBGeometry.h"
-#include <sofa/helper/Quater.h>
+#include <geometry/AABBGeometry.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <sofa/simulation/AnimateBeginEvent.h>
-#include <SofaBaseMechanics/MechanicalObject.h>
-#include <sofa/core/visual/VisualParams.h>
+#include <sofa/helper/system/gl.h>
+#include <sofa/helper/gl/template.h>
 
 namespace sofa {
 
@@ -144,8 +141,6 @@ unsigned AABBGeometry::getNbElements() const {
 void AABBGeometry::prepareDetection() {
     if (m_geo == NULL) return;
 
-    m_geo->update();
-
     m_indexedElement.resize(d_nbox.getValue()[0]+1);
     for (unsigned i=0;i<m_indexedElement.size();i++) {
         m_indexedElement[i].resize(d_nbox.getValue()[1]+1);
@@ -260,5 +255,3 @@ void AABBGeometry::draw(const core::visual::VisualParams * vparams) {
 } //component
 
 }//Sofa
-
-#endif
