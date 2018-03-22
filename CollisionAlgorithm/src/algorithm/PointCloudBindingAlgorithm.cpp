@@ -23,8 +23,12 @@
 //* Contact information: contact@sofa-framework.org                             *
 //******************************************************************************/
 
+//#include "PointCloudBindingAlgorithm.inl"
 //#include <sofa/core/ObjectFactory.h>
-//#include "BezierTriangleGeometry.inl"
+//#include <sofa/core/visual/VisualParams.h>
+//#include <math.h>
+//#include <assert.h>     /* assert */
+
 
 //namespace sofa
 //{
@@ -35,15 +39,13 @@
 //namespace behavior
 //{
 
-//using namespace sofa::defaulttype;
+//SOFA_DECL_CLASS(PointCloudBindingAlgorithm)
 
-//SOFA_DECL_CLASS(BezierTriangleGeometry)
-
-//int BezierTriangleGeometryClass = core::RegisterObject("Solver toticulated system objects")
-//.add<BezierTriangleGeometry >();
+//int PointCloudBindingAlgorithmClass = core::RegisterObject("Triangle liear interpolation")
+//.add<PointCloudBindingAlgorithm >()
+//;
 //} // namespace controller
 
 //} // namespace component
 
 //} // namespace sofa
-
