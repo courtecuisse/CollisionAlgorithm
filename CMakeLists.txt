@@ -32,18 +32,21 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 #)
 
 file(GLOB_RECURSE HEADER_FILES
-    "src/*.h"
-    "src/*.inl"
+    "*.h"
+    "*.inl"
 )
 
 file(GLOB_RECURSE SOURCE_FILES
-    "src/*.cpp"
+    "*.cpp"
 )
 
 file(GLOB_RECURSE SCENES_FILES
     "scenes/*.scn"
     "scenes/*.xml"
 )
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${README_FILES} )
 #set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "_d")
@@ -54,7 +57,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "$<INSTALL_INTERFACE:include/$
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DPLUGIN_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\"")
 #target_link_libraries(${PROJECT_NAME} SofaCore SofaComponentBase SofaSimulationTree SofaUserInteraction SofaConstraint TRI6FEM)
-target_link_libraries(${PROJECT_NAME} SofaCore SofaComponentBase SofaSimulationTree SofaUserInteraction SofaConstraint ConstraintGeometryPlugin)
+target_link_libraries(${PROJECT_NAME} SofaCore SofaComponentBase SofaSimulationTree SofaUserInteraction SofaConstraint)
 
 ## Install rules for the library and headers; CMake package configurations files
 sofa_create_package(${PROJECT_NAME} 0.1 ${PROJECT_NAME} ${PROJECT_NAME})

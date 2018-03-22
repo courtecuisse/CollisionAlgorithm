@@ -3,7 +3,7 @@
 #include <algorithm/CollisionDetectionAlgorithm.h>
 #include <limits>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 CollisionDetectionAlgorithm::CollisionDetectionAlgorithm()
 : p_from(this)

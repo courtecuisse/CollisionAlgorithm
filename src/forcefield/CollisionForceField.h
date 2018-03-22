@@ -3,9 +3,7 @@
 #include <BaseGeometry.h>
 #include <Collision.h>
 
-namespace graFE {
-
-class ForceField;
+namespace collisionAlgorithm {
 
 class CollisionForceField :  public ForceField {
 public:

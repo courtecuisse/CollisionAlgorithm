@@ -4,7 +4,7 @@
 //#include <Eigen/SVD>
 #include <GL/gl.h>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 //namespace core {
 

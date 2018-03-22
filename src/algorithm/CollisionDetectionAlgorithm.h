@@ -2,7 +2,7 @@
 
 #include <Collision.h>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 class CollisionDetectionAlgorithm : public Collision {
 public:

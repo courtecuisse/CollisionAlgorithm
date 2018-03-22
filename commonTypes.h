@@ -14,7 +14,7 @@
 #include <SofaBaseTopology/TriangleSetTopologyContainer.h>
 #include <sofa/core/ObjectFactory.h>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 typedef sofa::defaulttype::Vector3 Vector3;
 typedef sofa::core::topology::BaseMeshTopology::Triangle TTriangle;
@@ -103,7 +103,7 @@ public:
         Nflag
     };
 
-    bool isActive(DisplayMode m) {
+    bool isActive(DisplayMode /*m*/) {
         return true;
     }
 };

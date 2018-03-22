@@ -1,6 +1,6 @@
 #include <geometry/EdgeGeometry.inl>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 DECLARE_CLASS(EdgeGeometry)
 

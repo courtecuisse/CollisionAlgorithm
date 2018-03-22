@@ -3,7 +3,7 @@
 #include <geometry/PointGeometry.h>
 #include <GL/gl.h>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 /**************************************************************************/
 /******************************PROXIMITY***********************************/
@@ -27,6 +27,14 @@ Vector3 PointProximity::getNormal() const {
 
 ConstraintElement * PointProximity::getElement() {
     return m_elmt;
+}
+
+std::map<unsigned,Vector3> PointProximity::getContribution(const Vector3 & N) {
+    std::map<unsigned,Vector3> res;
+
+    res[m_elmt->m_pid] = N;
+
+    return res;
 }
 
 /**************************************************************************/

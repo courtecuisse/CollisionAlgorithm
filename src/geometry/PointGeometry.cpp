@@ -1,6 +1,6 @@
 #include <geometry/PointGeometry.inl>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 DECLARE_CLASS(PointGeometry)
 

@@ -3,7 +3,7 @@
 #include <BaseGeometry.h>
 #include <GL/gl.h>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 typedef std::pair<ConstraintProximityPtr,ConstraintProximityPtr> PairProximity;
 typedef std::vector<PairProximity> PairProximityVector;

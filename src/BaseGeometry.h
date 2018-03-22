@@ -3,9 +3,9 @@
 #include <memory>
 #include <map>
 #include <vector>
-#include <grafe.h>
+#include <commonTypes.h>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 class ConstraintElement;
 class BaseGeometry;

@@ -2,7 +2,7 @@
 
 #include <BaseGeometry.h>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 class PointGeometry : public BaseGeometry {
     friend class PointElement;
@@ -43,6 +43,8 @@ public :
     Vector3 getNormal() const;
 
     ConstraintElement * getElement();
+
+    std::map<unsigned,Vector3> getContribution(const Vector3 & N);
 
 protected:
     PointElement * m_elmt;

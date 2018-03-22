@@ -26,7 +26,7 @@
 
 #include <geometry/PointGeometry.h>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 class EdgeGeometry : public BaseGeometry {
     friend class EdgeElement;
@@ -69,6 +69,8 @@ public :
     Vector3 getNormal() const;
 
     ConstraintElement * getElement();
+
+    std::map<unsigned,Vector3> getContribution(const Vector3 & N);
 
 protected:
     EdgeElement * m_elmt;

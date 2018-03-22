@@ -3,7 +3,7 @@
 #include <geometry/EdgeGeometry.h>
 #include <GL/gl.h>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 /**************************************************************************/
 /******************************PROXIMITY***********************************/
@@ -33,6 +33,15 @@ ConstraintElement * EdgeProximity::getElement() {
     return m_elmt;
 }
 
+std::map<unsigned,Vector3> EdgeProximity::getContribution(const Vector3 & N) {
+    std::map<unsigned,Vector3> res;
+
+    res[m_elmt->m_pid[0]] = N * 1.0/2.0;
+    res[m_elmt->m_pid[1]] = N * 1.0/2.0;
+
+    return res;
+}
+
 /**************************************************************************/
 /******************************ELEMENT*************************************/
 /**************************************************************************/
@@ -41,7 +50,7 @@ EdgeElement::EdgeElement(EdgeGeometry * geo,unsigned eid) {
     m_geo = geo;
     m_eid = eid;
 
-    const std::vector<TEdge> & edges = m_geo->getTopology()->getEdges();
+    const std::vector<TEdge> & edges = m_geo->p_topology->getEdges();
 
     m_pid[0] = edges[eid][0];
     m_pid[1] = edges[eid][1];
@@ -67,7 +76,7 @@ ConstraintProximityPtr EdgeElement::project(Vector3 P) {
     Vector3 P2 = pos[m_pid[1]];
 
     Vector3 v = P2-P1;
-    fact_v = (P - P1).dot(v) / v.dot(v);
+    fact_v = dot(P - P1,v) / dot(v,v);
 
     if (fact_v<0.0) fact_v = 0.0;
     else if (fact_v>1.0) fact_v = 1.0;
@@ -89,7 +98,7 @@ void EdgeElement::draw(const std::vector<Vector3> & X) {
 /**************************************************************************/
 
 void EdgeGeometry::createElements() {
-    for (unsigned i=0;i<getTopology()->getEdges().size();i++) {
+    for (unsigned i=0;i<p_topology->getEdges().size();i++) {
         m_elements.push_back(std::make_shared<EdgeElement>(this,i));
     }
 }

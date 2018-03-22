@@ -26,7 +26,7 @@
 
 #include <geometry/PointGeometry.h>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 class TriangleGeometry : public BaseGeometry {
     friend class TriangleElement;
@@ -89,51 +89,13 @@ public :
 
     ConstraintElement * getElement();
 
-
+    std::map<unsigned,Vector3> getContribution(const Vector3 & N);
 
 protected:
     TriangleElement * m_elmt;
     double m_fact[3];
 
 };
-
-
-//class TriangleGeometry : public EdgeGeometry
-//{
-//    friend class TriangleElement;
-//    friend class TriangleProximity;
-
-//public:
-//    SOFA_CLASS(TriangleGeometry , EdgeGeometry );
-
-//    Data<bool> d_phong;
-
-//    TriangleGeometry();
-
-//    ConstraintProximityPtr getTriangleProximity(unsigned eid, unsigned p1, double f1, unsigned p2, double f2, unsigned p3, double f3) const;
-
-////    void projectPoint(const defaulttype::Vector3 & s,TriangleConstraintProximity * pinfo) const;
-
-//    void draw(const core::visual::VisualParams */*vparams*/);
-
-//    int getNbTriangles() const;
-
-//    unsigned getNbElements() const;
-
-//    ConstraintElementPtr getElement(unsigned eid) const;
-
-//protected:
-
-
-
-//    virtual void prepareDetection();
-
-//    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_w,double & fact_u, double & fact_v) const;
-
-
-
-//    void drawTriangle(const core::visual::VisualParams * vparams,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C);
-//};
 
 }
 

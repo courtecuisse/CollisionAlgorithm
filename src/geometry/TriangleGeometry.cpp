@@ -1,6 +1,6 @@
 #include <geometry/TriangleGeometry.inl>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 DECLARE_CLASS(TriangleGeometry)
 

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <GL/gl.h>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 CollisionForceField::CollisionForceField()
 : d_stiffness("stiffness",40.0,this)
@@ -33,7 +33,7 @@ void CollisionForceField::addForce(TVecId f) {
     }
 }
 
-void CollisionForceField::addToMatrix(BaseMatrix *M) {
+void CollisionForceField::addToMatrix(BaseMatrix */*M*/) {
 //    if (d_indice1.getValue() == -1) return;
 //    if (d_indice2.getValue() == -1) return;
 

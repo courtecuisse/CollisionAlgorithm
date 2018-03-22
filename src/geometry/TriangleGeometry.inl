@@ -3,7 +3,7 @@
 #include <geometry/TriangleGeometry.h>
 #include <GL/gl.h>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 /**************************************************************************/
 /******************************PROXIMITY***********************************/
@@ -42,6 +42,16 @@ ConstraintElement * TriangleProximity::getElement() {
     return m_elmt;
 }
 
+std::map<unsigned,Vector3> TriangleProximity::getContribution(const Vector3 & N) {
+    std::map<unsigned,Vector3> res;
+
+    res[m_elmt->m_pid[0]] = N * 1.0/3.0;
+    res[m_elmt->m_pid[1]] = N * 1.0/3.0;
+    res[m_elmt->m_pid[2]] = N * 1.0/3.0;
+
+    return res;
+}
+
 /**************************************************************************/
 /******************************ELEMENT*************************************/
 /**************************************************************************/
@@ -50,7 +60,7 @@ TriangleElement::TriangleElement(TriangleGeometry * geo,unsigned eid) {
     m_geo = geo;
     m_eid = eid;
 
-    const std::vector<TTriangle> & triangles = m_geo->getTopology()->getTriangles();
+    const std::vector<TTriangle> & triangles = m_geo->p_topology->getTriangles();
 
     m_pid[0] = triangles[eid][0];
     m_pid[1] = triangles[eid][1];
@@ -73,8 +83,8 @@ unsigned TriangleElement::getNbControlPoints() {
 void TriangleElement::computeBaryCoords(const Vector3 & proj_P,const TriangleGeometry::TriangleInfo & tinfo, const Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const {
     Vector3 v2 = proj_P - p0;
 
-    double d20 = v2.dot(tinfo.v0);
-    double d21 = v2.dot(tinfo.v1);
+    double d20 = dot(v2,tinfo.v0);
+    double d21 = dot(v2,tinfo.v1);
 
     fact_v = (tinfo.d11 * d20 - tinfo.d01 * d21) * tinfo.invDenom;
     fact_w = (tinfo.d00 * d21 - tinfo.d01 * d20) * tinfo.invDenom;
@@ -96,8 +106,8 @@ ConstraintProximityPtr TriangleElement::project(Vector3 P) {
     const TriangleGeometry::TriangleInfo & tinfo = m_geo->m_triangle_info[m_eid];
 
     //corrdinate on the plane
-    double c0 = x1x2.dot(tinfo.ax1);
-    double c1 = x1x2.dot(tinfo.ax2);
+    double c0 = dot(x1x2,tinfo.ax1);
+    double c1 = dot(x1x2,tinfo.ax2);
     Vector3 proj_P = P0 + tinfo.ax1 * c0 + tinfo.ax2 * c1;
 
     double fact_u,fact_v,fact_w;
@@ -107,7 +117,7 @@ ConstraintProximityPtr TriangleElement::project(Vector3 P) {
     if (fact_u<0) {
         Vector3 v3 = P1 - P2;
         Vector3 v4 = proj_P - P2;
-        double alpha = v4.dot(v3) / v3.dot(v3);
+        double alpha = dot(v4,v3) / dot(v3,v3);
 
         if (alpha<0) alpha = 0;
         else if (alpha>1) alpha = 1;
@@ -118,7 +128,7 @@ ConstraintProximityPtr TriangleElement::project(Vector3 P) {
     } else if (fact_v<0) {
         Vector3 v3 = P0 - P2;
         Vector3 v4 = proj_P - P2;
-        double alpha = v4.dot(v3) / v3.dot(v3);
+        double alpha = dot(v4,v3) / dot(v3,v3);
 
         if (alpha<0) alpha = 0;
         else if (alpha>1) alpha = 1;
@@ -128,8 +138,8 @@ ConstraintProximityPtr TriangleElement::project(Vector3 P) {
         fact_w = 1.0 - alpha;
     } else if (fact_w<0) {
         Vector3 v3 = P1 - P0;
-        Vector3 v4 = proj_P - P2;
-        double alpha = v4.dot(v3) / v3.dot(v3);
+        Vector3 v4 = proj_P - P0;
+        double alpha = dot(v4,v3) / dot(v3,v3);
 
         if (alpha<0) alpha = 0;
         else if (alpha>1) alpha = 1;
@@ -143,6 +153,7 @@ ConstraintProximityPtr TriangleElement::project(Vector3 P) {
 }
 
 void TriangleElement::draw(const std::vector<Vector3> & X) {
+    glEnable(GL_CULL_FACE);
     glBegin(GL_TRIANGLES);
         glVertex3dv(X[m_pid[0]].data());
         glVertex3dv(X[m_pid[1]].data());
@@ -185,8 +196,8 @@ void TriangleElement::draw(const std::vector<Vector3> & X) {
 //        glBegin(GL_TRIANGLES);
 //    }
 
-//    for(int t=0;t<this->getTopology()->getNbTriangles();t++) {
-//        const sofa::core::topology::BaseMeshTopology::Triangle tri = this->getTopology()->getTriangle(t);
+//    for(int t=0;t<this->p_topology->getNbTriangles();t++) {
+//        const sofa::core::topology::BaseMeshTopology::Triangle tri = this->p_topology->getTriangle(t);
 
 //        //Compute Bezier Positions
 //        defaulttype::Vector3 p0 = x[tri[0]];
@@ -204,23 +215,23 @@ void TriangleElement::draw(const std::vector<Vector3> & X) {
 /**************************************************************************/
 
 void TriangleGeometry::createElements() {
-    for (unsigned i=0;i<getTopology()->getTriangles().size();i++) {
+    for (unsigned i=0;i<p_topology->getNbTriangles();i++) {
         m_elements.push_back(std::make_shared<TriangleElement>(this,i));
     }
 
-    m_pointNormal.resize(getTopology()->getNbPoints());
+    m_pointNormal.resize(p_topology->getNbPoints());
 
 }
 
 void TriangleGeometry::beginStep() {
     const std::vector<Vector3> & x = getPos();
 
-    m_triangle_info.resize(getTopology()->getTriangles().size());
+    m_triangle_info.resize(p_topology->getTriangles().size());
 
-    for (unsigned t=0;t<this->getTopology()->getNbTriangles();t++) {
+    for (unsigned t=0;t<this->p_topology->getNbTriangles();t++) {
         TriangleInfo & tinfo = m_triangle_info[t];
 
-        const TTriangle tri = this->getTopology()->getTriangle(t);
+        const TTriangle tri = this->p_topology->getTriangle(t);
 
         //Compute Bezier Positions
         Vector3 p0 = x[tri[0]];
@@ -230,9 +241,9 @@ void TriangleGeometry::beginStep() {
         tinfo.v0 = p1 - p0;
         tinfo.v1 = p2 - p0;
 
-        tinfo.d00 = tinfo.v0.dot(tinfo.v0);
-        tinfo.d01 = tinfo.v0.dot(tinfo.v1);
-        tinfo.d11 = tinfo.v1.dot(tinfo.v1);
+        tinfo.d00 = dot(tinfo.v0,tinfo.v0);
+        tinfo.d01 = dot(tinfo.v0,tinfo.v1);
+        tinfo.d11 = dot(tinfo.v1,tinfo.v1);
 
         tinfo.invDenom = 1.0 / (tinfo.d00 * tinfo.d11 - tinfo.d01 * tinfo.d01);
 
@@ -247,7 +258,7 @@ void TriangleGeometry::beginStep() {
 
     m_pointNormal.resize(x.size());
     for (unsigned p=0;p<x.size();p++) {
-        const Topology::TrianglesAroundVertex & tav = this->getTopology()->getTrianglesAroundVertex(p);
+        const Topology::TrianglesAroundVertex & tav = this->p_topology->getTrianglesAroundVertex(p);
         m_pointNormal[p] = Vector3(0,0,0);
         for (unsigned t=0;t<tav.size();t++) {
             m_pointNormal[p] += this->m_triangle_info[tav[t]].tn;

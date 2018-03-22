@@ -1,6 +1,6 @@
 #include <algorithm/CollisionDetectionAlgorithm.inl>
 
-namespace graFE {
+namespace collisionAlgorithm {
 
 DECLARE_CLASS(CollisionDetectionAlgorithm)
 
