@@ -9,35 +9,25 @@ namespace collisionAlgorithm {
 /******************************PROXIMITY***********************************/
 /**************************************************************************/
 
-EdgeProximity::EdgeProximity(EdgeElement * geo,double f1,double f2) {
-    m_elmt = geo;
+EdgeProximity::EdgeProximity(EdgeElement * elmt,double f1,double f2) : ConstraintProximity(elmt) {
     m_fact[0] = f1;
     m_fact[1] = f2;
 }
 
-Vector3 EdgeProximity::getPosition() const {
-    const std::vector<Vector3> & pos = m_elmt->m_geo->getPos();
-    return pos[m_elmt->m_pid[0]] * m_fact[0] + pos[m_elmt->m_pid[1]] * m_fact[1];
-}
-
-Vector3 EdgeProximity::getFreePosition() const {
-    const std::vector<Vector3> & pos = m_elmt->m_geo->getFreePos();
-    return pos[m_elmt->m_pid[0]] * m_fact[0] + pos[m_elmt->m_pid[1]] * m_fact[1];
+Vector3 EdgeProximity::getPosition(TVecId v) const {
+    const std::vector<Vector3> & pos = element()->geometry()->getPos(v);
+    return pos[element()->m_pid[0]] * m_fact[0] + pos[element()->m_pid[1]] * m_fact[1];
 }
 
 Vector3 EdgeProximity::getNormal() const {
     return Vector3(1,0,0);
 }
 
-ConstraintElement * EdgeProximity::getElement() {
-    return m_elmt;
-}
-
 std::map<unsigned,Vector3> EdgeProximity::getContribution(const Vector3 & N) {
     std::map<unsigned,Vector3> res;
 
-    res[m_elmt->m_pid[0]] = N * 1.0/2.0;
-    res[m_elmt->m_pid[1]] = N * 1.0/2.0;
+    res[element()->m_pid[0]] = N * 1.0/2.0;
+    res[element()->m_pid[1]] = N * 1.0/2.0;
 
     return res;
 }
@@ -46,11 +36,10 @@ std::map<unsigned,Vector3> EdgeProximity::getContribution(const Vector3 & N) {
 /******************************ELEMENT*************************************/
 /**************************************************************************/
 
-EdgeElement::EdgeElement(EdgeGeometry * geo,unsigned eid) {
-    m_geo = geo;
+EdgeElement::EdgeElement(EdgeGeometry * geo,unsigned eid) : ConstraintElement(geo) {
     m_eid = eid;
 
-    const std::vector<TEdge> & edges = m_geo->p_topology->getEdges();
+    const std::vector<TEdge> & edges = geometry()->p_topology->getEdges();
 
     m_pid[0] = edges[eid][0];
     m_pid[1] = edges[eid][1];
@@ -70,7 +59,7 @@ unsigned EdgeElement::getNbControlPoints() {
 ConstraintProximityPtr EdgeElement::project(Vector3 P) {
     double fact_u,fact_v;
 
-    const std::vector<Vector3> & pos = m_geo->getPos();
+    const std::vector<Vector3> & pos = geometry()->getPos(TVecId::position);
 
     Vector3 P1 = pos[m_pid[0]];
     Vector3 P2 = pos[m_pid[1]];
@@ -97,7 +86,9 @@ void EdgeElement::draw(const std::vector<Vector3> & X) {
 /******************************GEOMETRY************************************/
 /**************************************************************************/
 
-void EdgeGeometry::createElements() {
+void EdgeGeometry::prepareDetection() {
+    if (! m_elements.empty()) return;
+
     for (unsigned i=0;i<p_topology->getEdges().size();i++) {
         m_elements.push_back(std::make_shared<EdgeElement>(this,i));
     }

@@ -13,21 +13,29 @@ class BaseGeometry;
 class ConstraintProximity {
 public :
 
-    virtual Vector3 getPosition() const = 0;
+    ConstraintProximity(ConstraintElement * elmt) : m_element(elmt) {}
 
-    virtual Vector3 getFreePosition() const = 0;
+    virtual Vector3 getPosition(TVecId v = TVecId::position) const = 0;
 
     virtual Vector3 getNormal() const = 0;
 
     virtual std::map<unsigned,Vector3> getContribution(const Vector3 & N) = 0;
 
-    virtual ConstraintElement * getElement() = 0;
+    inline ConstraintElement * element() const {
+        return (ConstraintElement*) m_element;
+    }
+
+protected:
+    ConstraintElement * m_element;
 };
 
 typedef std::shared_ptr<ConstraintProximity> ConstraintProximityPtr;
 
 class ConstraintElement {
+    friend class ConstraintProximity;
 public:
+
+    ConstraintElement(BaseGeometry * geo) : m_geometry(geo) {}
 
     //this function returns a vector with all the control points of the element
     virtual ConstraintProximityPtr getControlPoint(const int i) = 0;
@@ -39,6 +47,14 @@ public:
     virtual ConstraintProximityPtr project(Vector3 P) = 0;
 
     virtual void draw(const std::vector<Vector3> & pos) = 0;
+
+    template<class T = BaseGeometry>
+    T * geometry() const {
+        return (T*) m_geometry;
+    }
+
+protected:
+    BaseGeometry * m_geometry;
 };
 
 typedef std::shared_ptr<ConstraintElement> ConstraintElementPtr;
@@ -57,7 +73,6 @@ public:
 
     void init() {
         m_elements.clear();
-        createElements();
     }
 
     void beginStep() {
@@ -70,8 +85,6 @@ public:
     void endStep() {
         m_dirty = true;
     }
-
-    virtual void createElements() = 0;
 
     unsigned getNbElements() {
         beginStep();
@@ -86,12 +99,8 @@ public:
         return m_elements[i];
     }
 
-    const std::vector<Vector3> & getPos() {
-        return p_topology->p_state->get(TVecId::position);
-    }
-
-    const std::vector<Vector3> & getFreePos() {
-        return p_topology->p_state->get(TVecId::freePosition);
+    const std::vector<Vector3> & getPos(TVecId v) {
+        return p_topology->p_state->get(v);
     }
 
     virtual void prepareDetection() {}

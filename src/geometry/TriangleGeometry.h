@@ -34,8 +34,6 @@ class TriangleGeometry : public BaseGeometry {
 
 public:
 
-    void createElements();
-
     void prepareDetection();
 
     typedef struct {
@@ -71,30 +69,31 @@ public:
 
     void draw(const std::vector<Vector3> & X);
 
+    inline TriangleGeometry * geometry() const {
+        return (TriangleGeometry*) m_geometry;
+    }
+
 protected:
     unsigned m_pid[3];
     unsigned m_eid;
-    TriangleGeometry * m_geo;
 };
 
 class TriangleProximity : public ConstraintProximity {
 public :
     TriangleProximity(TriangleElement *geo,double f1,double f2,double f3);
 
-    Vector3 getPosition() const;
-
-    Vector3 getFreePosition() const;
+    Vector3 getPosition(TVecId v) const;
 
     Vector3 getNormal() const;
 
-    ConstraintElement * getElement();
-
     std::map<unsigned,Vector3> getContribution(const Vector3 & N);
 
-protected:
-    TriangleElement * m_elmt;
-    double m_fact[3];
+    inline TriangleElement * element() const {
+        return (TriangleElement*) m_element;
+    }
 
+protected:
+    double m_fact[3];
 };
 
 }

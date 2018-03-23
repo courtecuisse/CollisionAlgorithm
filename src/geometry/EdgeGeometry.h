@@ -30,10 +30,8 @@ namespace collisionAlgorithm {
 
 class EdgeGeometry : public BaseGeometry {
     friend class EdgeElement;
-
 public:
-
-    void createElements();
+    void prepareDetection();
 };
 
 class EdgeElement : public ConstraintElement {
@@ -55,25 +53,23 @@ public:
 protected:
     unsigned m_pid[2];
     unsigned m_eid;
-    EdgeGeometry * m_geo;
 };
 
 class EdgeProximity : public ConstraintProximity {
 public :
     EdgeProximity(EdgeElement *geo,double f1,double f2);
 
-    Vector3 getPosition() const;
-
-    Vector3 getFreePosition() const;
+    Vector3 getPosition(TVecId v) const;
 
     Vector3 getNormal() const;
 
-    ConstraintElement * getElement();
-
     std::map<unsigned,Vector3> getContribution(const Vector3 & N);
 
+    inline EdgeElement * element() const {
+        return (EdgeElement*) m_element;
+    }
+
 protected:
-    EdgeElement * m_elmt;
     double m_fact[2];
 };
 

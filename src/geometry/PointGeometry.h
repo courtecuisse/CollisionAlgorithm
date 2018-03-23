@@ -8,7 +8,7 @@ class PointGeometry : public BaseGeometry {
     friend class PointElement;
 
 public:
-    void createElements();
+    void prepareDetection();
 
 };
 
@@ -29,25 +29,21 @@ public:
 
 protected:
     unsigned m_pid;
-    PointGeometry * m_geo;
 };
 
 class PointProximity : public ConstraintProximity {
 public :
     PointProximity(PointElement *geo);
 
-    Vector3 getPosition() const;
-
-    Vector3 getFreePosition() const;
+    Vector3 getPosition(TVecId v) const;
 
     Vector3 getNormal() const;
 
-    ConstraintElement * getElement();
-
     std::map<unsigned,Vector3> getContribution(const Vector3 & N);
 
-protected:
-    PointElement * m_elmt;
+    inline PointElement * element() const {
+        return (PointElement*) m_element;
+    }
 };
 
 

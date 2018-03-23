@@ -9,45 +9,32 @@ namespace collisionAlgorithm {
 /******************************PROXIMITY***********************************/
 /**************************************************************************/
 
-TriangleProximity::TriangleProximity(TriangleElement * geo,double f1,double f2,double f3) {
-    m_elmt = geo;
+TriangleProximity::TriangleProximity(TriangleElement * elmt,double f1,double f2,double f3) : ConstraintProximity (elmt) {
     m_fact[0] = f1;
     m_fact[1] = f2;
     m_fact[2] = f3;
 }
 
-Vector3 TriangleProximity::getPosition() const {
-    const std::vector<Vector3> & pos = m_elmt->m_geo->getPos();
-    return pos[m_elmt->m_pid[0]] * m_fact[0] +
-           pos[m_elmt->m_pid[1]] * m_fact[1] +
-           pos[m_elmt->m_pid[2]] * m_fact[2];
-}
-
-Vector3 TriangleProximity::getFreePosition() const {
-    const std::vector<Vector3> & pos = m_elmt->m_geo->getFreePos();
-
-    return pos[m_elmt->m_pid[0]] * m_fact[0] +
-           pos[m_elmt->m_pid[1]] * m_fact[1] +
-           pos[m_elmt->m_pid[2]] * m_fact[2];
+Vector3 TriangleProximity::getPosition(TVecId v) const {
+    const std::vector<Vector3> & pos = element()->geometry()->getPos(v);
+    return pos[element()->m_pid[0]] * m_fact[0] +
+           pos[element()->m_pid[1]] * m_fact[1] +
+           pos[element()->m_pid[2]] * m_fact[2];
 }
 
 Vector3 TriangleProximity::getNormal() const {
-    const std::vector<Vector3> & pos = m_elmt->m_geo->m_pointNormal;
-    return pos[m_elmt->m_pid[0]] * m_fact[0] +
-           pos[m_elmt->m_pid[1]] * m_fact[1] +
-           pos[m_elmt->m_pid[2]] * m_fact[2];
-}
-
-ConstraintElement * TriangleProximity::getElement() {
-    return m_elmt;
+    const std::vector<Vector3> & pos = element()->geometry()->m_pointNormal;
+    return pos[element()->m_pid[0]] * m_fact[0] +
+           pos[element()->m_pid[1]] * m_fact[1] +
+           pos[element()->m_pid[2]] * m_fact[2];
 }
 
 std::map<unsigned,Vector3> TriangleProximity::getContribution(const Vector3 & N) {
     std::map<unsigned,Vector3> res;
 
-    res[m_elmt->m_pid[0]] = N * 1.0/3.0;
-    res[m_elmt->m_pid[1]] = N * 1.0/3.0;
-    res[m_elmt->m_pid[2]] = N * 1.0/3.0;
+    res[element()->m_pid[0]] = N * 1.0/3.0;
+    res[element()->m_pid[1]] = N * 1.0/3.0;
+    res[element()->m_pid[2]] = N * 1.0/3.0;
 
     return res;
 }
@@ -56,11 +43,10 @@ std::map<unsigned,Vector3> TriangleProximity::getContribution(const Vector3 & N)
 /******************************ELEMENT*************************************/
 /**************************************************************************/
 
-TriangleElement::TriangleElement(TriangleGeometry * geo,unsigned eid) {
-    m_geo = geo;
+TriangleElement::TriangleElement(TriangleGeometry * geo,unsigned eid) : ConstraintElement(geo) {
     m_eid = eid;
 
-    const std::vector<TTriangle> & triangles = m_geo->p_topology->getTriangles();
+    const std::vector<TTriangle> & triangles = geometry()->p_topology->getTriangles();
 
     m_pid[0] = triangles[eid][0];
     m_pid[1] = triangles[eid][1];
@@ -95,7 +81,7 @@ void TriangleElement::computeBaryCoords(const Vector3 & proj_P,const TriangleGeo
 //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 
 ConstraintProximityPtr TriangleElement::project(Vector3 P) {
-    const std::vector<Vector3> & pos = m_geo->getPos();
+    const std::vector<Vector3> & pos = geometry()->getPos(TVecId::position);
 
     Vector3 P0 = pos[m_pid[0]];
     Vector3 P1 = pos[m_pid[1]];
@@ -103,7 +89,7 @@ ConstraintProximityPtr TriangleElement::project(Vector3 P) {
 
     Vector3 x1x2 = P - P0;
 
-    const TriangleGeometry::TriangleInfo & tinfo = m_geo->m_triangle_info[m_eid];
+    const TriangleGeometry::TriangleInfo & tinfo = geometry()->m_triangle_info[m_eid];
 
     //corrdinate on the plane
     double c0 = dot(x1x2,tinfo.ax1);
@@ -214,17 +200,10 @@ void TriangleElement::draw(const std::vector<Vector3> & X) {
 /******************************GEOMETRY************************************/
 /**************************************************************************/
 
-void TriangleGeometry::createElements() {
-    for (unsigned i=0;i<p_topology->getNbTriangles();i++) {
-        m_elements.push_back(std::make_shared<TriangleElement>(this,i));
-    }
+void TriangleGeometry::prepareDetection() {
+    const std::vector<Vector3> & x = getPos(TVecId::position);
 
     m_pointNormal.resize(p_topology->getNbPoints());
-
-}
-
-void TriangleGeometry::prepareDetection() {
-    const std::vector<Vector3> & x = getPos();
 
     m_triangle_info.resize(p_topology->getTriangles().size());
 
@@ -264,6 +243,12 @@ void TriangleGeometry::prepareDetection() {
             m_pointNormal[p] += this->m_triangle_info[tav[t]].tn;
         }
         m_pointNormal[p].normalize();
+    }
+
+    if (!m_elements.empty()) return;
+
+    for (unsigned i=0;i<p_topology->getNbTriangles();i++) {
+        m_elements.push_back(std::make_shared<TriangleElement>(this,i));
     }
 }
 

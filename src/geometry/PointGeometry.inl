@@ -9,30 +9,20 @@ namespace collisionAlgorithm {
 /******************************PROXIMITY***********************************/
 /**************************************************************************/
 
-PointProximity::PointProximity(PointElement * geo) {
-    m_elmt = geo;
-}
+PointProximity::PointProximity(PointElement * elmt) : ConstraintProximity(elmt) {}
 
-Vector3 PointProximity::getPosition() const {
-    return m_elmt->m_geo->getPos()[m_elmt->m_pid];
-}
-
-Vector3 PointProximity::getFreePosition() const {
-    return m_elmt->m_geo->getFreePos()[m_elmt->m_pid];
+Vector3 PointProximity::getPosition(TVecId v) const {
+    return element()->geometry()->getPos(TVecId::position)[element()->m_pid];
 }
 
 Vector3 PointProximity::getNormal() const {
     return Vector3(1,0,0);
 }
 
-ConstraintElement * PointProximity::getElement() {
-    return m_elmt;
-}
-
 std::map<unsigned,Vector3> PointProximity::getContribution(const Vector3 & N) {
     std::map<unsigned,Vector3> res;
 
-    res[m_elmt->m_pid] = N;
+    res[element()->m_pid] = N;
 
     return res;
 }
@@ -41,9 +31,8 @@ std::map<unsigned,Vector3> PointProximity::getContribution(const Vector3 & N) {
 /******************************ELEMENT*************************************/
 /**************************************************************************/
 
-PointElement::PointElement(PointGeometry * geo,unsigned pid) {
+PointElement::PointElement(PointGeometry * geo,unsigned pid) : ConstraintElement(geo) {
     m_pid = pid;
-    m_geo = geo;
 }
 
 ConstraintProximityPtr PointElement::getControlPoint(const int cid) {
@@ -72,8 +61,10 @@ void PointElement::draw(const std::vector<Vector3> & X) {
 /******************************GEOMETRY************************************/
 /**************************************************************************/
 
-void PointGeometry::createElements() {
-    for (unsigned i=0;i<getPos().size();i++) {
+void PointGeometry::prepareDetection() {
+    if (! m_elements.empty()) return;
+
+    for (unsigned i=0;i<p_topology->getNbPoints();i++) {
         m_elements.push_back(std::make_shared<PointElement>(this,i));
     }
 }
