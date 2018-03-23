@@ -51,16 +51,30 @@ public:
 
     BaseGeometry()
     : p_topology(this)
-    , p_type(this,"Any") {}
+    , p_type(this,"Any") {
+        m_dirty = true;
+    }
 
     void init() {
         m_elements.clear();
         createElements();
     }
 
+    void beginStep() {
+        if (m_dirty) {
+            m_dirty = false;
+            prepareDetection();
+        }
+    }
+
+    void endStep() {
+        m_dirty = true;
+    }
+
     virtual void createElements() = 0;
 
-    virtual unsigned getNbElements() const {
+    unsigned getNbElements() {
+        beginStep();
         return m_elements.size();
     }
 
@@ -86,6 +100,7 @@ public:
 
 protected:
     std::vector<ConstraintElementPtr> m_elements;
+    bool m_dirty;
 
 };
 

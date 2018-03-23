@@ -223,7 +223,7 @@ void TriangleGeometry::createElements() {
 
 }
 
-void TriangleGeometry::beginStep() {
+void TriangleGeometry::prepareDetection() {
     const std::vector<Vector3> & x = getPos();
 
     m_triangle_info.resize(p_topology->getTriangles().size());

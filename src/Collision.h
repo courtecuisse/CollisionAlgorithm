@@ -13,13 +13,22 @@ public :
     PortIn<BaseObject> p_type;
 
     Collision()
-    : p_type(this,"Any") {}
+    : p_type(this,"Any") {
+        m_dirty = true;
+    }
 
     virtual void processAlgorithm() = 0;
 
     void beginStep() {
-        m_pairDetection.clear();
-//        processAlgorithm();
+        if (m_dirty) {
+            m_dirty = false;
+            m_pairDetection.clear();
+            processAlgorithm();
+        }
+    }
+
+    void endStep() {
+        m_dirty = true;
     }
 
     static std::string getObjectType() {
@@ -40,11 +49,13 @@ public :
     }
 
     PairProximityVector & getCollisionPairs() {
+        beginStep();
         return m_pairDetection;
     }
 
 protected:
     PairProximityVector m_pairDetection;
+    bool m_dirty;
 };
 
 }

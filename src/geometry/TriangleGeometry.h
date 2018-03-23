@@ -36,7 +36,7 @@ public:
 
     void createElements();
 
-    void beginStep();
+    void prepareDetection();
 
     typedef struct {
         Vector3 v0,v1;
