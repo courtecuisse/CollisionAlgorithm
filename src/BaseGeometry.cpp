@@ -170,8 +170,8 @@ namespace collisionAlgorithm {
 //} // namespace component
 
 
-void BaseGeometry::draw(DisplayFlag vparams) {
-    if (! vparams.isActive(DisplayFlag::COLLISION)) return;
+void BaseGeometry::draw(const VisualParams *vparams) {
+    if (! vparams->displayFlags().getShowCollisionModels()) return;
 
     const std::vector<Vector3> & X = getPos();
 

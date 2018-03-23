@@ -61,8 +61,8 @@ void CollisionForceField::addToMatrix(BaseMatrix */*M*/) {
 //    M->add(d_indice2.getValue()*Vector3::size()+2,d_indice1.getValue()*Vector3::size()+2,off1,off2,-m_force[2]);
 }
 
-void CollisionForceField::draw(DisplayFlag flag) {
-    if (!flag.isActive(DisplayFlag::FORCEFIELD)) return;
+void CollisionForceField::draw(const VisualParams *flag) {
+    if (!flag->displayFlags().getShowForceFields()) return;
 //    if (d_indice1.getValue() == -1) return;
 //    if (d_indice2.getValue() == -1) return;
 

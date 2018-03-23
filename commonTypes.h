@@ -13,6 +13,7 @@
 #include <sofa/simulation/Simulation.h>
 #include <SofaBaseTopology/TriangleSetTopologyContainer.h>
 #include <sofa/core/ObjectFactory.h>
+#include <sofa/core/visual/VisualParams.h>
 
 namespace collisionAlgorithm {
 
@@ -20,6 +21,7 @@ typedef sofa::defaulttype::Vector3 Vector3;
 typedef sofa::core::topology::BaseMeshTopology::Triangle TTriangle;
 typedef sofa::core::topology::BaseMeshTopology::Edge TEdge;
 typedef sofa::core::objectmodel::BaseObject BaseObject;
+typedef sofa::core::visual::VisualParams VisualParams;
 
 class BaseMatrix {
 
@@ -88,24 +90,6 @@ public:
     }
 
     BaseObject * m_container;
-};
-
-class DisplayFlag {
-public:
-    enum  DisplayMode {
-        STATS,
-        VISUAL,
-        STATE,
-        FORCEFIELD,
-        MAPPING,
-        COLLISION,
-        WIREFRAME,
-        Nflag
-    };
-
-    bool isActive(DisplayMode /*m*/) {
-        return true;
-    }
 };
 
 class VecID {

@@ -1,9 +1,9 @@
 #pragma once
 
+#include <commonTypes.h>
 #include <memory>
 #include <map>
 #include <vector>
-#include <commonTypes.h>
 
 namespace collisionAlgorithm {
 
@@ -82,7 +82,7 @@ public:
 
     virtual void prepareDetection() {}
 
-    void draw(DisplayFlag vparams);
+    void draw(const VisualParams * vparams);
 
 protected:
     std::vector<ConstraintElementPtr> m_elements;

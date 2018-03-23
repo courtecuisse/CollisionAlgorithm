@@ -26,8 +26,8 @@ public :
         return std::string("Collision");
     }
 
-    void draw(DisplayFlag vparams) {
-        if (! vparams.isActive(DisplayFlag::COLLISION)) return;
+    void draw(const VisualParams * vparams) {
+        if (! vparams->displayFlags().getShowCollisionModels()) return;
 
         glDisable(GL_LIGHTING);
         glColor4f(0,1,0,1);

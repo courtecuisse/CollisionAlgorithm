@@ -18,7 +18,7 @@ public:
 
     void addToMatrix(BaseMatrix *M);
 
-    void draw(DisplayFlag);
+    void draw(const VisualParams * );
 
 };
 
