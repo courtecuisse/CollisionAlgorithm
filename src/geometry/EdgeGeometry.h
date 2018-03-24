@@ -32,6 +32,10 @@ class EdgeGeometry : public BaseGeometry {
     friend class EdgeElement;
 public:
     void prepareDetection();
+
+    void init();
+
+    void draw(const VisualParams *vparams);
 };
 
 class EdgeElement : public ConstraintElement {
@@ -45,8 +49,6 @@ public:
     ConstraintProximityPtr getControlPoint(const int i);
 
     ConstraintProximityPtr project(Vector3 /*P*/);
-
-    void draw(const std::vector<Vector3> & X);
 
 protected:
     unsigned m_pid[2];

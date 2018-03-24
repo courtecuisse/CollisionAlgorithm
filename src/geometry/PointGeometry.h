@@ -10,10 +10,15 @@ class PointGeometry : public BaseGeometry {
 public:
     void prepareDetection();
 
+    void init();
+
+    void draw(const VisualParams *vparams);
+
 };
 
 class PointElement : public ConstraintElement {
     friend class PointProximity;
+    friend class PointGeometry;
 
 public:
 
@@ -22,8 +27,6 @@ public:
     ConstraintProximityPtr getControlPoint(const int i);
 
     ConstraintProximityPtr project(Vector3 /*P*/);
-
-    void draw(const std::vector<Vector3> & X);
 
 protected:
     unsigned m_pid;

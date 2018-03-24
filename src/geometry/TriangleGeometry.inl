@@ -134,15 +134,6 @@ ConstraintProximityPtr TriangleElement::project(Vector3 P) {
     return std::make_shared<TriangleProximity>(this,fact_u,fact_v,fact_w);
 }
 
-void TriangleElement::draw(const std::vector<Vector3> & X) {
-    glEnable(GL_CULL_FACE);
-    glBegin(GL_TRIANGLES);
-        glVertex3dv(X[m_pid[0]].data());
-        glVertex3dv(X[m_pid[1]].data());
-        glVertex3dv(X[m_pid[2]].data());
-    glEnd();
-}
-
 //void TriangleGeometry::drawTriangle(const core::visual::VisualParams * vparams,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C) {
 //    double delta = 0.05;
 //    glColor4f(d_color.getValue()[0],d_color.getValue()[1]-delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(A);
@@ -240,12 +231,32 @@ void TriangleGeometry::prepareDetection() {
         }
         m_pointNormal[p].normalize();
     }
+}
 
-    if (!m_elements.empty()) return;
+void TriangleGeometry::init() {
+    m_elements.clear();
 
     for (unsigned i=0;i<p_topology->getNbTriangles();i++) {
         m_elements.push_back(std::make_shared<TriangleElement>(this,i));
     }
+}
+
+void TriangleGeometry::draw(const VisualParams *vparams) {
+    if (! vparams->displayFlags().getShowCollisionModels()) return;
+
+    const std::vector<Vector3> & X = getPos(TVecId::position);
+
+    glDisable(GL_LIGHTING);
+    glColor4f(1,0,1,1);
+    glEnable(GL_CULL_FACE);
+    glBegin(GL_TRIANGLES);
+    for (unsigned i=0;i<m_elements.size();i++) {
+        std::shared_ptr<TriangleElement> elmt = std::dynamic_pointer_cast<TriangleElement>(m_elements[i]);
+        glVertex3dv(X[elmt->m_pid[0]].data());
+        glVertex3dv(X[elmt->m_pid[1]].data());
+        glVertex3dv(X[elmt->m_pid[2]].data());
+    }
+    glEnd();
 }
 
 }

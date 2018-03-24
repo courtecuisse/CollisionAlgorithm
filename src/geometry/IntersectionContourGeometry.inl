@@ -47,13 +47,6 @@ ConstraintProximityPtr IntersectionContourElement::getControlPoint(const int /*i
     return std::make_shared<IntersectionContourProximity>(this);
 }
 
-void IntersectionContourElement::draw(const std::vector<Vector3> & X) {
-    glBegin(GL_POINTS);
-    glPointSize(20);
-    glVertex3dv((X[m_pid[0]] * m_fact[0] + X[m_pid[1]] * m_fact[1]).data());
-    glEnd();
-}
-
 /**************************************************************************/
 /******************************GEOMETRY************************************/
 /**************************************************************************/
@@ -89,46 +82,53 @@ void IntersectionContourGeometry::prepareDetection() {
     }
 }
 
-//void IntersectionContourGeometry::draw(const VisualParams * vparams) {
-//    if (! vparams->displayFlags().getShowCollisionModels()) return;
+void IntersectionContourGeometry::draw(const VisualParams * vparams) {
+    if (! vparams->displayFlags().getShowCollisionModels()) return;
 
-//    Vector3 P = d_planePos.getValue();
+    Vector3 P = d_planePos.getValue();
 
-//    Vector3 T(1,0,0);
-//    Vector3 Z = d_planeNormal.getValue();
-//    Z.normalize();
+    Vector3 T(1,0,0);
+    Vector3 Z = d_planeNormal.getValue();
+    Z.normalize();
 
-//    if (fabs(dot(T,Z))>0.9999) T = Vector3(0,1,0);
+    if (fabs(dot(T,Z))>0.9999) T = Vector3(0,1,0);
 
-//    Vector3 X = cross(T,Z);
-//    Vector3 Y = cross(X,Z);
+    Vector3 X = cross(T,Z);
+    Vector3 Y = cross(X,Z);
 
-////    std::cout << "P=" << P << std::endl;
-////    std::cout << "X=" << X << std::endl;
-////    std::cout << "Y=" << Y << std::endl;
+//    std::cout << "P=" << P << std::endl;
+//    std::cout << "X=" << X << std::endl;
+//    std::cout << "Y=" << Y << std::endl;
 
-//    BoundingBox bbox;
-//    p_topology->p_state->computeBBox(bbox);
-//    Vector3 C = (Vector3(bbox.min()) + Vector3(bbox.max())) * 0.5;
-//    C -= Z*dot(C-P,Z);
+    BoundingBox bbox;
+    p_topology->p_state->computeBBox(bbox);
+    Vector3 C = (Vector3(bbox.min()) + Vector3(bbox.max())) * 0.5;
+    C -= Z*dot(C-P,Z);
 
-//    double norm = bbox.norm();
+    double norm = bbox.norm();
 
-//    X = X * norm * 0.5;
-//    Y = Y * norm * 0.5;
-////    std::cout << "BBOX = " << bbox << std::endl;
+    X = X * norm * 0.5;
+    Y = Y * norm * 0.5;
+//    std::cout << "BBOX = " << bbox << std::endl;
 
-//    glBegin(GL_LINE_LOOP);
-//        glVertex3dv((C-X-Y).data());
-//        glVertex3dv((C+X-Y).data());
-//        glVertex3dv((C+X+Y).data());
-//        glVertex3dv((C-X+Y).data());
-//    glEnd();
+    glBegin(GL_LINE_LOOP);
+        glVertex3dv((C-X-Y).data());
+        glVertex3dv((C+X-Y).data());
+        glVertex3dv((C+X+Y).data());
+        glVertex3dv((C-X+Y).data());
+    glEnd();
 
-//    const std::vector<Vector3> & pos = getPos(TVecId::position);
-//    for (unsigned i=0;i<m_elements.size();i++) {
-//        m_elements[i]->draw(pos);
-//    }
-//}
+    const std::vector<Vector3> & pos = getPos(TVecId::position);
+
+    glBegin(GL_POINTS);
+    glPointSize(20);
+    for (unsigned i=0;i<m_elements.size();i++) {
+        std::shared_ptr<IntersectionContourElement> elmt = std::dynamic_pointer_cast<IntersectionContourElement>(m_elements[i]);
+        Vector3 p1 = pos[elmt->m_pid[0]] * elmt->m_fact[0];
+        Vector3 p2 = pos[elmt->m_pid[1]] * elmt->m_fact[1];
+        glVertex3dv((p1+p2).data());
+    }
+    glEnd();
+}
 
 }

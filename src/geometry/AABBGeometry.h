@@ -4,12 +4,13 @@
 
 namespace collisionAlgorithm {
 
+
 class AABBGeometry : public BaseGeometry {
     friend class AABBElement;
 
 public:
     Data<TVec3i> d_nbox;
-    PortOut<BaseGeometry,REQUIRED> d_geometry;
+    PortOut<BaseGeometry,REQUIRED> p_geometry;
 
     AABBGeometry();
 
@@ -19,15 +20,25 @@ public:
 
     void draw(const VisualParams * vparams);
 
-    virtual unsigned getNbElements() const;
-
-    virtual ConstraintElementPtr getElement(unsigned eid) const;
-
 protected:
     Vector3 m_Bmin,m_Bmax,m_cellSize;
     std::vector<std::vector<std::vector<std::vector<unsigned> > > >  m_indexedElement;
-    BaseGeometry * m_geo;
+};
 
+class AABBElement : public ConstraintElement {
+public:
+    AABBElement(AABBGeometry *geo);
+
+    ConstraintProximityPtr getControlPoint(const int i);
+
+    ConstraintProximityPtr project(Vector3 /*P*/);
+
+    inline AABBGeometry * geometry() const {
+        return (AABBGeometry*) m_geometry;
+    }
+
+private:
+    void fillElementSet(TVec3i cbox,int d, std::set<int> & selectElements);
 };
 
 }

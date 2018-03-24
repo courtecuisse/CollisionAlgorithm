@@ -1,8 +1,8 @@
-//#include <geometry/AABBGeometry.inl>
+#include <geometry/AABBGeometry.inl>
 
-//namespace collisionAlgorithm {
+namespace collisionAlgorithm {
 
-//DECLARE_CLASS(AABBGeometry)
+DECLARE_CLASS(AABBGeometry)
 
-//}
+}
 

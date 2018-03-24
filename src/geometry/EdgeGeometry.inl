@@ -71,23 +71,34 @@ ConstraintProximityPtr EdgeElement::project(Vector3 P) {
     return std::make_shared<EdgeProximity>(this,fact_u,fact_v);
 }
 
-void EdgeElement::draw(const std::vector<Vector3> & X) {
-    glBegin(GL_LINES);
-        glVertex3dv(X[m_pid[0]].data());
-        glVertex3dv(X[m_pid[1]].data());
-    glEnd();
-}
-
 /**************************************************************************/
 /******************************GEOMETRY************************************/
 /**************************************************************************/
 
-void EdgeGeometry::prepareDetection() {
-    if (! m_elements.empty()) return;
+void EdgeGeometry::init() {
+    m_elements.clear();
 
     for (unsigned i=0;i<p_topology->getNbEdges();i++) {
         m_elements.push_back(std::make_shared<EdgeElement>(this,i));
     }
+}
+
+void EdgeGeometry::prepareDetection() {}
+
+void EdgeGeometry::draw(const VisualParams *vparams) {
+    if (! vparams->displayFlags().getShowCollisionModels()) return;
+
+    const std::vector<Vector3> & X = getPos(TVecId::position);
+
+    glDisable(GL_LIGHTING);
+    glColor4f(1,0,1,1);
+    glBegin(GL_LINES);
+    for (unsigned i=0;i<m_elements.size();i++) {
+        std::shared_ptr<EdgeElement> elmt = std::dynamic_pointer_cast<EdgeElement>(m_elements[i]);
+        glVertex3dv(X[elmt->m_pid[0]].data());
+        glVertex3dv(X[elmt->m_pid[1]].data());
+    }
+    glEnd();
 }
 
 }

@@ -11,11 +11,12 @@ CollisionDetectionAlgorithm::CollisionDetectionAlgorithm()
 {}
 
 PairProximity  CollisionDetectionAlgorithm::getClosestPoint(ConstraintElementPtr efrom) {
+    PairProximity min_pair;
     double min_dist = std::numeric_limits<double>::max();
 
-    ConstraintProximityPtr pfrom = efrom->getControlPoint(0);
+    ConstraintProximityPtr pfrom = efrom->getControlPoint(-1);
+    if (pfrom == NULL) return min_pair;
     Vector3 P = pfrom->getPosition();
-    PairProximity min_pair;
 
     for (unsigned i=0;i<p_dest->getNbElements();i++) {
         ConstraintElementPtr edest = p_dest->getElement(i);

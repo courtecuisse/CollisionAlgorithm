@@ -34,7 +34,11 @@ class TriangleGeometry : public BaseGeometry {
 
 public:
 
+    void init();
+
     void prepareDetection();
+
+    void draw(const VisualParams *vparams);
 
     typedef struct {
         Vector3 v0,v1;
@@ -64,8 +68,6 @@ public:
     void computeBaryCoords(const Vector3 & proj_P,const TriangleGeometry::TriangleInfo & tinfo, const Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const;
 
     ConstraintProximityPtr project(Vector3 /*P*/);
-
-    void draw(const std::vector<Vector3> & X);
 
     inline TriangleGeometry * geometry() const {
         return (TriangleGeometry*) m_geometry;

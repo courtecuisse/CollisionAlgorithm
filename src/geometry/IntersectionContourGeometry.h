@@ -13,7 +13,7 @@ public:
 
         void prepareDetection();
 
-//        void draw(const VisualParams * vparams);
+        void draw(const VisualParams * vparams);
 };
 
 
@@ -26,8 +26,6 @@ public:
     ConstraintProximityPtr getControlPoint(const int i);
 
     ConstraintProximityPtr project(Vector3 /*P*/);
-
-    void draw(const std::vector<Vector3> & X);
 
 protected:
     unsigned m_pid[2];

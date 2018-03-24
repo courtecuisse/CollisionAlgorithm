@@ -44,25 +44,34 @@ ConstraintProximityPtr PointElement::project(Vector3 /*P*/) {
     return getControlPoint(0);
 }
 
-void PointElement::draw(const std::vector<Vector3> & X) {
-    glBegin(GL_POINTS);
-    glPointSize(20);
-    glVertex3dv(X[m_pid].data());
-    glEnd();
-}
-
-
 /**************************************************************************/
 /******************************GEOMETRY************************************/
 /**************************************************************************/
 
-void PointGeometry::prepareDetection() {
-    if (! m_elements.empty()) return;
+void PointGeometry::init() {
+    m_elements.clear();
 
     for (unsigned i=0;i<p_topology->getNbPoints();i++) {
         m_elements.push_back(std::make_shared<PointElement>(this,i));
     }
 }
 
+void PointGeometry::prepareDetection() {}
+
+void PointGeometry::draw(const VisualParams *vparams) {
+    if (! vparams->displayFlags().getShowCollisionModels()) return;
+
+    const std::vector<Vector3> & X = getPos(TVecId::position);
+
+    glDisable(GL_LIGHTING);
+    glColor4f(1,0,1,1);
+    glBegin(GL_POINTS);
+    glPointSize(20);
+    for (unsigned i=0;i<m_elements.size();i++) {
+        std::shared_ptr<PointElement> elmt = std::dynamic_pointer_cast<PointElement>(m_elements[i]);
+        glVertex3dv(X[elmt->m_pid].data());
+    }
+    glEnd();
+}
 
 }

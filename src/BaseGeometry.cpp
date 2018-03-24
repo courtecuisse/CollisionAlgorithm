@@ -170,14 +170,6 @@ namespace collisionAlgorithm {
 //} // namespace component
 
 
-void BaseGeometry::draw(const VisualParams *vparams) {
-    if (! vparams->displayFlags().getShowCollisionModels()) return;
 
-    const std::vector<Vector3> & X = getPos(TVecId::position);
-
-    glDisable(GL_LIGHTING);
-    glColor4f(1,0,1,1);
-    for (unsigned i=0;i<m_elements.size();i++) m_elements[i]->draw(X);
-}
 
 }
