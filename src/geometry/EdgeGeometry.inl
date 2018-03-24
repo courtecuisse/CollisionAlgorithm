@@ -36,7 +36,7 @@ std::map<unsigned,Vector3> EdgeProximity::getContribution(const Vector3 & N) {
 /******************************ELEMENT*************************************/
 /**************************************************************************/
 
-EdgeElement::EdgeElement(EdgeGeometry * geo,unsigned eid) : ConstraintElement(geo) {
+EdgeElement::EdgeElement(EdgeGeometry * geo,unsigned eid) : ConstraintElement(geo,2) {
     m_eid = eid;
 
     const std::vector<TEdge> & edges = geometry()->p_topology->getEdges();
@@ -48,11 +48,7 @@ EdgeElement::EdgeElement(EdgeGeometry * geo,unsigned eid) : ConstraintElement(ge
 ConstraintProximityPtr EdgeElement::getControlPoint(const int cid) {
     if (cid == 0) return std::make_shared<EdgeProximity>(this,1,0);
     else if (cid == 1) return std::make_shared<EdgeProximity>(this,0,1);
-    return NULL;
-}
-
-unsigned EdgeElement::getNbControlPoints() {
-    return 2;
+    return std::make_shared<EdgeProximity>(this,1.0/2.0,1.0/2.0);
 }
 
 //this function project the point P on the element and return the corresponding proximity
@@ -89,7 +85,7 @@ void EdgeElement::draw(const std::vector<Vector3> & X) {
 void EdgeGeometry::prepareDetection() {
     if (! m_elements.empty()) return;
 
-    for (unsigned i=0;i<p_topology->getEdges().size();i++) {
+    for (unsigned i=0;i<p_topology->getNbEdges();i++) {
         m_elements.push_back(std::make_shared<EdgeElement>(this,i));
     }
 }

@@ -25,8 +25,6 @@ public:
 
     ConstraintProximityPtr getControlPoint(const int i);
 
-    unsigned getNbControlPoints();
-
     ConstraintProximityPtr project(Vector3 /*P*/);
 
     void draw(const std::vector<Vector3> & X);

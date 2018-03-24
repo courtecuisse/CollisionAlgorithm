@@ -31,7 +31,7 @@ std::map<unsigned,Vector3> IntersectionContourProximity::getContribution(const V
 /******************************ELEMENT*************************************/
 /**************************************************************************/
 
-IntersectionContourElement::IntersectionContourElement(IntersectionContourGeometry *geo, unsigned pid1, unsigned pid2,double f1,double f2) : ConstraintElement(geo) {
+IntersectionContourElement::IntersectionContourElement(IntersectionContourGeometry *geo, unsigned pid1, unsigned pid2,double f1,double f2) : ConstraintElement(geo,1) {
     m_pid[0] = pid1;
     m_pid[1] = pid2;
 
@@ -40,17 +40,12 @@ IntersectionContourElement::IntersectionContourElement(IntersectionContourGeomet
 }
 
 ConstraintProximityPtr IntersectionContourElement::project(Vector3 /*P*/) {
-
+    return getControlPoint(0);
 }
 
-ConstraintProximityPtr IntersectionContourElement::getControlPoint(const int i) {
-
+ConstraintProximityPtr IntersectionContourElement::getControlPoint(const int /*i*/) {
+    return std::make_shared<IntersectionContourProximity>(this);
 }
-
-unsigned IntersectionContourElement::getNbControlPoints() {
-
-}
-
 
 void IntersectionContourElement::draw(const std::vector<Vector3> & X) {
     glBegin(GL_POINTS);

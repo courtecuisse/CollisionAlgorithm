@@ -13,7 +13,7 @@ public :
     PortIn<BaseObject> p_type;
 
     Collision()
-    : p_type(this,"Any") {
+    : p_type(this,"Out") {
         m_dirty = true;
     }
 
@@ -35,7 +35,9 @@ public :
         return std::string("Collision");
     }
 
-    void draw(const VisualParams * vparams) {
+    void draw(const VisualParams * vparams) {        
+        processAlgorithm();
+
         if (! vparams->displayFlags().getShowCollisionModels()) return;
 
         glDisable(GL_LIGHTING);

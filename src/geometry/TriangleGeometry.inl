@@ -43,7 +43,7 @@ std::map<unsigned,Vector3> TriangleProximity::getContribution(const Vector3 & N)
 /******************************ELEMENT*************************************/
 /**************************************************************************/
 
-TriangleElement::TriangleElement(TriangleGeometry * geo,unsigned eid) : ConstraintElement(geo) {
+TriangleElement::TriangleElement(TriangleGeometry * geo,unsigned eid) : ConstraintElement(geo,3) {
     m_eid = eid;
 
     const std::vector<TTriangle> & triangles = geometry()->p_topology->getTriangles();
@@ -57,11 +57,7 @@ ConstraintProximityPtr TriangleElement::getControlPoint(const int cid) {
     if (cid == 0) return std::make_shared<TriangleProximity>(this,1,0,0);
     else if (cid == 1) return std::make_shared<TriangleProximity>(this,0,1,0);
     else if (cid == 2) return std::make_shared<TriangleProximity>(this,0,0,1);
-    return NULL;
-}
-
-unsigned TriangleElement::getNbControlPoints() {
-    return 3;
+    return std::make_shared<TriangleProximity>(this,1.0/3.0,1.0/3.0,1.0/3.0);
 }
 
 //proj_P must be on the plane

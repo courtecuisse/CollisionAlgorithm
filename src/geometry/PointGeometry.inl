@@ -31,17 +31,12 @@ std::map<unsigned,Vector3> PointProximity::getContribution(const Vector3 & N) {
 /******************************ELEMENT*************************************/
 /**************************************************************************/
 
-PointElement::PointElement(PointGeometry * geo,unsigned pid) : ConstraintElement(geo) {
+PointElement::PointElement(PointGeometry * geo,unsigned pid) : ConstraintElement(geo,1) {
     m_pid = pid;
 }
 
-ConstraintProximityPtr PointElement::getControlPoint(const int cid) {
-    if (cid == 0) return std::make_shared<PointProximity>(this);
-    return NULL;
-}
-
-unsigned PointElement::getNbControlPoints() {
-    return 1;
+ConstraintProximityPtr PointElement::getControlPoint(const int /*cid*/) {
+    return std::make_shared<PointProximity>(this);
 }
 
 //this function project the point P on the element and return the corresponding proximity

@@ -61,8 +61,6 @@ public:
 
     ConstraintProximityPtr getControlPoint(const int i);
 
-    unsigned getNbControlPoints();
-
     void computeBaryCoords(const Vector3 & proj_P,const TriangleGeometry::TriangleInfo & tinfo, const Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const;
 
     ConstraintProximityPtr project(Vector3 /*P*/);

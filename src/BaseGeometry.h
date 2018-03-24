@@ -35,18 +35,22 @@ class ConstraintElement {
     friend class ConstraintProximity;
 public:
 
-    ConstraintElement(BaseGeometry * geo) : m_geometry(geo) {}
+    ConstraintElement(BaseGeometry * geo,unsigned nc)
+    : m_geometry(geo)
+    , m_controlPoints(nc) {}
 
     //this function returns a vector with all the control points of the element
     virtual ConstraintProximityPtr getControlPoint(const int i) = 0;
-
-    // return the number of control points
-    virtual unsigned getNbControlPoints() = 0;
 
     //this function project the point P on the element and return the corresponding proximity
     virtual ConstraintProximityPtr project(Vector3 P) = 0;
 
     virtual void draw(const std::vector<Vector3> & pos) = 0;
+
+    // return the number of control points
+    unsigned getNbControlPoints() {
+        return m_controlPoints;
+    }
 
     template<class T = BaseGeometry>
     T * geometry() const {
@@ -55,6 +59,7 @@ public:
 
 protected:
     BaseGeometry * m_geometry;
+    unsigned m_controlPoints;
 };
 
 typedef std::shared_ptr<ConstraintElement> ConstraintElementPtr;
