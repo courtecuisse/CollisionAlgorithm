@@ -108,8 +108,6 @@ public:
 
     virtual void prepareDetection() {}
 
-    void draw(const VisualParams * vparams);
-
     ConstraintProximityPtr project(const Vector3 & P) {
         double min_dist = std::numeric_limits<double>::max();
         ConstraintProximityPtr min_prox = NULL;

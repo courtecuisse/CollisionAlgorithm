@@ -18,12 +18,14 @@
 namespace collisionAlgorithm {
 
 typedef sofa::defaulttype::Vector3 Vector3;
+typedef sofa::defaulttype::Vec3i Vec3i;
 typedef sofa::core::topology::BaseMeshTopology::Triangle TTriangle;
 typedef sofa::core::topology::BaseMeshTopology::Edge TEdge;
 typedef sofa::core::objectmodel::BaseObject BaseObject;
 typedef sofa::core::visual::VisualParams VisualParams;
 typedef sofa::core::topology::TopologyContainer Topology;
 typedef sofa::core::behavior::MechanicalState<sofa::defaulttype::Vec3dTypes> State;
+typedef sofa::defaulttype::BoundingBox BoundingBox;
 
 class BaseMatrix {};
 
@@ -143,6 +145,12 @@ public:
 
         static std::string getObjectType() {
             return "State";
+        }
+
+        void computeBBox(BoundingBox & b) {
+            m_object->computeBBox(sofa::core::ExecParams::defaultInstance());
+
+            b = m_object->f_bbox.getValue();
         }
 
         std::vector<Vector3> & get(TVecId v) {

@@ -36,7 +36,7 @@ ConstraintProximityPtr AABBElement::getControlPoint(const int /*cid*/) {
     return NULL;
 }
 
-void AABBElement::fillElementSet(TVec3i cbox,int d, std::set<int> & selectElements) {
+void AABBElement::fillElementSet(Vec3i cbox, int d, std::set<int> & selectElements) {
     for (int i=-d;i<=d;i++) {
         if (cbox[0]+i < 0 || cbox[0]+i > geometry()->d_nbox.getValue()[0]) continue;
         if (i!=-d && i!=d) continue;
@@ -59,7 +59,7 @@ void AABBElement::fillElementSet(TVec3i cbox,int d, std::set<int> & selectElemen
 //this function project the point P on the element and return the corresponding proximity
 ConstraintProximityPtr AABBElement::project(Vector3 P) {
     //compute the box where is P
-    TVec3i cbox;
+    Vec3i cbox;
     cbox[0] = floor((P[0] - geometry()->m_Bmin[0])/geometry()->m_cellSize[0]);
     cbox[1] = floor((P[1] - geometry()->m_Bmin[1])/geometry()->m_cellSize[1]);
     cbox[2] = floor((P[2] - geometry()->m_Bmin[2])/geometry()->m_cellSize[2]);
@@ -100,7 +100,7 @@ ConstraintProximityPtr AABBElement::project(Vector3 P) {
 /**************************************************************************/
 
 AABBGeometry::AABBGeometry()
-: d_nbox("nbox",TVec3i(8,8,8),this)
+: d_nbox("nbox",Vec3i(8,8,8),this)
 , p_geometry(this)
 {}
 
@@ -125,8 +125,8 @@ void AABBGeometry::prepareDetection() {
     BoundingBox bbox;
     p_topology->p_state->computeBBox(bbox);
 
-    m_Bmin = Vector3(bbox.min());
-    m_Bmax = Vector3(bbox.max());
+    m_Bmin = Vector3(bbox.minBBoxPtr());
+    m_Bmax = Vector3(bbox.minBBoxPtr());
 
     m_cellSize[0] = (m_Bmax[0] - m_Bmin[0]) / d_nbox.getValue()[0];
     m_cellSize[1] = (m_Bmax[1] - m_Bmin[1]) / d_nbox.getValue()[1];
@@ -155,8 +155,8 @@ void AABBGeometry::prepareDetection() {
             maxbox[2] = std::max(maxbox[2],P[2]);
         }
 
-        TVec3i cminbox;
-        TVec3i cmaxbox;
+        Vec3i cminbox;
+        Vec3i cmaxbox;
 
         cminbox[0] = floor((minbox[0] - m_Bmin[0])/m_cellSize[0]);
         cminbox[1] = floor((minbox[1] - m_Bmin[1])/m_cellSize[1]);

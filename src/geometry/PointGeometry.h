@@ -8,6 +8,7 @@ class PointGeometry : public BaseGeometry {
     friend class PointElement;
 
 public:
+
     void prepareDetection();
 
     void init();

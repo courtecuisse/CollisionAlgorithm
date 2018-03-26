@@ -9,10 +9,12 @@ class AABBGeometry : public BaseGeometry {
     friend class AABBElement;
 
 public:
-    Data<TVec3i> d_nbox;
+    Data<Vec3i> d_nbox;
     PortOut<BaseGeometry,REQUIRED> p_geometry;
 
     AABBGeometry();
+
+    ~AABBGeometry(){}
 
     void init();
 
@@ -38,7 +40,7 @@ public:
     }
 
 private:
-    void fillElementSet(TVec3i cbox,int d, std::set<int> & selectElements);
+    void fillElementSet(Vec3i cbox,int d, std::set<int> & selectElements);
 };
 
 }

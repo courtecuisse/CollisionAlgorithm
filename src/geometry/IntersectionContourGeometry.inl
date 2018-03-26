@@ -102,10 +102,13 @@ void IntersectionContourGeometry::draw(const VisualParams * vparams) {
 
     BoundingBox bbox;
     p_topology->p_state->computeBBox(bbox);
-    Vector3 C = (Vector3(bbox.min()) + Vector3(bbox.max())) * 0.5;
+    Vector3 min = Vector3(bbox.minBBoxPtr());
+    Vector3 max = Vector3(bbox.maxBBoxPtr());
+
+    Vector3 C = (min+max) * 0.5;
     C -= Z*dot(C-P,Z);
 
-    double norm = bbox.norm();
+    double norm = (max - min).norm();
 
     X = X * norm * 0.5;
     Y = Y * norm * 0.5;
