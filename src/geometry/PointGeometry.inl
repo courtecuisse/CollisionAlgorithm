@@ -11,8 +11,9 @@ namespace collisionAlgorithm {
 
 PointProximity::PointProximity(PointElement * elmt) : ConstraintProximity(elmt) {}
 
-Vector3 PointProximity::getPosition(TVecId v) const {
-    return element()->geometry()->getPos(TVecId::position)[element()->m_pid];
+Vector3 PointProximity::getPosition(VecID v) const {
+    const ReadAccessor<Vector3> & pos = element()->geometry()->p_topology->p_state->read(v);
+    return pos[element()->m_pid];
 }
 
 Vector3 PointProximity::getNormal() const {
@@ -61,7 +62,7 @@ void PointGeometry::prepareDetection() {}
 void PointGeometry::draw(const VisualParams *vparams) {
     if (! vparams->displayFlags().getShowCollisionModels()) return;
 
-    const std::vector<Vector3> & X = getPos(TVecId::position);
+    const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
 
     glDisable(GL_LIGHTING);
     glColor4f(1,0,1,1);
@@ -69,7 +70,7 @@ void PointGeometry::draw(const VisualParams *vparams) {
     glPointSize(20);
     for (unsigned i=0;i<m_elements.size();i++) {
         std::shared_ptr<PointElement> elmt = std::dynamic_pointer_cast<PointElement>(m_elements[i]);
-        glVertex3dv(X[elmt->m_pid].data());
+        glVertex3dv(pos[elmt->m_pid].data());
     }
     glEnd();
 }

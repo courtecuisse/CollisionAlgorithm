@@ -123,7 +123,8 @@ void AABBGeometry::prepareDetection() {
     }
 
     BoundingBox bbox;
-    p_topology->p_state->computeBBox(bbox);
+    const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
+    for (unsigned i=0;i<pos.size();i++) bbox.include(pos[i]);
 
     m_Bmin = Vector3(bbox.minBBoxPtr());
     m_Bmax = Vector3(bbox.minBBoxPtr());

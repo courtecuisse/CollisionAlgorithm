@@ -82,7 +82,7 @@ class TriangleProximity : public ConstraintProximity {
 public :
     TriangleProximity(TriangleElement *geo,double f1,double f2,double f3);
 
-    Vector3 getPosition(TVecId v) const;
+    Vector3 getPosition(VecID v) const;
 
     Vector3 getNormal() const;
 

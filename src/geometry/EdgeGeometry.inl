@@ -14,8 +14,9 @@ EdgeProximity::EdgeProximity(EdgeElement * elmt,double f1,double f2) : Constrain
     m_fact[1] = f2;
 }
 
-Vector3 EdgeProximity::getPosition(TVecId v) const {
-    const std::vector<Vector3> & pos = element()->geometry()->getPos(v);
+Vector3 EdgeProximity::getPosition(VecID v) const {
+    const ReadAccessor<Vector3> & pos = element()->geometry()->p_topology->p_state->read(v);
+
     return pos[element()->m_pid[0]] * m_fact[0] + pos[element()->m_pid[1]] * m_fact[1];
 }
 
@@ -55,7 +56,7 @@ ConstraintProximityPtr EdgeElement::getControlPoint(const int cid) {
 ConstraintProximityPtr EdgeElement::project(Vector3 P) {
     double fact_u,fact_v;
 
-    const std::vector<Vector3> & pos = geometry()->getPos(TVecId::position);
+    const ReadAccessor<Vector3> & pos = geometry()->p_topology->p_state->read(VecCoordId::position());
 
     Vector3 P1 = pos[m_pid[0]];
     Vector3 P2 = pos[m_pid[1]];
@@ -88,15 +89,15 @@ void EdgeGeometry::prepareDetection() {}
 void EdgeGeometry::draw(const VisualParams *vparams) {
     if (! vparams->displayFlags().getShowCollisionModels()) return;
 
-    const std::vector<Vector3> & X = getPos(TVecId::position);
+    const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
 
     glDisable(GL_LIGHTING);
     glColor4f(1,0,1,1);
     glBegin(GL_LINES);
     for (unsigned i=0;i<m_elements.size();i++) {
         std::shared_ptr<EdgeElement> elmt = std::dynamic_pointer_cast<EdgeElement>(m_elements[i]);
-        glVertex3dv(X[elmt->m_pid[0]].data());
-        glVertex3dv(X[elmt->m_pid[1]].data());
+        glVertex3dv(pos[elmt->m_pid[0]].data());
+        glVertex3dv(pos[elmt->m_pid[1]].data());
     }
     glEnd();
 }

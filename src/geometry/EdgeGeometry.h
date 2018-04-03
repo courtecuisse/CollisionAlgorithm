@@ -59,7 +59,7 @@ class EdgeProximity : public ConstraintProximity {
 public :
     EdgeProximity(EdgeElement *geo,double f1,double f2);
 
-    Vector3 getPosition(TVecId v) const;
+    Vector3 getPosition(VecID v) const;
 
     Vector3 getNormal() const;
 

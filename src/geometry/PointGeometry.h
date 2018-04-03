@@ -37,7 +37,7 @@ class PointProximity : public ConstraintProximity {
 public :
     PointProximity(PointElement *geo);
 
-    Vector3 getPosition(TVecId v) const;
+    Vector3 getPosition(VecID v) const;
 
     Vector3 getNormal() const;
 

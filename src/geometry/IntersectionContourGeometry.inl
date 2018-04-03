@@ -11,8 +11,9 @@ namespace collisionAlgorithm {
 
 IntersectionContourProximity::IntersectionContourProximity(IntersectionContourElement * elmt) : ConstraintProximity(elmt) {}
 
-Vector3 IntersectionContourProximity::getPosition(TVecId v) const {
-    const std::vector<Vector3> & pos = element()->geometry()->getPos(v);
+Vector3 IntersectionContourProximity::getPosition(VecID v) const {
+    const ReadAccessor<Vector3> & pos = element()->geometry()->p_topology->p_state->read(v);
+
     Vector3 P = pos[element()->m_pid[0]] * element()->m_fact[0];
     Vector3 Q = pos[element()->m_pid[1]] * element()->m_fact[1];
 
@@ -59,7 +60,7 @@ IntersectionContourGeometry::IntersectionContourGeometry()
 void IntersectionContourGeometry::prepareDetection() {
     m_elements.clear();
 
-    const std::vector<Vector3> & x = getPos(TVecId::position);
+    const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
 
     Vector3 pointOnPlane = d_planePos.getValue();
     Vector3 planeNormal = d_planeNormal.getValue();
@@ -71,8 +72,8 @@ void IntersectionContourGeometry::prepareDetection() {
     for(unsigned i=0;i<p_topology->getNbEdges();i++) {
         const TEdge & e = p_topology->getEdge(i);
 
-        Vector3 p1 = x[e[0]];
-        Vector3 p2 = x[e[1]];
+        Vector3 p1 = pos[e[0]];
+        Vector3 p2 = pos[e[1]];
 
         double alpha=1.0 - (d-dot(planeNormal,p1))/(dot(planeNormal,p2-p1));
 
@@ -101,7 +102,10 @@ void IntersectionContourGeometry::draw(const VisualParams * vparams) {
 //    std::cout << "Y=" << Y << std::endl;
 
     BoundingBox bbox;
-    p_topology->p_state->computeBBox(bbox);
+    const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
+    for (unsigned i=0;i<pos.size();i++) bbox.include(pos[i]);
+
+
     Vector3 min = Vector3(bbox.minBBoxPtr());
     Vector3 max = Vector3(bbox.maxBBoxPtr());
 
@@ -120,8 +124,6 @@ void IntersectionContourGeometry::draw(const VisualParams * vparams) {
         glVertex3dv((C+X+Y).data());
         glVertex3dv((C-X+Y).data());
     glEnd();
-
-    const std::vector<Vector3> & pos = getPos(TVecId::position);
 
     glBegin(GL_POINTS);
     glPointSize(20);

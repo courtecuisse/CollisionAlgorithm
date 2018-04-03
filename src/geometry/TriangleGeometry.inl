@@ -15,8 +15,9 @@ TriangleProximity::TriangleProximity(TriangleElement * elmt,double f1,double f2,
     m_fact[2] = f3;
 }
 
-Vector3 TriangleProximity::getPosition(TVecId v) const {
-    const std::vector<Vector3> & pos = element()->geometry()->getPos(v);
+Vector3 TriangleProximity::getPosition(VecID v) const {
+    const ReadAccessor<Vector3> & pos = element()->geometry()->p_topology->p_state->read(v);
+
     return pos[element()->m_pid[0]] * m_fact[0] +
            pos[element()->m_pid[1]] * m_fact[1] +
            pos[element()->m_pid[2]] * m_fact[2];
@@ -77,7 +78,7 @@ void TriangleElement::computeBaryCoords(const Vector3 & proj_P,const TriangleGeo
 //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 
 ConstraintProximityPtr TriangleElement::project(Vector3 P) {
-    const std::vector<Vector3> & pos = geometry()->getPos(TVecId::position);
+    const ReadAccessor<Vector3> & pos = geometry()->p_topology->p_state->read(VecCoordId::position());
 
     Vector3 P0 = pos[m_pid[0]];
     Vector3 P1 = pos[m_pid[1]];
@@ -188,7 +189,7 @@ ConstraintProximityPtr TriangleElement::project(Vector3 P) {
 /**************************************************************************/
 
 void TriangleGeometry::prepareDetection() {
-    const std::vector<Vector3> & x = getPos(TVecId::position);
+    const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
 
     m_pointNormal.resize(p_topology->getNbPoints());
 
@@ -200,9 +201,9 @@ void TriangleGeometry::prepareDetection() {
         const TTriangle tri = this->p_topology->getTriangle(t);
 
         //Compute Bezier Positions
-        Vector3 p0 = x[tri[0]];
-        Vector3 p1 = x[tri[1]];
-        Vector3 p2 = x[tri[2]];
+        Vector3 p0 = pos[tri[0]];
+        Vector3 p1 = pos[tri[1]];
+        Vector3 p2 = pos[tri[2]];
 
         tinfo.v0 = p1 - p0;
         tinfo.v1 = p2 - p0;
@@ -222,8 +223,8 @@ void TriangleGeometry::prepareDetection() {
         tinfo.ax2.normalize();
     }
 
-    m_pointNormal.resize(x.size());
-    for (unsigned p=0;p<x.size();p++) {
+    m_pointNormal.resize(pos.size());
+    for (unsigned p=0;p<pos.size();p++) {
         const Topology::TrianglesAroundVertex & tav = this->p_topology->getTrianglesAroundVertex(p);
         m_pointNormal[p] = Vector3(0,0,0);
         for (unsigned t=0;t<tav.size();t++) {
@@ -244,7 +245,7 @@ void TriangleGeometry::init() {
 void TriangleGeometry::draw(const VisualParams *vparams) {
     if (! vparams->displayFlags().getShowCollisionModels()) return;
 
-    const std::vector<Vector3> & X = getPos(TVecId::position);
+    const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
 
     glDisable(GL_LIGHTING);
     glColor4f(1,0,1,1);
@@ -252,9 +253,9 @@ void TriangleGeometry::draw(const VisualParams *vparams) {
     glBegin(GL_TRIANGLES);
     for (unsigned i=0;i<m_elements.size();i++) {
         std::shared_ptr<TriangleElement> elmt = std::dynamic_pointer_cast<TriangleElement>(m_elements[i]);
-        glVertex3dv(X[elmt->m_pid[0]].data());
-        glVertex3dv(X[elmt->m_pid[1]].data());
-        glVertex3dv(X[elmt->m_pid[2]].data());
+        glVertex3dv(pos[elmt->m_pid[0]].data());
+        glVertex3dv(pos[elmt->m_pid[1]].data());
+        glVertex3dv(pos[elmt->m_pid[2]].data());
     }
     glEnd();
 }

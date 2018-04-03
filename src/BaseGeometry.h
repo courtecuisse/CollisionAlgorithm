@@ -15,7 +15,7 @@ public :
 
     ConstraintProximity(ConstraintElement * elmt) : m_element(elmt) {}
 
-    virtual Vector3 getPosition(TVecId v = TVecId::position) const = 0;
+    virtual Vector3 getPosition(VecID v = VecCoordId::position()) const = 0;
 
     virtual Vector3 getNormal() const = 0;
 
@@ -100,10 +100,6 @@ public:
 
     ConstraintElementPtr getElement(unsigned i) const {
         return m_elements[i];
-    }
-
-    const std::vector<Vector3> & getPos(TVecId v) {
-        return p_topology->p_state->get(v);
     }
 
     virtual void prepareDetection() {}

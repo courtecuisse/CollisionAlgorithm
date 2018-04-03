@@ -35,22 +35,14 @@ typedef enum {
     UNIQUE = 2
 } PORT_POLICY;
 
-class VecID {
-public:
-    enum VecID_d {
-        restPosition,
-        position,
-        freePosition,
-        velocity,
-        force,
-        vec_x,
-        vec_q,
-        vec_d,
-        vec_r,
-        NVecID
-    };
-};
-typedef VecID::VecID_d TVecId;
+typedef sofa::core::VecCoordId VecCoordId;
+typedef sofa::core::VecCoordId VecID;
+
+
+template<class T>
+using ReadAccessor = sofa::helper::ReadAccessor<sofa::core::objectmodel::Data<sofa::helper::vector<T > > >;
+//helper::ReadAccessor< Data< sofa::helper::vector<Triangle> > > m_triangle = d_triangle;
+//typedef sofa::helper::ReadAccessor< sofa::core::objectmodel::Data< sofa::helper::vector<Vector3> > > ReadAccessor;
 
 template<class T>
 class Data : public sofa::core::objectmodel::Data<T>{
@@ -81,7 +73,7 @@ public:
     sofa::core::objectmodel::Data<std::string> d_name;
 
     PortIn(sofa::core::objectmodel::BaseObject * o)
-    : d_name(o->initData(&d_name, std::string("IN_").append(OUT::getObjectType()).c_str(), "Port out")) {
+    : d_name(o->initData(&d_name, std::string("IN_").append(typeid(o).name()).c_str(), "Port out")) {
         m_container = o;
     }
 
@@ -109,7 +101,7 @@ public:
     sofa::core::objectmodel::Data<std::string> d_name;
 
     PortOut(sofa::core::objectmodel::BaseObject * o)
-    : d_name(o->initData(&d_name, std::string("OUT_").append(OUT::getObjectType()).c_str(), "Port out")) {
+    : d_name(o->initData(&d_name, std::string("OUT_").append(typeid(o).name()).c_str(), "Port out")) {
         m_container = o;
     }
 
@@ -130,64 +122,64 @@ public:
     BaseObject * m_container;
 };
 
-template<>
-class InternalType<State> {
-public:
-    class Wrapper {
-    public:
-        Wrapper(State * obj) {
-            m_object = obj;
-        }
+//template<>
+//class InternalType<State> {
+//public:
+//    class Wrapper {
+//    public:
+//        Wrapper(State * obj) {
+//            m_object = obj;
+//        }
 
-        const std::string & getName() {
-            return m_object->getName();
-        }
+//        const std::string & getName() {
+//            return m_object->getName();
+//        }
 
-        static std::string getObjectType() {
-            return "State";
-        }
+//        static std::string getObjectType() {
+//            return "State";
+//        }
 
-        void computeBBox(BoundingBox & b) {
-            m_object->computeBBox(sofa::core::ExecParams::defaultInstance());
+//        void computeBBox(BoundingBox & b) {
+//            m_object->computeBBox(sofa::core::ExecParams::defaultInstance());
 
-            b = m_object->f_bbox.getValue();
-        }
+//            b = m_object->f_bbox.getValue();
+//        }
 
-        std::vector<Vector3> & get(TVecId v) {
-            sofa::core::VecCoordId vid;
+//        ReadAccessor<Vector3> & read(TVecId v) {
+//            sofa::core::VecCoordId vid;
 
-            if (v == TVecId::restPosition) vid = sofa::core::VecCoordId::restPosition();
-            else if (v == TVecId::position) vid = sofa::core::VecCoordId::position();
+//            if (v == TVecId::restPosition) vid = sofa::core::VecCoordId::restPosition();
+//            else if (v == TVecId::position) vid = sofa::core::VecCoordId::position();
 
 
-            sofa::helper::WriteAccessor<sofa::core::objectmodel::Data <State::VecCoord> > x = *m_object->write(vid);
-            return x.wref();
-        }
+//            sofa::helper::WriteAccessor<sofa::core::objectmodel::Data <State::VecCoord> > x = *m_object->write(vid);
+//            return x.wref();
+//        }
 
-        State * m_object;
-    };
+//        State * m_object;
+//    };
 
-    InternalType() {
-        m_wrapper = NULL;
-    }
+//    InternalType() {
+//        m_wrapper = NULL;
+//    }
 
-    ~InternalType() {
-        if (m_wrapper) delete m_wrapper;
-    }
+//    ~InternalType() {
+//        if (m_wrapper) delete m_wrapper;
+//    }
 
-    Wrapper* search(sofa::core::objectmodel::BaseContext * ctx,const std::string & name) {
-        if (m_wrapper == NULL) {
-            State * m_object;
-            ctx->get(m_object,name);
-            if (m_object == NULL) std::cerr << "CANNOT FIND OUT PORT " << name << std::endl;
-            else m_wrapper = new Wrapper(m_object);
-        }
-        return m_wrapper;
-    }
+//    Wrapper* search(sofa::core::objectmodel::BaseContext * ctx,const std::string & name) {
+//        if (m_wrapper == NULL) {
+//            State * m_object;
+//            ctx->get(m_object,name);
+//            if (m_object == NULL) std::cerr << "CANNOT FIND OUT PORT " << name << std::endl;
+//            else m_wrapper = new Wrapper(m_object);
+//        }
+//        return m_wrapper;
+//    }
 
-    Wrapper * m_wrapper;
-    typedef Wrapper OUT;
-};
+//    Wrapper * m_wrapper;
+//    typedef Wrapper OUT;
+//};
 
 template<>
 class InternalType<Topology> {
