@@ -258,43 +258,43 @@ public:
     typedef Wrapper OUT;
 };
 
-template<>
-class InternalType<BaseObject> {
-public:
-    class Wrapper {
-    public:
-        Wrapper(BaseObject * obj) {
-            m_object = obj;
-        }
+//template<>
+//class InternalType<BaseObject> {
+//public:
+//    class Wrapper {
+//    public:
+//        Wrapper(BaseObject * obj) {
+//            m_object = obj;
+//        }
 
-        static std::string getObjectType() {
-            return "BaseObject";
-        }
+//        static std::string getObjectType() {
+//            return "BaseObject";
+//        }
 
-        BaseObject * m_object;
-    };
+//        BaseObject * m_object;
+//    };
 
-    InternalType() {
-        m_wrapper = NULL;
-    }
+//    InternalType() {
+//        m_wrapper = NULL;
+//    }
 
-    ~InternalType() {
-        if (m_wrapper) delete m_wrapper;
-    }
+//    ~InternalType() {
+//        if (m_wrapper) delete m_wrapper;
+//    }
 
-    Wrapper* search(sofa::core::objectmodel::BaseContext * ctx,const std::string & name) {
-        if (m_wrapper == NULL) {
-            BaseObject * m_object;
-            ctx->get(m_object,name);
-            if (m_object == NULL) std::cerr << "CANNOT FIND OUT PORT " << name << std::endl;
-            else m_wrapper = new Wrapper(m_object);
-        }
-        return m_wrapper;
-    }
+//    Wrapper* search(sofa::core::objectmodel::BaseContext * ctx,const std::string & name) {
+//        if (m_wrapper == NULL) {
+//            BaseObject * m_object;
+//            ctx->get(m_object,name);
+//            if (m_object == NULL) std::cerr << "CANNOT FIND OUT PORT " << name << std::endl;
+//            else m_wrapper = new Wrapper(m_object);
+//        }
+//        return m_wrapper;
+//    }
 
-    Wrapper * m_wrapper;
-    typedef Wrapper OUT;
-};
+//    Wrapper * m_wrapper;
+//    typedef Wrapper OUT;
+//};
 
 #define DECLARE_CLASS(CLASS_NAME) \
 SOFA_DECL_CLASS(CLASS_NAME) \
