@@ -31,8 +31,8 @@
 //    if (m_from->getNbPoints() == 0) return res;
 //    if (m_dest->getNbPoints() == 0) return res;
 
-//    helper::vector<defaulttype::Vector3> p1;
-//    helper::vector<defaulttype::Vector3> p2;
+//    helper::vector<Vector3> p1;
+//    helper::vector<Vector3> p2;
 
 //    for (int i=0;i<m_from->getNbPoints();i++) p1.push_back(m_from->getElement(i)->getDefaultProximity()->getPosition());
 //    for (int i=0;i<m_dest->getNbPoints();i++) p1.push_back(m_dest->getElement(i)->getDefaultProximity()->getPosition());
@@ -54,13 +54,13 @@
 //        for (unsigned p=0;p<p1.size();p++) {
 //            if (bindId[p] != -1) continue;
 
-//            defaulttype::Vector3 P = p1[p];
+//            Vector3 P = p1[p];
 //            int closestId = -1;
 //            double closestDist = std::numeric_limits<double>::max();
 
 //            //Find minimal distance
 //            for (unsigned i=0;i<p2.size();i++) {
-//                defaulttype::Vector3 Q = p2[i];
+//                Vector3 Q = p2[i];
 //                double dist = (Q-P).norm();
 
 //                if (dist < closestDist && invBind[i] == -1) {

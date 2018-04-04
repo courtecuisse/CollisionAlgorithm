@@ -80,7 +80,7 @@
 //    return getNonLinearTriangleProximity(eid, tri[0],0.3333,tri[1],0.3333,tri[2],0.3333);
 //}
 
-//void BezierTriangleGeometry::projectPoint(const defaulttype::Vector3 & P, BezierConstraintProximity *pfrom) const {
+//void BezierTriangleGeometry::projectPoint(const Vector3 & P, BezierConstraintProximity *pfrom) const {
 //    TriangleConstraintProximity plinear(this,pfrom->m_eid,pfrom->m_pid[0],pfrom->m_fact[0],pfrom->m_pid[1],pfrom->m_fact[1],pfrom->m_pid[2],pfrom->m_fact[2]);
 //    TriangleGeometry::projectPoint(P,&plinear);
 //    pfrom->m_fact[0] = plinear.getFact()[0];
@@ -102,24 +102,24 @@
 //    int p2 = pinfo.m_pid[2];
 
 //    while(it< max_it) {
-//        defaulttype::Vector3 Q = pinfo.getPosition();
+//        Vector3 Q = pinfo.getPosition();
 
-//        defaulttype::Vector3 nQP = P - Q;
+//        Vector3 nQP = P - Q;
 //        if (nQP.norm() < tolerance) break;
 //        nQP.normalize();
 
-//        defaulttype::Vector3 N1 = pinfo.getNormal();
+//        Vector3 N1 = pinfo.getNormal();
 //        N1.normalize();
 
 //        if (pinfo.m_fact[0] < 0 || pinfo.m_fact[1] < 0 || pinfo.m_fact[2] < 0) break;
 
-//        defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(1,0,0)))>0.99) ? defaulttype::Vector3(0,1,0) : defaulttype::Vector3(1,0,0)));
+//        Vector3 N2 = cross(N1,((fabs(dot(N1,Vector3(1,0,0)))>0.99) ? Vector3(0,1,0) : Vector3(1,0,0)));
 //        N2.normalize();
 
-//        defaulttype::Vector3 N3 = cross(N1,N2);
+//        Vector3 N3 = cross(N1,N2);
 //        N3.normalize();
 
-//        defaulttype::Vector2 e_0(dot(nQP,N2),dot(nQP,N3));
+//        Vector2 e_0(dot(nQP,N2),dot(nQP,N3));
 
 //        if(e_0.norm() < tolerance) break;
 
@@ -132,21 +132,21 @@
 //        double P_v_fact2 = pinfo.m_fact[2] - delta * fact_v;
 
 //        BezierConstraintProximity P_v(this,pinfo.m_eid,p0,P_v_fact0,p1,P_v_fact1,p2,P_v_fact2);
-//        defaulttype::Vector3 p_v = (P - P_v.getPosition()).normalized();
-//        defaulttype::Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
+//        Vector3 p_v = (P - P_v.getPosition()).normalized();
+//        Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
 
 //        //variation point along u
 //        double P_u_fact0 = pinfo.m_fact[0];
 //        double P_u_fact1 = pinfo.m_fact[1] + delta * fact_u;
 //        double P_u_fact2 = pinfo.m_fact[2] - delta * fact_u;
 //        BezierConstraintProximity P_u(this,pinfo.m_eid,p0,P_u_fact0,p1,P_u_fact1,p2,P_u_fact2);
-//        defaulttype::Vector3 p_u = (P - P_u.getPosition()).normalized();
-//        defaulttype::Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
+//        Vector3 p_u = (P - P_u.getPosition()).normalized();
+//        Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
 
 //        if (P_v.m_fact[0] < 0 || P_v.m_fact[1] < 0 || P_v.m_fact[2] < 0) break;
 //        if (P_u.m_fact[0] < 0 || P_u.m_fact[1] < 0 || P_u.m_fact[2] < 0) break;
 
-//        defaulttype::Mat<2,2,double> J, invJ;
+//        Mat<2,2,double> J, invJ;
 //        J[0][0] = (e_v[0] - e_0[0])/delta;
 //        J[1][0] = (e_v[1] - e_0[1])/delta;
 //        J[0][1] = (e_u[0] - e_0[0])/delta;
@@ -155,7 +155,7 @@
 //        invertMatrix(invJ, J);
 
 //        // dUV is the optimal direction
-//        defaulttype::Vector2 dUV = -invJ * e_0;
+//        Vector2 dUV = -invJ * e_0;
 //        if(dUV.norm() < threshold) break;
 
 //        //bary coords of the solution of the 2D problem
@@ -164,7 +164,7 @@
 //        double sol_w = 1.0 - sol_u - sol_v;
 
 //        // we now search what is the optimal displacmeent along this path
-//        defaulttype::Vector3 dir2d(sol_v - pinfo.m_fact[0],
+//        Vector3 dir2d(sol_v - pinfo.m_fact[0],
 //                                   sol_u - pinfo.m_fact[1],
 //                                   sol_w - pinfo.m_fact[2]);
 
@@ -181,7 +181,7 @@
 
 //        if (P_a.m_fact[0] < 0 || P_a.m_fact[1] < 0 || P_a.m_fact[2] < 0) break;
 
-//        defaulttype::Vector3 QA = P_a.getPosition();
+//        Vector3 QA = P_a.getPosition();
 
 //        double fact;
 //        if (fabs(dot(nQP,N1))>0.8) {
@@ -190,7 +190,7 @@
 //            double j = (fxdx - fx) / delta;
 //            fact = -fx / j;
 //        } else {
-//            defaulttype::Vector3 nQA = (Q-QA).normalized();
+//            Vector3 nQA = (Q-QA).normalized();
 //            double fx = dot(P-Q, nQA);
 //            double fxdx = dot(P-QA, nQA);
 //            double j = (fxdx - fx) / delta;
@@ -221,24 +221,24 @@
 //    pfrom->m_fact[2] = pinfo.m_fact[2];
 //}
 
-//void BezierTriangleGeometry::tesselate(const core::visual::VisualParams * vparams, unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C) {
+//void BezierTriangleGeometry::tesselate(const core::visual::VisualParams * vparams, unsigned level,int tid, const Vector3 & bary_A,const Vector3 & bary_B, const Vector3 & bary_C) {
 //    if (level >= d_draw_tesselation.getValue()) {
 //        const topology::BaseMeshTopology::Triangle & tri = this->getTopology()->getTriangle(tid);
 
-//        defaulttype::Vector3 pA = getNonLinearTriangleProximity(tid,tri[0],bary_A[0],tri[1],bary_A[1],tri[2],bary_A[2])->getPosition();
-//        defaulttype::Vector3 pB = getNonLinearTriangleProximity(tid,tri[0],bary_B[0],tri[1],bary_B[1],tri[2],bary_B[2])->getPosition();
-//        defaulttype::Vector3 pC = getNonLinearTriangleProximity(tid,tri[0],bary_C[0],tri[1],bary_C[1],tri[2],bary_C[2])->getPosition();
+//        Vector3 pA = getNonLinearTriangleProximity(tid,tri[0],bary_A[0],tri[1],bary_A[1],tri[2],bary_A[2])->getPosition();
+//        Vector3 pB = getNonLinearTriangleProximity(tid,tri[0],bary_B[0],tri[1],bary_B[1],tri[2],bary_B[2])->getPosition();
+//        Vector3 pC = getNonLinearTriangleProximity(tid,tri[0],bary_C[0],tri[1],bary_C[1],tri[2],bary_C[2])->getPosition();
 
 //        this->drawTriangle(vparams,pA,pB,pC);
 
 //        return;
 //    }
 
-//    defaulttype::Vector3 bary_D = (bary_A + bary_B)/2.0;
-//    defaulttype::Vector3 bary_E = (bary_A + bary_C)/2.0;
-//    defaulttype::Vector3 bary_F = (bary_B + bary_C)/2.0;
+//    Vector3 bary_D = (bary_A + bary_B)/2.0;
+//    Vector3 bary_E = (bary_A + bary_C)/2.0;
+//    Vector3 bary_F = (bary_B + bary_C)/2.0;
 
-//    defaulttype::Vector3 bary_G = (bary_A + bary_B + bary_C)/3.0;
+//    Vector3 bary_G = (bary_A + bary_B + bary_C)/3.0;
 
 //    tesselate(vparams,level+1,tid,bary_A,bary_D,bary_G);
 //    tesselate(vparams,level+1,tid,bary_D,bary_B,bary_G);
@@ -267,7 +267,7 @@
 //        }
 
 //        for(int t=0;t<this->getTopology()->getNbTriangles();t++) {
-//            tesselate(vparams,0,t,defaulttype::Vector3(1,0,0),defaulttype::Vector3(0,1,0),defaulttype::Vector3(0,0,1));
+//            tesselate(vparams,0,t,Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1));
 //        }
 
 //        glEnd();

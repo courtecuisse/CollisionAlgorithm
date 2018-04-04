@@ -12,8 +12,8 @@ namespace collisionAlgorithm {
 //    typedef TriangleGeometry Inherit;
 //    typedef typename Inherit::TriangleInfo TriangleInfo;
 
-//    typedef typename defaulttype::Vector2 Vector2;
-//    typedef typename defaulttype::Vector3 Vector3;
+//    typedef typename Vector2 Vector2;
+//    typedef typename Vector3 Vector3;
 //    typedef typename DataTypes::Coord Coord;
 //    typedef typename DataTypes::Real Real;
 //    typedef typename DataTypes::VecCoord VecCoord;
@@ -48,7 +48,7 @@ namespace collisionAlgorithm {
 
 //        ////Bezier triangle are computed according to :
 //        ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
-//        defaulttype::Vector3 getPosition() const {
+//        Vector3 getPosition() const {
 //            const BezierTriangleInfo & tbinfo = ((BezierTriangleGeometry *)m_geo)->m_beziertriangle_info[m_eid];
 //            const helper::ReadAccessor<Data <VecCoord> > & x = ((BezierTriangleGeometry *)m_geo)->getMstate()->read(core::VecCoordId::position());
 
@@ -72,7 +72,7 @@ namespace collisionAlgorithm {
 //                   tbinfo.p111 * 6*fact_w*fact_u*fact_v;
 //        }
 
-//        defaulttype::Vector3 getFreePosition() const {
+//        Vector3 getFreePosition() const {
 //            double fact_w = m_fact[2];
 //            double fact_u = m_fact[1];
 //            double fact_v = m_fact[0];
@@ -159,7 +159,7 @@ namespace collisionAlgorithm {
 
 //    void draw(const core::visual::VisualParams * vparams);
 
-//    void projectPoint(const defaulttype::Vector3 & s,BezierConstraintProximity * pinfo) const;
+//    void projectPoint(const Vector3 & s,BezierConstraintProximity * pinfo) const;
 
 //private :
 //    typedef struct {
@@ -169,9 +169,9 @@ namespace collisionAlgorithm {
 
 //    helper::vector<BezierTriangleInfo> m_beziertriangle_info;
 
-//    void tesselate(const core::visual::VisualParams * vparams, unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C);
+//    void tesselate(const core::visual::VisualParams * vparams, unsigned level,int tid, const Vector3 & bary_A,const Vector3 & bary_B, const Vector3 & bary_C);
 
-//    ConstraintProximityPtr newtonTriangularIterations(const defaulttype::Vector3 & P,unsigned eid,const ConstraintProximityPtr & pfrom,unsigned max_it, double tolerance, double threshold);
+//    ConstraintProximityPtr newtonTriangularIterations(const Vector3 & P,unsigned eid,const ConstraintProximityPtr & pfrom,unsigned max_it, double tolerance, double threshold);
 
 //};
 

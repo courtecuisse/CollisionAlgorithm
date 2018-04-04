@@ -135,7 +135,7 @@ ConstraintProximityPtr TriangleElement::project(Vector3 P) {
     return std::make_shared<TriangleProximity>(this,fact_u,fact_v,fact_w);
 }
 
-//void TriangleGeometry::drawTriangle(const core::visual::VisualParams * vparams,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C) {
+//void TriangleGeometry::drawTriangle(const core::visual::VisualParams * vparams,const Vector3 & A,const Vector3 & B, const Vector3 & C) {
 //    double delta = 0.05;
 //    glColor4f(d_color.getValue()[0],d_color.getValue()[1]-delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(A);
 //    glColor4f(d_color.getValue()[0],d_color.getValue()[1]-2*delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(B); // A<->B
@@ -174,9 +174,9 @@ ConstraintProximityPtr TriangleElement::project(Vector3 P) {
 //        const sofa::core::topology::BaseMeshTopology::Triangle tri = this->p_topology->getTriangle(t);
 
 //        //Compute Bezier Positions
-//        defaulttype::Vector3 p0 = x[tri[0]];
-//        defaulttype::Vector3 p1 = x[tri[1]];
-//        defaulttype::Vector3 p2 = x[tri[2]];
+//        Vector3 p0 = x[tri[0]];
+//        Vector3 p1 = x[tri[1]];
+//        Vector3 p2 = x[tri[2]];
 
 //        drawTriangle(vparams,p0,p1,p2);
 //    }

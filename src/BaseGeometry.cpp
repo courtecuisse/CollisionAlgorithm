@@ -10,7 +10,7 @@ namespace collisionAlgorithm {
 
 //namespace behavior {
 
-////void ConstraintProximity::getControlPoints(helper::vector<defaulttype::Vector3> & controlPoints) {
+////void ConstraintProximity::getControlPoints(helper::vector<Vector3> & controlPoints) {
 ////    helper::vector<double> prev = m_fact;
 ////    m_fact.clear();
 ////    m_fact.resize(prev.size(),0.0);
@@ -65,7 +65,7 @@ namespace collisionAlgorithm {
 //    return m_inverse;
 //}
 
-//ConstraintProximityPtr BaseGeometry::ConstraintElement::project(defaulttype::Vector3 Q) {
+//ConstraintProximityPtr BaseGeometry::ConstraintElement::project(Vector3 Q) {
 //    const int maxIt = 1;
 //    const double tolerance = 0.0001;
 //    const double threshold = 0.0000001;
@@ -84,7 +84,7 @@ namespace collisionAlgorithm {
 //    int it = 0;
 
 //    while (it< maxIt) {
-//        defaulttype::Vector3 P = res->getPosition();
+//        Vector3 P = res->getPosition();
 
 
 ////        for (unsigned i=0;i<m_fact.size();i++) {
@@ -101,9 +101,9 @@ namespace collisionAlgorithm {
 //        Eigen::VectorXd e0(JLin);
 //        Eigen::MatrixXd J = Eigen::MatrixXd::Zero(JLin,JLin);
 
-//        defaulttype::Vector3 PQ = Q-P;
+//        Vector3 PQ = Q-P;
 
-//        helper::vector<defaulttype::Vector3> normals;
+//        helper::vector<Vector3> normals;
 
 //        double err=0.0;
 //        for (unsigned j=0;j<JLin;j++) {
@@ -119,7 +119,7 @@ namespace collisionAlgorithm {
 //        if (sqrt(err)<tolerance) break;
 
 //        for (unsigned j=0;j<JLin;j++) {
-//            const defaulttype::Vector3 R = P + normals[j] * delta;
+//            const Vector3 R = P + normals[j] * delta;
 //            for (unsigned i=0;i<JLin;i++) {
 //                const double fxdx = dot(R, normals[i]);
 //                J(i,j) = (fxdx - e0(i))/ delta;

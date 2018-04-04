@@ -15,11 +15,11 @@ namespace collisionAlgorithm {
 //        m_geo = geo;
 //    }
 
-//    defaulttype::Vector3 getPosition(core::VecCoordId vid) const {
-//        return defaulttype::Vector3();
+//    Vector3 getPosition(core::VecCoordId vid) const {
+//        return Vector3();
 //    }
 
-//    void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const defaulttype::Vector3 & N) {
+//    void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const Vector3 & N) {
 
 //    }
 //};
