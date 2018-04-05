@@ -6,8 +6,8 @@
 namespace collisionAlgorithm {
 
 CollisionDetectionAlgorithm::CollisionDetectionAlgorithm()
-: p_from(this,"from")
-, p_dest(this,"dest")
+: p_from("from",this)
+, p_dest("dest",this)
 {}
 
 PairProximity  CollisionDetectionAlgorithm::getClosestPoint(ConstraintElementPtr efrom) {

@@ -70,7 +70,7 @@ public:
 
     BaseGeometry()
     : p_topology(this)
-    , p_type(this,"Any") {
+    , p_type("Any",this) {
         m_dirty = true;
     }
 

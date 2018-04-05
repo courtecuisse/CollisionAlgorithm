@@ -13,7 +13,7 @@ public :
     PortIn<BaseObject> p_type;
 
     Collision()
-    : p_type(this,"Out") {
+    : p_type("Out",this) {
         m_dirty = true;
     }
 
