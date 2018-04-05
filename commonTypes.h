@@ -77,7 +77,7 @@ public:
         m_container = o;
     }
 
-    PortIn(BaseObject * o,const char * name)
+    PortIn(const char * name,BaseObject * o)
     : d_name(o->initData(&d_name, std::string("IN_").append(name).c_str(), "Port out")) {
         m_container = o;
     }
@@ -105,7 +105,7 @@ public:
         m_container = o;
     }
 
-    PortOut(BaseObject * o,const char * name)
+    PortOut(const char * name,BaseObject * o)
     : d_name(o->initData(&d_name, std::string("OUT_").append(name).c_str(), "Port out")) {
         m_container = o;
     }
