@@ -14,6 +14,8 @@
 #include <SofaBaseTopology/TriangleSetTopologyContainer.h>
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/core/visual/VisualParams.h>
+#include <sofa/simulation/AnimateBeginEvent.h>
+#include <sofa/simulation/AnimateEndEvent.h>
 
 namespace collisionAlgorithm {
 
@@ -26,6 +28,9 @@ typedef sofa::core::visual::VisualParams VisualParams;
 typedef sofa::core::topology::TopologyContainer Topology;
 typedef sofa::core::behavior::MechanicalState<sofa::defaulttype::Vec3dTypes> State;
 typedef sofa::defaulttype::BoundingBox BoundingBox;
+typedef sofa::core::objectmodel::Event Event;
+typedef sofa::simulation::AnimateBeginEvent AnimateBeginEvent;
+typedef sofa::simulation::AnimateEndEvent AnimateEndEvent;
 
 class BaseMatrix {};
 

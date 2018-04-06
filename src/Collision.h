@@ -19,16 +19,20 @@ public :
 
     virtual void processAlgorithm() = 0;
 
-    void beginStep() {
-        if (m_dirty) {
-            m_dirty = false;
-            m_pairDetection.clear();
-            processAlgorithm();
-        }
+    void newStep() {
+        if (! m_dirty) return;
+        m_dirty = false;
+        m_pairDetection.clear();
+        processAlgorithm();
     }
 
     void endStep() {
         m_dirty = true;
+    }
+
+    void handleEvent(Event * e) {
+        if (dynamic_cast<AnimateBeginEvent *>(e)) newStep();
+        else if (dynamic_cast<AnimateEndEvent *>(e)) m_dirty = true;
     }
 
     static std::string getObjectType() {
@@ -51,7 +55,7 @@ public :
     }
 
     PairProximityVector & getCollisionPairs() {
-        beginStep();
+        newStep();
         return m_pairDetection;
     }
 

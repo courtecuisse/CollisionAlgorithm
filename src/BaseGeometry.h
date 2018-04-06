@@ -78,19 +78,19 @@ public:
         m_elements.clear();
     }
 
-    void beginStep() {
-        if (m_dirty) {
-            m_dirty = false;
-            prepareDetection();
-        }
+    void newStep() {
+        if (! m_dirty) return;
+        m_dirty = false;
+        prepareDetection();
     }
 
-    void endStep() {
-        m_dirty = true;
+    void handleEvent(Event * e) {
+        if (dynamic_cast<AnimateBeginEvent *>(e)) newStep();
+        else if (dynamic_cast<AnimateEndEvent *>(e)) m_dirty = true;
     }
 
     unsigned getNbElements() {
-        beginStep();
+        newStep();
         return m_elements.size();
     }
 
