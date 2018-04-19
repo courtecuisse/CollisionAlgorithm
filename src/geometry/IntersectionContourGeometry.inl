@@ -70,7 +70,7 @@ void IntersectionContourGeometry::prepareDetection() {
 
     //inspect the plane edge intersection
     for(unsigned i=0;i<p_topology->getNbEdges();i++) {
-        const TEdge & e = p_topology->getEdge(i);
+        const Topology::Edge & e = p_topology->getEdge(i);
 
         Vector3 p1 = pos[e[0]];
         Vector3 p2 = pos[e[1]];

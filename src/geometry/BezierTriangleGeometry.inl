@@ -26,7 +26,7 @@
 //    m_beziertriangle_info.resize(this->getTopology()->getNbTriangles());
 //    for (int t=0;t<this->getTopology()->getNbTriangles();t++) {
 //        BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[t];
-//        const sofa::core::topology::BaseMeshTopology::Triangle trpids = this->getTopology()->getTriangle(t);
+//        const sofa::core::topology::BaseMeshTopology::Triangle trpids = this->getTopology()->geTriangle(t);
 
 //        const Vector3 & p300 = x[trpids[2]];
 //        const Vector3 & p030 = x[trpids[1]];
@@ -76,7 +76,7 @@
 //}
 
 //ConstraintProximityPtr BezierTriangleGeometry::getElementProximity(unsigned eid) const {
-//    const sofa::core::topology::BaseMeshTopology::Triangle tri = getTopology()->getTriangle(eid);
+//    const sofa::core::topology::BaseMeshTopology::Triangle tri = getTopology()->geTriangle(eid);
 //    return getNonLinearTriangleProximity(eid, tri[0],0.3333,tri[1],0.3333,tri[2],0.3333);
 //}
 
@@ -223,7 +223,7 @@
 
 //void BezierTriangleGeometry::tesselate(const core::visual::VisualParams * vparams, unsigned level,int tid, const Vector3 & bary_A,const Vector3 & bary_B, const Vector3 & bary_C) {
 //    if (level >= d_draw_tesselation.getValue()) {
-//        const topology::BaseMeshTopology::Triangle & tri = this->getTopology()->getTriangle(tid);
+//        const topology::BaseMeshTopology::Triangle & tri = this->getTopology()->geTriangle(tid);
 
 //        Vector3 pA = getNonLinearTriangleProximity(tid,tri[0],bary_A[0],tri[1],bary_A[1],tri[2],bary_A[2])->getPosition();
 //        Vector3 pB = getNonLinearTriangleProximity(tid,tri[0],bary_B[0],tri[1],bary_B[1],tri[2],bary_B[2])->getPosition();

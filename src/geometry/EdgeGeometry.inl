@@ -40,7 +40,7 @@ std::map<unsigned,Vector3> EdgeProximity::getContribution(const Vector3 & N) {
 EdgeElement::EdgeElement(EdgeGeometry * geo,unsigned eid) : ConstraintElement(geo,2) {
     m_eid = eid;
 
-    const std::vector<TEdge> & edges = geometry()->p_topology->getEdges();
+    const std::vector<Topology::Edge> & edges = geometry()->p_topology->getEdges();
 
     m_pid[0] = edges[eid][0];
     m_pid[1] = edges[eid][1];

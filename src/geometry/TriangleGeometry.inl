@@ -47,7 +47,7 @@ std::map<unsigned,Vector3> TriangleProximity::getContribution(const Vector3 & N)
 TriangleElement::TriangleElement(TriangleGeometry * geo,unsigned eid) : ConstraintElement(geo,3) {
     m_eid = eid;
 
-    const std::vector<TTriangle> & triangles = geometry()->p_topology->getTriangles();
+    const std::vector<Topology::Triangle> & triangles = geometry()->p_topology->getTriangles();
 
     m_pid[0] = triangles[eid][0];
     m_pid[1] = triangles[eid][1];
@@ -171,7 +171,7 @@ ConstraintProximityPtr TriangleElement::project(Vector3 P) {
 //    }
 
 //    for(int t=0;t<this->p_topology->getNbTriangles();t++) {
-//        const sofa::core::topology::BaseMeshTopology::Triangle tri = this->p_topology->getTriangle(t);
+//        const sofa::core::topology::BaseMeshTopology::Triangle tri = this->p_topology->geTriangle(t);
 
 //        //Compute Bezier Positions
 //        Vector3 p0 = x[tri[0]];
@@ -198,7 +198,7 @@ void TriangleGeometry::prepareDetection() {
     for (unsigned t=0;t<this->p_topology->getNbTriangles();t++) {
         TriangleInfo & tinfo = m_triangle_info[t];
 
-        const TTriangle tri = this->p_topology->getTriangle(t);
+        const Topology::Triangle tri = this->p_topology->getTriangle(t);
 
         //Compute Bezier Positions
         Vector3 p0 = pos[tri[0]];
