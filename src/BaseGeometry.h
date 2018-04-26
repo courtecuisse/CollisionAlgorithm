@@ -65,12 +65,12 @@ typedef std::shared_ptr<ConstraintElement> ConstraintElementPtr;
 class BaseGeometry : public BaseObject {
 public:
 
-    PortIn<Topology,REQUIRED> p_topology;
-    PortIn<BaseObject> p_type;
+    Port<Topology,REQUIRED> p_topology;
+    Port<BaseObject> p_type;
 
     BaseGeometry()
-    : p_topology(this)
-    , p_type("Any",this) {
+    : p_topology("topology",LEFT,this)
+    , p_type("any",LEFT,this) {
         m_dirty = true;
     }
 
@@ -92,10 +92,6 @@ public:
     unsigned getNbElements() {
         newStep();
         return m_elements.size();
-    }
-
-    static std::string getObjectType() {
-        return std::string("Geometry");
     }
 
     ConstraintElementPtr getElement(unsigned i) const {

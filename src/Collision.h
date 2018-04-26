@@ -10,10 +10,10 @@ typedef std::vector<PairProximity> PairProximityVector;
 
 class Collision : public BaseObject {
 public :
-    PortIn<BaseObject> p_type;
+    Port<BaseObject> p_type;
 
     Collision()
-    : p_type("Out",this) {
+    : p_type("out",LEFT,this) {
         m_dirty = true;
     }
 
@@ -39,7 +39,7 @@ public :
         return std::string("Collision");
     }
 
-    void draw(const VisualParams * vparams) {        
+    void draw(const VisualParams * vparams) {
         processAlgorithm();
 
         if (! vparams->displayFlags().getShowCollisionModels()) return;

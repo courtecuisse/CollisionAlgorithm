@@ -10,7 +10,7 @@ class AABBGeometry : public BaseGeometry {
 
 public:
     Data<Vec3i> d_nbox;
-    PortOut<BaseGeometry,REQUIRED> p_geometry;
+    Port<BaseGeometry,REQUIRED> p_geometry;
 
     AABBGeometry();
 

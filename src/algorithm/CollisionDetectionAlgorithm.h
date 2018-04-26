@@ -7,8 +7,8 @@ namespace collisionAlgorithm {
 class CollisionDetectionAlgorithm : public Collision {
 public:
 
-    PortOut<BaseGeometry,REQUIRED> p_from;
-    PortOut<BaseGeometry,REQUIRED> p_dest;
+    Port<BaseGeometry,REQUIRED> p_from;
+    Port<BaseGeometry,REQUIRED> p_dest;
 
     CollisionDetectionAlgorithm();
 
