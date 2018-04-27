@@ -40,13 +40,12 @@ public :
     }
 
     void draw(const VisualParams * vparams) {
-        processAlgorithm();
-
         if (! vparams->displayFlags().getShowCollisionModels()) return;
 
         glDisable(GL_LIGHTING);
         glColor4f(0,1,0,1);
         glBegin(GL_LINES);
+
         for (unsigned i=0;i<m_pairDetection.size();i++) {
             glVertex3dv(m_pairDetection[i].first->getPosition().data());
             glVertex3dv(m_pairDetection[i].second->getPosition().data());
