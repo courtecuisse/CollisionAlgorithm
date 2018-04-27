@@ -14,7 +14,7 @@ PairProximity  CollisionDetectionAlgorithm::getClosestPoint(ConstraintElementPtr
     PairProximity min_pair;
     double min_dist = std::numeric_limits<double>::max();
 
-    ConstraintProximityPtr pfrom = efrom->getControlPoint(-1);
+    ConstraintProximityPtr pfrom = efrom->getControlPoint();
     if (pfrom == NULL) return min_pair;
     Vector3 P = pfrom->getPosition();
 
@@ -42,6 +42,7 @@ PairProximity  CollisionDetectionAlgorithm::getClosestPoint(ConstraintElementPtr
 
     return min_pair;
 }
+
 
 void CollisionDetectionAlgorithm::processAlgorithm() {
     m_pairDetection.clear();

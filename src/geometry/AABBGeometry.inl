@@ -37,20 +37,98 @@ ConstraintProximityPtr AABBElement::getControlPoint(const int /*cid*/) {
 }
 
 void AABBElement::fillElementSet(Vec3i cbox, int d, std::set<int> & selectElements) {
-    for (int i=-d;i<=d;i++) {
-        if (cbox[0]+i < 0 || cbox[0]+i > geometry()->d_nbox.getValue()[0]) continue;
-        if (i!=-d && i!=d) continue;
+    {
+        int i=-d;
+        if (cbox[0]+i >= 0 && cbox[0]+i < geometry()->m_nbox[0]) {
+            for (int j=-d;j<=d;j++) {
+                if (cbox[1]+j < 0 || cbox[1]+j >= geometry()->m_nbox[1]) continue;
+                for (int k=-d;k<=d;k++) {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= geometry()->m_nbox[2]) continue;
 
-        for (int j=-d;j<=d;j++) {
-            if (cbox[1]+j < 0 || cbox[1]+j > geometry()->d_nbox.getValue()[1]) continue;
-            if (j!=-d && j!=d) continue;
+                    const std::vector<unsigned> & elemntsID = geometry()->m_indexedElement[cbox[0] + i][cbox[1] + j][cbox[2] + k];
+                    for (unsigned t=0;t<elemntsID.size();t++) selectElements.insert(elemntsID[t]);
+                }
+            }
+        }
+    }
 
-            for (int k=-d;k<=d;k++) {
-                if (cbox[2]+k < 0 || cbox[2]+k > geometry()->d_nbox.getValue()[2]) continue;
-                if (k!=-d && k!=d) continue;
+    {
+        int i=d;
+        if (cbox[0]+i >= 0 && cbox[0]+i < geometry()->m_nbox[0]) {
+            for (int j=-d;j<=d;j++) {
+                if (cbox[1]+j < 0 || cbox[1]+j >= geometry()->m_nbox[1]) continue;
 
-                const std::vector<unsigned> & elemntsID = geometry()->m_indexedElement[cbox[0] + i][cbox[1] + j][cbox[2] + k];
-                for (unsigned t=0;t<elemntsID.size();t++) selectElements.insert(elemntsID[t]);
+                for (int k=-d;k<=d;k++) {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= geometry()->m_nbox[2]) continue;
+
+                    const std::vector<unsigned> & elemntsID = geometry()->m_indexedElement[cbox[0] + i][cbox[1] + j][cbox[2] + k];
+                    for (unsigned t=0;t<elemntsID.size();t++) selectElements.insert(elemntsID[t]);
+                }
+            }
+        }
+    }
+
+
+    {
+        int j=-d;
+        if (cbox[1]+j >= 0 && cbox[1]+j < geometry()->m_nbox[1]) {
+            for (int i=-d+1;i<d;i++) {
+                if (cbox[0]+i < 0 || cbox[0]+i >= geometry()->m_nbox[0]) continue;
+
+                for (int k=-d;k<=d;k++) {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= geometry()->m_nbox[2]) continue;
+
+                    const std::vector<unsigned> & elemntsID = geometry()->m_indexedElement[cbox[0] + i][cbox[1] + j][cbox[2] + k];
+                    for (unsigned t=0;t<elemntsID.size();t++) selectElements.insert(elemntsID[t]);
+                }
+            }
+        }
+    }
+
+    {
+        int j=d;
+        if (cbox[1]+j >= 0 && cbox[1]+j < geometry()->m_nbox[1]) {
+            for (int i=-d+1;i<d;i++) {
+                if (cbox[0]+i < 0 || cbox[0]+i >= geometry()->m_nbox[0]) continue;
+
+                for (int k=-d;k<=d;k++) {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= geometry()->m_nbox[2]) continue;
+
+                    const std::vector<unsigned> & elemntsID = geometry()->m_indexedElement[cbox[0] + i][cbox[1] + j][cbox[2] + k];
+                    for (unsigned t=0;t<elemntsID.size();t++) selectElements.insert(elemntsID[t]);
+                }
+            }
+        }
+    }
+
+    {
+        int k=-d;
+        if (cbox[2]+k >= 0 && cbox[2]+k < geometry()->m_nbox[2]) {
+            for (int i=-d+1;i<d;i++) {
+                if (cbox[0]+i < 0 || cbox[0]+i >= geometry()->m_nbox[0]) continue;
+
+                for (int j=-d+1;j<d;j++) {
+                    if (cbox[1]+j < 0 || cbox[1]+j >= geometry()->m_nbox[1]) continue;
+
+                    const std::vector<unsigned> & elemntsID = geometry()->m_indexedElement[cbox[0] + i][cbox[1] + j][cbox[2] + k];
+                    for (unsigned t=0;t<elemntsID.size();t++) selectElements.insert(elemntsID[t]);
+                }
+            }
+        }
+    }
+
+    {
+        int k=d;
+        if (cbox[2]+k >= 0 && cbox[2]+k < geometry()->m_nbox[2]) {
+            for (int i=-d+1;i<d;i++) {
+                if (cbox[0]+i < 0 || cbox[0]+i >= geometry()->m_nbox[0]) continue;
+
+                for (int j=-d+1;j<d;j++) {
+                    if (cbox[1]+j < 0 || cbox[1]+j >= geometry()->m_nbox[1]) continue;
+
+                    const std::vector<unsigned> & elemntsID = geometry()->m_indexedElement[cbox[0] + i][cbox[1] + j][cbox[2] + k];
+                    for (unsigned t=0;t<elemntsID.size();t++) selectElements.insert(elemntsID[t]);
+                }
             }
         }
     }
@@ -68,11 +146,11 @@ ConstraintProximityPtr AABBElement::project(Vector3 P) {
     //search with the closest box in bbox
     for (int i=0;i<3;i++) {
         if (cbox[i] < 0) cbox[i] = 0;
-        else if (cbox[i] > geometry()->d_nbox.getValue()[i]) cbox[i] = geometry()->d_nbox.getValue()[i];
+        else if (cbox[i] > geometry()->m_nbox[i]) cbox[i] = geometry()->m_nbox[i];
     }
 
     int d = 0;
-    int max = std::max(std::max(geometry()->d_nbox.getValue()[0],geometry()->d_nbox.getValue()[1]),geometry()->d_nbox.getValue()[2]);
+    int max = std::max(std::max(geometry()->m_nbox[0],geometry()->m_nbox[1]),geometry()->m_nbox[2]);
     std::set<int> selectElements;
     while (selectElements.empty() && d<max) {
         fillElementSet(cbox,d,selectElements);
@@ -110,36 +188,51 @@ void AABBGeometry::init() {
 }
 
 void AABBGeometry::prepareDetection() {
-    m_indexedElement.resize(d_nbox.getValue()[0]+1);
-    for (unsigned i=0;i<m_indexedElement.size();i++) {
-        m_indexedElement[i].resize(d_nbox.getValue()[1]+1);
-        for (unsigned j=0;j<m_indexedElement[i].size();j++) {
-            m_indexedElement[i][j].resize(d_nbox.getValue()[2]+1);
-
-            for (unsigned k=0;k<m_indexedElement[i][j].size();k++) {
-                m_indexedElement[i][j][k].clear();
-            }
-        }
-    }
-
-    m_Bmin = Vector3(std::numeric_limits<double>::max(),std::numeric_limits<double>::max(),std::numeric_limits<double>::max());
-    m_Bmax = Vector3(std::numeric_limits<double>::min(),std::numeric_limits<double>::min(),std::numeric_limits<double>::min());
     const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
+    if (pos.empty()) return;
 
-    for (unsigned i=0;i<pos.size();i++) {
+    m_Bmin = pos[0];
+    m_Bmax = pos[0];
+    for (unsigned i=1;i<pos.size();i++) {
         if (pos[i][0]<m_Bmin[0]) m_Bmin[0] = pos[i][0];
-        if (pos[i][0]>m_Bmax[0]) m_Bmax[0] = pos[i][0];
-
         if (pos[i][1]<m_Bmin[1]) m_Bmin[1] = pos[i][1];
-        if (pos[i][1]>m_Bmax[1]) m_Bmax[1] = pos[i][1];
-
         if (pos[i][2]<m_Bmin[2]) m_Bmin[2] = pos[i][2];
+
+        if (pos[i][0]>m_Bmax[0]) m_Bmax[0] = pos[i][0];
+        if (pos[i][1]>m_Bmax[1]) m_Bmax[1] = pos[i][1];
         if (pos[i][2]>m_Bmax[2]) m_Bmax[2] = pos[i][2];
     }
 
     m_cellSize[0] = (m_Bmax[0] - m_Bmin[0]) / d_nbox.getValue()[0];
     m_cellSize[1] = (m_Bmax[1] - m_Bmin[1]) / d_nbox.getValue()[1];
     m_cellSize[2] = (m_Bmax[2] - m_Bmin[2]) / d_nbox.getValue()[2];
+
+    if (m_cellSize[0] == 0) {
+        m_cellSize[0] = (m_cellSize[1]+m_cellSize[2])*0.5;
+        m_nbox[0] = 1;
+    } else m_nbox[0] = d_nbox.getValue()[0] + 1;
+
+    if (m_cellSize[1] == 0) {
+        m_cellSize[1] = (m_cellSize[0]+m_cellSize[2])*0.5;
+        m_nbox[1] = 1;
+    } else m_nbox[1] = d_nbox.getValue()[1] + 1;
+
+    if (m_cellSize[2] == 0) {
+        m_cellSize[2] = (m_cellSize[0]+m_cellSize[1])*0.5;
+        m_nbox[2] = 1;
+    } else m_nbox[2] = d_nbox.getValue()[2] + 1;
+
+    m_indexedElement.resize(m_nbox[0]);
+    for (unsigned i=0;i<m_indexedElement.size();i++) {
+        m_indexedElement[i].resize(m_nbox[1]);
+        for (unsigned j=0;j<m_indexedElement[i].size();j++) {
+            m_indexedElement[i][j].resize(m_nbox[2]);
+
+            for (unsigned k=0;k<m_indexedElement[i][j].size();k++) {
+                m_indexedElement[i][j][k].clear();
+            }
+        }
+    }
 
     // center in -0.5 cellwidth
     m_Bmin -= m_cellSize * 0.5;
@@ -149,10 +242,9 @@ void AABBGeometry::prepareDetection() {
         ConstraintElementPtr elmt = p_geometry->getElement(itE);
         if (elmt->getNbControlPoints() == 0) continue;
 
-        Vector3 minbox(std::numeric_limits<double>::max(),std::numeric_limits<double>::max(),std::numeric_limits<double>::max());
-        Vector3 maxbox(std::numeric_limits<double>::min(),std::numeric_limits<double>::min(),std::numeric_limits<double>::min());
-
-        for (unsigned p=0;p<elmt->getNbControlPoints();p++) {
+        Vector3 minbox = elmt->getControlPoint(0)->getPosition();
+        Vector3 maxbox = elmt->getControlPoint(0)->getPosition();
+        for (unsigned p=1;p<elmt->getNbControlPoints();p++) {
             Vector3 P = elmt->getControlPoint(p)->getPosition();
 
             minbox[0] = std::min(minbox[0],P[0]);

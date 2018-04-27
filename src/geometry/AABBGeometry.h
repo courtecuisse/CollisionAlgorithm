@@ -22,8 +22,14 @@ public:
 
     void draw(const VisualParams * vparams);
 
+    virtual void handleEvent(Event * e) {
+        p_geometry->handleEvent(e);
+        BaseGeometry::handleEvent(e);
+    }
+
 protected:
     Vector3 m_Bmin,m_Bmax,m_cellSize;
+    Vec3i m_nbox;
     std::vector<std::vector<std::vector<std::vector<unsigned> > > >  m_indexedElement;
 };
 

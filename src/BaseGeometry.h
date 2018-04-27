@@ -41,7 +41,8 @@ public:
     , m_controlPoints(nc) {}
 
     //this function returns a vector with all the control points of the element
-    virtual ConstraintProximityPtr getControlPoint(const int i) = 0;
+    //if an id is not >=0 and <getNbControlPoints() this function should return the gravity center of the element
+    virtual ConstraintProximityPtr getControlPoint(const int i = -1) = 0;
 
     //this function project the point P on the element and return the corresponding proximity
     virtual ConstraintProximityPtr project(Vector3 P) = 0;
@@ -79,27 +80,28 @@ public:
         m_elements.clear();
     }
 
-    void newStep() {
+    virtual void beginStep() {
         if (! m_dirty) return;
         m_dirty = false;
         prepareDetection();
     }
 
-    void handleEvent(Event * e) {
-        if (dynamic_cast<AnimateBeginEvent *>(e)) newStep();
-        else if (dynamic_cast<AnimateEndEvent *>(e)) m_dirty = true;
+    virtual void endStep() {
+        m_dirty = true;
     }
 
-    unsigned getNbElements() {
-        newStep();
+    virtual void handleEvent(Event * e) {
+        if (dynamic_cast<AnimateBeginEvent *>(e)) beginStep();
+        else if (dynamic_cast<AnimateEndEvent *>(e)) endStep();
+    }
+
+    unsigned getNbElements() {        
         return m_elements.size();
     }
 
     ConstraintElementPtr getElement(unsigned i) const {
         return m_elements[i];
     }
-
-    virtual void prepareDetection() {}
 
     ConstraintProximityPtr project(const Vector3 & P) {
         double min_dist = std::numeric_limits<double>::max();
@@ -122,6 +124,7 @@ protected:
     std::vector<ConstraintElementPtr> m_elements;
     bool m_dirty;
 
+    virtual void prepareDetection() {}
 };
 
 
