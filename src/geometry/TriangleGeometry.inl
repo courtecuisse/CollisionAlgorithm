@@ -16,7 +16,7 @@ TriangleProximity::TriangleProximity(TriangleElement * elmt,double f1,double f2,
 }
 
 Vector3 TriangleProximity::getPosition(VecID v) const {
-    const ReadAccessor<Vector3> & pos = element()->geometry()->p_topology->p_state->read(v);
+    const ReadAccessor<Vector3> & pos = m_state->read(v);
 
     return pos[element()->m_pid[0]] * m_fact[0] +
            pos[element()->m_pid[1]] * m_fact[1] +

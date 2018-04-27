@@ -44,8 +44,6 @@ PairProximity  CollisionDetectionAlgorithm::getClosestPoint(ConstraintElementPtr
 }
 
 void CollisionDetectionAlgorithm::processAlgorithm() {
-    Timer::beginStep(this,"COLLISION ALGO");
-
     m_pairDetection.clear();
 
     for (unsigned i=0;i<p_from->getNbElements();i++) {
@@ -56,8 +54,6 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
 
         m_pairDetection.push_back(pair);
     }
-
-    Timer::endStep(this,"COLLISION ALGO");
 }
 
 }

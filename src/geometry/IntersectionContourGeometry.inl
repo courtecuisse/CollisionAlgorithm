@@ -12,7 +12,7 @@ namespace collisionAlgorithm {
 IntersectionContourProximity::IntersectionContourProximity(IntersectionContourElement * elmt) : ConstraintProximity(elmt) {}
 
 Vector3 IntersectionContourProximity::getPosition(VecID v) const {
-    const ReadAccessor<Vector3> & pos = element()->geometry()->p_topology->p_state->read(v);
+    const ReadAccessor<Vector3> & pos = m_state->read(v);
 
     Vector3 P = pos[element()->m_pid[0]] * element()->m_fact[0];
     Vector3 Q = pos[element()->m_pid[1]] * element()->m_fact[1];

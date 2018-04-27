@@ -12,7 +12,7 @@ namespace collisionAlgorithm {
 PointProximity::PointProximity(PointElement * elmt) : ConstraintProximity(elmt) {}
 
 Vector3 PointProximity::getPosition(VecID v) const {
-    const ReadAccessor<Vector3> & pos = element()->geometry()->p_topology->p_state->read(v);
+    const ReadAccessor<Vector3> & pos = m_state->read(v);
     return pos[element()->m_pid];
 }
 

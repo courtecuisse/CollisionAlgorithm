@@ -13,7 +13,7 @@ class BaseGeometry;
 class ConstraintProximity {
 public :
 
-    ConstraintProximity(ConstraintElement * elmt) : m_element(elmt) {}
+    ConstraintProximity(ConstraintElement * elmt);
 
     virtual Vector3 getPosition(VecID v = VecCoordId::position()) const = 0;
 
@@ -27,6 +27,7 @@ public :
 
 protected:
     ConstraintElement * m_element;
+    State * m_state; // direct access to the state;
 };
 
 typedef std::shared_ptr<ConstraintProximity> ConstraintProximityPtr;
