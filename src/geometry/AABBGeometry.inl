@@ -122,12 +122,20 @@ void AABBGeometry::prepareDetection() {
         }
     }
 
-    BoundingBox bbox;
+    m_Bmin = Vector3(std::numeric_limits<double>::max(),std::numeric_limits<double>::max(),std::numeric_limits<double>::max());
+    m_Bmax = Vector3(std::numeric_limits<double>::min(),std::numeric_limits<double>::min(),std::numeric_limits<double>::min());
     const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
-    for (unsigned i=0;i<pos.size();i++) bbox.include(pos[i]);
 
-    m_Bmin = Vector3(bbox.minBBoxPtr());
-    m_Bmax = Vector3(bbox.minBBoxPtr());
+    for (unsigned i=0;i<pos.size();i++) {
+        if (pos[i][0]<m_Bmin[0]) m_Bmin[0] = pos[i][0];
+        if (pos[i][0]>m_Bmax[0]) m_Bmax[0] = pos[i][0];
+
+        if (pos[i][1]<m_Bmin[1]) m_Bmin[1] = pos[i][1];
+        if (pos[i][1]>m_Bmax[1]) m_Bmax[1] = pos[i][1];
+
+        if (pos[i][2]<m_Bmin[2]) m_Bmin[2] = pos[i][2];
+        if (pos[i][2]>m_Bmax[2]) m_Bmax[2] = pos[i][2];
+    }
 
     m_cellSize[0] = (m_Bmax[0] - m_Bmin[0]) / d_nbox.getValue()[0];
     m_cellSize[1] = (m_Bmax[1] - m_Bmin[1]) / d_nbox.getValue()[1];
@@ -156,8 +164,8 @@ void AABBGeometry::prepareDetection() {
             maxbox[2] = std::max(maxbox[2],P[2]);
         }
 
-        Vec3i cminbox;
-        Vec3i cmaxbox;
+        Vec3i cminbox(0,0,0);
+        Vec3i cmaxbox(0,0,0);
 
         cminbox[0] = floor((minbox[0] - m_Bmin[0])/m_cellSize[0]);
         cminbox[1] = floor((minbox[1] - m_Bmin[1])/m_cellSize[1]);
