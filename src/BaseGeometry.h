@@ -27,7 +27,6 @@ public :
 
 protected:
     ConstraintElement * m_element;
-    State * m_state; // direct access to the state;
 };
 
 typedef std::shared_ptr<ConstraintProximity> ConstraintProximityPtr;
@@ -52,11 +51,6 @@ public:
         return m_controlPoints;
     }
 
-    template<class T = BaseGeometry>
-    T * geometry() const {
-        return (T*) m_geometry;
-    }
-
 protected:
     BaseGeometry * m_geometry;
     unsigned m_controlPoints;
@@ -67,12 +61,12 @@ typedef std::shared_ptr<ConstraintElement> ConstraintElementPtr;
 class BaseGeometry : public BaseObject {
 public:
 
-    Port<Topology,REQUIRED> p_topology;
+//    Port<Topology,REQUIRED> p_topology;
     Port<BaseObject> p_type;
 
     BaseGeometry()
-    : p_topology("topology",LEFT,this)
-    , p_type("any",LEFT,this) {
+//    : p_topology("topology",LEFT,this)
+    : p_type("any",RIGHT,this) {
         m_dirty = true;
     }
 
@@ -118,6 +112,8 @@ public:
 
         return min_prox;
     }
+
+    virtual ReadAccessor<Vector3> read(VecID v) = 0;
 
 
 protected:

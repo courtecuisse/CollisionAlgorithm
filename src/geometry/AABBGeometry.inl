@@ -179,7 +179,7 @@ ConstraintProximityPtr AABBElement::project(Vector3 P) {
 
 AABBGeometry::AABBGeometry()
 : d_nbox("nbox",Vec3i(8,8,8),this)
-, p_geometry("geometry",RIGHT, this)
+, p_geometry("geometry",LEFT, this)
 {}
 
 void AABBGeometry::init() {
@@ -188,7 +188,7 @@ void AABBGeometry::init() {
 }
 
 void AABBGeometry::prepareDetection() {
-    const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
+    const ReadAccessor<Vector3> & pos = read(VecCoordId::position());
     if (pos.empty()) return;
 
     m_Bmin = pos[0];

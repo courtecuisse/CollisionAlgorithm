@@ -10,6 +10,11 @@ class TriangleGeometry : public BaseGeometry {
 
 public:
 
+    Port<Topology,REQUIRED> p_topology;
+
+    TriangleGeometry()
+    : p_topology("topology",LEFT,this) {}
+
     void init();
 
     void prepareDetection();
@@ -25,6 +30,10 @@ public:
 
         Vector3 tn,ax1,ax2;
     } TriangleInfo;
+
+    inline ReadAccessor<Vector3> read(VecID v) {
+        return p_topology->p_state->read(v);
+    }
 
 protected:
     std::vector<TriangleInfo> m_triangle_info;
@@ -50,6 +59,7 @@ public:
     }
 
 protected:
+    Vector3 m_pos;
     unsigned m_pid[3];
     unsigned m_eid;
 };

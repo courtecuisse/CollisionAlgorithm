@@ -27,6 +27,10 @@ public:
         BaseGeometry::handleEvent(e);
     }
 
+    inline ReadAccessor<Vector3> read(VecID v) {
+        return p_geometry->read(v);
+    }
+
 protected:
     Vector3 m_Bmin,m_Bmax,m_cellSize;
     Vec3i m_nbox;

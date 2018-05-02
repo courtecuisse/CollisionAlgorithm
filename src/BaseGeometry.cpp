@@ -7,9 +7,7 @@
 namespace collisionAlgorithm {
 
 ConstraintProximity::ConstraintProximity(ConstraintElement * elmt)
-: m_element(elmt) {
-    m_state = m_element->geometry()->p_topology->p_state();
-}
+: m_element(elmt) {}
 
 //namespace core {
 

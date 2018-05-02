@@ -15,8 +15,7 @@ EdgeProximity::EdgeProximity(EdgeElement * elmt,double f1,double f2) : Constrain
 }
 
 Vector3 EdgeProximity::getPosition(VecID v) const {
-    const ReadAccessor<Vector3> & pos = m_state->read(v);
-
+    const ReadAccessor<Vector3> & pos = element()->geometry()->p_topology->p_state->read(v);
     return pos[element()->m_pid[0]] * m_fact[0] + pos[element()->m_pid[1]] * m_fact[1];
 }
 
@@ -56,7 +55,7 @@ ConstraintProximityPtr EdgeElement::getControlPoint(const int cid) {
 ConstraintProximityPtr EdgeElement::project(Vector3 P) {
     double fact_u,fact_v;
 
-    const ReadAccessor<Vector3> & pos = geometry()->p_topology->p_state->read(VecCoordId::position());
+    const ReadAccessor<Vector3> & pos = geometry()->read(VecCoordId::position());
 
     Vector3 P1 = pos[m_pid[0]];
     Vector3 P2 = pos[m_pid[1]];
@@ -70,6 +69,10 @@ ConstraintProximityPtr EdgeElement::project(Vector3 P) {
     fact_u = 1.0-fact_v;
 
     return std::make_shared<EdgeProximity>(this,fact_u,fact_v);
+}
+
+EdgeGeometry * EdgeElement::geometry() {
+    return (EdgeGeometry * )m_geometry;
 }
 
 /**************************************************************************/

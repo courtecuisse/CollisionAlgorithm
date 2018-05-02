@@ -12,7 +12,7 @@ namespace collisionAlgorithm {
 PointProximity::PointProximity(PointElement * elmt) : ConstraintProximity(elmt) {}
 
 Vector3 PointProximity::getPosition(VecID v) const {
-    const ReadAccessor<Vector3> & pos = m_state->read(v);
+    const ReadAccessor<Vector3> & pos = element()->geometry()->read(v);
     return pos[element()->m_pid];
 }
 
@@ -43,6 +43,11 @@ ConstraintProximityPtr PointElement::getControlPoint(const int /*cid*/) {
 //this function project the point P on the element and return the corresponding proximity
 ConstraintProximityPtr PointElement::project(Vector3 /*P*/) {
     return getControlPoint(0);
+}
+
+//this function project the point P on the element and return the corresponding proximity
+PointGeometry * PointElement::geometry() {
+    return (PointGeometry * ) m_geometry;
 }
 
 /**************************************************************************/

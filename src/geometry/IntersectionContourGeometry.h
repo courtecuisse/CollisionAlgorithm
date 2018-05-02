@@ -8,12 +8,17 @@ class IntersectionContourGeometry : public BaseGeometry {
 public:
         Data<Vector3> d_planePos;
         Data<Vector3> d_planeNormal;
+        Port<Topology,REQUIRED> p_topology;
 
         IntersectionContourGeometry();
 
         void prepareDetection();
 
         void draw(const VisualParams * vparams);
+
+        ReadAccessor<Vector3> read(VecID v) {
+            return p_topology->p_state->read(v);
+        }
 };
 
 
@@ -26,6 +31,10 @@ public:
     ConstraintProximityPtr getControlPoint(const int i);
 
     ConstraintProximityPtr project(Vector3 /*P*/);
+
+    IntersectionContourGeometry * geometry() {
+        return (IntersectionContourGeometry *)m_geometry;
+    }
 
 protected:
     unsigned m_pid[2];
