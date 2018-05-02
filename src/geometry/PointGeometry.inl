@@ -1,58 +1,10 @@
 ﻿#pragma once
 
 #include <geometry/PointGeometry.h>
+#include <element/PointElement.h>
 #include <GL/gl.h>
 
 namespace collisionAlgorithm {
-
-/**************************************************************************/
-/******************************PROXIMITY***********************************/
-/**************************************************************************/
-
-PointProximity::PointProximity(PointElement * elmt) : ConstraintProximity(elmt) {}
-
-Vector3 PointProximity::getPosition(VecID v) const {
-    const ReadAccessor<Vector3> & pos = element()->geometry()->read(v);
-    return pos[element()->m_pid];
-}
-
-Vector3 PointProximity::getNormal() const {
-    return Vector3(1,0,0);
-}
-
-std::map<unsigned,Vector3> PointProximity::getContribution(const Vector3 & N) {
-    std::map<unsigned,Vector3> res;
-
-    res[element()->m_pid] = N;
-
-    return res;
-}
-
-/**************************************************************************/
-/******************************ELEMENT*************************************/
-/**************************************************************************/
-
-PointElement::PointElement(PointGeometry * geo,unsigned pid) : ConstraintElement(geo,1) {
-    m_pid = pid;
-}
-
-ConstraintProximityPtr PointElement::getControlPoint(const int /*cid*/) {
-    return std::make_shared<PointProximity>(this);
-}
-
-//this function project the point P on the element and return the corresponding proximity
-ConstraintProximityPtr PointElement::project(Vector3 /*P*/) {
-    return getControlPoint(0);
-}
-
-//this function project the point P on the element and return the corresponding proximity
-PointGeometry * PointElement::geometry() {
-    return (PointGeometry * ) m_geometry;
-}
-
-/**************************************************************************/
-/******************************GEOMETRY************************************/
-/**************************************************************************/
 
 void PointGeometry::init() {
     m_elements.clear();

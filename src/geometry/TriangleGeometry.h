@@ -40,47 +40,6 @@ protected:
     std::vector<Vector3> m_pointNormal;
 };
 
-class TriangleElement : public ConstraintElement {
-    friend class TriangleProximity;
-    friend class TriangleGeometry;
-
-public:
-
-    TriangleElement(TriangleGeometry *geo, unsigned pid);
-
-    ConstraintProximityPtr getControlPoint(const int i);
-
-    void computeBaryCoords(const Vector3 & proj_P,const TriangleGeometry::TriangleInfo & tinfo, const Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const;
-
-    ConstraintProximityPtr project(Vector3 /*P*/);
-
-    inline TriangleGeometry * geometry() const {
-        return (TriangleGeometry*) m_geometry;
-    }
-
-protected:
-    Vector3 m_pos;
-    unsigned m_pid[3];
-    unsigned m_eid;
-};
-
-class TriangleProximity : public ConstraintProximity {
-public :
-    TriangleProximity(TriangleElement *geo,double f1,double f2,double f3);
-
-    Vector3 getPosition(VecID v) const;
-
-    Vector3 getNormal() const;
-
-    std::map<unsigned,Vector3> getContribution(const Vector3 & N);
-
-    inline TriangleElement * element() const {
-        return (TriangleElement*) m_element;
-    }
-
-protected:
-    double m_fact[3];
-};
 
 }
 

@@ -19,7 +19,7 @@ public :
 
     virtual Vector3 getNormal() const = 0;
 
-    virtual std::map<unsigned,Vector3> getContribution(const Vector3 & N) = 0;
+    virtual std::map<unsigned,double> getContributions() = 0;
 
     inline ConstraintElement * element() const {
         return (ConstraintElement*) m_element;
