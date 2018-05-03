@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(CollisionAlgorithmPlugin)
 
+
 find_package(SofaFramework REQUIRED)
 find_package(SofaBase REQUIRED)
 find_package(SofaSimulation REQUIRED)
 find_package(SofaGeneral REQUIRED)
 
+find_package(PCL 1.3 REQUIRED COMPONENTS common io)
+#list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
 #find_package(TRI6FEM REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -22,12 +25,20 @@ set(SOURCE_FILES
      src/AABBDecorator.cpp
      src/FindClosestPoint.cpp
      src/BindPointCloud.cpp
+     src/KdTreeClosestPoint.cpp
+     src/totalDistanceBind.cpp
+     src/kdtreeBind.cpp
+     src/BindPointCloudReinit.cpp
+     src/HybridBind.cpp
+     src/PCAPointCloud.cpp
+     src/ManualBind.cpp
 )
 
 file(GLOB_RECURSE SCENES_FILES
     "scenes/*.scn"
     "scenes/*.xml"
 )
+
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${README_FILES} )
 #set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "_d")
@@ -38,7 +49,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "$<INSTALL_INTERFACE:include/$
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DPLUGIN_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\"")
 #target_link_libraries(${PROJECT_NAME} SofaCore SofaComponentBase SofaSimulationTree SofaUserInteraction SofaConstraint TRI6FEM)
-target_link_libraries(${PROJECT_NAME} SofaCore SofaComponentBase SofaSimulationTree SofaUserInteraction SofaConstraint ConstraintGeometryPlugin)
+target_link_libraries(${PROJECT_NAME} SofaCore SofaComponentBase SofaSimulationTree SofaUserInteraction SofaConstraint ConstraintGeometryPlugin ${PCL_COMMON_LIBRARIES} ${PCL_IO_LIBRARIES})
 
 ## Install rules for the library and headers; CMake package configurations files
 sofa_create_package(${PROJECT_NAME} 0.1 ${PROJECT_NAME} ${PROJECT_NAME})

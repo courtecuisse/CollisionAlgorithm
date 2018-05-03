@@ -9,6 +9,9 @@
 #include <math.h>
 #include <sofa/defaulttype/Vec.h>
 #include "AABBDecorator.h"
+#include <pcl/point_cloud.h>
+#include <pcl/registration/correspondence_estimation.h>
+#include <pcl/correspondence.h>
 
 namespace sofa {
 
@@ -17,10 +20,10 @@ namespace core {
 namespace behavior {
 
 
-void CollisionAlgorithm::BindPointCloud(const helper::vector<defaulttype::Vector3> & p1, const helper::vector<defaulttype::Vector3> & p2 , helper::vector<int> & bindId, double minDist) {
-   // bindId.resize(p1.size(),-1);
-    helper::vector<int> reinit(p1.size(),-1);
-    bindId.swap(reinit);
+void CollisionAlgorithm::KdTreeClosestPoint(const helper::vector<defaulttype::Vector3> & p1, const helper::vector<defaulttype::Vector3> & p2 , helper::vector<int> & bindId, double minDist) {
+
+    bindId.resize(p1.size(),-1);
+
     if (p1.empty()) return;
     if (p2.empty()) return;
 
@@ -29,9 +32,53 @@ void CollisionAlgorithm::BindPointCloud(const helper::vector<defaulttype::Vector
     helper::vector<int> invBind;
     invBind.resize(p2.size(),-1);
 
+    /*pcl cloud data initialisation*/
+
+    //registration through kdtree algorithm
+
+    pcl::PointCloud<pcl::PointXYZ>::Ptr p1cloudconst (new pcl::PointCloud<pcl::PointXYZ>);
+    p1cloudconst->width = p1.size();
+    p1cloudconst->height = 1;
+    p1cloudconst->points.resize (p1cloudconst->width * p1cloudconst->height);
+    for (size_t i = 0; i < p1.size(); ++i)
+    {
+        //p1cloud.push_back(pcl::PointXYZ(p1[i].x(),p1[i].y(), p1[i].z() ));
+
+        p1cloudconst->points[i].x = p1[i].x();
+        p1cloudconst->points[i].y = p1[i].y();
+        p1cloudconst->points[i].z = p1[i].z();
+
+    }
+
+    pcl::PointCloud<pcl::PointXYZ>::Ptr p2cloudconst (new pcl::PointCloud<pcl::PointXYZ>);
+    p2cloudconst->width = p2.size();
+    p2cloudconst->height = 1;
+    p2cloudconst->points.resize (p2cloudconst->width * p2cloudconst->height);
+    for (size_t i = 0; i < p2.size(); ++i)
+    {
+        //p1cloud.push_back(pcl::PointXYZ(p1[i].x(),p1[i].y(), p1[i].z() ));
+
+        p2cloudconst->points[i].x = p2[i].x();
+        p2cloudconst->points[i].y = p2[i].y();
+        p2cloudconst->points[i].z = p2[i].z();
+
+    }
+    //pcl::PointCloud<pcl::PointXYZ>::Ptr p1cloudconst(&p1cloud);
+    pcl::registration::CorrespondenceEstimation<pcl::PointXYZ, pcl::PointXYZ>::Ptr KdtreeEstimator;
+
+    KdtreeEstimator->setInputSource(p1cloudconst);
+    std::cout << "RAMISTAR" << std::endl;
+    KdtreeEstimator->setInputTarget(p2cloudconst);
+    int _index_query;
+    int _index_match;
+    float _distance;
+    pcl::Correspondence reciprocalBinding(_index_query, _index_match, _distance);
+    //KdtreeEstimator->determineReciprocalCorrespondences (all_correspondences);
+
+
     while (change) {
 //        printf("NEW LOOP\n");
-//        std::cout << "BIND=" << bindId << std::endl;
+//          std::cout << "BIND=" << bindId << std::endl;
 //        std::cout << "IBIND=" << invBind << std::endl;
         change = false;//ne new change
 
@@ -101,4 +148,3 @@ void CollisionAlgorithm::BindPointCloud(const helper::vector<defaulttype::Vector
 } // namespace sofa
 
 #endif // SOFA_COMPONENT_CONTROLLER_NeedleConstraint_H
-

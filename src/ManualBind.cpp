@@ -17,7 +17,7 @@ namespace core {
 namespace behavior {
 
 
-void CollisionAlgorithm::BindPointCloud(const helper::vector<defaulttype::Vector3> & p1, const helper::vector<defaulttype::Vector3> & p2 , helper::vector<int> & bindId, double minDist) {
+void CollisionAlgorithm::ManualBind(const helper::vector<defaulttype::Vector3> & p1, const helper::vector<defaulttype::Vector3> & p2 , helper::vector<int> & bindId, double minDist) {
    // bindId.resize(p1.size(),-1);
     helper::vector<int> reinit(p1.size(),-1);
     bindId.swap(reinit);
