@@ -14,11 +14,11 @@ class PointElement : public ConstraintElement {
 
 public:
 
+    inline ConstraintProximityPtr createProximity(const int i);
+
     PointElement(PointGeometry *geo, unsigned pid) : ConstraintElement(geo,1) {
         m_pid = pid;
     }
-
-    ConstraintProximityPtr createProximity(const int i);
 
     ConstraintProximityPtr getControlPoint(const int i) {
         return createProximity(i);
@@ -54,10 +54,10 @@ public :
         return Vector3(1,0,0);
     }
 
-    std::map<unsigned,Vector3> getContribution(const Vector3 & N) {
-        std::map<unsigned,Vector3> res;
+    std::map<unsigned,double> getContributions() {
+        std::map<unsigned,double> res;
 
-        res[element()->m_pid] = N;
+        res[element()->m_pid] = 1.0;
 
         return res;
     }

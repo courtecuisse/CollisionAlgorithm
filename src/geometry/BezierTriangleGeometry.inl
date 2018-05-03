@@ -68,11 +68,11 @@ void BezierTriangleGeometry::prepareDetection() {
 
 void BezierTriangleGeometry::tesselate(const VisualParams * vparams, unsigned level,int tid, const Vector3 & bary_A,const Vector3 & bary_B, const Vector3 & bary_C) {
     if (level >= d_draw_tesselation.getValue()) {
-        const Topology::Triangle & tri = p_topology->getTriangle(tid);
+        BezierTriangleElement * elmt = (BezierTriangleElement *) getElement(tid).get();
 
-        Vector3 pA = getNonLinearTriangleProximity(tid,tri[0],bary_A[0],tri[1],bary_A[1],tri[2],bary_A[2])->getPosition();
-        Vector3 pB = getNonLinearTriangleProximity(tid,tri[0],bary_B[0],tri[1],bary_B[1],tri[2],bary_B[2])->getPosition();
-        Vector3 pC = getNonLinearTriangleProximity(tid,tri[0],bary_C[0],tri[1],bary_C[1],tri[2],bary_C[2])->getPosition();
+        Vector3 pA = elmt->createProximity(bary_A[0],bary_A[1],bary_A[2])->getPosition();
+        Vector3 pB = elmt->createProximity(bary_B[0],bary_B[1],bary_B[2])->getPosition();
+        Vector3 pC = elmt->createProximity(bary_C[0],bary_C[1],bary_C[2])->getPosition();
 
         this->drawTriangle(vparams,pA,pB,pC);
 
@@ -95,7 +95,7 @@ void BezierTriangleGeometry::tesselate(const VisualParams * vparams, unsigned le
     tesselate(vparams,level+1,tid,bary_A,bary_G,bary_E);
 }
 
-void BezierTriangleGeometry::draw(const core::visual::VisualParams * vparams) {
+void BezierTriangleGeometry::draw(const VisualParams * vparams) {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
 
         if (m_triangle_info.empty()) {
@@ -105,13 +105,10 @@ void BezierTriangleGeometry::draw(const core::visual::VisualParams * vparams) {
 
         glDisable(GL_LIGHTING);
 
-        if (vparams->displayFlags().getShowWireFrame()) glBegin(GL_LINES);
-        else {
-            glEnable(GL_CULL_FACE);
-            glBegin(GL_TRIANGLES);
-        }
+        glEnable(GL_CULL_FACE);
+        glBegin(GL_TRIANGLES);
 
-        for(int t=0;t<this->getTopology()->getNbTriangles();t++) {
+        for(unsigned t=0;t<p_topology->getNbTriangles();t++) {
             tesselate(vparams,0,t,Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1));
         }
 

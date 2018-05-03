@@ -5,6 +5,9 @@
 namespace collisionAlgorithm {
 
 class BezierTriangleGeometry : public TriangleGeometry {
+    friend class BezierTriangleElement;
+    friend class BezierTriangleProximity;
+
 public:
     typedef TriangleGeometry Inherit;
     typedef typename Inherit::TriangleInfo TriangleInfo;
@@ -17,10 +20,6 @@ public:
     BezierTriangleGeometry();
 
     void prepareDetection();
-
-    ConstraintProximityPtr getNonLinearTriangleProximity(unsigned eid, unsigned p1,double f1,unsigned p2, double f2, unsigned p3, double f3) const;
-
-    ConstraintProximityPtr getElementProximity(unsigned eid) const;
 
     void draw(const VisualParams * vparams);
 

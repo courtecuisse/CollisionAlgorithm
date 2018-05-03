@@ -1,56 +1,10 @@
 #pragma once
 
 #include <geometry/IntersectionContourGeometry.h>
+#include <element/IntersectionContourElement.h>
 #include <GL/gl.h>
 
 namespace collisionAlgorithm {
-
-/**************************************************************************/
-/******************************PROXIMITY***********************************/
-/**************************************************************************/
-
-IntersectionContourProximity::IntersectionContourProximity(IntersectionContourElement * elmt) : ConstraintProximity(elmt) {}
-
-Vector3 IntersectionContourProximity::getPosition(VecID v) const {
-    const ReadAccessor<Vector3> & pos = element()->geometry()->read(v);
-
-    Vector3 P = pos[element()->m_pid[0]] * element()->m_fact[0];
-    Vector3 Q = pos[element()->m_pid[1]] * element()->m_fact[1];
-
-    return (P+Q);
-}
-
-Vector3 IntersectionContourProximity::getNormal() const {
-//        return m_geo->getPos(ie.p1,vid) * ie.alpha + m_geo->getPos(ie.p2,vid) * (1.0 - ie.alpha);
-}
-
-std::map<unsigned,Vector3> IntersectionContourProximity::getContribution(const Vector3 & N) {
-
-}
-
-/**************************************************************************/
-/******************************ELEMENT*************************************/
-/**************************************************************************/
-
-IntersectionContourElement::IntersectionContourElement(IntersectionContourGeometry *geo, unsigned pid1, unsigned pid2,double f1,double f2) : ConstraintElement(geo,1) {
-    m_pid[0] = pid1;
-    m_pid[1] = pid2;
-
-    m_fact[0] = f1;
-    m_fact[1] = f2;
-}
-
-ConstraintProximityPtr IntersectionContourElement::project(Vector3 /*P*/) {
-    return getControlPoint(0);
-}
-
-ConstraintProximityPtr IntersectionContourElement::getControlPoint(const int /*i*/) {
-    return std::make_shared<IntersectionContourProximity>(this);
-}
-
-/**************************************************************************/
-/******************************GEOMETRY************************************/
-/**************************************************************************/
 
 IntersectionContourGeometry::IntersectionContourGeometry()
 : d_planePos("planePos",Vector3(0,0,0),this)
@@ -62,6 +16,24 @@ void IntersectionContourGeometry::prepareDetection() {
     m_elements.clear();
 
     const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
+
+    m_pointNormal.resize(pos.size());
+    for (unsigned p=0;p<pos.size();p++) {
+        const Topology::TrianglesAroundVertex & tav = this->p_topology->getTrianglesAroundVertex(p);
+        m_pointNormal[p] = Vector3(0,0,0);
+        for (unsigned t=0;t<tav.size();t++) {
+            Topology::Triangle tri = this->p_topology->getTriangle(tav[t]);
+
+            //Compute Bezier Positions
+            Vector3 p0 = pos[tri[0]];
+            Vector3 p1 = pos[tri[1]];
+            Vector3 p2 = pos[tri[2]];
+
+            m_pointNormal[p] += (p1 - p0).cross(p2 - p0);;
+        }
+        m_pointNormal[p].normalize();
+    }
+
 
     Vector3 pointOnPlane = d_planePos.getValue();
     Vector3 planeNormal = d_planeNormal.getValue();

@@ -2,7 +2,7 @@
 
 namespace collisionAlgorithm {
 
-//DECLARE_CLASS(BezierTriangleGeometry)
+DECLARE_CLASS(BezierTriangleGeometry)
 
 }
 

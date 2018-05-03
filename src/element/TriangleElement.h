@@ -9,13 +9,15 @@ namespace collisionAlgorithm {
 /******************************ELEMENT*************************************/
 /**************************************************************************/
 
+class TriangleProximity;
+
 class TriangleElement : public ConstraintElement {
     friend class TriangleProximity;
     friend class TriangleGeometry;
 
 public:
 
-    ConstraintProximityPtr createProximity(double f1,double f2,double f3);
+    inline ConstraintProximityPtr createProximity(double f1,double f2,double f3);
 
     TriangleElement(TriangleGeometry * geo,unsigned eid) : ConstraintElement(geo,3) {
         m_eid = eid;
@@ -158,10 +160,8 @@ public :
         return (TriangleElement*) m_element;
     }
 
-protected:
     double m_fact[3];
 };
-
 
 ConstraintProximityPtr TriangleElement::createProximity(double f1,double f2,double f3) {
     return std::make_shared<TriangleProximity>(this,f1,f2,f3);

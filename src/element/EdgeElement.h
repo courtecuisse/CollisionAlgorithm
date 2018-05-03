@@ -14,7 +14,7 @@ class EdgeElement : public ConstraintElement {
 
 public:
 
-    ConstraintProximityPtr createProximity(EdgeElement * elmt,double f1,double f2);
+    inline ConstraintProximityPtr createProximity(EdgeElement * elmt,double f1,double f2);
 
     EdgeElement(EdgeGeometry * geo,unsigned eid) : ConstraintElement(geo,2) {
         m_eid = eid;
@@ -85,11 +85,11 @@ public :
         return Vector3(1,0,0);
     }
 
-    std::map<unsigned,Vector3> getContribution(const Vector3 & N) {
-        std::map<unsigned,Vector3> res;
+    std::map<unsigned,double> getContributions() {
+        std::map<unsigned,double> res;
 
-        res[element()->m_pid[0]] = N * 1.0/2.0;
-        res[element()->m_pid[1]] = N * 1.0/2.0;
+        res[element()->m_pid[0]] = m_fact[0];
+        res[element()->m_pid[1]] = m_fact[1];
 
         return res;
     }
@@ -99,7 +99,7 @@ protected:
 };
 
 
-ConstraintProximityPtr EdgeElement::createEdgeProximity(EdgeElement * elmt,double f1,double f2) {
+ConstraintProximityPtr EdgeElement::createProximity(EdgeElement * elmt,double f1,double f2) {
     return std::make_shared<EdgeProximity>(elmt,f1,f2);
 }
 

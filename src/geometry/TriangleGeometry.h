@@ -11,15 +11,19 @@ class TriangleGeometry : public BaseGeometry {
 public:
 
     Port<Topology,REQUIRED> p_topology;
+    Data<Vector4> d_color;
 
     TriangleGeometry()
-    : p_topology("topology",LEFT,this) {}
+    : p_topology("topology",LEFT,this)
+    , d_color("color", Vector4(1,0,1,1), this){}
 
     void init();
 
     void prepareDetection();
 
     void draw(const VisualParams *vparams);
+
+    void drawTriangle(const VisualParams * vparams,const Vector3 & A,const Vector3 & B, const Vector3 & C);
 
     typedef struct {
         Vector3 v0,v1;

@@ -61,71 +61,70 @@ void TriangleGeometry::init() {
 }
 
 
-//void TriangleGeometry::drawTriangle(const core::visual::VisualParams * vparams,const Vector3 & A,const Vector3 & B, const Vector3 & C) {
-//    double delta = 0.05;
-//    glColor4f(d_color.getValue()[0],d_color.getValue()[1]-delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(A);
-//    glColor4f(d_color.getValue()[0],d_color.getValue()[1]-2*delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(B); // A<->B
+void TriangleGeometry::drawTriangle(const VisualParams * vparams,const Vector3 & A,const Vector3 & B, const Vector3 & C) {
+    double delta = 0.05;
+    glColor4f(d_color.getValue()[0],d_color.getValue()[1]-delta,d_color.getValue()[2],d_color.getValue()[3]);glVertex3dv(A.data());
+    glColor4f(d_color.getValue()[0],d_color.getValue()[1]-2*delta,d_color.getValue()[2],d_color.getValue()[3]);glVertex3dv(B.data()); // A<->B
 
 //    if (vparams->displayFlags().getShowWireFrame()) {
-//        glColor4f(d_color.getValue()[0],d_color.getValue()[1]-2*delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(B);
+//        glColor4f(d_color.getValue()[0],d_color.getValue()[1]-2*delta,d_color.getValue()[2],d_color.getValue()[3]);glVertex3dv(B.data());
 //    } //A<->B
 
-//    glColor4f(d_color.getValue()[0],d_color.getValue()[1]-0.5*delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(C);
+    glColor4f(d_color.getValue()[0],d_color.getValue()[1]-0.5*delta,d_color.getValue()[2],d_color.getValue()[3]);glVertex3dv(C.data());
 
 //    if (vparams->displayFlags().getShowWireFrame()) {
-//        glColor4f(d_color.getValue()[0],d_color.getValue()[1]-0.5*delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(C);
+//        glColor4f(d_color.getValue()[0],d_color.getValue()[1]-0.5*delta,d_color.getValue()[2],d_color.getValue()[3]);glVertex3dv(C.data());
 //    } // C<->A
 //    if (vparams->displayFlags().getShowWireFrame()) {
-//        glColor4f(d_color.getValue()[0],d_color.getValue()[1]-delta,d_color.getValue()[2],d_color.getValue()[3]);helper::gl::glVertexT(A);
+//        glColor4f(d_color.getValue()[0],d_color.getValue()[1]-delta,d_color.getValue()[2],d_color.getValue()[3]);glVertex3dv(A.data());
 //    }// C<->A
-//}
+}
 
 
-//void TriangleGeometry::draw(const core::visual::VisualParams * vparams) {
+void TriangleGeometry::draw(const VisualParams * vparams) {
 
-//    if (! vparams->displayFlags().getShowCollisionModels()) return;
-//    if (d_color.getValue()[3] == 0.0) return;
+    if (! vparams->displayFlags().getShowCollisionModels()) return;
+    if (d_color.getValue()[3] == 0.0) return;
 
-//    helper::ReadAccessor<Data <VecCoord> > x = *this->getMstate()->read(core::VecCoordId::position());
+    const ReadAccessor<Vector3> & x = read(VecCoordId::position());
 
-//    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHTING);
 
 //    if (vparams->displayFlags().getShowWireFrame()) glBegin(GL_LINES);
 //    else {
-////        glEnable(GL_CULL_FACE);
-//        glBegin(GL_TRIANGLES);
+        glBegin(GL_TRIANGLES);
 //    }
 
-//    for(int t=0;t<this->p_topology->getNbTriangles();t++) {
-//        const sofa::core::topology::BaseMeshTopology::Triangle tri = this->p_topology->geTriangle(t);
+    for(unsigned t=0;t<this->p_topology->getNbTriangles();t++) {
+        const Topology::Triangle tri = this->p_topology->getTriangle(t);
 
-//        //Compute Bezier Positions
-//        Vector3 p0 = x[tri[0]];
-//        Vector3 p1 = x[tri[1]];
-//        Vector3 p2 = x[tri[2]];
+        //Compute Bezier Positions
+        Vector3 p0 = x[tri[0]];
+        Vector3 p1 = x[tri[1]];
+        Vector3 p2 = x[tri[2]];
 
-//        drawTriangle(vparams,p0,p1,p2);
-//    }
-
-//    glEnd();
-//}
-
-void TriangleGeometry::draw(const VisualParams *vparams) {
-    if (! vparams->displayFlags().getShowCollisionModels()) return;
-
-    const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
-
-    glDisable(GL_LIGHTING);
-    glColor4f(1,0,1,1);
-    glEnable(GL_CULL_FACE);
-    glBegin(GL_TRIANGLES);
-    for (unsigned i=0;i<m_elements.size();i++) {
-        std::shared_ptr<TriangleElement> elmt = std::dynamic_pointer_cast<TriangleElement>(m_elements[i]);
-        glVertex3dv(pos[elmt->m_pid[0]].data());
-        glVertex3dv(pos[elmt->m_pid[1]].data());
-        glVertex3dv(pos[elmt->m_pid[2]].data());
+        drawTriangle(vparams,p0,p1,p2);
     }
+
     glEnd();
 }
+
+//void TriangleGeometry::draw(const VisualParams *vparams) {
+//    if (! vparams->displayFlags().getShowCollisionModels()) return;
+
+//    const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
+
+//    glDisable(GL_LIGHTING);
+//    glColor4f(1,0,1,1);
+//    glEnable(GL_CULL_FACE);
+//    glBegin(GL_TRIANGLES);
+//    for (unsigned i=0;i<m_elements.size();i++) {
+//        std::shared_ptr<TriangleElement> elmt = std::dynamic_pointer_cast<TriangleElement>(m_elements[i]);
+//        glVertex3dv(pos[elmt->m_pid[0]].data());
+//        glVertex3dv(pos[elmt->m_pid[1]].data());
+//        glVertex3dv(pos[elmt->m_pid[2]].data());
+//    }
+//    glEnd();
+//}
 
 }

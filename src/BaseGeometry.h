@@ -4,59 +4,9 @@
 #include <memory>
 #include <map>
 #include <vector>
+#include <element/BaseElement.h>
 
 namespace collisionAlgorithm {
-
-class ConstraintElement;
-class BaseGeometry;
-
-class ConstraintProximity {
-public :
-
-    ConstraintProximity(ConstraintElement * elmt);
-
-    virtual Vector3 getPosition(VecID v = VecCoordId::position()) const = 0;
-
-    virtual Vector3 getNormal() const = 0;
-
-    virtual std::map<unsigned,double> getContributions() = 0;
-
-    inline ConstraintElement * element() const {
-        return (ConstraintElement*) m_element;
-    }
-
-protected:
-    ConstraintElement * m_element;
-};
-
-typedef std::shared_ptr<ConstraintProximity> ConstraintProximityPtr;
-
-class ConstraintElement {
-    friend class ConstraintProximity;
-public:
-
-    ConstraintElement(BaseGeometry * geo,unsigned nc)
-    : m_geometry(geo)
-    , m_controlPoints(nc) {}
-
-    //this function returns a vector with all the control points of the element
-    //if an id is not >=0 and <getNbControlPoints() this function should return the gravity center of the element
-    virtual ConstraintProximityPtr getControlPoint(const int i = -1) = 0;
-
-    //this function project the point P on the element and return the corresponding proximity
-    virtual ConstraintProximityPtr project(Vector3 P) = 0;
-
-    // return the number of control points
-    unsigned getNbControlPoints() {
-        return m_controlPoints;
-    }
-
-protected:
-    BaseGeometry * m_geometry;
-    unsigned m_controlPoints;
-};
-
-typedef std::shared_ptr<ConstraintElement> ConstraintElementPtr;
 
 class BaseGeometry : public BaseObject {
 public:

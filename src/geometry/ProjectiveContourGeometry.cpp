@@ -1,8 +1,8 @@
-#include <geometry/ProjectiveContourGeometry.inl>
+//#include <geometry/ProjectiveContourGeometry.inl>
 
-namespace collisionAlgorithm {
+//namespace collisionAlgorithm {
 
-DECLARE_CLASS(ProjectiveContourGeometry)
+//DECLARE_CLASS(ProjectiveContourGeometry)
 
-}
+//}
 
