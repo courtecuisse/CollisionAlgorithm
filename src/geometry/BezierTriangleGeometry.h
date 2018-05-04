@@ -21,7 +21,7 @@ public:
 
     void prepareDetection();
 
-    void draw(const VisualParams * vparams);
+    void init();
 
 private :
     typedef struct {
@@ -30,8 +30,6 @@ private :
     } BezierTriangleInfo;
 
     std::vector<BezierTriangleInfo> m_beziertriangle_info;
-
-    void tesselate(const VisualParams * vparams, unsigned level,int tid, const Vector3 & bary_A,const Vector3 & bary_B, const Vector3 & bary_C);
 
 };
 

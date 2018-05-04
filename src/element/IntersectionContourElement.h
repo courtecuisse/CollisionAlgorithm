@@ -20,7 +20,7 @@ public:
         IntersectionContourProximity(IntersectionContourElement * elmt) : ConstraintProximity(elmt) {}
 
         Vector3 getPosition(VecID v) const {
-            const ReadAccessor<Vector3> & pos = element()->geometry()->read(v);
+            const ReadAccessor<Vector3> & pos = m_state->read(v);
 
             Vector3 P = pos[element()->m_pid[0]] * element()->m_fact[0];
             Vector3 Q = pos[element()->m_pid[1]] * element()->m_fact[1];
@@ -73,6 +73,15 @@ public:
 
     IntersectionContourGeometry * geometry() {
         return (IntersectionContourGeometry *)m_geometry;
+    }
+
+    void draw(const VisualParams * /*vparams*/) {
+        glColor4dv(geometry()->d_color.getValue().data());
+
+        glBegin(GL_POINTS);
+        glPointSize(20);
+        glVertex3dv(getControlPoint(0)->getPosition().data());
+        glEnd();
     }
 
 protected:

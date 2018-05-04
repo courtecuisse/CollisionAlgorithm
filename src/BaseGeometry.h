@@ -63,7 +63,17 @@ public:
         return min_prox;
     }
 
-    virtual ReadAccessor<Vector3> read(VecID v) = 0;
+    virtual State * getState() = 0;
+
+    void draw(const VisualParams *vparams) {
+        if (! vparams->displayFlags().getShowCollisionModels()) return;
+
+        glDisable(GL_LIGHTING);
+
+        for(unsigned i=0;i<m_elements.size();i++) {
+            m_elements[i]->draw(vparams);
+        }
+    }
 
 
 protected:

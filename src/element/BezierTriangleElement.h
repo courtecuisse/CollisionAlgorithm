@@ -23,7 +23,7 @@ public:
         ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
         Vector3 getPosition() const {
             const BezierTriangleGeometry::BezierTriangleInfo & tbinfo = element()->geometry()->m_beziertriangle_info[element()->m_eid];
-            const ReadAccessor<Vector3> & x = element()->geometry()->read(VecCoordId::position());
+            const ReadAccessor<Vector3> & x = m_state->read(VecCoordId::position());
 
             const Vector3 & p300 = x[element()->m_pid[2]];
             const Vector3 & p030 = x[element()->m_pid[1]];
@@ -50,7 +50,7 @@ public:
             double fact_u = m_fact[1];
             double fact_v = m_fact[0];
 
-            const ReadAccessor<Vector3> & x = element()->geometry()->read(VecCoordId::freePosition());
+            const ReadAccessor<Vector3> & x = m_state->read(VecCoordId::freePosition());
 
             const Vector3 & p300_Free = x[element()->m_pid[2]];
             const Vector3 & p030_Free = x[element()->m_pid[1]];
@@ -135,145 +135,177 @@ public:
     BezierTriangleElement(BezierTriangleGeometry * geo,unsigned eid) : TriangleElement(geo,eid) {}
 
     ConstraintProximityPtr project(Vector3 P) {
-//        //initialize the algorithm xith the projection on a linear triangle
-//        TriangleProximity * linear_prox = (TriangleProximity *) TriangleElement(geometry(),m_eid).project(P).get();
+        //initialize the algorithm xith the projection on a linear triangle
+        TriangleProximity * linear_prox = (TriangleProximity *) TriangleElement(geometry(),m_eid).project(P).get();
 
-//        double fact[3];
-//        fact[0] = linear_prox->m_fact[0];
-//        fact[1] = linear_prox->m_fact[1];
-//        fact[2] = linear_prox->m_fact[2];
-//    //    ConstraintProximityPtr((ConstraintProximity *)pfrom)->refineToClosestPoint(P);
+        double fact[3];
+        fact[0] = linear_prox->m_fact[0];
+        fact[1] = linear_prox->m_fact[1];
+        fact[2] = linear_prox->m_fact[2];
+    //    ConstraintProximityPtr((ConstraintProximity *)pfrom)->refineToClosestPoint(P);
 
-//        unsigned max_it = geometry()->d_nonlin_max_it.getValue();
-//        double tolerance = geometry()->d_nonlin_tolerance.getValue();
-//        double threshold = geometry()->d_nonlin_threshold.getValue();
+        unsigned max_it = geometry()->d_nonlin_max_it.getValue();
+        double tolerance = geometry()->d_nonlin_tolerance.getValue();
+        double threshold = geometry()->d_nonlin_threshold.getValue();
 
-//        unsigned int it=0;
-//        double delta = 0.00001;
+        unsigned int it=0;
+        double delta = 0.00001;
 
-//        std::shared_ptr<BezierTriangleProximity> pinfo = createProximity(fact[0],fact[1],fact[2]);
+        std::shared_ptr<BezierTriangleProximity> pinfo = createProximity(fact[0],fact[1],fact[2]);
 
-//        while(it< max_it) {
-//            Vector3 Q = pinfo->getPosition();
+        while(it< max_it) {
+            Vector3 Q = pinfo->getPosition();
 
-//            Vector3 nQP = P - Q;
-//            if (nQP.norm() < tolerance) break;
-//            nQP.normalize();
+            Vector3 nQP = P - Q;
+            if (nQP.norm() < tolerance) break;
+            nQP.normalize();
 
-//            Vector3 N1 = pinfo->getNormal();
-//            N1.normalize();
+            Vector3 N1 = pinfo->getNormal();
+            N1.normalize();
 
-//            if (pinfo->m_fact[0] < 0 || pinfo->m_fact[1] < 0 || pinfo->m_fact[2] < 0) break;
+            if (pinfo->m_fact[0] < 0 || pinfo->m_fact[1] < 0 || pinfo->m_fact[2] < 0) break;
 
-//            Vector3 N2 = cross(N1,((fabs(dot(N1,Vector3(1,0,0)))>0.99) ? Vector3(0,1,0) : Vector3(1,0,0)));
-//            N2.normalize();
+            Vector3 N2 = cross(N1,((fabs(dot(N1,Vector3(1,0,0)))>0.99) ? Vector3(0,1,0) : Vector3(1,0,0)));
+            N2.normalize();
 
-//            Vector3 N3 = cross(N1,N2);
-//            N3.normalize();
+            Vector3 N3 = cross(N1,N2);
+            N3.normalize();
 
-//            Vector2 e_0(dot(nQP,N2),dot(nQP,N3));
+            Vector2 e_0(dot(nQP,N2),dot(nQP,N3));
 
-//            if(e_0.norm() < tolerance) break;
+            if(e_0.norm() < tolerance) break;
 
-//            double fact_u = (pinfo->m_fact[2] - delta < 0.0 || pinfo->m_fact[1] + delta > 1.0) ? -1.0 : 1.0;
-//            double fact_v = (pinfo->m_fact[2] - delta < 0.0 || pinfo->m_fact[0] + delta > 1.0) ? -1.0 : 1.0;
+            double fact_u = (pinfo->m_fact[2] - delta < 0.0 || pinfo->m_fact[1] + delta > 1.0) ? -1.0 : 1.0;
+            double fact_v = (pinfo->m_fact[2] - delta < 0.0 || pinfo->m_fact[0] + delta > 1.0) ? -1.0 : 1.0;
 
-//            //variation point along v
-//            double P_v_fact0 = pinfo->m_fact[0] + delta * fact_v;
-//            double P_v_fact1 = pinfo->m_fact[1];
-//            double P_v_fact2 = pinfo->m_fact[2] - delta * fact_v;
-//            BezierTriangleProximity P_v(this,P_v_fact0,P_v_fact1,P_v_fact2);
-//            Vector3 p_v = (P - P_v.getPosition()).normalized();
-//            Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
+            //variation point along v
+            double P_v_fact0 = pinfo->m_fact[0] + delta * fact_v;
+            double P_v_fact1 = pinfo->m_fact[1];
+            double P_v_fact2 = pinfo->m_fact[2] - delta * fact_v;
+            BezierTriangleProximity P_v(this,P_v_fact0,P_v_fact1,P_v_fact2);
+            Vector3 p_v = (P - P_v.getPosition()).normalized();
+            Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
 
-//            //variation point along u
-//            double P_u_fact0 = pinfo->m_fact[0];
-//            double P_u_fact1 = pinfo->m_fact[1] + delta * fact_u;
-//            double P_u_fact2 = pinfo->m_fact[2] - delta * fact_u;
-//            BezierTriangleProximity P_u(this,P_u_fact0,P_u_fact1,P_u_fact2);
-//            Vector3 p_u = (P - P_u.getPosition()).normalized();
-//            Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
+            //variation point along u
+            double P_u_fact0 = pinfo->m_fact[0];
+            double P_u_fact1 = pinfo->m_fact[1] + delta * fact_u;
+            double P_u_fact2 = pinfo->m_fact[2] - delta * fact_u;
+            BezierTriangleProximity P_u(this,P_u_fact0,P_u_fact1,P_u_fact2);
+            Vector3 p_u = (P - P_u.getPosition()).normalized();
+            Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
 
-//            if (P_v.m_fact[0] < 0 || P_v.m_fact[1] < 0 || P_v.m_fact[2] < 0) break;
-//            if (P_u.m_fact[0] < 0 || P_u.m_fact[1] < 0 || P_u.m_fact[2] < 0) break;
+            if (P_v.m_fact[0] < 0 || P_v.m_fact[1] < 0 || P_v.m_fact[2] < 0) break;
+            if (P_u.m_fact[0] < 0 || P_u.m_fact[1] < 0 || P_u.m_fact[2] < 0) break;
 
-//            Mat<2,2,double> J, invJ;
-//            J[0][0] = (e_v[0] - e_0[0])/delta;
-//            J[1][0] = (e_v[1] - e_0[1])/delta;
-//            J[0][1] = (e_u[0] - e_0[0])/delta;
-//            J[1][1] = (e_u[1] - e_0[1])/delta;
+            Mat<2,2,double> J, invJ;
+            J[0][0] = (e_v[0] - e_0[0])/delta;
+            J[1][0] = (e_v[1] - e_0[1])/delta;
+            J[0][1] = (e_u[0] - e_0[0])/delta;
+            J[1][1] = (e_u[1] - e_0[1])/delta;
 
-//            invertMatrix(invJ, J);
+            invertMatrix(invJ, J);
 
-//            // dUV is the optimal direction
-//            Vector2 dUV = -invJ * e_0;
-//            if(dUV.norm() < threshold) break;
+            // dUV is the optimal direction
+            Vector2 dUV = -invJ * e_0;
+            if(dUV.norm() < threshold) break;
 
-//            //bary coords of the solution of the 2D problem
-//            double sol_v = pinfo->m_fact[0] + dUV[0];
-//            double sol_u = pinfo->m_fact[1] + dUV[1];
-//            double sol_w = 1.0 - sol_u - sol_v;
+            //bary coords of the solution of the 2D problem
+            double sol_v = pinfo->m_fact[0] + dUV[0];
+            double sol_u = pinfo->m_fact[1] + dUV[1];
+            double sol_w = 1.0 - sol_u - sol_v;
 
-//            // we now search what is the optimal displacmeent along this path
-//            Vector3 dir2d(sol_v - pinfo->m_fact[0],
-//                                       sol_u - pinfo->m_fact[1],
-//                                       sol_w - pinfo->m_fact[2]);
+            // we now search what is the optimal displacmeent along this path
+            Vector3 dir2d(sol_v - pinfo->m_fact[0],
+                                       sol_u - pinfo->m_fact[1],
+                                       sol_w - pinfo->m_fact[2]);
 
-//            if(dir2d.norm() < threshold) break;
+            if(dir2d.norm() < threshold) break;
 
-//            //we apply a small perturbation arond the 2d direction
-//            dir2d.normalize();
+            //we apply a small perturbation arond the 2d direction
+            dir2d.normalize();
 
-//            double fact_a = (pinfo->m_fact[0] + dir2d[0] * delta < 0 || pinfo->m_fact[1] + dir2d[1] * delta < 0 || pinfo->m_fact[2] + dir2d[2] * delta < 0) ? -1.0 : 1.0;
-//            double P_a_fact0 = pinfo->m_fact[0] + dir2d[0] * delta * fact_a;
-//            double P_a_fact1 = pinfo->m_fact[1] + dir2d[1] * delta * fact_a;
-//            double P_a_fact2 = pinfo->m_fact[2] + dir2d[2] * delta * fact_a;
-//            BezierTriangleProximity P_a(this,P_a_fact0,P_a_fact1,P_a_fact2);
+            double fact_a = (pinfo->m_fact[0] + dir2d[0] * delta < 0 || pinfo->m_fact[1] + dir2d[1] * delta < 0 || pinfo->m_fact[2] + dir2d[2] * delta < 0) ? -1.0 : 1.0;
+            double P_a_fact0 = pinfo->m_fact[0] + dir2d[0] * delta * fact_a;
+            double P_a_fact1 = pinfo->m_fact[1] + dir2d[1] * delta * fact_a;
+            double P_a_fact2 = pinfo->m_fact[2] + dir2d[2] * delta * fact_a;
+            BezierTriangleProximity P_a(this,P_a_fact0,P_a_fact1,P_a_fact2);
 
-//            if (P_a.m_fact[0] < 0 || P_a.m_fact[1] < 0 || P_a.m_fact[2] < 0) break;
+            if (P_a.m_fact[0] < 0 || P_a.m_fact[1] < 0 || P_a.m_fact[2] < 0) break;
 
-//            Vector3 QA = P_a.getPosition();
+            Vector3 QA = P_a.getPosition();
 
-//            double fact;
-//            if (fabs(dot(nQP,N1))>0.8) {
-//                double fx = acos(fabs(dot(nQP,N1)));
-//                double fxdx = acos(fabs(dot((P - QA).normalized(),P_a.getNormal())));
-//                double j = (fxdx - fx) / delta;
-//                fact = -fx / j;
-//            } else {
-//                Vector3 nQA = (Q-QA).normalized();
-//                double fx = dot(P-Q, nQA);
-//                double fxdx = dot(P-QA, nQA);
-//                double j = (fxdx - fx) / delta;
-//                fact = -fx / j;
-//            }
+            double fact;
+            if (fabs(dot(nQP,N1))>0.8) {
+                double fx = acos(fabs(dot(nQP,N1)));
+                double fxdx = acos(fabs(dot((P - QA).normalized(),P_a.getNormal())));
+                double j = (fxdx - fx) / delta;
+                fact = -fx / j;
+            } else {
+                Vector3 nQA = (Q-QA).normalized();
+                double fx = dot(P-Q, nQA);
+                double fxdx = dot(P-QA, nQA);
+                double j = (fxdx - fx) / delta;
+                fact = -fx / j;
+            }
 
-//            if(fabs(fact) < threshold) break;
+            if(fabs(fact) < threshold) break;
 
-//            dir2d *= fact * fact_a;
+            dir2d *= fact * fact_a;
 
-//            double new_v = pinfo->m_fact[0] + dir2d[0];
-//            double new_u = pinfo->m_fact[1] + dir2d[1];
-//            double new_w = pinfo->m_fact[2] + dir2d[2];
+            double new_v = pinfo->m_fact[0] + dir2d[0];
+            double new_u = pinfo->m_fact[1] + dir2d[1];
+            double new_w = pinfo->m_fact[2] + dir2d[2];
 
-//            if (new_v<0 && fabs(dir2d[0])>0) dir2d *= -pinfo->m_fact[0] / dir2d[0];
-//            if (new_u<0 && fabs(dir2d[1])>0) dir2d *= -pinfo->m_fact[1] / dir2d[1];
-//            if (new_w<0 && fabs(dir2d[2])>0) dir2d *= -pinfo->m_fact[2] / dir2d[2];
+            if (new_v<0 && fabs(dir2d[0])>0) dir2d *= -pinfo->m_fact[0] / dir2d[0];
+            if (new_u<0 && fabs(dir2d[1])>0) dir2d *= -pinfo->m_fact[1] / dir2d[1];
+            if (new_w<0 && fabs(dir2d[2])>0) dir2d *= -pinfo->m_fact[2] / dir2d[2];
 
-//            pinfo->m_fact[0] += dir2d[0];
-//            pinfo->m_fact[1] += dir2d[1];
-//            pinfo->m_fact[2] += dir2d[2];
+            pinfo->m_fact[0] += dir2d[0];
+            pinfo->m_fact[1] += dir2d[1];
+            pinfo->m_fact[2] += dir2d[2];
 
-//            it++;
-//        }
+            it++;
+        }
 
-//        return pinfo;
+        return pinfo;
 
-        return newton_project(P);
+//        return newton_project(P);
     }
 
     inline BezierTriangleGeometry * geometry() const {
         return (BezierTriangleGeometry*) m_geometry;
+    }
+
+    void tesselate(const VisualParams * vparams, unsigned level,int tid, const Vector3 & bary_A,const Vector3 & bary_B, const Vector3 & bary_C) {
+        if (level >= geometry()->d_draw_tesselation.getValue()) {
+
+            Vector3 pA = createProximity(bary_A[0],bary_A[1],bary_A[2])->getPosition();
+            Vector3 pB = createProximity(bary_B[0],bary_B[1],bary_B[2])->getPosition();
+            Vector3 pC = createProximity(bary_C[0],bary_C[1],bary_C[2])->getPosition();
+
+            drawTriangle(vparams,pA,pB,pC);
+
+            return;
+        }
+
+        Vector3 bary_D = (bary_A + bary_B)/2.0;
+        Vector3 bary_E = (bary_A + bary_C)/2.0;
+        Vector3 bary_F = (bary_B + bary_C)/2.0;
+
+        Vector3 bary_G = (bary_A + bary_B + bary_C)/3.0;
+
+        tesselate(vparams,level+1,tid,bary_A,bary_D,bary_G);
+        tesselate(vparams,level+1,tid,bary_D,bary_B,bary_G);
+
+        tesselate(vparams,level+1,tid,bary_G,bary_B,bary_F);
+        tesselate(vparams,level+1,tid,bary_G,bary_F,bary_C);
+
+        tesselate(vparams,level+1,tid,bary_G,bary_C,bary_E);
+        tesselate(vparams,level+1,tid,bary_A,bary_G,bary_E);
+    }
+
+    virtual void draw(const VisualParams *vparams) {
+        tesselate(vparams,0,m_eid,Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1));
     }
 };
 

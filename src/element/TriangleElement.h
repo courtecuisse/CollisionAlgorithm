@@ -53,7 +53,7 @@ public:
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 
     ConstraintProximityPtr project(Vector3 P) {
-        const ReadAccessor<Vector3> & pos = geometry()->p_topology->p_state->read(VecCoordId::position());
+        const ReadAccessor<Vector3> & pos = geometry()->getState()->read(VecCoordId::position());
 
         Vector3 P0 = pos[m_pid[0]];
         Vector3 P1 = pos[m_pid[1]];
@@ -114,6 +114,26 @@ public:
         return (TriangleGeometry*) m_geometry;
     }
 
+    void drawTriangle(const VisualParams * /*vparams*/,const Vector3 & A,const Vector3 & B, const Vector3 & C) {
+        double delta = 0.1;
+        Vector4 color = geometry()->d_color.getValue();
+
+        glBegin(GL_TRIANGLES);
+            glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
+            glVertex3dv(A.data());
+            glColor4f(color[0],fabs(color[1]-delta),color[2],color[3]);
+            glVertex3dv(B.data()); // A<->B
+            glColor4f(color[0],color[1],fabs(color[2]-delta),color[3]);
+            glVertex3dv(C.data());
+        glEnd();
+    }
+
+    virtual void draw(const VisualParams *vparams) {
+        drawTriangle(vparams,getControlPoint(0)->getPosition(),
+                             getControlPoint(1)->getPosition(),
+                             getControlPoint(2)->getPosition());
+    }
+
 protected:
     unsigned m_pid[3];
     unsigned m_eid;
@@ -132,7 +152,7 @@ public :
     }
 
     Vector3 getPosition(VecID v) const {
-        const ReadAccessor<Vector3> & pos = element()->geometry()->read(v);
+        const ReadAccessor<Vector3> & pos = m_state->read(v);
 
         return pos[element()->m_pid[0]] * m_fact[0] +
                pos[element()->m_pid[1]] * m_fact[1] +

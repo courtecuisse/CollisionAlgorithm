@@ -7,6 +7,7 @@
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/SVD>
+#include <GL/gl.h>
 
 namespace collisionAlgorithm {
 
@@ -16,8 +17,7 @@ class BaseGeometry;
 class ConstraintProximity {
 public :
 
-    ConstraintProximity(ConstraintElement * elmt)
-    : m_element(elmt) {}
+    ConstraintProximity(ConstraintElement * elmt);
 
     virtual Vector3 getPosition(VecID v = VecCoordId::position()) const = 0;
 
@@ -25,8 +25,17 @@ public :
 
     virtual std::map<unsigned,double> getContributions() = 0;
 
+    virtual double distance(const Vector3 & P) {
+        return (this->getPosition() - P).norm();
+    }
+
+    State * getState() {
+        return m_state;
+    }
+
 protected:
     ConstraintElement * m_element;
+    State * m_state;
 };
 
 typedef std::shared_ptr<ConstraintProximity> ConstraintProximityPtr;
@@ -51,6 +60,7 @@ public:
         return m_controlPoints;
     }
 
+    virtual void draw(const VisualParams *vparams) = 0;
 
 protected:
 

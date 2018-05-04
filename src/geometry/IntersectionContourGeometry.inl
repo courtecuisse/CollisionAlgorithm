@@ -9,13 +9,12 @@ namespace collisionAlgorithm {
 IntersectionContourGeometry::IntersectionContourGeometry()
 : d_planePos("planePos",Vector3(0,0,0),this)
 , d_planeNormal("planeNormal",Vector3(0,0,1),this)
-, p_topology("topology",LEFT,this)
 {}
 
 void IntersectionContourGeometry::prepareDetection() {
     m_elements.clear();
 
-    const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
+    const ReadAccessor<Vector3> & pos = getState()->read(VecCoordId::position());
 
     m_pointNormal.resize(pos.size());
     for (unsigned p=0;p<pos.size();p++) {
@@ -70,12 +69,8 @@ void IntersectionContourGeometry::draw(const VisualParams * vparams) {
     Vector3 X = cross(T,Z);
     Vector3 Y = cross(X,Z);
 
-//    std::cout << "P=" << P << std::endl;
-//    std::cout << "X=" << X << std::endl;
-//    std::cout << "Y=" << Y << std::endl;
-
     BoundingBox bbox;
-    const ReadAccessor<Vector3> & pos = p_topology->p_state->read(VecCoordId::position());
+    const ReadAccessor<Vector3> & pos = getState()->read(VecCoordId::position());
     for (unsigned i=0;i<pos.size();i++) bbox.include(pos[i]);
 
 
@@ -98,15 +93,7 @@ void IntersectionContourGeometry::draw(const VisualParams * vparams) {
         glVertex3dv((C-X+Y).data());
     glEnd();
 
-    glBegin(GL_POINTS);
-    glPointSize(20);
-    for (unsigned i=0;i<m_elements.size();i++) {
-        std::shared_ptr<IntersectionContourElement> elmt = std::dynamic_pointer_cast<IntersectionContourElement>(m_elements[i]);
-        Vector3 p1 = pos[elmt->m_pid[0]] * elmt->m_fact[0];
-        Vector3 p2 = pos[elmt->m_pid[1]] * elmt->m_fact[1];
-        glVertex3dv((p1+p2).data());
-    }
-    glEnd();
+    BaseGeometry::draw(vparams);
 }
 
 }

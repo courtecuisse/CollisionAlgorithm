@@ -1,194 +1,20 @@
 ﻿#pragma once
 
 #include <geometry/AABBGeometry.h>
+#include <element/AABBElement.h>
 #include <GL/gl.h>
 
 namespace collisionAlgorithm {
-
-/**************************************************************************/
-/******************************PROXIMITY***********************************/
-/**************************************************************************/
-
-//class AABBProximity : public BaseGeometry::ConstraintProximity {
-//public :
-//    AABBProximity(const AABBProximity * geo) {
-//        m_geo = geo;
-//    }
-
-//    Vector3 getPosition(core::VecCoordId vid) const {
-//        return Vector3();
-//    }
-
-//    void buildConstraintMatrix(const ConstraintParams* /*cParams*/, core::MultiMatrixDerivId cId, unsigned cline,const Vector3 & N) {
-
-//    }
-//};
-
-/**************************************************************************/
-/******************************ELEMENT*************************************/
-/**************************************************************************/
-
-AABBElement::AABBElement(AABBGeometry * geo)
-: ConstraintElement(geo,0) {}
-
-//this function returns a vector with all the control points of the element
-ConstraintProximityPtr AABBElement::getControlPoint(const int /*cid*/) {
-    return NULL;
-}
-
-void AABBElement::fillElementSet(Vec3i cbox, int d, std::set<int> & selectElements) {
-    {
-        int i=-d;
-        if (cbox[0]+i >= 0 && cbox[0]+i < geometry()->m_nbox[0]) {
-            for (int j=-d;j<=d;j++) {
-                if (cbox[1]+j < 0 || cbox[1]+j >= geometry()->m_nbox[1]) continue;
-                for (int k=-d;k<=d;k++) {
-                    if (cbox[2]+k < 0 || cbox[2]+k >= geometry()->m_nbox[2]) continue;
-
-                    const std::vector<unsigned> & elemntsID = geometry()->m_indexedElement[cbox[0] + i][cbox[1] + j][cbox[2] + k];
-                    for (unsigned t=0;t<elemntsID.size();t++) selectElements.insert(elemntsID[t]);
-                }
-            }
-        }
-    }
-
-    {
-        int i=d;
-        if (cbox[0]+i >= 0 && cbox[0]+i < geometry()->m_nbox[0]) {
-            for (int j=-d;j<=d;j++) {
-                if (cbox[1]+j < 0 || cbox[1]+j >= geometry()->m_nbox[1]) continue;
-
-                for (int k=-d;k<=d;k++) {
-                    if (cbox[2]+k < 0 || cbox[2]+k >= geometry()->m_nbox[2]) continue;
-
-                    const std::vector<unsigned> & elemntsID = geometry()->m_indexedElement[cbox[0] + i][cbox[1] + j][cbox[2] + k];
-                    for (unsigned t=0;t<elemntsID.size();t++) selectElements.insert(elemntsID[t]);
-                }
-            }
-        }
-    }
-
-
-    {
-        int j=-d;
-        if (cbox[1]+j >= 0 && cbox[1]+j < geometry()->m_nbox[1]) {
-            for (int i=-d+1;i<d;i++) {
-                if (cbox[0]+i < 0 || cbox[0]+i >= geometry()->m_nbox[0]) continue;
-
-                for (int k=-d;k<=d;k++) {
-                    if (cbox[2]+k < 0 || cbox[2]+k >= geometry()->m_nbox[2]) continue;
-
-                    const std::vector<unsigned> & elemntsID = geometry()->m_indexedElement[cbox[0] + i][cbox[1] + j][cbox[2] + k];
-                    for (unsigned t=0;t<elemntsID.size();t++) selectElements.insert(elemntsID[t]);
-                }
-            }
-        }
-    }
-
-    {
-        int j=d;
-        if (cbox[1]+j >= 0 && cbox[1]+j < geometry()->m_nbox[1]) {
-            for (int i=-d+1;i<d;i++) {
-                if (cbox[0]+i < 0 || cbox[0]+i >= geometry()->m_nbox[0]) continue;
-
-                for (int k=-d;k<=d;k++) {
-                    if (cbox[2]+k < 0 || cbox[2]+k >= geometry()->m_nbox[2]) continue;
-
-                    const std::vector<unsigned> & elemntsID = geometry()->m_indexedElement[cbox[0] + i][cbox[1] + j][cbox[2] + k];
-                    for (unsigned t=0;t<elemntsID.size();t++) selectElements.insert(elemntsID[t]);
-                }
-            }
-        }
-    }
-
-    {
-        int k=-d;
-        if (cbox[2]+k >= 0 && cbox[2]+k < geometry()->m_nbox[2]) {
-            for (int i=-d+1;i<d;i++) {
-                if (cbox[0]+i < 0 || cbox[0]+i >= geometry()->m_nbox[0]) continue;
-
-                for (int j=-d+1;j<d;j++) {
-                    if (cbox[1]+j < 0 || cbox[1]+j >= geometry()->m_nbox[1]) continue;
-
-                    const std::vector<unsigned> & elemntsID = geometry()->m_indexedElement[cbox[0] + i][cbox[1] + j][cbox[2] + k];
-                    for (unsigned t=0;t<elemntsID.size();t++) selectElements.insert(elemntsID[t]);
-                }
-            }
-        }
-    }
-
-    {
-        int k=d;
-        if (cbox[2]+k >= 0 && cbox[2]+k < geometry()->m_nbox[2]) {
-            for (int i=-d+1;i<d;i++) {
-                if (cbox[0]+i < 0 || cbox[0]+i >= geometry()->m_nbox[0]) continue;
-
-                for (int j=-d+1;j<d;j++) {
-                    if (cbox[1]+j < 0 || cbox[1]+j >= geometry()->m_nbox[1]) continue;
-
-                    const std::vector<unsigned> & elemntsID = geometry()->m_indexedElement[cbox[0] + i][cbox[1] + j][cbox[2] + k];
-                    for (unsigned t=0;t<elemntsID.size();t++) selectElements.insert(elemntsID[t]);
-                }
-            }
-        }
-    }
-}
-
-//this function project the point P on the element and return the corresponding proximity
-ConstraintProximityPtr AABBElement::project(Vector3 P) {
-    //compute the box where is P
-    Vec3i cbox;
-    cbox[0] = floor((P[0] - geometry()->m_Bmin[0])/geometry()->m_cellSize[0]);
-    cbox[1] = floor((P[1] - geometry()->m_Bmin[1])/geometry()->m_cellSize[1]);
-    cbox[2] = floor((P[2] - geometry()->m_Bmin[2])/geometry()->m_cellSize[2]);
-
-    //project the box in the bounding box of the object
-    //search with the closest box in bbox
-    for (int i=0;i<3;i++) {
-        if (cbox[i] < 0) cbox[i] = 0;
-        else if (cbox[i] > geometry()->m_nbox[i]) cbox[i] = geometry()->m_nbox[i];
-    }
-
-    int d = 0;
-    int max = std::max(std::max(geometry()->m_nbox[0],geometry()->m_nbox[1]),geometry()->m_nbox[2]);
-    std::set<int> selectElements;
-    while (selectElements.empty() && d<max) {
-        fillElementSet(cbox,d,selectElements);
-        d++;// we look for boxed located at d+1
-    }
-
-    ConstraintProximityPtr res = NULL;
-    double min_norm = std::numeric_limits<double>::max();
-    for (std::set<int>::iterator it = selectElements.begin();it!=selectElements.end();it++) {
-        ConstraintProximityPtr tmp_res = geometry()->p_geometry->getElement(*it)->project(P);
-
-        double norm = (tmp_res->getPosition() - P).norm();
-
-        if (norm<min_norm) {
-            res = tmp_res;
-            min_norm = norm;
-        }
-    }
-
-    return res;
-}
-
-/**************************************************************************/
-/******************************GEOMETRY************************************/
-/**************************************************************************/
 
 AABBGeometry::AABBGeometry()
 : d_nbox("nbox",Vec3i(8,8,8),this)
 , p_geometry("geometry",LEFT, this)
 {}
 
-void AABBGeometry::init() {
-    m_elements.clear();
-    m_elements.push_back(std::make_shared<AABBElement>(this));
-}
+void AABBGeometry::init() {}
 
 void AABBGeometry::prepareDetection() {
-    const ReadAccessor<Vector3> & pos = read(VecCoordId::position());
+    const ReadAccessor<Vector3> & pos = getState()->read(VecCoordId::position());
     if (pos.empty()) return;
 
     m_Bmin = pos[0];
@@ -222,16 +48,12 @@ void AABBGeometry::prepareDetection() {
         m_nbox[2] = 1;
     } else m_nbox[2] = d_nbox.getValue()[2] + 1;
 
-    m_indexedElement.resize(m_nbox[0]);
-    for (unsigned i=0;i<m_indexedElement.size();i++) {
-        m_indexedElement[i].resize(m_nbox[1]);
-        for (unsigned j=0;j<m_indexedElement[i].size();j++) {
-            m_indexedElement[i][j].resize(m_nbox[2]);
+    m_indexedElement.resize(m_nbox[0]*m_nbox[1]*m_nbox[2]);
+    m_offset[0] = m_nbox[1]*m_nbox[2];
+    m_offset[1] = m_nbox[2];
 
-            for (unsigned k=0;k<m_indexedElement[i][j].size();k++) {
-                m_indexedElement[i][j][k].clear();
-            }
-        }
+    for (unsigned i=0;i<m_indexedElement.size();i++) {
+        m_indexedElement[i].clear();
     }
 
     // center in -0.5 cellwidth
@@ -270,48 +92,156 @@ void AABBGeometry::prepareDetection() {
         for (int i=cminbox[0];i<cmaxbox[0];i++) {
             for (int j=cminbox[1];j<cmaxbox[1];j++) {
                 for (int k=cminbox[2];k<cmaxbox[2];k++) {
-                    m_indexedElement[i][j][k].push_back(itE);
+                    getIndexedElements(i,j,k).insert(itE);
+                }
+            }
+        }
+    }
+
+    m_elements.clear();
+    for (int i=0;i<m_nbox[0];i++) {
+        for (int j=0;j<m_nbox[1];j++) {
+            for (int k=0;k<m_nbox[2];k++) {
+                if (! getIndexedElements(i,j,k).empty()) {
+                    m_elements.push_back(std::make_shared<AABBElement>(this,i,j,k));
                 }
             }
         }
     }
 }
 
-void AABBGeometry::draw(const VisualParams * vparams) {
-    if (!vparams->displayFlags().getShowCollisionModels()) return;
+//this function project the point P on the element and return the corresponding proximity
+ConstraintProximityPtr AABBGeometry::project(Vector3 P) {
+    //compute the box where is P
+    Vec3i cbox;
+    cbox[0] = floor((P[0] - m_Bmin[0])/m_cellSize[0]);
+    cbox[1] = floor((P[1] - m_Bmin[1])/m_cellSize[1]);
+    cbox[2] = floor((P[2] - m_Bmin[2])/m_cellSize[2]);
 
-    for (unsigned i=0;i<m_indexedElement.size();i++) {
-        for (unsigned j=0;j<m_indexedElement[i].size();j++) {
-            for (unsigned k=0;k<m_indexedElement[i][j].size();k++) {
-                if (m_indexedElement[i][j][k].empty()) continue;
+    //project the box in the bounding box of the object
+    //search with the closest box in bbox
+    for (int i=0;i<3;i++) {
+        if (cbox[i] < 0) cbox[i] = 0;
+        else if (cbox[i] > m_nbox[i]) cbox[i] = m_nbox[i];
+    }
 
-                Vector3 points[8];
-                points[0] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-                points[1] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-                points[2] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j+1) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-                points[3] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-                points[4] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
-                points[5] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j  ) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
-                points[6] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
-                points[7] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
+    int d = 0;
+    int max = std::max(std::max(m_nbox[0],m_nbox[1]),m_nbox[2]);
+    std::set<int> selectElements;
+    while (selectElements.empty() && d<max) {
+        fillElementSet(cbox,d,selectElements);
+        d++;// we look for boxed located at d+1
+    }
 
-                glColor4f(1,0,0,1);
-                glBegin(GL_LINES);
-                    glVertex3dv(points[0].data());glVertex3dv(points[1].data());
-                    glVertex3dv(points[3].data());glVertex3dv(points[2].data());
-                    glVertex3dv(points[7].data());glVertex3dv(points[6].data());
-                    glVertex3dv(points[4].data());glVertex3dv(points[5].data());
+    ConstraintProximityPtr res = NULL;
+    double min_norm = std::numeric_limits<double>::max();
+    for (std::set<int>::iterator it = selectElements.begin();it!=selectElements.end();it++) {
+        ConstraintProximityPtr tmp_res = p_geometry->getElement(*it)->project(P);
 
-                    glVertex3dv(points[0].data());glVertex3dv(points[2].data());
-                    glVertex3dv(points[1].data());glVertex3dv(points[3].data());
-                    glVertex3dv(points[4].data());glVertex3dv(points[6].data());
-                    glVertex3dv(points[5].data());glVertex3dv(points[7].data());
+        double norm = (tmp_res->getPosition() - P).norm();
 
-                    glVertex3dv(points[0].data());glVertex3dv(points[4].data());
-                    glVertex3dv(points[1].data());glVertex3dv(points[5].data());
-                    glVertex3dv(points[2].data());glVertex3dv(points[6].data());
-                    glVertex3dv(points[3].data());glVertex3dv(points[7].data());
-                glEnd();
+        if (norm<min_norm) {
+            res = tmp_res;
+            min_norm = norm;
+        }
+    }
+
+    return res;
+}
+
+void AABBGeometry::fillElementSet(Vec3i cbox, int d, std::set<int> & selectElements) {
+    {
+        int i=-d;
+        if (cbox[0]+i >= 0 && cbox[0]+i < m_nbox[0]) {
+            for (int j=-d;j<=d;j++) {
+                if (cbox[1]+j < 0 || cbox[1]+j >= m_nbox[1]) continue;
+                for (int k=-d;k<=d;k++) {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= m_nbox[2]) continue;
+
+                    const std::set<unsigned> & elemntsID = getIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                    selectElements.insert(elemntsID.begin(),elemntsID.end());
+                }
+            }
+        }
+    }
+
+    {
+        int i=d;
+        if (cbox[0]+i >= 0 && cbox[0]+i < m_nbox[0]) {
+            for (int j=-d;j<=d;j++) {
+                if (cbox[1]+j < 0 || cbox[1]+j >= m_nbox[1]) continue;
+
+                for (int k=-d;k<=d;k++) {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= m_nbox[2]) continue;
+
+                    const std::set<unsigned> & elemntsID = getIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                    selectElements.insert(elemntsID.begin(),elemntsID.end());
+                }
+            }
+        }
+    }
+
+
+    {
+        int j=-d;
+        if (cbox[1]+j >= 0 && cbox[1]+j < m_nbox[1]) {
+            for (int i=-d+1;i<d;i++) {
+                if (cbox[0]+i < 0 || cbox[0]+i >= m_nbox[0]) continue;
+
+                for (int k=-d;k<=d;k++) {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= m_nbox[2]) continue;
+
+                    const std::set<unsigned> & elemntsID = getIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                    selectElements.insert(elemntsID.begin(),elemntsID.end());
+                }
+            }
+        }
+    }
+
+    {
+        int j=d;
+        if (cbox[1]+j >= 0 && cbox[1]+j < m_nbox[1]) {
+            for (int i=-d+1;i<d;i++) {
+                if (cbox[0]+i < 0 || cbox[0]+i >= m_nbox[0]) continue;
+
+                for (int k=-d;k<=d;k++) {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= m_nbox[2]) continue;
+
+                    const std::set<unsigned> & elemntsID = getIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                    selectElements.insert(elemntsID.begin(),elemntsID.end());
+                }
+            }
+        }
+    }
+
+    {
+        int k=-d;
+        if (cbox[2]+k >= 0 && cbox[2]+k < m_nbox[2]) {
+            for (int i=-d+1;i<d;i++) {
+                if (cbox[0]+i < 0 || cbox[0]+i >= m_nbox[0]) continue;
+
+                for (int j=-d+1;j<d;j++) {
+                    if (cbox[1]+j < 0 || cbox[1]+j >= m_nbox[1]) continue;
+
+                    const std::set<unsigned> & elemntsID = getIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                    selectElements.insert(elemntsID.begin(),elemntsID.end());
+                }
+            }
+        }
+    }
+
+    {
+        int k=d;
+        if (cbox[2]+k >= 0 && cbox[2]+k < m_nbox[2]) {
+            for (int i=-d+1;i<d;i++) {
+                if (cbox[0]+i < 0 || cbox[0]+i >= m_nbox[0]) continue;
+
+                for (int j=-d+1;j<d;j++) {
+                    if (cbox[1]+j < 0 || cbox[1]+j >= m_nbox[1]) continue;
+
+                    const std::set<unsigned> & elemntsID = getIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                    selectElements.insert(elemntsID.begin(),elemntsID.end());
+                }
             }
         }
     }

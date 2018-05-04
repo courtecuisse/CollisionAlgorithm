@@ -4,23 +4,16 @@
 
 namespace collisionAlgorithm {
 
-class EdgeGeometry : public BaseGeometry {
+class EdgeGeometry : public PointGeometry {
     friend class EdgeElement;
 public:
-    Port<Topology,REQUIRED> p_topology;
 
-    EdgeGeometry()
-    : p_topology("topology",LEFT,this) {}
+    EdgeGeometry() {}
 
     void prepareDetection();
 
     void init();
 
-    void draw(const VisualParams *vparams);
-
-    inline ReadAccessor<Vector3> read(VecID v) {
-        return p_topology->p_state->read(v);
-    }
 };
 
 }

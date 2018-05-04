@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <geometry/PointGeometry.h>
+#include <GL/gl.h>
 
 namespace collisionAlgorithm {
 
@@ -33,6 +34,14 @@ public:
         return (PointGeometry * ) m_geometry;
     }
 
+    void draw(const VisualParams */*vparams*/ ) {
+        glColor4dv(geometry()->d_color.getValue().data());
+
+        glBegin(GL_POINTS);
+            glVertex3dv(getControlPoint(0)->getPosition().data());
+        glEnd();
+    }
+
 protected:
     unsigned m_pid;
 };
@@ -46,7 +55,7 @@ public :
     PointProximity(PointElement * elmt) : ConstraintProximity(elmt) {}
 
     Vector3 getPosition(VecID v) const {
-        const ReadAccessor<Vector3> & pos = element()->geometry()->read(v);
+        const ReadAccessor<Vector3> & pos = m_state->read(v);
         return pos[element()->m_pid];
     }
 

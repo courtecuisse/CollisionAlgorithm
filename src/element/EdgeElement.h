@@ -1,6 +1,7 @@
 #pragma once
 
 #include <geometry/EdgeGeometry.h>
+#include <GL/gl.h>
 
 namespace collisionAlgorithm {
 
@@ -14,7 +15,47 @@ class EdgeElement : public ConstraintElement {
 
 public:
 
-    inline ConstraintProximityPtr createProximity(EdgeElement * elmt,double f1,double f2);
+    /**************************************************************************/
+    /******************************PROXIMITY***********************************/
+    /**************************************************************************/
+
+    class EdgeProximity : public ConstraintProximity {
+    public :
+
+        inline EdgeElement * element() const {
+            return (EdgeElement*) m_element;
+        }
+
+        EdgeProximity(EdgeElement * elmt,double f1,double f2) : ConstraintProximity(elmt) {
+            m_fact[0] = f1;
+            m_fact[1] = f2;
+        }
+
+        Vector3 getPosition(VecID v) const {
+            const ReadAccessor<Vector3> & pos = m_state->read(v);
+            return pos[element()->m_pid[0]] * m_fact[0] + pos[element()->m_pid[1]] * m_fact[1];
+        }
+
+        Vector3 getNormal() const {
+            return Vector3(1,0,0);
+        }
+
+        std::map<unsigned,double> getContributions() {
+            std::map<unsigned,double> res;
+
+            res[element()->m_pid[0]] = m_fact[0];
+            res[element()->m_pid[1]] = m_fact[1];
+
+            return res;
+        }
+
+    protected:
+        double m_fact[2];
+    };
+
+    inline ConstraintProximityPtr createProximity(EdgeElement * elmt,double f1,double f2) {
+        return std::make_shared<EdgeProximity>(elmt,f1,f2);
+    }
 
     EdgeElement(EdgeGeometry * geo,unsigned eid) : ConstraintElement(geo,2) {
         m_eid = eid;
@@ -35,7 +76,7 @@ public:
     ConstraintProximityPtr project(Vector3 P) {
         double fact_u,fact_v;
 
-        const ReadAccessor<Vector3> & pos = geometry()->read(VecCoordId::position());
+        const ReadAccessor<Vector3> & pos = geometry()->getState()->read(VecCoordId::position());
 
         Vector3 P1 = pos[m_pid[0]];
         Vector3 P2 = pos[m_pid[1]];
@@ -55,53 +96,24 @@ public:
         return (EdgeGeometry * )m_geometry;
     }
 
+
+    void draw(const VisualParams *vparams) {
+        glColor4dv(geometry()->d_color.getValue().data());
+
+        glBegin(GL_LINES);
+            glVertex3dv(getControlPoint(0)->getPosition().data());
+            glVertex3dv(getControlPoint(1)->getPosition().data());
+        glEnd();
+    }
+
 protected:
     unsigned m_pid[2];
     unsigned m_eid;
 };
 
-/**************************************************************************/
-/******************************PROXIMITY***********************************/
-/**************************************************************************/
-
-class EdgeProximity : public ConstraintProximity {
-public :
-
-    inline EdgeElement * element() const {
-        return (EdgeElement*) m_element;
-    }
-
-    EdgeProximity(EdgeElement * elmt,double f1,double f2) : ConstraintProximity(elmt) {
-        m_fact[0] = f1;
-        m_fact[1] = f2;
-    }
-
-    Vector3 getPosition(VecID v) const {
-        const ReadAccessor<Vector3> & pos = element()->geometry()->p_topology->p_state->read(v);
-        return pos[element()->m_pid[0]] * m_fact[0] + pos[element()->m_pid[1]] * m_fact[1];
-    }
-
-    Vector3 getNormal() const {
-        return Vector3(1,0,0);
-    }
-
-    std::map<unsigned,double> getContributions() {
-        std::map<unsigned,double> res;
-
-        res[element()->m_pid[0]] = m_fact[0];
-        res[element()->m_pid[1]] = m_fact[1];
-
-        return res;
-    }
-
-protected:
-    double m_fact[2];
-};
 
 
-ConstraintProximityPtr EdgeElement::createProximity(EdgeElement * elmt,double f1,double f2) {
-    return std::make_shared<EdgeProximity>(elmt,f1,f2);
-}
+
 
 }
 

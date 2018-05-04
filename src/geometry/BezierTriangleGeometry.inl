@@ -13,10 +13,20 @@ BezierTriangleGeometry::BezierTriangleGeometry()
 , d_draw_tesselation("tesselation",(unsigned) 0.0,this)
 {}
 
+void BezierTriangleGeometry::init() {
+    m_elements.clear();
+
+    for (unsigned i=0;i<p_topology->getNbTriangles();i++) {
+        m_elements.push_back(std::make_shared<BezierTriangleElement>(this,i));
+    }
+
+    prepareDetection();
+}
+
 void BezierTriangleGeometry::prepareDetection() {
     Inherit::prepareDetection();
 
-    const ReadAccessor<Vector3> & x = read(VecCoordId::position());
+    const ReadAccessor<Vector3> & x = getState()->read(VecCoordId::position());
 
     m_beziertriangle_info.resize(p_topology->getNbTriangles());
     for (unsigned t=0;t<p_topology()->getNbTriangles();t++) {
@@ -65,54 +75,5 @@ void BezierTriangleGeometry::prepareDetection() {
         tbinfo.n101 = h101 / h101.norm();
     }
 }
-
-void BezierTriangleGeometry::tesselate(const VisualParams * vparams, unsigned level,int tid, const Vector3 & bary_A,const Vector3 & bary_B, const Vector3 & bary_C) {
-    if (level >= d_draw_tesselation.getValue()) {
-        BezierTriangleElement * elmt = (BezierTriangleElement *) getElement(tid).get();
-
-        Vector3 pA = elmt->createProximity(bary_A[0],bary_A[1],bary_A[2])->getPosition();
-        Vector3 pB = elmt->createProximity(bary_B[0],bary_B[1],bary_B[2])->getPosition();
-        Vector3 pC = elmt->createProximity(bary_C[0],bary_C[1],bary_C[2])->getPosition();
-
-        this->drawTriangle(vparams,pA,pB,pC);
-
-        return;
-    }
-
-    Vector3 bary_D = (bary_A + bary_B)/2.0;
-    Vector3 bary_E = (bary_A + bary_C)/2.0;
-    Vector3 bary_F = (bary_B + bary_C)/2.0;
-
-    Vector3 bary_G = (bary_A + bary_B + bary_C)/3.0;
-
-    tesselate(vparams,level+1,tid,bary_A,bary_D,bary_G);
-    tesselate(vparams,level+1,tid,bary_D,bary_B,bary_G);
-
-    tesselate(vparams,level+1,tid,bary_G,bary_B,bary_F);
-    tesselate(vparams,level+1,tid,bary_G,bary_F,bary_C);
-
-    tesselate(vparams,level+1,tid,bary_G,bary_C,bary_E);
-    tesselate(vparams,level+1,tid,bary_A,bary_G,bary_E);
-}
-
-void BezierTriangleGeometry::draw(const VisualParams * vparams) {
-        if (! vparams->displayFlags().getShowCollisionModels()) return;
-
-        if (m_triangle_info.empty()) {
-            Inherit::draw((vparams));
-            return;
-        }
-
-        glDisable(GL_LIGHTING);
-
-        glEnable(GL_CULL_FACE);
-        glBegin(GL_TRIANGLES);
-
-        for(unsigned t=0;t<p_topology->getNbTriangles();t++) {
-            tesselate(vparams,0,t,Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1));
-        }
-
-        glEnd();
-    }
 
 }

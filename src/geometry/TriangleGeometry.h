@@ -1,29 +1,19 @@
 #pragma once
 
 #include <geometry/PointGeometry.h>
+#include <geometry/EdgeGeometry.h>
 
 namespace collisionAlgorithm {
 
-class TriangleGeometry : public BaseGeometry {
+class TriangleGeometry : public EdgeGeometry {
     friend class TriangleElement;
     friend class TriangleProximity;
 
 public:
 
-    Port<Topology,REQUIRED> p_topology;
-    Data<Vector4> d_color;
+    virtual void init();
 
-    TriangleGeometry()
-    : p_topology("topology",LEFT,this)
-    , d_color("color", Vector4(1,0,1,1), this){}
-
-    void init();
-
-    void prepareDetection();
-
-    void draw(const VisualParams *vparams);
-
-    void drawTriangle(const VisualParams * vparams,const Vector3 & A,const Vector3 & B, const Vector3 & C);
+    virtual void prepareDetection();
 
     typedef struct {
         Vector3 v0,v1;
@@ -34,10 +24,6 @@ public:
 
         Vector3 tn,ax1,ax2;
     } TriangleInfo;
-
-    inline ReadAccessor<Vector3> read(VecID v) {
-        return p_topology->p_state->read(v);
-    }
 
 protected:
     std::vector<TriangleInfo> m_triangle_info;
