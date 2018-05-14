@@ -29,7 +29,7 @@ void BezierTriangleGeometry::prepareDetection() {
     const ReadAccessor<Vector3> & x = getState()->read(VecCoordId::position());
 
     m_beziertriangle_info.resize(p_topology->getNbTriangles());
-    for (unsigned t=0;t<p_topology()->getNbTriangles();t++) {
+    for (unsigned t=0;t<(unsigned) p_topology()->getNbTriangles();t++) {
         BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[t];
         const Topology::Triangle trpids = p_topology->getTriangle(t);
 

@@ -14,7 +14,7 @@ public:
             m_position = P;
         }
 
-        Vector3 getPosition(VecID v) const {
+        Vector3 getPosition(VecID /*v*/) const {
             return m_position;
         }
 
@@ -78,7 +78,7 @@ public:
         return (AABBGeometry*) m_geometry;
     }
 
-    void draw(const VisualParams * vparams) {
+    void draw(const VisualParams * /*vparams*/) {
         Vector3 points[8];
 
         points[0] = geometry()->m_Bmin + Vector3((i  ) * geometry()->m_cellSize[0],(j  ) * geometry()->m_cellSize[1],(k  ) * geometry()->m_cellSize[2]) ;

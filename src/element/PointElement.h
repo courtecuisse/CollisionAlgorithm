@@ -76,7 +76,7 @@ public :
     }
 };
 
-ConstraintProximityPtr PointElement::createProximity(const int i) {
+ConstraintProximityPtr PointElement::createProximity(const int /*i*/) {
     return std::make_shared<PointProximity>(this);
 }
 

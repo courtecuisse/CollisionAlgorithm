@@ -197,7 +197,7 @@ public:
             if (P_v.m_fact[0] < 0 || P_v.m_fact[1] < 0 || P_v.m_fact[2] < 0) break;
             if (P_u.m_fact[0] < 0 || P_u.m_fact[1] < 0 || P_u.m_fact[2] < 0) break;
 
-            Mat<2,2,double> J, invJ;
+            Mat2x2 J, invJ;
             J[0][0] = (e_v[0] - e_0[0])/delta;
             J[1][0] = (e_v[1] - e_0[1])/delta;
             J[0][1] = (e_u[0] - e_0[0])/delta;
