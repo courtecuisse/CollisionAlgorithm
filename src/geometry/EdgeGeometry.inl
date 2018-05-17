@@ -2,7 +2,7 @@
 
 #include <geometry/EdgeGeometry.h>
 #include <element/EdgeElement.h>
-#include <GL/gl.h>
+#include <qopengl.h>
 
 namespace collisionAlgorithm {
 

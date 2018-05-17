@@ -2,7 +2,7 @@
 
 #include <geometry/TriangleGeometry.h>
 #include <element/TriangleElement.h>
-#include <GL/gl.h>
+#include <qopengl.h>
 
 namespace collisionAlgorithm {
 

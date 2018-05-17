@@ -1,6 +1,6 @@
 #include <BaseGeometry.h>
 
-#include <GL/gl.h>
+#include <qopengl.h>
 
 namespace collisionAlgorithm {
 
@@ -64,3 +64,5 @@ namespace collisionAlgorithm {
 
 
 }
+
+CONNECTABLE(collisionAlgorithm::BaseGeometry)

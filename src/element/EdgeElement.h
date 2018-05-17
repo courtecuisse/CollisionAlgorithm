@@ -1,7 +1,7 @@
 #pragma once
 
 #include <geometry/EdgeGeometry.h>
-#include <GL/gl.h>
+#include <qopengl.h>
 
 namespace collisionAlgorithm {
 

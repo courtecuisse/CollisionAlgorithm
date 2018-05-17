@@ -4,10 +4,10 @@
 #include <memory>
 #include <map>
 #include <vector>
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/SVD>
-#include <GL/gl.h>
+#include <Eigen/Dense>
+#include <Eigen/Core>
+#include <Eigen/SVD>
+#include <qopengl.h>
 
 namespace collisionAlgorithm {
 

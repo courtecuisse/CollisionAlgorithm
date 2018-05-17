@@ -2,7 +2,7 @@
 
 #include <geometry/IntersectionContourGeometry.h>
 #include <element/IntersectionContourElement.h>
-#include <GL/gl.h>
+#include <qopengl.h>
 
 namespace collisionAlgorithm {
 

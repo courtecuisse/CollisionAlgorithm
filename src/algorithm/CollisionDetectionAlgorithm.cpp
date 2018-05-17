@@ -6,4 +6,7 @@ DECLARE_CLASS(CollisionDetectionAlgorithm)
 
 }
 
+CONNECTABLE(collisionAlgorithm::CollisionDetectionAlgorithm)
+
+
 

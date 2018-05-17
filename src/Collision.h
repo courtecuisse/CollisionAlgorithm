@@ -1,7 +1,7 @@
 #pragma once
 
 #include <BaseGeometry.h>
-#include <GL/gl.h>
+#include <qopengl.h>
 
 namespace collisionAlgorithm {
 
@@ -12,10 +12,7 @@ class Collision : public BaseObject {
 public :
     Port<BaseObject> p_type;
 
-    Collision()
-    : p_type("out",LEFT,this) {
-        m_dirty = true;
-    }
+    Collision();
 
     virtual void beginStep() {
         if (! m_dirty) return;

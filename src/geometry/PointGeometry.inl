@@ -2,7 +2,7 @@
 
 #include <geometry/PointGeometry.h>
 #include <element/PointElement.h>
-#include <GL/gl.h>
+#include <qopengl.h>
 
 namespace collisionAlgorithm {
 
