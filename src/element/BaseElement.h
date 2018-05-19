@@ -108,7 +108,7 @@ protected:
     //            if (usePoints[i]) normals.push_back((controlPoints[i] - P)*delta);
     //        }
 
-            unsigned JLin = controlPoints.size();
+            unsigned JLin = (unsigned) controlPoints.size();
 
     //        if (JLin == 0) break;
 

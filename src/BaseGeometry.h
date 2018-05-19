@@ -40,7 +40,7 @@ public:
     }
 
     unsigned getNbElements() {        
-        return m_elements.size();
+        return (unsigned) m_elements.size();
     }
 
     ConstraintElementPtr getElement(unsigned i) const {

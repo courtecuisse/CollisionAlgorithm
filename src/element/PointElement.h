@@ -34,7 +34,7 @@ public:
         return (PointGeometry * ) m_geometry;
     }
 
-    void draw(const VisualParams */*vparams*/ ) {
+    void draw(const VisualParams * /*vparams*/ ) {
         glColor4dv(geometry()->d_color.getValue().data());
 
         glBegin(GL_POINTS);
