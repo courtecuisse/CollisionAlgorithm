@@ -30,7 +30,7 @@ public :
         else if (dynamic_cast<AnimateEndEvent *>(e)) endStep();
     }
 
-    static std::string getObjectType() {
+    static std::string getObjectCategory() {
         return std::string("Collision");
     }
 
