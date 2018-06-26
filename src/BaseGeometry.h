@@ -16,7 +16,7 @@ public:
 
     BaseGeometry()
 //    : p_topology("topology",LEFT,this)
-    : p_type("any",RIGHT,this) {
+    : p_type("any",LEFT,this) {
         m_dirty = true;
     }
 

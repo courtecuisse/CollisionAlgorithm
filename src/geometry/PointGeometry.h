@@ -12,7 +12,7 @@ public:
     Data<Vector4> d_color;
 
     PointGeometry()
-    : p_topology("topology",LEFT,this)
+    : p_topology("topology",RIGHT,this)
     , d_color("color", Vector4(1,0,1,1), this){}
 
     void prepareDetection();

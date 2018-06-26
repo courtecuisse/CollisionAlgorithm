@@ -8,7 +8,7 @@ namespace collisionAlgorithm {
 
 AABBGeometry::AABBGeometry()
 : d_nbox("nbox",Vec3i(8,8,8),this)
-, p_geometry("geometry",LEFT, this)
+, p_geometry("geometry",RIGHT, this)
 {}
 
 void AABBGeometry::init() {}
