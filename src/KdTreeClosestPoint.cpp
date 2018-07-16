@@ -9,9 +9,6 @@
 #include <math.h>
 #include <sofa/defaulttype/Vec.h>
 #include "AABBDecorator.h"
-#include <pcl/point_cloud.h>
-#include <pcl/registration/correspondence_estimation.h>
-#include <pcl/correspondence.h>
 
 namespace sofa {
 

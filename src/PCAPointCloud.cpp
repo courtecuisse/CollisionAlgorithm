@@ -34,7 +34,6 @@
 #include <sofa/core/collision/NarrowPhaseDetection.h>
 
 #include <sofa/core/behavior/PairInteractionConstraint.h>
-#include <sofa/core/behavior/MixedInteractionConstraint.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/defaulttype/SolidTypes.h>
 
