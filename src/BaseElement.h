@@ -1,6 +1,6 @@
 #pragma once
 
-#include <commonTypes.h>
+#include <collisionAlgorithm.h>
 #include <memory>
 #include <map>
 #include <vector>

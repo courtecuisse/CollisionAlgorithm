@@ -1,5 +1,4 @@
 #include <BaseGeometry.h>
-#include <element/BaseElement.h>
 
 namespace collisionAlgorithm {
 

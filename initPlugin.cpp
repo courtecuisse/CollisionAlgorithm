@@ -22,7 +22,7 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#include "initPlugin.h"
+#include "collisionAlgorithm.h"
 #include <sofa/helper/system/config.h>
 #include <sofa/core/ObjectFactory.h>
 #include <string>

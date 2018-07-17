@@ -1,10 +1,10 @@
 #pragma once
 
-#include <commonTypes.h>
+#include <collisionAlgorithm.h>
 #include <memory>
 #include <map>
 #include <vector>
-#include <element/BaseElement.h>
+#include <BaseElement.h>
 
 namespace collisionAlgorithm {
 
@@ -24,26 +24,25 @@ public:
         m_elements.clear();
     }
 
-    virtual void beginStep() {
-        if (! m_dirty) return;
-        m_dirty = false;
-        prepareDetection();
-    }
-
-    virtual void endStep() {
-        m_dirty = true;
-    }
-
     virtual void handleEvent(Event * e) {
-        if (dynamic_cast<AnimateBeginEvent *>(e)) beginStep();
-        else if (dynamic_cast<AnimateEndEvent *>(e)) endStep();
+        if (dynamic_cast<AnimateBeginEvent *>(e)) m_dirty=true;
     }
 
-    unsigned getNbElements() {        
+    unsigned getNbElements() {
+        if (m_dirty) {
+            prepareDetection();
+            m_dirty = false;
+        }
+
         return (unsigned) m_elements.size();
     }
 
-    ConstraintElementPtr getElement(unsigned i) const {
+    ConstraintElementPtr getElement(unsigned i) {
+        if (m_dirty) {
+            prepareDetection();
+            m_dirty = false;
+        }
+
         return m_elements[i];
     }
 

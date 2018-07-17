@@ -1,5 +1,6 @@
 #pragma once
 
+#include <collisionAlgorithm.h>
 #include <BaseGeometry.h>
 #include <qopengl.h>
 
@@ -14,20 +15,8 @@ public :
 
     Collision();
 
-    virtual void beginStep() {
-        if (! m_dirty) return;
-        m_dirty = false;
-        m_pairDetection.clear();
-        processAlgorithm();
-    }
-
-    virtual void endStep() {
-        m_dirty = true;
-    }
-
     virtual void handleEvent(Event * e) {
-        if (dynamic_cast<AnimateBeginEvent *>(e)) beginStep();
-        else if (dynamic_cast<AnimateEndEvent *>(e)) endStep();
+        if (dynamic_cast<AnimateBeginEvent *>(e)) m_dirty= true;
     }
 
     static std::string getObjectCategory() {
@@ -49,6 +38,12 @@ public :
     }
 
     PairProximityVector & getCollisionPairs() {
+        if (m_dirty) {
+            m_pairDetection.clear();
+            processAlgorithm();
+            m_dirty = false;
+        }
+
         return m_pairDetection;
     }
 
