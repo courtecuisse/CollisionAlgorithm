@@ -31,7 +31,7 @@ public:
             m_fact[1] = f2;
         }
 
-        Vector3 getPosition(VecID v) const {
+        Vector3 getPosition(VecCoordId v) const {
             const ReadAccessor<Vector3> & pos = m_state->read(v);
             return pos[element()->m_pid[0]] * m_fact[0] + pos[element()->m_pid[1]] * m_fact[1];
         }

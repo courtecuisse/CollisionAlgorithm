@@ -19,7 +19,7 @@ public:
     public :
         IntersectionContourProximity(IntersectionContourElement * elmt) : ConstraintProximity(elmt) {}
 
-        Vector3 getPosition(VecID v) const {
+        Vector3 getPosition(VecCoordId v) const {
             const ReadAccessor<Vector3> & pos = m_state->read(v);
 
             Vector3 P = pos[element()->m_pid[0]] * element()->m_fact[0];

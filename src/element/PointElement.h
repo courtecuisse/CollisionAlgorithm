@@ -54,7 +54,7 @@ class PointProximity : public ConstraintProximity {
 public :
     PointProximity(PointElement * elmt) : ConstraintProximity(elmt) {}
 
-    Vector3 getPosition(VecID v) const {
+    Vector3 getPosition(VecCoordId v) const {
         const ReadAccessor<Vector3> & pos = m_state->read(v);
         return pos[element()->m_pid];
     }

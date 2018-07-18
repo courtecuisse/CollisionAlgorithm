@@ -19,7 +19,7 @@ public :
 
     ConstraintProximity(ConstraintElement * elmt);
 
-    virtual Vector3 getPosition(VecID v = VecCoordId::position()) const = 0;
+    virtual Vector3 getPosition(VecCoordId v = VecCoordId::position()) const = 0;
 
     virtual Vector3 getNormal() const = 0;
 

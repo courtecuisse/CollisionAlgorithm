@@ -14,7 +14,7 @@ public:
             m_position = P;
         }
 
-        Vector3 getPosition(VecID /*v*/) const {
+        Vector3 getPosition(VecCoordId /*v*/) const {
             return m_position;
         }
 
