@@ -14,11 +14,11 @@ public:
 
     void processAlgorithm();
 
-    virtual void handleEvent(Event * e) {
-        p_from->handleEvent(e);
-        p_dest->handleEvent(e);
-        Collision::handleEvent(e);
-    }
+//    virtual void handleEvent(Event * e) {
+//        p_from->handleEvent(e);
+//        p_dest->handleEvent(e);
+//        Collision::handleEvent(e);
+//    }
 
 private:
 
