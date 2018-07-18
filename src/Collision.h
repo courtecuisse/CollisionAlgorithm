@@ -39,9 +39,11 @@ public :
 
     PairProximityVector & getCollisionPairs() {
         if (m_dirty) {
+            Timer::beginStep("Collision");
             m_pairDetection.clear();
             processAlgorithm();
             m_dirty = false;
+            Timer::endStep("Collision");
         }
 
         return m_pairDetection;
