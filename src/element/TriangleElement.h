@@ -19,7 +19,11 @@ public:
 
     inline ConstraintProximityPtr createProximity(double f1,double f2,double f3);
 
-    TriangleElement(TriangleGeometry * geo,unsigned eid) : ConstraintElement(geo,3) {
+    TriangleElement(TriangleGeometry * geo,unsigned eid)
+    : ConstraintElement(geo->getState(),
+                        ControlPoint<3>(createProximity(1,0,0),createProximity(0,1,0),createProximity(0,0,1)),
+                        createProximity(1.0/3.0,1.0/3.0,1.0/3.0))
+    , m_geometry(geo) {
         m_eid = eid;
 
         const std::vector<Topology::Triangle> & triangles = geometry()->p_topology->getTriangles();
@@ -27,13 +31,6 @@ public:
         m_pid[0] = triangles[eid][0];
         m_pid[1] = triangles[eid][1];
         m_pid[2] = triangles[eid][2];
-    }
-
-    ConstraintProximityPtr getControlPoint(const int cid) {
-        if (cid == 0) return createProximity(1,0,0);
-        else if (cid == 1) return createProximity(0,1,0);
-        else if (cid == 2) return createProximity(0,0,1);
-        return createProximity(1.0/3.0,1.0/3.0,1.0/3.0);
     }
 
     //proj_P must be on the plane
@@ -137,6 +134,7 @@ public:
 protected:
     unsigned m_pid[3];
     unsigned m_eid;
+    TriangleGeometry * m_geometry;
 };
 
 /**************************************************************************/

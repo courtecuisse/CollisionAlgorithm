@@ -16,8 +16,10 @@ class BaseGeometry;
 
 class ConstraintProximity {
 public :
+    typedef std::shared_ptr<ConstraintProximity> ConstraintProximityPtr;
 
-    ConstraintProximity(ConstraintElement * elmt);
+    ConstraintProximity(ConstraintElement * elmt)
+    : m_element(elmt) {}
 
     virtual Vector3 getPosition(VecCoordId v = VecCoordId::position()) const = 0;
 
@@ -29,35 +31,65 @@ public :
         return (this->getPosition() - P).norm();
     }
 
-    State * getState() {
-        return m_state;
-    }
-
-protected:
     ConstraintElement * m_element;
     State * m_state;
 };
 
-typedef std::shared_ptr<ConstraintProximity> ConstraintProximityPtr;
+typedef ConstraintProximity::ConstraintProximityPtr ConstraintProximityPtr;
+
+template<int C>
+using ControlPoint=fixed_array<ConstraintProximityPtr,C>;
 
 class ConstraintElement {
     friend class ConstraintProximity;
-public:
 
-    ConstraintElement(BaseGeometry * geo,unsigned nc)
-    : m_geometry(geo)
-    , m_controlPoints(nc) {}
+public:
+    typedef std::shared_ptr<ConstraintElement> ConstraintElementPtr;
+
+    ConstraintElement(State * s,ControlPoint<1> cp,ConstraintProximityPtr c)
+    : m_centerPoint(c) {
+        m_controlPoint.resize(1);
+        m_controlPoint[0] = cp[0];
+
+        m_controlPoint[0]->m_state = s;
+    }
+
+    ConstraintElement(State * s,ControlPoint<2> cp,ConstraintProximityPtr c)
+    : m_centerPoint(c) {
+        m_controlPoint.resize(2);
+        m_controlPoint[0] = cp[0];
+        m_controlPoint[1] = cp[1];
+
+        m_controlPoint[0]->m_state = s;
+        m_controlPoint[1]->m_state = s;
+    }
+
+    ConstraintElement(State * s,ControlPoint<3> cp,ConstraintProximityPtr c)
+    : m_centerPoint(c) {
+        m_controlPoint.resize(3);
+        m_controlPoint[0] = cp[0];
+        m_controlPoint[1] = cp[1];
+        m_controlPoint[2] = cp[2];
+
+        m_controlPoint[0]->m_state = s;
+        m_controlPoint[1]->m_state = s;
+        m_controlPoint[2]->m_state = s;
+    }
 
     //this function returns a vector with all the control points of the element
     //if an id is not >=0 and <getNbControlPoints() this function should return the gravity center of the element
-    virtual ConstraintProximityPtr getControlPoint(const int i = -1) = 0;
+    ConstraintProximityPtr getControlPoint(const int cid = -1) {
+        if (cid >= 0 && cid<m_controlPoint.size()) return m_controlPoint[cid];
+        return m_centerPoint;
+    }
+
 
     //this function project the point P on the element and return the corresponding proximity
     virtual ConstraintProximityPtr project(Vector3 P) = 0;
 
     // return the number of control points
     unsigned getNbControlPoints() {
-        return m_controlPoints;
+        return m_controlPoint.size();
     }
 
     virtual void draw(const VisualParams *vparams) = 0;
@@ -85,7 +117,7 @@ protected:
         double delta = 0.001;
 
         std::vector<ConstraintProximityPtr> controlPoints;
-        for (unsigned i=0;i<m_controlPoints;i++) controlPoints.push_back(getControlPoint(i));
+        for (unsigned i=0;i<m_controlPoint.size();i++) controlPoints.push_back(getControlPoint(i));
 
         ConstraintProximityPtr res = getControlPoint();
 
@@ -180,10 +212,10 @@ protected:
     }
 
 protected:
-    BaseGeometry * m_geometry;
-    unsigned m_controlPoints;
+    std::vector<ConstraintProximityPtr> m_controlPoint;
+    ConstraintProximityPtr m_centerPoint;
 };
 
-typedef std::shared_ptr<ConstraintElement> ConstraintElementPtr;
+typedef ConstraintElement::ConstraintElementPtr ConstraintElementPtr;
 
 } // namespace controller

@@ -15,15 +15,16 @@ class PointElement : public ConstraintElement {
 
 public:
 
-    inline ConstraintProximityPtr createProximity(const int i);
 
-    PointElement(PointGeometry *geo, unsigned pid) : ConstraintElement(geo,1) {
+    PointElement(PointGeometry *geo, unsigned pid)
+    : ConstraintElement(geo->getState(),
+                        ControlPoint<1>(createProximity()),
+                        createProximity())
+    , m_geometry(geo) {
         m_pid = pid;
     }
 
-    ConstraintProximityPtr getControlPoint(const int i) {
-        return createProximity(i);
-    }
+    ConstraintProximityPtr createProximity();
 
     //this function project the point P on the element and return the corresponding proximity
     ConstraintProximityPtr project(Vector3 /*P*/) {
@@ -44,6 +45,7 @@ public:
 
 protected:
     unsigned m_pid;
+    PointGeometry * m_geometry;
 };
 
 /**************************************************************************/
@@ -76,7 +78,7 @@ public :
     }
 };
 
-ConstraintProximityPtr PointElement::createProximity(const int /*i*/) {
+ConstraintProximityPtr PointElement::createProximity() {
     return std::make_shared<PointProximity>(this);
 }
 
