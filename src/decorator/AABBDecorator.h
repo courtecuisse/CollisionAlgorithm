@@ -25,7 +25,11 @@ public:
     }
 
     virtual void handleEvent(Event * e) {
-        if (dynamic_cast<AnimateBeginEvent *>(e)) prepareDetection();
+        if (dynamic_cast<AnimateBeginEvent *>(e)) {
+            Timer::beginStep("AABBDecorator");
+            prepareDetection();
+            Timer::endStep("AABBDecorator");
+        }
     }
 
     Vector3 m_Bmin,m_Bmax,m_cellSize;
