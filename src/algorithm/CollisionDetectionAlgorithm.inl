@@ -220,11 +220,11 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
 
     //first we search if there is a AABB connected to the geometry
     for (unsigned i=0;i<p_from->p_type.size();i++) {
-        if (from = dynamic_cast<AABBDecorator *>(p_from->p_type[i])) break;
+        if ((from = dynamic_cast<AABBDecorator *>(p_from->p_type[i]))) break;
     }
 
     for (unsigned i=0;i<p_dest->p_type.size();i++) {
-        if (dest = dynamic_cast<AABBDecorator *>(p_dest->p_type[i])) break;
+        if ((dest = dynamic_cast<AABBDecorator *>(p_dest->p_type[i]))) break;
     }
 
     //we do the collision from first to second

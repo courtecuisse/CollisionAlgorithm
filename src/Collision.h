@@ -2,6 +2,7 @@
 
 #include <collisionAlgorithm.h>
 #include <BaseGeometry.h>
+#include <BaseElement.h>
 #include <qopengl.h>
 
 namespace collisionAlgorithm {
@@ -9,7 +10,7 @@ namespace collisionAlgorithm {
 typedef std::pair<ConstraintProximityPtr,ConstraintProximityPtr> PairProximity;
 typedef std::vector<PairProximity> PairProximityVector;
 
-class Collision : public BaseObject {
+class Collision : public CollisionPipeline {
 public :
     Port<BaseObject> p_type;
 
