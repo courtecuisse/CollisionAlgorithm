@@ -15,8 +15,8 @@ public:
     Port<BaseObject> p_type;
 
     BaseGeometry()
-//    : p_topology("topology",LEFT,this)
-    : p_type("any",LEFT,this) {
+//    : p_topology("topology",IN,this)
+    : p_type("any",IN,this) {
         m_dirty = true;
     }
 

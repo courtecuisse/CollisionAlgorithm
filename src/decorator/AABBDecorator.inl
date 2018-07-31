@@ -7,7 +7,7 @@ namespace collisionAlgorithm {
 
 AABBDecorator::AABBDecorator()
 : d_nbox("nbox",Vec3i(8,8,8),this)
-, p_geometry("geometry",RIGHT, this)
+, p_geometry("geometry",OUT, this)
 {}
 
 void AABBDecorator::prepareDetection() {
