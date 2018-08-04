@@ -10,8 +10,8 @@ public:
 
 
 
-    Port<BaseGeometry,REQUIRED> p_from;
-    Port<BaseGeometry,REQUIRED> p_dest;
+    Port<BaseGeometry,IN> p_from;
+    Port<BaseGeometry,IN> p_dest;
 
     CollisionDetectionAlgorithm();
 
