@@ -15,8 +15,8 @@ public:
     Port<Connectable,OUT> p_type;
 
     BaseGeometry()
-//    : p_topology("topology",IN,this)
-    : p_type("any",IN,this) {
+//    : p_topology("topology",this)
+    : p_type("any",this) {
         m_dirty = true;
     }
 

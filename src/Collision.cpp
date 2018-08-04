@@ -4,7 +4,7 @@
 namespace collisionAlgorithm {
 
 Collision::Collision()
-: p_type("out",IN,this) {
+: p_type("out",this) {
     m_dirty = true;
 }
 
