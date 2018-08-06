@@ -229,7 +229,8 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
 
     //we do the collision from first to second
     for (unsigned i=0;i<p_from->getNbElements();i++) {
-        PairProximity pair = (dest == NULL) ? getClosestPoint(DefaultIterator(p_from->getElement(i), p_dest())) : getClosestPoint(AABBElementIterator(p_from->getElement(i), dest));
+        ConstraintElementPtr elmt = p_from->getElement(i);
+        PairProximity pair = (dest == NULL) ? getClosestPoint(DefaultIterator(elmt, p_dest())) : getClosestPoint(AABBElementIterator(elmt, dest));
 
         if (pair.first == NULL) continue;
         if (pair.second == NULL) continue;
@@ -239,7 +240,8 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
 
     //then from second to first
     for (unsigned i=0;i<p_dest->getNbElements();i++) {
-        PairProximity pair = (from == NULL) ? getClosestPoint(DefaultIterator(p_dest->getElement(i), p_from())) : getClosestPoint(AABBElementIterator(p_dest->getElement(i), from));
+        ConstraintElementPtr elmt = p_from->getElement(i);
+        PairProximity pair = (from == NULL) ? getClosestPoint(DefaultIterator(elmt, p_from())) : getClosestPoint(AABBElementIterator(elmt, from));
 
         if (pair.first == NULL) continue;
         if (pair.second == NULL) continue;
