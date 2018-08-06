@@ -11,8 +11,8 @@ namespace collisionAlgorithm {
 class BaseGeometry : public BaseObject {
 public:
 
-//    Port<Topology,REQUIRED> p_topology;
-    Port<Connectable,OUT> p_type;
+//    Port<Topology,_REQUIRED> p_topology;
+    Port<Connectable,_OUT> p_type;
 
     BaseGeometry()
 //    : p_topology("topology",this)

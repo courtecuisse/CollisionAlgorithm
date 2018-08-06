@@ -180,7 +180,7 @@ public :
     }
 
     unsigned size() {
-        return m_selectElements.size();
+        return (unsigned) m_selectElements.size();
     }
 
     inline ConstraintElementPtr element(unsigned i) {
