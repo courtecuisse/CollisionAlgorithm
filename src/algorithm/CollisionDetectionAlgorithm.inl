@@ -16,24 +16,24 @@ PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_el
     PairProximity min_pair;
     double min_dist = std::numeric_limits<double>::max();
 
-    ConstraintProximityPtr pfrom = it_element.efrom->getControlPoint();
+    ConstraintProximityPtr pfrom = it_element.efrom->getControlPoint(); //centered control point
     if (pfrom == NULL) return min_pair;
     Vector3 P = pfrom->getPosition();
 
     for (unsigned i=0;i<it_element.size();i++) {
         ConstraintElementPtr edest = it_element.element(i);
         ConstraintProximityPtr pdest = edest->project(P);
-        pfrom = it_element.efrom->project(pdest->getPosition());
 
-        //iterate until to find the correct location on pfrom
-        for (int itearation = 0;itearation<10 && pfrom->distance(P)>0.0001;itearation++) {
-            P = pfrom->getPosition();
-            pdest = edest->project(P);
-            pfrom = it_element.efrom->project(pdest->getPosition());
-        }
+//        pfrom = it_element.efrom->project(pdest->getPosition());
+//        //iterate until to find the correct location on pfrom
+//        for (int itearation = 0;itearation<10 && pfrom->distance(P)>0.0001;itearation++) {
+//            P = pfrom->getPosition();
+//            pdest = edest->project(P);
+//            pfrom = it_element.efrom->project(pdest->getPosition());
+//        }
 
         //compute all the distances with to elements
-        double dist = pdest->distance(P);
+        double dist = pfrom->distance(pdest->getPosition());
 
         if (dist<min_dist) {
             min_dist = dist;
@@ -215,13 +215,13 @@ public:
 void CollisionDetectionAlgorithm::processAlgorithm() {
     m_pairDetection.clear();
 
-    AABBDecorator * from = NULL;
+//    AABBDecorator * from = NULL;
     AABBDecorator * dest = NULL;
 
-    //first we search if there is a AABB connected to the geometry
-    for (unsigned i=0;i<p_from->p_type.size();i++) {
-        if ((from = dynamic_cast<AABBDecorator *>(p_from->p_type[i]))) break;
-    }
+//    //first we search if there is a AABB connected to the geometry
+//    for (unsigned i=0;i<p_from->p_type.size();i++) {
+//        if ((from = dynamic_cast<AABBDecorator *>(p_from->p_type[i]))) break;
+//    }
 
     for (unsigned i=0;i<p_dest->p_type.size();i++) {
         if ((dest = dynamic_cast<AABBDecorator *>(p_dest->p_type[i]))) break;
@@ -238,16 +238,16 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
         m_pairDetection.push_back(PairProximity(pair.first,pair.second));
     }
 
-    //then from second to first
-    for (unsigned i=0;i<p_dest->getNbElements();i++) {
-        ConstraintElementPtr elmt = p_dest->getElement(i);
-        PairProximity pair = (from == NULL) ? getClosestPoint(DefaultIterator(elmt, p_from())) : getClosestPoint(AABBElementIterator(elmt, from));
+//    //then from second to first
+//    for (unsigned i=0;i<p_dest->getNbElements();i++) {
+//        ConstraintElementPtr elmt = p_dest->getElement(i);
+//        PairProximity pair = (from == NULL) ? getClosestPoint(DefaultIterator(elmt, p_from())) : getClosestPoint(AABBElementIterator(elmt, from));
 
-        if (pair.first == NULL) continue;
-        if (pair.second == NULL) continue;
+//        if (pair.first == NULL) continue;
+//        if (pair.second == NULL) continue;
 
-        m_pairDetection.push_back(PairProximity(pair.second,pair.first));
-    }
+//        m_pairDetection.push_back(PairProximity(pair.second,pair.first));
+//    }
 }
 
 }
