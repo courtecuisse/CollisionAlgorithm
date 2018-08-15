@@ -26,7 +26,6 @@ public :
 
     void draw(const VisualParams * vparams) {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
-
         glDisable(GL_LIGHTING);
         glColor4f(0,1,0,1);
         glBegin(GL_LINES);
@@ -40,9 +39,9 @@ public :
 
     void computeCollisionDetection() {
         if (! m_dirty) return;
-
         m_pairDetection.clear();
         processAlgorithm();
+
         m_dirty = false;
     }
 

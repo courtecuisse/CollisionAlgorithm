@@ -13,7 +13,7 @@ BezierTriangleGeometry::BezierTriangleGeometry()
 , d_draw_tesselation("tesselation",(unsigned) 0.0,this)
 {}
 
-void BezierTriangleGeometry::init() {
+void BezierTriangleGeometry::createElements() {
     m_elements.clear();
 
     for (unsigned i=0;i<p_topology->getNbTriangles();i++) {

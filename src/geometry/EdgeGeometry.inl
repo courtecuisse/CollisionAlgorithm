@@ -14,6 +14,8 @@ void EdgeGeometry::init() {
     }
 }
 
-void EdgeGeometry::prepareDetection() {}
+void EdgeGeometry::prepareDetection() {
+    if (m_elements.size() != p_topology->getNbEdges()) init();
+}
 
 }

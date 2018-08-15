@@ -21,7 +21,7 @@ public:
 
     void prepareDetection();
 
-    void init();
+    void createElements();
 
 private :
     typedef struct {

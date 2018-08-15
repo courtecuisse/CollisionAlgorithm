@@ -14,7 +14,9 @@ void PointGeometry::init() {
     }
 }
 
-void PointGeometry::prepareDetection() {}
+void PointGeometry::prepareDetection() {
+    if (m_elements.size() != p_topology->getNbPoints()) init();
+}
 
 
 

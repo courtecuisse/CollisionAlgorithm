@@ -46,21 +46,21 @@ public:
         return m_elements[i];
     }
 
-    ConstraintProximityPtr project(const Vector3 & P) {
-        double min_dist = std::numeric_limits<double>::max();
-        ConstraintProximityPtr min_prox = NULL;
+//    ConstraintProximityPtr project(const Vector3 & P) {
+//        double min_dist = std::numeric_limits<double>::max();
+//        ConstraintProximityPtr min_prox = NULL;
 
-        for (unsigned i=0;i<m_elements.size();i++) {
-            ConstraintProximityPtr pdest = m_elements[i]->project(P);
-            double dist = (P - pdest->getPosition()).norm();
-            if (dist<min_dist) {
-                min_dist = dist;
-                min_prox = pdest;
-            }
-        }
+//        for (unsigned i=0;i<m_elements.size();i++) {
+//            ConstraintProximityPtr pdest = m_elements[i]->project(P);
+//            double dist = (P - pdest->getPosition()).norm();
+//            if (dist<min_dist) {
+//                min_dist = dist;
+//                min_prox = pdest;
+//            }
+//        }
 
-        return min_prox;
-    }
+//        return min_prox;
+//    }
 
     virtual State * getState() = 0;
 

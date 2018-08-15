@@ -7,8 +7,8 @@
 namespace collisionAlgorithm {
 
 CollisionDetectionAlgorithm::CollisionDetectionAlgorithm()
-: p_from("from",this)
-, p_dest("dest",this)
+: p_from("from",_REQUIRED,this)
+, p_dest("dest",_REQUIRED,this)
 {}
 
 template<class ElementIterator>
