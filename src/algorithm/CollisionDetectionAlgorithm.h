@@ -8,8 +8,6 @@ namespace collisionAlgorithm {
 class CollisionDetectionAlgorithm : public Collision {
 public:
 
-
-
     Port<BaseGeometry,_IN> p_from;
     Port<BaseGeometry,_IN> p_dest;
 

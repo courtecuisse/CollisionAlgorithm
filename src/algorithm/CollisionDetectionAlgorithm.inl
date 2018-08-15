@@ -240,7 +240,7 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
 
     //then from second to first
     for (unsigned i=0;i<p_dest->getNbElements();i++) {
-        ConstraintElementPtr elmt = p_from->getElement(i);
+        ConstraintElementPtr elmt = p_dest->getElement(i);
         PairProximity pair = (from == NULL) ? getClosestPoint(DefaultIterator(elmt, p_from())) : getClosestPoint(AABBElementIterator(elmt, from));
 
         if (pair.first == NULL) continue;
