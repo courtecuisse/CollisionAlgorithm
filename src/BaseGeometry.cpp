@@ -61,5 +61,3 @@ namespace collisionAlgorithm {
 //} // namespace component
 
 }
-
-CONNECTABLE(collisionAlgorithm::BaseGeometry)

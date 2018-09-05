@@ -9,7 +9,13 @@ namespace collisionAlgorithm {
 CollisionDetectionAlgorithm::CollisionDetectionAlgorithm()
 : p_from("from",_REQUIRED,this)
 , p_dest("dest",_REQUIRED,this)
-{}
+{
+    p_from.setMinConnections(1);
+    p_from.setMaxConnections(1);
+
+    p_dest.setMinConnections(1);
+    p_dest.setMaxConnections(1);
+}
 
 template<class ElementIterator>
 PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_element) {

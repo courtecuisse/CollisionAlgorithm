@@ -9,5 +9,3 @@ Collision::Collision()
 }
 
 }
-
-CONNECTABLE(collisionAlgorithm::Collision)
