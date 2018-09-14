@@ -12,7 +12,7 @@ typedef std::vector<PairProximity> PairProximityVector;
 
 class Collision : public CollisionPipeline {
 public :
-    Port<Connectable,_OUT> p_type;
+    PortOut<Collision> p_out;
 
     Collision();
 

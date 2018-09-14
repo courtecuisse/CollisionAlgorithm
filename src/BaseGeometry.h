@@ -12,11 +12,11 @@ class BaseGeometry : public BaseObject {
 public:
 
 //    Port<Topology,_REQUIRED> p_topology;
-    Port<Connectable,_OUT> p_type;
+    PortOut<BaseGeometry> p_out;
 
     BaseGeometry()
 //    : p_topology("topology",this)
-    : p_type("any",this) {
+    : p_out("out",this, this) {
         m_dirty = true;
     }
 

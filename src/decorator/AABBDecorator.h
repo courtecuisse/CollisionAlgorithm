@@ -10,7 +10,7 @@ class AABBDecorator : public BaseObject {
 
 public:
     Data<Vec3i> d_nbox;
-    Port<BaseGeometry,_IN> p_geometry;
+    PortIn<BaseGeometry,REQUIRED> p_geometry;
 
     AABBDecorator();
 

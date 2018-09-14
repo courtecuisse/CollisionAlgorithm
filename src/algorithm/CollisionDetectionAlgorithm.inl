@@ -7,13 +7,10 @@
 namespace collisionAlgorithm {
 
 CollisionDetectionAlgorithm::CollisionDetectionAlgorithm()
-: p_from("from",_REQUIRED,this)
-, p_dest("dest",_REQUIRED,this)
+: p_from("from",this)
+, p_dest("dest",this)
 {
-    p_from.setMinConnections(1);
     p_from.setMaxConnections(1);
-
-    p_dest.setMinConnections(1);
     p_dest.setMaxConnections(1);
 }
 
@@ -229,8 +226,8 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
 //        if ((from = dynamic_cast<AABBDecorator *>(p_from->p_type[i]))) break;
 //    }
 
-    for (unsigned i=0;i<p_dest->p_type.size();i++) {
-        if ((dest = dynamic_cast<AABBDecorator *>(p_dest->p_type[i]))) break;
+    for (unsigned i=0;i<p_dest->p_out.size();i++) {
+        if ((dest = dynamic_cast<AABBDecorator *>(p_dest->p_out.get(i)))) break;
     }
 
     //we do the collision from first to second

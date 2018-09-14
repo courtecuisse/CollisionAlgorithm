@@ -7,9 +7,8 @@ namespace collisionAlgorithm {
 
 AABBDecorator::AABBDecorator()
 : d_nbox("nbox",Vec3i(8,8,8),this)
-, p_geometry("geometry",_REQUIRED, this)
+, p_geometry("geometry", this)
 {
-    p_geometry.setMinConnections(1);
     p_geometry.setMaxConnections(1);
 }
 
