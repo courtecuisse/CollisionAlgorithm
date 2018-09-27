@@ -8,12 +8,10 @@ class PointGeometry : public BaseGeometry {
     friend class PointElement;
 
 public:
-    PortIn<Topology,REQUIRED> p_topology;
     Data<Vector4> d_color;
 
     PointGeometry()
-    : p_topology("topology",this)
-    , d_color("color", Vector4(1,0,1,1), this){}
+    : d_color("color", Vector4(1,0,1,1), this){}
 
     void prepareDetection();
 
@@ -23,6 +21,8 @@ public:
         return p_topology->p_state();
     }
 
+protected:
+    Topology * m_topology;
 };
 
 }

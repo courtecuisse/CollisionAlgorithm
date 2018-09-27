@@ -8,6 +8,10 @@
 #include <Eigen/Core>
 #include <Eigen/SVD>
 #include <qopengl.h>
+#include <sofa/core/objectmodel/BaseObject.h>
+#include <sofa/core/VecId.h>
+
+namespace sofa {
 
 namespace collisionAlgorithm {
 
@@ -19,23 +23,23 @@ public :
 
     ConstraintProximity(ConstraintElement * elmt);
 
-    virtual Vector3 getPosition(VecCoordId v = VecCoordId::position()) const = 0;
+    virtual defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
 
-    virtual Vector3 getNormal() const = 0;
+    virtual defaulttype::Vector3 getNormal() const = 0;
 
     virtual std::map<unsigned,double> getContributions() = 0;
 
-    virtual double distance(const Vector3 & P) {
+    virtual double distance(const defaulttype::Vector3 & P) {
         return (this->getPosition() - P).norm();
     }
 
-    State * getState() {
+    sofa::core::behavior::MechanicalState<DataTypes> * getState() {
         return m_state;
     }
 
 protected:
     ConstraintElement * m_element;
-    State * m_state;
+    sofa::core::behavior::MechanicalState<DataTypes> * m_state;
 };
 
 typedef std::shared_ptr<ConstraintProximity> ConstraintProximityPtr;
@@ -53,14 +57,14 @@ public:
     virtual ConstraintProximityPtr getControlPoint(const int i = -1) = 0;
 
     //this function project the point P on the element and return the corresponding proximity
-    virtual ConstraintProximityPtr project(Vector3 P) = 0;
+    virtual ConstraintProximityPtr project(defaulttype::Vector3 P) = 0;
 
     // return the number of control points
     unsigned getNbControlPoints() {
         return m_controlPoints;
     }
 
-    virtual void draw(const VisualParams *vparams) = 0;
+    virtual void draw(const core::visual::VisualParams *vparams) = 0;
 
 protected:
 
@@ -78,7 +82,7 @@ protected:
         return m_inverse;
     }
 
-    virtual ConstraintProximityPtr newton_project(Vector3 Q) {
+    virtual ConstraintProximityPtr newton_project(defaulttype::Vector3 Q) {
         const int maxIt = 1;
         const double tolerance = 0.0001;
 //        const double threshold = 0.0000001;
@@ -98,7 +102,7 @@ protected:
         int it = 0;
 
         while (it< maxIt) {
-            Vector3 P = res->getPosition();
+            defaulttype::Vector3 P = res->getPosition();
 
 
     //        for (unsigned i=0;i<m_fact.size();i++) {
@@ -115,9 +119,9 @@ protected:
             Eigen::VectorXd e0(JLin);
             Eigen::MatrixXd J = Eigen::MatrixXd::Zero(JLin,JLin);
 
-            Vector3 PQ = Q-P;
+            defaulttype::Vector3 PQ = Q-P;
 
-            std::vector<Vector3> normals;
+            std::vector<defaulttype::Vector3> normals;
 
             double err=0.0;
             for (unsigned j=0;j<JLin;j++) {
@@ -133,7 +137,7 @@ protected:
             if (sqrt(err)<tolerance) break;
 
             for (unsigned j=0;j<JLin;j++) {
-                const Vector3 R = P + normals[j] * delta;
+                const defaulttype::Vector3 R = P + normals[j] * delta;
                 for (unsigned i=0;i<JLin;i++) {
                     const double fxdx = dot(R, normals[i]);
                     J(i,j) = (fxdx - e0(i))/ delta;
@@ -187,3 +191,5 @@ protected:
 typedef std::shared_ptr<ConstraintElement> ConstraintElementPtr;
 
 } // namespace controller
+
+}
