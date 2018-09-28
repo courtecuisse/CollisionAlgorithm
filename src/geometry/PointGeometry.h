@@ -13,7 +13,7 @@ public:
     Data<defaulttype::Vector4> d_color;
 
     PointGeometry()
-    : d_color("color", defaulttype::Vector4(1,0,1,1), this){
+    : d_color(initData(&d_color,defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model")) {
         addActivateCondition(&PointGeometry::canCreate);
     }
 

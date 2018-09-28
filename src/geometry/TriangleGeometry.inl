@@ -20,7 +20,7 @@ void TriangleGeometry::prepareDetection() {
     for (unsigned t=0;t<m_topology->getNbTriangles();t++) {
         TriangleInfo & tinfo = m_triangle_info[t];
 
-        const Topology::Triangle tri = m_topology->getTriangle(t);
+        const core::topology::Topology::Triangle tri = m_topology->getTriangle(t);
 
         //Compute Bezier Positions
         defaulttype::Vector3 p0 = pos[tri[0]];
@@ -47,7 +47,7 @@ void TriangleGeometry::prepareDetection() {
 
     m_pointNormal.resize(pos.size());
     for (unsigned p=0;p<pos.size();p++) {
-        const Topology::TrianglesAroundVertex & tav = m_topology->getTrianglesAroundVertex(p);
+        const core::topology::Topology::TrianglesAroundVertex & tav = m_topology->getTrianglesAroundVertex(p);
         m_pointNormal[p] = defaulttype::Vector3(0,0,0);
         for (unsigned t=0;t<tav.size();t++) {
             m_pointNormal[p] += this->m_triangle_info[tav[t]].tn;

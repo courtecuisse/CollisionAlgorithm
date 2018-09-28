@@ -26,9 +26,9 @@ public:
 
     virtual void handleEvent(core::objectmodel::Event * e) {
         if (dynamic_cast<simulation::AnimateBeginEvent *>(e)) {
-            Timer::beginStep("AABBDecorator");
+            sofa::helper::AdvancedTimer::stepBegin("AABBDecorator");
             prepareDetection();
-            Timer::endStep("AABBDecorator");
+            sofa::helper::AdvancedTimer::stepEnd("AABBDecorator");
         }
     }
 
