@@ -4,14 +4,15 @@
 #include <limits>
 #include <decorator/AABBDecorator.h>
 
+namespace sofa {
+
 namespace collisionAlgorithm {
 
 CollisionDetectionAlgorithm::CollisionDetectionAlgorithm()
 : p_from("from",this)
 , p_dest("dest",this)
 {
-    p_from.setMaxConnections(1);
-    p_dest.setMaxConnections(1);
+    addActivateCondition(&CollisionDetectionAlgorithm::canCreate);
 }
 
 template<class ElementIterator>
@@ -21,7 +22,7 @@ PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_el
 
     ConstraintProximityPtr pfrom = it_element.efrom->getControlPoint(); //centered control point
     if (pfrom == NULL) return min_pair;
-    Vector3 P = pfrom->getPosition();
+    defaulttype::Vector3 P = pfrom->getPosition();
 
     for (unsigned i=0;i<it_element.size();i++) {
         ConstraintElementPtr edest = it_element.element(i);
@@ -54,13 +55,13 @@ public :
 
     AABBElementIterator(ConstraintElementPtr from,AABBDecorator * aabb) {
         m_aabb = aabb;
-        m_geo = aabb->p_geometry();
+        m_geo = aabb->m_geometry;
         efrom = from;
 
-        Vector3 P = from->getControlPoint()->getPosition();
+        defaulttype::Vector3 P = from->getControlPoint()->getPosition();
 
         //compute the box where is P
-        Vec3i cbox;
+        defaulttype::Vec3i cbox;
         cbox[0] = floor((P[0] - m_aabb->m_Bmin[0])/m_aabb->m_cellSize[0]);
         cbox[1] = floor((P[1] - m_aabb->m_Bmin[1])/m_aabb->m_cellSize[1]);
         cbox[2] = floor((P[2] - m_aabb->m_Bmin[2])/m_aabb->m_cellSize[2]);
@@ -84,7 +85,7 @@ public :
         for (std::set<int>::iterator it = selectElements.begin();it != selectElements.end(); it++) m_selectElements.push_back(*it);
     }
 
-    void fillElementSet(Vec3i cbox, int d, std::set<int> & selectElements) {
+    void fillElementSet(defaulttype::Vec3i cbox, int d, std::set<int> & selectElements) {
         {
             int i=-d;
             if (cbox[0]+i >= 0 && cbox[0]+i < m_aabb->m_nbox[0]) {
@@ -219,21 +220,17 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
     m_pairDetection.clear();
 
 //    AABBDecorator * from = NULL;
-    AABBDecorator * dest = NULL;
+    AABBDecorator * dest = m_dest->getContext()->get<AABBDecorator>();
 
 //    //first we search if there is a AABB connected to the geometry
 //    for (unsigned i=0;i<p_from->p_type.size();i++) {
 //        if ((from = dynamic_cast<AABBDecorator *>(p_from->p_type[i]))) break;
 //    }
 
-    for (unsigned i=0;i<p_dest->p_out.size();i++) {
-        if ((dest = dynamic_cast<AABBDecorator *>(p_dest->p_out.get(i)))) break;
-    }
-
     //we do the collision from first to second
-    for (unsigned i=0;i<p_from->getNbElements();i++) {
-        ConstraintElementPtr elmt = p_from->getElement(i);
-        PairProximity pair = (dest == NULL) ? getClosestPoint(DefaultIterator(elmt, p_dest())) : getClosestPoint(AABBElementIterator(elmt, dest));
+    for (unsigned i=0;i<m_from->getNbElements();i++) {
+        ConstraintElementPtr elmt = m_from->getElement(i);
+        PairProximity pair = (dest == NULL) ? getClosestPoint(DefaultIterator(elmt, m_dest)) : getClosestPoint(AABBElementIterator(elmt, dest));
 
         if (pair.first == NULL) continue;
         if (pair.second == NULL) continue;
@@ -251,6 +248,8 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
 
 //        m_pairDetection.push_back(PairProximity(pair.second,pair.first));
 //    }
+}
+
 }
 
 }

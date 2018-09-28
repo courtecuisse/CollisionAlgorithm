@@ -5,10 +5,16 @@
 #include <map>
 #include <vector>
 #include <BaseElement.h>
+#include <sofa/core/visual/VisualParams.h>
+#include <sofa/simulation/AnimateBeginEvent.h>
+#include <sofa/core/objectmodel/BaseObject.h>
+#include <sofa/core/behavior/BaseMechanicalState.h>
+
+namespace sofa {
 
 namespace collisionAlgorithm {
 
-class BaseGeometry : public BaseObject {
+class BaseGeometry : public core::objectmodel::BaseObject {
 public:
 
 //    Port<Topology,_REQUIRED> p_topology;
@@ -21,8 +27,8 @@ public:
         m_elements.clear();
     }
 
-    virtual void handleEvent(Event * e) {
-        if (dynamic_cast<AnimateBeginEvent *>(e)) m_dirty=true;
+    virtual void handleEvent(core::objectmodel::Event * e) {
+        if (dynamic_cast<simulation::AnimateBeginEvent *>(e)) m_dirty=true;
     }
 
     unsigned getNbElements() {
@@ -59,9 +65,9 @@ public:
 //        return min_prox;
 //    }
 
-    virtual State * getState() = 0;
+    virtual core::behavior::BaseMechanicalState * getState() = 0;
 
-    void draw(const VisualParams *vparams) {
+    void draw(const core::visual::VisualParams *vparams) {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
 
         glDisable(GL_LIGHTING);
@@ -79,7 +85,6 @@ protected:
     virtual void prepareDetection() {}
 };
 
+}
 
-
-
-} // namespace controller
+}

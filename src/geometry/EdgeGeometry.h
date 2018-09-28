@@ -2,6 +2,8 @@
 
 #include <geometry/PointGeometry.h>
 
+namespace sofa {
+
 namespace collisionAlgorithm {
 
 class EdgeGeometry : public PointGeometry {
@@ -18,3 +20,4 @@ public:
 
 }
 
+}

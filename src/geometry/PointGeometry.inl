@@ -4,20 +4,22 @@
 #include <element/PointElement.h>
 #include <qopengl.h>
 
+namespace sofa {
+
 namespace collisionAlgorithm {
 
 void PointGeometry::init() {
     m_elements.clear();
 
-    for (unsigned i=0;i<p_topology->getNbPoints();i++) {
+    for (unsigned i=0;i<m_topology->getNbPoints();i++) {
         m_elements.push_back(std::make_shared<PointElement>(this,i));
     }
 }
 
 void PointGeometry::prepareDetection() {
-    if (m_elements.size() != p_topology->getNbPoints()) init();
+    if (m_elements.size() != m_topology->getNbPoints()) init();
 }
 
-
+}
 
 }

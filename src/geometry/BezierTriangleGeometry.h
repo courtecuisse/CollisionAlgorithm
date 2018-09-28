@@ -2,6 +2,8 @@
 
 #include <geometry/TriangleGeometry.h>
 
+namespace sofa {
+
 namespace collisionAlgorithm {
 
 class BezierTriangleGeometry : public TriangleGeometry {
@@ -25,12 +27,14 @@ public:
 
 private :
     typedef struct {
-        Vector3 p210,p120,p021,p012,p102,p201,p111;
-        Vector3 n110,n011,n101;
+        defaulttype::Vector3 p210,p120,p021,p012,p102,p201,p111;
+        defaulttype::Vector3 n110,n011,n101;
     } BezierTriangleInfo;
 
     std::vector<BezierTriangleInfo> m_beziertriangle_info;
 
 };
+
+}
 
 }

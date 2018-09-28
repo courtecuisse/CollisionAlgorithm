@@ -3,6 +3,8 @@
 #include <geometry/EdgeGeometry.h>
 #include <qopengl.h>
 
+namespace sofa {
+
 namespace collisionAlgorithm {
 
 /**************************************************************************/
@@ -31,13 +33,13 @@ public:
             m_fact[1] = f2;
         }
 
-        Vector3 getPosition(VecCoordId v) const {
-            const ReadAccessor<Vector3> & pos = m_state->read(v);
+        defaulttype::Vector3 getPosition(core::VecCoordId v) const {
+            const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = m_state->read(v);
             return pos[element()->m_pid[0]] * m_fact[0] + pos[element()->m_pid[1]] * m_fact[1];
         }
 
-        Vector3 getNormal() const {
-            return Vector3(1,0,0);
+        defaulttype::Vector3 getNormal() const {
+            return defaulttype::Vector3(1,0,0);
         }
 
         std::map<unsigned,double> getContributions() {
@@ -60,7 +62,7 @@ public:
     EdgeElement(EdgeGeometry * geo,unsigned eid) : ConstraintElement(geo,2) {
         m_eid = eid;
 
-        const std::vector<Topology::Edge> & edges = geometry()->p_topology->getEdges();
+        const std::vector<Topology::Edge> & edges = geometry()->m_topology->getEdges();
 
         m_pid[0] = edges[eid][0];
         m_pid[1] = edges[eid][1];
@@ -73,15 +75,15 @@ public:
     }
 
     //this function project the point P on the element and return the corresponding proximity
-    ConstraintProximityPtr project(Vector3 P) {
+    ConstraintProximityPtr project(defaulttype::Vector3 P) {
         double fact_u,fact_v;
 
-        const ReadAccessor<Vector3> & pos = geometry()->getState()->read(VecCoordId::position());
+        const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = geometry()->getState()->read(core::VecCoordId::position());
 
-        Vector3 P1 = pos[m_pid[0]];
-        Vector3 P2 = pos[m_pid[1]];
+        defaulttype::Vector3 P1 = pos[m_pid[0]];
+        defaulttype::Vector3 P2 = pos[m_pid[1]];
 
-        Vector3 v = P2-P1;
+        defaulttype::Vector3 v = P2-P1;
         fact_v = dot(P - P1,v) / dot(v,v);
 
         if (fact_v<0.0) fact_v = 0.0;
@@ -97,7 +99,7 @@ public:
     }
 
 
-    void draw(const VisualParams * /*vparams*/) {
+    void draw(const core::visual::VisualParams * /*vparams*/) {
         glColor4dv(geometry()->d_color.getValue().data());
 
         glBegin(GL_LINES);
@@ -111,9 +113,6 @@ protected:
     unsigned m_eid;
 };
 
-
-
-
-
 }
 
+}

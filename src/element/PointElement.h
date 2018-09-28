@@ -3,6 +3,8 @@
 #include <geometry/PointGeometry.h>
 #include <qopengl.h>
 
+namespace sofa {
+
 namespace collisionAlgorithm {
 
 /**************************************************************************/
@@ -26,7 +28,7 @@ public:
     }
 
     //this function project the point P on the element and return the corresponding proximity
-    ConstraintProximityPtr project(Vector3 /*P*/) {
+    ConstraintProximityPtr project(defaulttype::Vector3 /*P*/) {
         return getControlPoint(0);
     }
 
@@ -34,7 +36,7 @@ public:
         return (PointGeometry * ) m_geometry;
     }
 
-    void draw(const VisualParams * /*vparams*/ ) {
+    void draw(const core::visual::VisualParams * /*vparams*/ ) {
         glColor4dv(geometry()->d_color.getValue().data());
 
         glBegin(GL_POINTS);
@@ -54,13 +56,13 @@ class PointProximity : public ConstraintProximity {
 public :
     PointProximity(PointElement * elmt) : ConstraintProximity(elmt) {}
 
-    Vector3 getPosition(VecCoordId v) const {
-        const ReadAccessor<Vector3> & pos = m_state->read(v);
+    defaulttype::Vector3 getPosition(core::VecCoordId v) const {
+        const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = m_state->read(v);
         return pos[element()->m_pid];
     }
 
-    Vector3 getNormal() const {
-        return Vector3(1,0,0);
+    defaulttype::Vector3 getNormal() const {
+        return defaulttype::Vector3(1,0,0);
     }
 
     std::map<unsigned,double> getContributions() {
@@ -78,6 +80,8 @@ public :
 
 ConstraintProximityPtr PointElement::createProximity(const int /*i*/) {
     return std::make_shared<PointProximity>(this);
+}
+
 }
 
 }

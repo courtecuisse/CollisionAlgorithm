@@ -5,6 +5,8 @@
 #include <BaseElement.h>
 #include <qopengl.h>
 
+namespace sofa {
+
 namespace collisionAlgorithm {
 
 typedef std::pair<ConstraintProximityPtr,ConstraintProximityPtr> PairProximity;
@@ -12,19 +14,18 @@ typedef std::vector<PairProximity> PairProximityVector;
 
 class Collision : public CollisionPipeline {
 public :
-    PortOut<Collision> p_out;
 
     Collision();
 
-    virtual void handleEvent(Event * e) {
-        if (dynamic_cast<AnimateBeginEvent *>(e)) m_dirty= true;
+    virtual void handleEvent(core::objectmodel::Event * e) {
+        if (dynamic_cast<simulation::AnimateBeginEvent *>(e)) m_dirty= true;
     }
 
     static std::string getObjectCategory() {
         return std::string("Collision");
     }
 
-    void draw(const VisualParams * vparams) {
+    void draw(const core::visual::VisualParams * vparams) {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
         glDisable(GL_LIGHTING);
 
@@ -40,12 +41,12 @@ public :
             vparams->drawTool()->drawArrow(m_pairDetection[i].second->getPosition(),
                                            m_pairDetection[i].second->getPosition() + m_pairDetection[i].second->getNormal(),
                                            0.1,
-                                           Vector4(0,0,1,1));
+                                           defaulttype::Vector4(0,0,1,1));
 
             vparams->drawTool()->drawArrow(m_pairDetection[i].first->getPosition(),
                                            m_pairDetection[i].first->getPosition() + m_pairDetection[i].first->getNormal(),
                                            0.1,
-                                           Vector4(0,0,1,1));
+                                           defaulttype::Vector4(0,0,1,1));
         }
 
     }
@@ -72,3 +73,4 @@ protected:
 
 }
 
+}

@@ -4,26 +4,28 @@
 #include <element/TriangleElement.h>
 #include <qopengl.h>
 
+namespace sofa {
+
 namespace collisionAlgorithm {
 
 void TriangleGeometry::prepareDetection() {
-    if (m_elements.size() != p_topology->getNbTriangles()) init();
+    if (m_elements.size() != m_topology->getNbTriangles()) init();
 
-    const ReadAccessor<Vector3> & pos = getState()->read(VecCoordId::position());
+    const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = getState()->read(core::VecCoordId::position());
 
-    m_pointNormal.resize(p_topology->getNbPoints());
+    m_pointNormal.resize(m_topology->getNbPoints());
 
-    m_triangle_info.resize(p_topology->getTriangles().size());
+    m_triangle_info.resize(m_topology->getTriangles().size());
 
-    for (unsigned t=0;t<this->p_topology->getNbTriangles();t++) {
+    for (unsigned t=0;t<m_topology->getNbTriangles();t++) {
         TriangleInfo & tinfo = m_triangle_info[t];
 
-        const Topology::Triangle tri = this->p_topology->getTriangle(t);
+        const Topology::Triangle tri = m_topology->getTriangle(t);
 
         //Compute Bezier Positions
-        Vector3 p0 = pos[tri[0]];
-        Vector3 p1 = pos[tri[1]];
-        Vector3 p2 = pos[tri[2]];
+        defaulttype::Vector3 p0 = pos[tri[0]];
+        defaulttype::Vector3 p1 = pos[tri[1]];
+        defaulttype::Vector3 p2 = pos[tri[2]];
 
         tinfo.v0 = p1 - p0;
         tinfo.v1 = p2 - p0;
@@ -45,8 +47,8 @@ void TriangleGeometry::prepareDetection() {
 
     m_pointNormal.resize(pos.size());
     for (unsigned p=0;p<pos.size();p++) {
-        const Topology::TrianglesAroundVertex & tav = this->p_topology->getTrianglesAroundVertex(p);
-        m_pointNormal[p] = Vector3(0,0,0);
+        const Topology::TrianglesAroundVertex & tav = m_topology->getTrianglesAroundVertex(p);
+        m_pointNormal[p] = defaulttype::Vector3(0,0,0);
         for (unsigned t=0;t<tav.size();t++) {
             m_pointNormal[p] += this->m_triangle_info[tav[t]].tn;
         }
@@ -57,11 +59,13 @@ void TriangleGeometry::prepareDetection() {
 void TriangleGeometry::init() {
     m_elements.clear();
 
-    for (unsigned i=0;i<p_topology->getNbTriangles();i++) {
+    for (unsigned i=0;i<m_topology->getNbTriangles();i++) {
         m_elements.push_back(std::make_shared<TriangleElement>(this,i));
     }
 
     prepareDetection();
+}
+
 }
 
 }

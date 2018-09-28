@@ -4,29 +4,31 @@
 #include <element/IntersectionContourElement.h>
 #include <qopengl.h>
 
+namespace sofa {
+
 namespace collisionAlgorithm {
 
 IntersectionContourGeometry::IntersectionContourGeometry()
-: d_planePos("planePos",Vector3(0,0,0),this)
-, d_planeNormal("planeNormal",Vector3(0,0,1),this)
+: d_planePos("planePos",defaulttype::Vector3(0,0,0),this)
+, d_planeNormal("planeNormal",defaulttype::Vector3(0,0,1),this)
 {}
 
 void IntersectionContourGeometry::prepareDetection() {
     m_elements.clear();
 
-    const ReadAccessor<Vector3> & pos = getState()->read(VecCoordId::position());
+    const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = getState()->read(core::VecCoordId::position());
 
     m_pointNormal.resize(pos.size());
     for (unsigned p=0;p<pos.size();p++) {
-        const Topology::TrianglesAroundVertex & tav = this->p_topology->getTrianglesAroundVertex(p);
-        m_pointNormal[p] = Vector3(0,0,0);
+        const Topology::TrianglesAroundVertex & tav = m_topology->getTrianglesAroundVertex(p);
+        m_pointNormal[p] = defaulttype::Vector3(0,0,0);
         for (unsigned t=0;t<tav.size();t++) {
-            Topology::Triangle tri = this->p_topology->getTriangle(tav[t]);
+            Topology::Triangle tri = m_topology->getTriangle(tav[t]);
 
             //Compute Bezier Positions
-            Vector3 p0 = pos[tri[0]];
-            Vector3 p1 = pos[tri[1]];
-            Vector3 p2 = pos[tri[2]];
+            defaulttype::Vector3 p0 = pos[tri[0]];
+            defaulttype::Vector3 p1 = pos[tri[1]];
+            defaulttype::Vector3 p2 = pos[tri[2]];
 
             m_pointNormal[p] += (p1 - p0).cross(p2 - p0);;
         }
@@ -34,18 +36,18 @@ void IntersectionContourGeometry::prepareDetection() {
     }
 
 
-    Vector3 pointOnPlane = d_planePos.getValue();
-    Vector3 planeNormal = d_planeNormal.getValue();
+    defaulttype::Vector3 pointOnPlane = d_planePos.getValue();
+    defaulttype::Vector3 planeNormal = d_planeNormal.getValue();
     planeNormal.normalize();
 
     double d=dot(planeNormal,pointOnPlane);
 
     //inspect the plane edge intersection
-    for(unsigned i=0;i<p_topology->getNbEdges();i++) {
-        const Topology::Edge & e = p_topology->getEdge(i);
+    for(unsigned i=0;i<m_topology->getNbEdges();i++) {
+        const Topology::Edge & e = m_topology->getEdge(i);
 
-        Vector3 p1 = pos[e[0]];
-        Vector3 p2 = pos[e[1]];
+        defaulttype::Vector3 p1 = pos[e[0]];
+        defaulttype::Vector3 p2 = pos[e[1]];
 
         double alpha=1.0 - (d-dot(planeNormal,p1))/(dot(planeNormal,p2-p1));
 
@@ -55,29 +57,29 @@ void IntersectionContourGeometry::prepareDetection() {
     }
 }
 
-void IntersectionContourGeometry::draw(const VisualParams * vparams) {
+void IntersectionContourGeometry::draw(const core::visual::VisualParams * vparams) {
     if (! vparams->displayFlags().getShowCollisionModels()) return;
 
-    Vector3 P = d_planePos.getValue();
+    defaulttype::Vector3 P = d_planePos.getValue();
 
-    Vector3 T(1,0,0);
-    Vector3 Z = d_planeNormal.getValue();
+    defaulttype::Vector3 T(1,0,0);
+    defaulttype::Vector3 Z = d_planeNormal.getValue();
     Z.normalize();
 
-    if (fabs(dot(T,Z))>0.9999) T = Vector3(0,1,0);
+    if (fabs(dot(T,Z))>0.9999) T = defaulttype::Vector3(0,1,0);
 
-    Vector3 X = cross(T,Z);
-    Vector3 Y = cross(X,Z);
+    defaulttype::Vector3 X = cross(T,Z);
+    defaulttype::Vector3 Y = cross(X,Z);
 
-    BoundingBox bbox;
-    const ReadAccessor<Vector3> & pos = getState()->read(VecCoordId::position());
+    defaulttype::BoundingBox bbox;
+    const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = getState()->read(core::VecCoordId::position());
     for (unsigned i=0;i<pos.size();i++) bbox.include(pos[i]);
 
 
-    Vector3 min = Vector3(bbox.minBBoxPtr());
-    Vector3 max = Vector3(bbox.maxBBoxPtr());
+    defaulttype::Vector3 min = defaulttype::Vector3(bbox.minBBoxPtr());
+    defaulttype::Vector3 max = defaulttype::Vector3(bbox.maxBBoxPtr());
 
-    Vector3 C = (min+max) * 0.5;
+    defaulttype::Vector3 C = (min+max) * 0.5;
     C -= Z*dot(C-P,Z);
 
     double norm = (max - min).norm();
@@ -94,6 +96,8 @@ void IntersectionContourGeometry::draw(const VisualParams * vparams) {
     glEnd();
 
     BaseGeometry::draw(vparams);
+}
+
 }
 
 }

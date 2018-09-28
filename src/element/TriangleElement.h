@@ -3,6 +3,8 @@
 #include <geometry/TriangleGeometry.h>
 #include <qopengl.h>
 
+namespace sofa {
+
 namespace collisionAlgorithm {
 
 /**************************************************************************/
@@ -22,7 +24,7 @@ public:
     TriangleElement(TriangleGeometry * geo,unsigned eid) : ConstraintElement(geo,3) {
         m_eid = eid;
 
-        const std::vector<Topology::Triangle> & triangles = geometry()->p_topology->getTriangles();
+        const std::vector<Topology::Triangle> & triangles = geometry()->m_topology->getTriangles();
 
         m_pid[0] = triangles[eid][0];
         m_pid[1] = triangles[eid][1];
@@ -38,8 +40,8 @@ public:
 
     //proj_P must be on the plane
 
-    void computeBaryCoords(const Vector3 & proj_P,const TriangleGeometry::TriangleInfo & tinfo, const Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const {
-        Vector3 v2 = proj_P - p0;
+    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleGeometry::TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const {
+        defaulttype::Vector3 v2 = proj_P - p0;
 
         double d20 = dot(v2,tinfo.v0);
         double d21 = dot(v2,tinfo.v1);
@@ -52,29 +54,29 @@ public:
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 
-    ConstraintProximityPtr project(Vector3 P) {
-        const ReadAccessor<Vector3> & pos = geometry()->getState()->read(VecCoordId::position());
+    ConstraintProximityPtr project(defaulttype::Vector3 P) {
+        const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = geometry()->getState()->read(core::VecCoordId::position());
 
-        Vector3 P0 = pos[m_pid[0]];
-        Vector3 P1 = pos[m_pid[1]];
-        Vector3 P2 = pos[m_pid[2]];
+        defaulttype::Vector3 P0 = pos[m_pid[0]];
+        defaulttype::Vector3 P1 = pos[m_pid[1]];
+        defaulttype::Vector3 P2 = pos[m_pid[2]];
 
-        Vector3 x1x2 = P - P0;
+        defaulttype::Vector3 x1x2 = P - P0;
 
         const TriangleGeometry::TriangleInfo & tinfo = geometry()->m_triangle_info[m_eid];
 
         //corrdinate on the plane
         double c0 = dot(x1x2,tinfo.ax1);
         double c1 = dot(x1x2,tinfo.ax2);
-        Vector3 proj_P = P0 + tinfo.ax1 * c0 + tinfo.ax2 * c1;
+        defaulttype::Vector3 proj_P = P0 + tinfo.ax1 * c0 + tinfo.ax2 * c1;
 
         double fact_u,fact_v,fact_w;
 
         computeBaryCoords(proj_P, tinfo, P0, fact_u,fact_v,fact_w);
 
         if (fact_u<0) {
-            Vector3 v3 = P1 - P2;
-            Vector3 v4 = proj_P - P2;
+            defaulttype::Vector3 v3 = P1 - P2;
+            defaulttype::Vector3 v4 = proj_P - P2;
             double alpha = dot(v4,v3) / dot(v3,v3);
 
             if (alpha<0) alpha = 0;
@@ -84,8 +86,8 @@ public:
             fact_v = alpha;
             fact_w = 1.0 - alpha;
         } else if (fact_v<0) {
-            Vector3 v3 = P0 - P2;
-            Vector3 v4 = proj_P - P2;
+            defaulttype::Vector3 v3 = P0 - P2;
+            defaulttype::Vector3 v4 = proj_P - P2;
             double alpha = dot(v4,v3) / dot(v3,v3);
 
             if (alpha<0) alpha = 0;
@@ -95,8 +97,8 @@ public:
             fact_v = 0;
             fact_w = 1.0 - alpha;
         } else if (fact_w<0) {
-            Vector3 v3 = P1 - P0;
-            Vector3 v4 = proj_P - P0;
+            defaulttype::Vector3 v3 = P1 - P0;
+            defaulttype::Vector3 v4 = proj_P - P0;
             double alpha = dot(v4,v3) / dot(v3,v3);
 
             if (alpha<0) alpha = 0;
@@ -114,9 +116,9 @@ public:
         return (TriangleGeometry*) m_geometry;
     }
 
-    void drawTriangle(const VisualParams * /*vparams*/,const Vector3 & A,const Vector3 & B, const Vector3 & C) {
+    void drawTriangle(const core::visual::VisualParams * /*vparams*/,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C) {
         double delta = 0.1;
-        Vector4 color = geometry()->d_color.getValue();
+        defaulttype::Vector4 color = geometry()->d_color.getValue();
 
         glBegin(GL_TRIANGLES);
             glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
@@ -128,7 +130,7 @@ public:
         glEnd();
     }
 
-    virtual void draw(const VisualParams *vparams) {
+    virtual void draw(const core::visual::VisualParams *vparams) {
         drawTriangle(vparams,getControlPoint(0)->getPosition(),
                              getControlPoint(1)->getPosition(),
                              getControlPoint(2)->getPosition());
@@ -151,16 +153,16 @@ public :
         m_fact[2] = f3;
     }
 
-    Vector3 getPosition(VecCoordId v) const {
-        const ReadAccessor<Vector3> & pos = m_state->read(v);
+    defaulttype::Vector3 getPosition(core::VecCoordId v) const {
+        const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = m_state->read(v);
 
         return pos[element()->m_pid[0]] * m_fact[0] +
                pos[element()->m_pid[1]] * m_fact[1] +
                pos[element()->m_pid[2]] * m_fact[2];
     }
 
-    Vector3 getNormal() const {
-        const std::vector<Vector3> & pos = element()->geometry()->m_pointNormal;
+    defaulttype::Vector3 getNormal() const {
+        const std::vector<defaulttype::Vector3> & pos = element()->geometry()->m_pointNormal;
         return pos[element()->m_pid[0]] * m_fact[0] +
                pos[element()->m_pid[1]] * m_fact[1] +
                pos[element()->m_pid[2]] * m_fact[2];
@@ -185,6 +187,8 @@ public :
 
 ConstraintProximityPtr TriangleElement::createProximity(double f1,double f2,double f3) {
     return std::make_shared<TriangleProximity>(this,f1,f2,f3);
+}
+
 }
 
 }

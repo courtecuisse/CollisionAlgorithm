@@ -33,13 +33,13 @@ public :
         return (this->getPosition() - P).norm();
     }
 
-    sofa::core::behavior::MechanicalState<DataTypes> * getState() {
+    sofa::core::behavior::BaseMechanicalState * getState() {
         return m_state;
     }
 
 protected:
     ConstraintElement * m_element;
-    sofa::core::behavior::MechanicalState<DataTypes> * m_state;
+    sofa::core::behavior::BaseMechanicalState * m_state;
 };
 
 typedef std::shared_ptr<ConstraintProximity> ConstraintProximityPtr;

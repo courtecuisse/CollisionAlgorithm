@@ -3,17 +3,15 @@
 #include <decorator/AABBDecorator.h>
 #include <qopengl.h>
 
+namespace sofa {
+
 namespace collisionAlgorithm {
 
 AABBDecorator::AABBDecorator()
-: d_nbox("nbox",Vec3i(8,8,8),this)
-, p_geometry("geometry", this)
-{
-    p_geometry.setMaxConnections(1);
-}
+: d_nbox("nbox",defaulttype::Vec3i(8,8,8),this) {}
 
 void AABBDecorator::prepareDetection() {
-    const ReadAccessor<Vector3> & pos = p_geometry->getState()->read(VecCoordId::position());
+    const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = m_geometry->getState()->read(core::VecCoordId::position());
     if (pos.empty()) return;
 
     m_Bmin = pos[0];
@@ -59,14 +57,14 @@ void AABBDecorator::prepareDetection() {
     m_Bmin -= m_cellSize * 0.5;
     m_Bmax -= m_cellSize * 0.5;
 
-    for (unsigned itE = 0; itE < p_geometry->getNbElements(); itE++) {
-        ConstraintElementPtr elmt = p_geometry->getElement(itE);
+    for (unsigned itE = 0; itE < m_geometry->getNbElements(); itE++) {
+        ConstraintElementPtr elmt = m_geometry->getElement(itE);
         if (elmt->getNbControlPoints() == 0) continue;
 
-        Vector3 minbox = elmt->getControlPoint(0)->getPosition();
-        Vector3 maxbox = elmt->getControlPoint(0)->getPosition();
+        defaulttype::Vector3 minbox = elmt->getControlPoint(0)->getPosition();
+        defaulttype::Vector3 maxbox = elmt->getControlPoint(0)->getPosition();
         for (unsigned p=1;p<elmt->getNbControlPoints();p++) {
-            Vector3 P = elmt->getControlPoint(p)->getPosition();
+            defaulttype::Vector3 P = elmt->getControlPoint(p)->getPosition();
 
             minbox[0] = std::min(minbox[0],P[0]);
             minbox[1] = std::min(minbox[1],P[1]);
@@ -77,8 +75,8 @@ void AABBDecorator::prepareDetection() {
             maxbox[2] = std::max(maxbox[2],P[2]);
         }
 
-        Vec3i cminbox(0,0,0);
-        Vec3i cmaxbox(0,0,0);
+        defaulttype::Vec3i cminbox(0,0,0);
+        defaulttype::Vec3i cmaxbox(0,0,0);
 
         cminbox[0] = floor((minbox[0] - m_Bmin[0])/m_cellSize[0]);
         cminbox[1] = floor((minbox[1] - m_Bmin[1])/m_cellSize[1]);
@@ -98,7 +96,7 @@ void AABBDecorator::prepareDetection() {
     }
 }
 
-void AABBDecorator::draw(const VisualParams * vparams) {
+void AABBDecorator::draw(const core::visual::VisualParams * vparams) {
     if (! vparams->displayFlags().getShowCollisionModels()) return;
 
     for (int i=0;i<m_nbox[0];i++) {
@@ -106,16 +104,16 @@ void AABBDecorator::draw(const VisualParams * vparams) {
             for (int k=0;k<m_nbox[2];k++) {
                 if (getIndexedElements(i,j,k).empty()) continue;
 
-                Vector3 points[8];
+                defaulttype::Vector3 points[8];
 
-                points[0] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-                points[1] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-                points[2] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j+1) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-                points[3] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-                points[4] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
-                points[5] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j  ) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
-                points[6] = m_Bmin + Vector3((i  ) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
-                points[7] = m_Bmin + Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
+                points[0] = m_Bmin + defaulttype::Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
+                points[1] = m_Bmin + defaulttype::Vector3((i+1) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
+                points[2] = m_Bmin + defaulttype::Vector3((i  ) * m_cellSize[0],(j+1) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
+                points[3] = m_Bmin + defaulttype::Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
+                points[4] = m_Bmin + defaulttype::Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
+                points[5] = m_Bmin + defaulttype::Vector3((i+1) * m_cellSize[0],(j  ) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
+                points[6] = m_Bmin + defaulttype::Vector3((i  ) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
+                points[7] = m_Bmin + defaulttype::Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
 
                 glColor4f(1,0,0,1);
                 glBegin(GL_LINES);
@@ -138,6 +136,8 @@ void AABBDecorator::draw(const VisualParams * vparams) {
         }
     }
 
+
+}
 
 }
 

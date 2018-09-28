@@ -2,9 +2,9 @@
 
 #include <BaseGeometry.h>
 
+namespace sofa {
+
 namespace collisionAlgorithm {
-
-
 
 class IntersectionContourElement : public ConstraintElement {
     friend class IntersectionContourProximity;
@@ -19,16 +19,16 @@ public:
     public :
         IntersectionContourProximity(IntersectionContourElement * elmt) : ConstraintProximity(elmt) {}
 
-        Vector3 getPosition(VecCoordId v) const {
-            const ReadAccessor<Vector3> & pos = m_state->read(v);
+        defaulttype::Vector3 getPosition(core::VecCoordId v) const {
+            const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = m_state->read(v);
 
-            Vector3 P = pos[element()->m_pid[0]] * element()->m_fact[0];
-            Vector3 Q = pos[element()->m_pid[1]] * element()->m_fact[1];
+            defaulttype::Vector3 P = pos[element()->m_pid[0]] * element()->m_fact[0];
+            defaulttype::Vector3 Q = pos[element()->m_pid[1]] * element()->m_fact[1];
 
             return (P+Q);
         }
 
-        Vector3 getNormal() const {
+        defaulttype::Vector3 getNormal() const {
             return element()->geometry()->m_pointNormal[element()->m_pid[0]] * element()->m_fact[0] +
                    element()->geometry()->m_pointNormal[element()->m_pid[1]] * element()->m_fact[1];
         }
@@ -63,7 +63,7 @@ public:
         m_fact[1] = f2;
     }
 
-    ConstraintProximityPtr project(Vector3 /*P*/) {
+    ConstraintProximityPtr project(defaulttype::Vector3 /*P*/) {
         return createProximity();
     }
 
@@ -75,7 +75,7 @@ public:
         return (IntersectionContourGeometry *)m_geometry;
     }
 
-    void draw(const VisualParams * /*vparams*/) {
+    void draw(const core::visual::VisualParams * /*vparams*/) {
         glColor4dv(geometry()->d_color.getValue().data());
 
         glBegin(GL_POINTS);
@@ -89,6 +89,6 @@ protected:
     double m_fact[2];
 };
 
-
+}
 
 }

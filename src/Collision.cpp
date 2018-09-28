@@ -1,11 +1,14 @@
 #include <Collision.h>
 #include <qopengl.h>
 
+namespace sofa {
+
 namespace collisionAlgorithm {
 
-Collision::Collision()
-: p_out("out",this, this) {
+Collision::Collision() {
     m_dirty = true;
+}
+
 }
 
 }
