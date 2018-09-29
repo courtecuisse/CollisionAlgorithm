@@ -1,6 +1,7 @@
 #pragma once
 
 #include <BaseGeometry.h>
+#include <sofa/core/topology/BaseMeshTopology.h>
 
 namespace sofa {
 
@@ -13,7 +14,7 @@ public:
     Data<defaulttype::Vector4> d_color;
 
     PointGeometry()
-    : d_color(initData(&d_color,defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model")) {
+    : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model")) {
         addActivateCondition(&PointGeometry::canCreate);
     }
 
@@ -33,7 +34,7 @@ public:
     }
 
 protected:
-    core::topology::Topology * m_topology;
+    core::topology::BaseMeshTopology * m_topology;
     core::behavior::BaseMechanicalState * m_state;
 };
 

@@ -24,7 +24,7 @@ public:
     TriangleElement(TriangleGeometry * geo,unsigned eid) : ConstraintElement(geo,3) {
         m_eid = eid;
 
-        const std::vector<core::topology::Topology::Triangle> & triangles = geometry()->m_topology->getTriangles();
+        const std::vector<core::topology::BaseMeshTopology::Triangle> & triangles = geometry()->m_topology->getTriangles();
 
         m_pid[0] = triangles[eid][0];
         m_pid[1] = triangles[eid][1];

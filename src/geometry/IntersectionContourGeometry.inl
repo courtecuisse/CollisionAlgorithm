@@ -20,10 +20,10 @@ void IntersectionContourGeometry::prepareDetection() {
 
     m_pointNormal.resize(pos.size());
     for (unsigned p=0;p<pos.size();p++) {
-        const core::topology::Topology::TrianglesAroundVertex & tav = m_topology->getTrianglesAroundVertex(p);
+        const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = m_topology->getTrianglesAroundVertex(p);
         m_pointNormal[p] = defaulttype::Vector3(0,0,0);
         for (unsigned t=0;t<tav.size();t++) {
-            core::topology::Topology::Triangle tri = m_topology->getTriangle(tav[t]);
+            core::topology::BaseMeshTopology::Triangle tri = m_topology->getTriangle(tav[t]);
 
             //Compute Bezier Positions
             defaulttype::Vector3 p0 = pos[tri[0]];
@@ -44,7 +44,7 @@ void IntersectionContourGeometry::prepareDetection() {
 
     //inspect the plane edge intersection
     for(unsigned i=0;i<m_topology->getNbEdges();i++) {
-        const core::topology::Topology::Edge & e = m_topology->getEdge(i);
+        const core::topology::BaseMeshTopology::Edge & e = m_topology->getEdge(i);
 
         defaulttype::Vector3 p1 = pos[e[0]];
         defaulttype::Vector3 p2 = pos[e[1]];

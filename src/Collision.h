@@ -4,6 +4,7 @@
 #include <BaseGeometry.h>
 #include <BaseElement.h>
 #include <qopengl.h>
+#include <sofa/core/collision/Pipeline.h>
 
 namespace sofa {
 
@@ -12,7 +13,7 @@ namespace collisionAlgorithm {
 typedef std::pair<ConstraintProximityPtr,ConstraintProximityPtr> PairProximity;
 typedef std::vector<PairProximity> PairProximityVector;
 
-class Collision : public CollisionPipeline {
+class Collision : public core::collision::Pipeline {
 public :
 
     Collision();

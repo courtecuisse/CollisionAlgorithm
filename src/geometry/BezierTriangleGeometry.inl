@@ -33,7 +33,7 @@ void BezierTriangleGeometry::prepareDetection() {
     m_beziertriangle_info.resize(m_topology->getNbTriangles());
     for (unsigned t=0;t<(unsigned) m_topology->getNbTriangles();t++) {
         BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[t];
-        const core::topology::Topology::Triangle trpids = m_topology->getTriangle(t);
+        const core::topology::BaseMeshTopology::Triangle trpids = m_topology->getTriangle(t);
 
         const defaulttype::Vector3 & p300 = x[trpids[2]];
         const defaulttype::Vector3 & p030 = x[trpids[1]];

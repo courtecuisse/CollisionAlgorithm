@@ -1,6 +1,7 @@
 #pragma once
 
 #include <BaseGeometry.h>
+#include <sofa/helper/AdvancedTimer.h>
 
 namespace sofa {
 
