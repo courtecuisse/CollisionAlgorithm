@@ -11,6 +11,8 @@ class AABBDecorator : public sofa::core::objectmodel::BaseObject {
     friend class AABBElement;
 
 public:
+    typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
+
     Data<defaulttype::Vec3i> d_nbox;
 
     AABBDecorator();

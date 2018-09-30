@@ -28,7 +28,7 @@ void BezierTriangleGeometry::createElements() {
 void BezierTriangleGeometry::prepareDetection() {
     Inherit::prepareDetection();
 
-    const core::behavior::ReadAccessor<defaulttype::Vector3> & x = getState()->read(core::VecCoordId::position());
+    const helper::ReadAccessor<DataVecCoord> & x = getState()->read(core::VecCoordId::position());
 
     m_beziertriangle_info.resize(m_topology->getNbTriangles());
     for (unsigned t=0;t<(unsigned) m_topology->getNbTriangles();t++) {

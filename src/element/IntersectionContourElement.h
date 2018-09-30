@@ -20,7 +20,7 @@ public:
         IntersectionContourProximity(IntersectionContourElement * elmt) : ConstraintProximity(elmt) {}
 
         defaulttype::Vector3 getPosition(core::VecCoordId v) const {
-            const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = m_state->read(v);
+            const helper::ReadAccessor<Data<helper::vector<defaulttype::Vector3> > > & pos = m_state->read(v);
 
             defaulttype::Vector3 P = pos[element()->m_pid[0]] * element()->m_fact[0];
             defaulttype::Vector3 Q = pos[element()->m_pid[1]] * element()->m_fact[1];

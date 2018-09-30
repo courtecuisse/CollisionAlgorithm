@@ -11,7 +11,7 @@ namespace collisionAlgorithm {
 void TriangleGeometry::prepareDetection() {
     if (m_elements.size() != m_topology->getNbTriangles()) init();
 
-    const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = getState()->read(core::VecCoordId::position());
+    const helper::ReadAccessor<DataVecCoord> & pos = getState()->read(core::VecCoordId::position());
 
     m_pointNormal.resize(m_topology->getNbPoints());
 

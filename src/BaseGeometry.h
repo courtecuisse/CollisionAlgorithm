@@ -8,7 +8,7 @@
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
 #include <sofa/core/objectmodel/BaseObject.h>
-#include <sofa/core/behavior/BaseMechanicalState.h>
+#include <sofa/core/behavior/MechanicalState.h>
 
 namespace sofa {
 
@@ -16,6 +16,8 @@ namespace collisionAlgorithm {
 
 class BaseGeometry : public core::objectmodel::BaseObject {
 public:
+
+    typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
 
 //    Port<Topology,_REQUIRED> p_topology;
 
@@ -65,7 +67,7 @@ public:
 //        return min_prox;
 //    }
 
-    virtual core::behavior::BaseMechanicalState * getState() = 0;
+    virtual sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * getState() = 0;
 
     void draw(const core::visual::VisualParams *vparams) {
         if (! vparams->displayFlags().getShowCollisionModels()) return;

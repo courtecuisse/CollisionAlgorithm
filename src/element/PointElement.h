@@ -57,7 +57,7 @@ public :
     PointProximity(PointElement * elmt) : ConstraintProximity(elmt) {}
 
     defaulttype::Vector3 getPosition(core::VecCoordId v) const {
-        const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = m_state->read(v);
+        const helper::ReadAccessor<DataVecCoord> & pos = m_state->read(v);
         return pos[element()->m_pid];
     }
 

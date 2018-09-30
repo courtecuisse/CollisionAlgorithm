@@ -10,6 +10,8 @@
 #include <qopengl.h>
 #include <sofa/core/objectmodel/BaseObject.h>
 #include <sofa/core/VecId.h>
+#include <sofa/core/behavior/MechanicalState.h>
+
 
 namespace sofa {
 
@@ -20,6 +22,8 @@ class BaseGeometry;
 
 class ConstraintProximity {
 public :
+
+    typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
 
     ConstraintProximity(ConstraintElement * elmt);
 
@@ -33,13 +37,13 @@ public :
         return (this->getPosition() - P).norm();
     }
 
-    sofa::core::behavior::BaseMechanicalState * getState() {
+    sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * getState() {
         return m_state;
     }
 
 protected:
     ConstraintElement * m_element;
-    sofa::core::behavior::BaseMechanicalState * m_state;
+    sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * m_state;
 };
 
 typedef std::shared_ptr<ConstraintProximity> ConstraintProximityPtr;
@@ -47,6 +51,8 @@ typedef std::shared_ptr<ConstraintProximity> ConstraintProximityPtr;
 class ConstraintElement {
     friend class ConstraintProximity;
 public:
+
+    typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
 
     ConstraintElement(BaseGeometry * geo,unsigned nc)
     : m_geometry(geo)

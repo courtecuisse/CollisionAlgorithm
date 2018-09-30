@@ -25,7 +25,7 @@ public:
         ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
         defaulttype::Vector3 getPosition() const {
             const BezierTriangleGeometry::BezierTriangleInfo & tbinfo = element()->geometry()->m_beziertriangle_info[element()->m_eid];
-            const core::behavior::ReadAccessor<defaulttype::Vector3> & x = m_state->read(core::VecCoordId::position());
+            const helper::ReadAccessor<DataVecCoord> & x = m_state->read(core::VecCoordId::position());
 
             const defaulttype::Vector3 & p300 = x[element()->m_pid[2]];
             const defaulttype::Vector3 & p030 = x[element()->m_pid[1]];
@@ -52,7 +52,7 @@ public:
             double fact_u = m_fact[1];
             double fact_v = m_fact[0];
 
-            const core::behavior::ReadAccessor<defaulttype::Vector3> & x = m_state->read(core::VecCoordId::freePosition());
+            const helper::ReadAccessor<DataVecCoord> & x = m_state->read(core::VecCoordId::freePosition());
 
             const defaulttype::Vector3 & p300_Free = x[element()->m_pid[2]];
             const defaulttype::Vector3 & p030_Free = x[element()->m_pid[1]];

@@ -9,14 +9,14 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 IntersectionContourGeometry::IntersectionContourGeometry()
-: d_planePos("planePos",defaulttype::Vector3(0,0,0),this)
-, d_planeNormal("planeNormal",defaulttype::Vector3(0,0,1),this)
+: d_planePos(initData(&d_planePos,defaulttype::Vector3(0,0,0),"planePos","Position of the plane"))
+, d_planeNormal(initData(&d_planeNormal, defaulttype::Vector3(0,0,1),"planeNormal","Normal of the plane"))
 {}
 
 void IntersectionContourGeometry::prepareDetection() {
     m_elements.clear();
 
-    const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = getState()->read(core::VecCoordId::position());
+    const helper::ReadAccessor<DataVecCoord> & pos = getState()->read(core::VecCoordId::position());
 
     m_pointNormal.resize(pos.size());
     for (unsigned p=0;p<pos.size();p++) {
@@ -72,7 +72,7 @@ void IntersectionContourGeometry::draw(const core::visual::VisualParams * vparam
     defaulttype::Vector3 Y = cross(X,Z);
 
     defaulttype::BoundingBox bbox;
-    const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = getState()->read(core::VecCoordId::position());
+    const helper::ReadAccessor<DataVecCoord> & pos = getState()->read(core::VecCoordId::position());
     for (unsigned i=0;i<pos.size();i++) bbox.include(pos[i]);
 
 

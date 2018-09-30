@@ -22,7 +22,7 @@ public:
 
     void init();
 
-    sofa::core::behavior::BaseMechanicalState * getState() {
+    sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * getState() {
         return m_state;
     }
 
@@ -35,7 +35,7 @@ public:
 
 protected:
     core::topology::BaseMeshTopology * m_topology;
-    core::behavior::BaseMechanicalState * m_state;
+    sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * m_state;
 };
 
 }

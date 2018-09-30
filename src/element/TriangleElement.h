@@ -55,7 +55,7 @@ public:
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 
     ConstraintProximityPtr project(defaulttype::Vector3 P) {
-        const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = geometry()->getState()->read(core::VecCoordId::position());
+        const helper::ReadAccessor<DataVecCoord> & pos = geometry()->getState()->read(core::VecCoordId::position());
 
         defaulttype::Vector3 P0 = pos[m_pid[0]];
         defaulttype::Vector3 P1 = pos[m_pid[1]];
@@ -154,7 +154,7 @@ public :
     }
 
     defaulttype::Vector3 getPosition(core::VecCoordId v) const {
-        const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = m_state->read(v);
+        const helper::ReadAccessor<DataVecCoord> & pos = m_state->read(v);
 
         return pos[element()->m_pid[0]] * m_fact[0] +
                pos[element()->m_pid[1]] * m_fact[1] +

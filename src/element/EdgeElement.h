@@ -34,7 +34,7 @@ public:
         }
 
         defaulttype::Vector3 getPosition(core::VecCoordId v) const {
-            const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = m_state->read(v);
+            const helper::ReadAccessor<DataVecCoord> pos = m_state->read(v);
             return pos[element()->m_pid[0]] * m_fact[0] + pos[element()->m_pid[1]] * m_fact[1];
         }
 
@@ -78,7 +78,7 @@ public:
     ConstraintProximityPtr project(defaulttype::Vector3 P) {
         double fact_u,fact_v;
 
-        const core::behavior::ReadAccessor<defaulttype::Vector3> & pos = geometry()->getState()->read(core::VecCoordId::position());
+        const helper::ReadAccessor<DataVecCoord> & pos = geometry()->getState()->read(core::VecCoordId::position());
 
         defaulttype::Vector3 P1 = pos[m_pid[0]];
         defaulttype::Vector3 P2 = pos[m_pid[1]];
