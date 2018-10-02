@@ -10,11 +10,11 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-typedef std::pair<ConstraintProximityPtr,ConstraintProximityPtr> PairProximity;
-typedef std::vector<PairProximity> PairProximityVector;
-
-class Collision : public core::collision::Pipeline {
+class Collision : public /*core::collision::Pipeline */ core::objectmodel::BaseObject {
 public :
+
+    typedef std::pair<ConstraintProximityPtr,ConstraintProximityPtr> PairProximity;
+    typedef std::vector<PairProximity> PairProximityVector;
 
     Collision();
 

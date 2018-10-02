@@ -8,16 +8,16 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-void EdgeGeometry::init() {
+void EdgeGeometry::initialize() {
     m_elements.clear();
 
-    for (unsigned i=0;i<m_topology->getNbEdges();i++) {
+    for (unsigned i=0;i<d_topology->getNbEdges();i++) {
         m_elements.push_back(std::make_shared<EdgeElement>(this,i));
     }
 }
 
 void EdgeGeometry::prepareDetection() {
-    if (m_elements.size() != m_topology->getNbEdges()) init();
+    if (m_elements.size() != d_topology->getNbEdges()) init();
 }
 
 }

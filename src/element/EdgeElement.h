@@ -62,7 +62,7 @@ public:
     EdgeElement(EdgeGeometry * geo,unsigned eid) : ConstraintElement(geo,2) {
         m_eid = eid;
 
-        const std::vector<core::topology::BaseMeshTopology::Edge> & edges = geometry()->m_topology->getEdges();
+        const std::vector<core::topology::BaseMeshTopology::Edge> & edges = geometry()->d_topology->getEdges();
 
         m_pid[0] = edges[eid][0];
         m_pid[1] = edges[eid][1];

@@ -1,10 +1,14 @@
 #include <algorithm/CollisionDetectionAlgorithm.inl>
+#include <sofa/core/ObjectFactory.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
-DECLARE_CLASS(CollisionDetectionAlgorithm)
+SOFA_DECL_CLASS(CollisionDetectionAlgorithm)
+
+int CollisionDetectionAlgorithmClass = core::RegisterObject("CollisionDetectionAlgorithm")
+.add< CollisionDetectionAlgorithm >();
 
 }
 

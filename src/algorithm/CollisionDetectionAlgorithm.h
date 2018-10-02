@@ -10,27 +10,20 @@ namespace collisionAlgorithm {
 class CollisionDetectionAlgorithm : public Collision {
 public:
 
-    Data<std::string> p_from;
-    Data<std::string> p_dest;
+    DataLink<BaseGeometry> d_from;
+    DataLink<BaseGeometry> d_dest;
 
-    CollisionDetectionAlgorithm();
+    CollisionDetectionAlgorithm()
+    : d_from("from", this)
+    , d_dest("dest", this) {}
 
     void processAlgorithm();
-
-    bool canCreate() {
-        m_from = getContext()->get<BaseGeometry>(p_from.getValue());
-        m_dest = getContext()->get<BaseGeometry>(p_dest.getValue());
-
-        return m_from && m_dest;
-    }
 
 private:
 
     template<class ElementIterator>
     PairProximity getClosestPoint(ElementIterator geo);
 
-    BaseGeometry * m_from;
-    BaseGeometry * m_dest;
 };
 
 }

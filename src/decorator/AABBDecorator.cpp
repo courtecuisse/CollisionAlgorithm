@@ -1,10 +1,14 @@
 #include <decorator/AABBDecorator.inl>
+#include <sofa/core/ObjectFactory.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
-DECLARE_CLASS(AABBDecorator)
+SOFA_DECL_CLASS(AABBDecorator)
+
+int AABBDecoratorClass = core::RegisterObject("AABBDecorator")
+.add< AABBDecorator >();
 
 }
 

@@ -1,10 +1,14 @@
 #include <geometry/TriangleGeometry.inl>
+#include <sofa/core/ObjectFactory.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
-DECLARE_CLASS(TriangleGeometry)
+SOFA_DECL_CLASS(TriangleGeometry)
+
+int TriangleGeometryClass = core::RegisterObject("TriangleGeometry")
+.add< TriangleGeometry >();
 
 }
 

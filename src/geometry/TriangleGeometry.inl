@@ -9,18 +9,18 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 void TriangleGeometry::prepareDetection() {
-    if (m_elements.size() != m_topology->getNbTriangles()) init();
+    if (m_elements.size() != d_topology->getNbTriangles()) init();
 
     const helper::ReadAccessor<DataVecCoord> & pos = getState()->read(core::VecCoordId::position());
 
-    m_pointNormal.resize(m_topology->getNbPoints());
+    m_pointNormal.resize(d_topology->getNbPoints());
 
-    m_triangle_info.resize(m_topology->getTriangles().size());
+    m_triangle_info.resize(d_topology->getTriangles().size());
 
-    for (unsigned t=0;t<m_topology->getNbTriangles();t++) {
+    for (unsigned t=0;t<d_topology->getNbTriangles();t++) {
         TriangleInfo & tinfo = m_triangle_info[t];
 
-        const core::topology::BaseMeshTopology::Triangle tri = m_topology->getTriangle(t);
+        const core::topology::BaseMeshTopology::Triangle tri = d_topology->getTriangle(t);
 
         //Compute Bezier Positions
         defaulttype::Vector3 p0 = pos[tri[0]];
@@ -47,7 +47,7 @@ void TriangleGeometry::prepareDetection() {
 
     m_pointNormal.resize(pos.size());
     for (unsigned p=0;p<pos.size();p++) {
-        const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = m_topology->getTrianglesAroundVertex(p);
+        const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = d_topology->getTrianglesAroundVertex(p);
         m_pointNormal[p] = defaulttype::Vector3(0,0,0);
         for (unsigned t=0;t<tav.size();t++) {
             m_pointNormal[p] += this->m_triangle_info[tav[t]].tn;
@@ -56,10 +56,10 @@ void TriangleGeometry::prepareDetection() {
     }
 }
 
-void TriangleGeometry::init() {
+void TriangleGeometry::initialize() {
     m_elements.clear();
 
-    for (unsigned i=0;i<m_topology->getNbTriangles();i++) {
+    for (unsigned i=0;i<d_topology->getNbTriangles();i++) {
         m_elements.push_back(std::make_shared<TriangleElement>(this,i));
     }
 

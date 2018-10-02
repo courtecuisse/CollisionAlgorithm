@@ -8,17 +8,16 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 BezierTriangleGeometry::BezierTriangleGeometry()
-: Inherit()
-, d_nonlin_max_it("nonlin_max_it",(unsigned) 20, this)
-, d_nonlin_tolerance("nonlin_tol",(double) 0.001,this)
-, d_nonlin_threshold("nonlin_th",(double) 0.00001,this)
-, d_draw_tesselation("tesselation",(unsigned) 0.0,this)
+: d_nonlin_max_it(initData(&d_nonlin_max_it,(unsigned) 20,"nonlin_max_it", "number of iterations"))
+, d_nonlin_tolerance(initData(&d_nonlin_tolerance,(double) 0.001,"nonlin_tol", "Tolerance"))
+, d_nonlin_threshold(initData(&d_nonlin_threshold,(double) 0.00001,"nonlin_th", "Threshold"))
+, d_draw_tesselation(initData(&d_draw_tesselation,(unsigned) 0.0, "tesselation", "Number of tesselation"))
 {}
 
 void BezierTriangleGeometry::createElements() {
     m_elements.clear();
 
-    for (unsigned i=0;i<m_topology->getNbTriangles();i++) {
+    for (unsigned i=0;i<d_topology->getNbTriangles();i++) {
         m_elements.push_back(std::make_shared<BezierTriangleElement>(this,i));
     }
 
@@ -28,12 +27,12 @@ void BezierTriangleGeometry::createElements() {
 void BezierTriangleGeometry::prepareDetection() {
     Inherit::prepareDetection();
 
-    const helper::ReadAccessor<DataVecCoord> & x = getState()->read(core::VecCoordId::position());
+    const helper::ReadAccessor<DataVecCoord> & x = d_state->read(core::VecCoordId::position());
 
-    m_beziertriangle_info.resize(m_topology->getNbTriangles());
-    for (unsigned t=0;t<(unsigned) m_topology->getNbTriangles();t++) {
+    m_beziertriangle_info.resize(d_topology->getNbTriangles());
+    for (unsigned t=0;t<(unsigned) d_topology->getNbTriangles();t++) {
         BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[t];
-        const core::topology::BaseMeshTopology::Triangle trpids = m_topology->getTriangle(t);
+        const core::topology::BaseMeshTopology::Triangle trpids = d_topology->getTriangle(t);
 
         const defaulttype::Vector3 & p300 = x[trpids[2]];
         const defaulttype::Vector3 & p030 = x[trpids[1]];

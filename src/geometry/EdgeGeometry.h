@@ -14,7 +14,7 @@ public:
 
     void prepareDetection();
 
-    void init();
+    void initialize();
 
 };
 

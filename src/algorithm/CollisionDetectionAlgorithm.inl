@@ -8,15 +8,8 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-CollisionDetectionAlgorithm::CollisionDetectionAlgorithm()
-: p_from("from",this)
-, p_dest("dest",this)
-{
-    addActivateCondition(&CollisionDetectionAlgorithm::canCreate);
-}
-
 template<class ElementIterator>
-PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_element) {
+Collision::PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_element) {
     PairProximity min_pair;
     double min_dist = std::numeric_limits<double>::max();
 
@@ -48,7 +41,6 @@ PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_el
 
     return min_pair;
 }
-
 
 class AABBElementIterator {
 public :
@@ -220,7 +212,7 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
     m_pairDetection.clear();
 
 //    AABBDecorator * from = NULL;
-    AABBDecorator * dest = m_dest->getContext()->get<AABBDecorator>();
+    AABBDecorator * dest = d_dest->getContext()->get<AABBDecorator>();
 
 //    //first we search if there is a AABB connected to the geometry
 //    for (unsigned i=0;i<p_from->p_type.size();i++) {
@@ -228,9 +220,9 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
 //    }
 
     //we do the collision from first to second
-    for (unsigned i=0;i<m_from->getNbElements();i++) {
-        ConstraintElementPtr elmt = m_from->getElement(i);
-        PairProximity pair = (dest == NULL) ? getClosestPoint(DefaultIterator(elmt, m_dest)) : getClosestPoint(AABBElementIterator(elmt, dest));
+    for (unsigned i=0;i<d_from->getNbElements();i++) {
+        ConstraintElementPtr elmt = d_from->getElement(i);
+        PairProximity pair = (dest == NULL) ? getClosestPoint(DefaultIterator(elmt, d_dest.get())) : getClosestPoint(AABBElementIterator(elmt, dest));
 
         if (pair.first == NULL) continue;
         if (pair.second == NULL) continue;

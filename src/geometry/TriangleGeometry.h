@@ -13,7 +13,7 @@ class TriangleGeometry : public EdgeGeometry {
 
 public:
 
-    virtual void init();
+    virtual void initialize();
 
     virtual void prepareDetection();
 
