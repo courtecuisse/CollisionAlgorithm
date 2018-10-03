@@ -40,10 +40,10 @@ public:
         return m_geometry;
     }
 
-    template<class T>
-    static bool canCreate(T*& /*obj*/, core::objectmodel::BaseContext* /*context*/, core::objectmodel::BaseObjectDescription* /*arg*/) {
-        return true;
-    }
+//    template<class T>
+//    static bool canCreate(T*& /*obj*/, core::objectmodel::BaseContext* /*context*/, core::objectmodel::BaseObjectDescription* /*arg*/) {
+//        return true;
+//    }
 
     defaulttype::Vector3 m_Bmin,m_Bmax,m_cellSize;
     defaulttype::Vec3i m_nbox;
