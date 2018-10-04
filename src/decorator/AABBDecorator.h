@@ -14,6 +14,8 @@ public:
     typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
 
     Data<defaulttype::Vec3i> d_nbox;
+    DataLink<BaseGeometry> d_geometry;
+
 
     AABBDecorator();
 
@@ -35,21 +37,15 @@ public:
         }
     }
 
-    bool canCreate() {
-        getContext()->get(m_geometry);
-        return m_geometry;
+    template<class T>
+    static bool canCreate(T*& /*obj*/, core::objectmodel::BaseContext* /*context*/, core::objectmodel::BaseObjectDescription* /*arg*/) {
+        return true;
     }
-
-//    template<class T>
-//    static bool canCreate(T*& /*obj*/, core::objectmodel::BaseContext* /*context*/, core::objectmodel::BaseObjectDescription* /*arg*/) {
-//        return true;
-//    }
 
     defaulttype::Vector3 m_Bmin,m_Bmax,m_cellSize;
     defaulttype::Vec3i m_nbox;
     defaulttype::Vec2i m_offset;
     std::vector<std::set<unsigned> >  m_indexedElement;
-    BaseGeometry * m_geometry;
 };
 
 }

@@ -25,7 +25,7 @@ public:
     : d_state("mstate", this) {
         m_dirty = true;
 
-        d_state.addCallback(&BaseGeometry::newState);
+        d_state.addCallback(this,&BaseGeometry::newState);
     }
 
     void newState() {

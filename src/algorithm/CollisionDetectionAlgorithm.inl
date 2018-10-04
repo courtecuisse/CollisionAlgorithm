@@ -47,7 +47,7 @@ public :
 
     AABBElementIterator(ConstraintElementPtr from,AABBDecorator * aabb) {
         m_aabb = aabb;
-        m_geo = aabb->m_geometry;
+        m_geo = aabb->d_geometry.get();
         efrom = from;
 
         defaulttype::Vector3 P = from->getControlPoint()->getPosition();

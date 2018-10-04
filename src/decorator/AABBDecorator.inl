@@ -8,10 +8,11 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 AABBDecorator::AABBDecorator()
-: d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox", "number of bbox")) {}
+: d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox", "number of bbox"))
+, d_geometry("geometry", this) {}
 
 void AABBDecorator::prepareDetection() {
-    const helper::ReadAccessor<DataVecCoord> & pos = m_geometry->getState()->read(core::VecCoordId::position());
+    const helper::ReadAccessor<DataVecCoord> & pos = d_geometry->getState()->read(core::VecCoordId::position());
     if (pos.empty()) return;
 
     m_Bmin = pos[0];
@@ -57,8 +58,8 @@ void AABBDecorator::prepareDetection() {
     m_Bmin -= m_cellSize * 0.5;
     m_Bmax -= m_cellSize * 0.5;
 
-    for (unsigned itE = 0; itE < m_geometry->getNbElements(); itE++) {
-        ConstraintElementPtr elmt = m_geometry->getElement(itE);
+    for (unsigned itE = 0; itE < d_geometry->getNbElements(); itE++) {
+        ConstraintElementPtr elmt = d_geometry->getElement(itE);
         if (elmt->getNbControlPoints() == 0) continue;
 
         defaulttype::Vector3 minbox = elmt->getControlPoint(0)->getPosition();

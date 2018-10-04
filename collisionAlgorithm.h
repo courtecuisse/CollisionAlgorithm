@@ -56,11 +56,6 @@ public:
         updateLinks();
     }
 
-    template<class F>
-    void addCallback(const F c) {
-        m_callBack.push_back(reinterpret_cast<BaseObjectCallBack>(c));
-    }
-
     inline T* operator->() const {
         return m_link;
     }
@@ -112,15 +107,11 @@ private:
     }
 
     void getLink() {
-        std::cout << "GETLINK" << std::endl;
         m_link = m_object->getContext()->get<T>(m_path.getValue());
 
-        std::cout << "LINK:" << m_link << std::endl;
         if (m_link != NULL) m_path.setValue(m_link->getName());
 
-        for (unsigned i=0;i<m_callBack.size();i++) {
-            (m_object->*m_callBack[i])();
-        }
+        for (unsigned i=0;i<m_callback.size();i++) m_callback[i]->apply();
     }
 
     void addChild(Node* , Node* ) { getLink(); }
@@ -146,7 +137,35 @@ private:
 protected:
     core::objectmodel::BaseObject * m_object;
     T* m_link;
-    std::vector<BaseObjectCallBack> m_callBack;
+    class Callback {
+    public:
+        virtual ~Callback() {}
+
+        virtual void apply() = 0;
+    };
+
+    template<class FwdObject,class FwdFunction>
+    class CallbackImpl : public Callback {
+    public:
+
+        CallbackImpl(FwdObject * obj,FwdFunction f) : m_object(obj), m_function(f) {}
+
+        void apply() {
+            (m_object->*m_function)();
+        }
+
+        FwdObject * m_object;
+        FwdFunction m_function;
+    };
+
+    std::vector<std::unique_ptr<Callback> > m_callback;
+
+public:
+
+    template<class FwdObject,class FwdFunction>
+    void addCallback(FwdObject * obj,FwdFunction f) {
+        m_callback.push_back(std::unique_ptr<Callback>(new CallbackImpl<FwdObject,FwdFunction>(obj,f)));
+    }
 };
 
 }
