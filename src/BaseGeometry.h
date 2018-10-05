@@ -24,12 +24,6 @@ public:
     BaseGeometry()
     : d_state("mstate", this) {
         m_dirty = true;
-
-        d_state.addCallback(this,&BaseGeometry::newState);
-    }
-
-    void newState() {
-        m_elements.clear();
     }
 
     virtual void handleEvent(core::objectmodel::Event * e) {

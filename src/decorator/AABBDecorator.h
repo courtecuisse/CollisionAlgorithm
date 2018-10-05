@@ -16,7 +16,6 @@ public:
     Data<defaulttype::Vec3i> d_nbox;
     DataLink<BaseGeometry> d_geometry;
 
-
     AABBDecorator();
 
     ~AABBDecorator(){}

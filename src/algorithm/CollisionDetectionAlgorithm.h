@@ -20,7 +20,6 @@ public:
     void processAlgorithm();
 
 private:
-
     template<class ElementIterator>
     PairProximity getClosestPoint(ElementIterator geo);
 

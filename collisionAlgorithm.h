@@ -43,7 +43,6 @@ template<class T>
 class DataLink : public sofa::core::objectmodel::BaseLink, public sofa::simulation::MutationListener {
 public:
     typedef sofa::simulation::Node Node;
-    typedef void (core::objectmodel::BaseObject::*BaseObjectCallBack)();
 
     Data<std::string> m_path;
 
@@ -98,6 +97,7 @@ private:
 
     bool updateLinks() {
         m_link = NULL;
+
         if  (Node * n = dynamic_cast<sofa::simulation::Node*>(m_object->getContext())) {
             n->removeListener(this);
             n->addListener(this);
@@ -111,7 +111,7 @@ private:
 
         if (m_link != NULL) m_path.setValue(m_link->getName());
 
-        for (unsigned i=0;i<m_callback.size();i++) m_callback[i]->apply();
+
     }
 
     void addChild(Node* , Node* ) { getLink(); }
@@ -137,35 +137,6 @@ private:
 protected:
     core::objectmodel::BaseObject * m_object;
     T* m_link;
-    class Callback {
-    public:
-        virtual ~Callback() {}
-
-        virtual void apply() = 0;
-    };
-
-    template<class FwdObject,class FwdFunction>
-    class CallbackImpl : public Callback {
-    public:
-
-        CallbackImpl(FwdObject * obj,FwdFunction f) : m_object(obj), m_function(f) {}
-
-        void apply() {
-            (m_object->*m_function)();
-        }
-
-        FwdObject * m_object;
-        FwdFunction m_function;
-    };
-
-    std::vector<std::unique_ptr<Callback> > m_callback;
-
-public:
-
-    template<class FwdObject,class FwdFunction>
-    void addCallback(FwdObject * obj,FwdFunction f) {
-        m_callback.push_back(std::unique_ptr<Callback>(new CallbackImpl<FwdObject,FwdFunction>(obj,f)));
-    }
 };
 
 }
