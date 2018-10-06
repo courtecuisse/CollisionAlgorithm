@@ -51,7 +51,7 @@ public:
     , m_path(obj->initData(&m_path, name, "path To the link"))
     , m_object(obj)
     , m_link(NULL) {
-        m_object->addLink(this);
+        m_path.addLink(this);
         updateLinks();
     }
 

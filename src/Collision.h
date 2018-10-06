@@ -3,7 +3,6 @@
 #include <collisionAlgorithm.h>
 #include <BaseGeometry.h>
 #include <BaseElement.h>
-#include <qopengl.h>
 #include <sofa/core/collision/Pipeline.h>
 
 namespace sofa {
@@ -20,10 +19,6 @@ public :
 
     virtual void handleEvent(core::objectmodel::Event * e) {
         if (dynamic_cast<simulation::AnimateBeginEvent *>(e)) m_dirty= true;
-    }
-
-    static std::string getObjectCategory() {
-        return std::string("Collision");
     }
 
     void draw(const core::visual::VisualParams * vparams) {

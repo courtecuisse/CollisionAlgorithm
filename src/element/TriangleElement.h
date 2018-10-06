@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <geometry/TriangleGeometry.h>
-#include <qopengl.h>
 
 namespace sofa {
 

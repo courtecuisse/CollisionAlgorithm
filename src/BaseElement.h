@@ -7,7 +7,6 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 #include <Eigen/SVD>
-#include <qopengl.h>
 #include <sofa/core/objectmodel/BaseObject.h>
 #include <sofa/core/VecId.h>
 #include <sofa/core/behavior/MechanicalState.h>

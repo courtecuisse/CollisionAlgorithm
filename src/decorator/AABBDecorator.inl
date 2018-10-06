@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <decorator/AABBDecorator.h>
-#include <qopengl.h>
 
 namespace sofa {
 

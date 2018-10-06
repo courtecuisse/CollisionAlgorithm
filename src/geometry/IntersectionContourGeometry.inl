@@ -2,7 +2,6 @@
 
 #include <geometry/IntersectionContourGeometry.h>
 #include <element/IntersectionContourElement.h>
-#include <qopengl.h>
 
 namespace sofa {
 

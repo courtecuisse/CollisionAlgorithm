@@ -2,7 +2,6 @@
 
 #include <geometry/TriangleGeometry.h>
 #include <element/TriangleElement.h>
-#include <qopengl.h>
 
 namespace sofa {
 

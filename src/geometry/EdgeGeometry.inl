@@ -2,7 +2,6 @@
 
 #include <geometry/EdgeGeometry.h>
 #include <element/EdgeElement.h>
-#include <qopengl.h>
 
 namespace sofa {
 

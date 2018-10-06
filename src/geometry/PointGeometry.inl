@@ -2,7 +2,6 @@
 
 #include <geometry/PointGeometry.h>
 #include <element/PointElement.h>
-#include <qopengl.h>
 
 namespace sofa {
 

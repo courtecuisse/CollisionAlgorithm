@@ -1,5 +1,4 @@
 #include <Collision.h>
-#include <qopengl.h>
 
 namespace sofa {
 

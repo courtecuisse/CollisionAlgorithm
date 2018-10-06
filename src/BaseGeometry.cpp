@@ -1,7 +1,5 @@
 #include <BaseGeometry.h>
 
-#include <qopengl.h>
-
 namespace collisionAlgorithm {
 
 //ConstraintElement::ConstraintProximity::ConstraintProximity(ConstraintElement * elmt)

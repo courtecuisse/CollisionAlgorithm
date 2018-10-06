@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <geometry/PointGeometry.h>
-#include <qopengl.h>
 
 namespace sofa {
 

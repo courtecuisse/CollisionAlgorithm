@@ -1,7 +1,6 @@
 #pragma once
 
 #include <geometry/EdgeGeometry.h>
-#include <qopengl.h>
 
 namespace sofa {
 
