@@ -11,7 +11,6 @@
 #include <sofa/core/VecId.h>
 #include <sofa/core/behavior/MechanicalState.h>
 
-
 namespace sofa {
 
 namespace collisionAlgorithm {
