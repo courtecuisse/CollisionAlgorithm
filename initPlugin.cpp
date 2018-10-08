@@ -16,9 +16,7 @@
 
 namespace sofa {
 
-namespace core {
-
-namespace behavior {
+namespace collisionAlgorithm {
 
 	//Here are just several convenient functions to help user to know what contains the plugin
 
@@ -69,7 +67,5 @@ namespace behavior {
 	}
 
 }
-
-} 
 
 } 

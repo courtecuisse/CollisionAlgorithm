@@ -2,7 +2,7 @@
 
 #include <sofa/helper/system/config.h>
 #include <sofa/simulation/Node.h>
-#include <GL/gl.h>
+#include <qopengl.h>
 
 namespace sofa {
 
