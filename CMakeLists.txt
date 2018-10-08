@@ -31,7 +31,7 @@ set(COLLISIONALGORITHMPLUGIN_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src;${CMA
 target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${COLLISIONALGORITHMPLUGIN_INCLUDE_DIRS}>")
 target_include_directories(${PROJECT_NAME} PUBLIC "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 
-target_link_libraries(${PROJECT_NAME} SofaHelper SofaCore SofaGuiQt SofaOpenglVisual SofaUserInteraction ${OPENGL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} SofaCore SofaSimulationCommon SofaGuiQt ${OPENGL_LIBRARIES})
 
 ## Install rules for the library and headers; CMake package configurations files
 sofa_create_package(${PROJECT_NAME} 0.1 ${PROJECT_NAME} ${PROJECT_NAME})

@@ -2,11 +2,13 @@
 
 #include <sofa/helper/system/config.h>
 #include <sofa/simulation/Node.h>
+#include <GL/gl.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
+#ifndef MSOFA
 template<class T>
 class DataLink : public sofa::core::objectmodel::BaseLink, public sofa::simulation::MutationListener {
 public:
@@ -106,7 +108,7 @@ protected:
     core::objectmodel::BaseObject * m_object;
     T* m_link;
 };
-
+#endif
 
 }
 

@@ -9,7 +9,6 @@
 #include <sofa/simulation/AnimateBeginEvent.h>
 #include <sofa/core/objectmodel/BaseObject.h>
 #include <sofa/core/behavior/MechanicalState.h>
-#include <qopengl.h>
 
 namespace sofa {
 
