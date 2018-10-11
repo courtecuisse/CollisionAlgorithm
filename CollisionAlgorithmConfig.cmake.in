@@ -1,0 +1,14 @@
+# CMake package configuration file for the CollisionAlgorithm plugin
+
+@PACKAGE_INIT@
+
+find_package(SofaGeneral REQUIRED)
+
+if(NOT TARGET CollisionAlgorithm)
+        include("${CMAKE_CURRENT_LIST_DIR}/CollisionAlgorithmTargets.cmake")
+endif()
+
+check_required_components(CollisionAlgorithm)
+
+set(CollisionAlgorithm_LIBRARIES "CollisionAlgorithm")
+set_and_check(CollisionAlgorithm_INCLUDE_DIRS "@CollisionAlgorithm_INCLUDE_DIRS@")

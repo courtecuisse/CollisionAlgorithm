@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(CollisionAlgorithmPlugin)
+project(CollisionAlgorithm)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
@@ -27,11 +27,12 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${README_FILES} )
-set(COLLISIONALGORITHMPLUGIN_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src;${CMAKE_CURRENT_SOURCE_DIR}")
-target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${COLLISIONALGORITHMPLUGIN_INCLUDE_DIRS}>")
+set(CollisionAlgorithm_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src;${CMAKE_CURRENT_SOURCE_DIR}")
+
+target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${CollisionAlgorithm_INCLUDE_DIRS}>")
 target_include_directories(${PROJECT_NAME} PUBLIC "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 
-target_link_libraries(${PROJECT_NAME} SofaCore SofaSimulationCommon SofaGuiQt ${OPENGL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} SofaCore SofaSimulationCommon SofaGuiQt SofaTypes ${OPENGL_LIBRARIES})
 
 ## Install rules for the library and headers; CMake package configurations files
 sofa_create_package(${PROJECT_NAME} 0.1 ${PROJECT_NAME} ${PROJECT_NAME})
