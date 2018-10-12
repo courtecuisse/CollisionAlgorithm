@@ -16,7 +16,7 @@ public:
 
     PointGeometry()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , d_topology("topology", this) {}
+    , d_topology(initData(&d_topology, "topology", "this")) {}
 
     void prepareDetection();
 

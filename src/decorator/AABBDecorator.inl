@@ -8,7 +8,7 @@ namespace collisionAlgorithm {
 
 AABBDecorator::AABBDecorator()
 : d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox", "number of bbox"))
-, d_geometry("geometry", this) {}
+, d_geometry(initData(&d_geometry, "geometry", "this")) {}
 
 void AABBDecorator::prepareDetection() {
     const helper::ReadAccessor<DataVecCoord> & pos = d_geometry->getState()->read(core::VecCoordId::position());

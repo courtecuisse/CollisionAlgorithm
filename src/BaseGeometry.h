@@ -22,7 +22,7 @@ public:
     DataLink<sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> > d_state;
 
     BaseGeometry()
-    : d_state("mstate", this) {
+    : d_state(initData(&d_state, "mstate", "this")) {
         m_dirty = true;
     }
 

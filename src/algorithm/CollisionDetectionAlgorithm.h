@@ -14,8 +14,8 @@ public:
     DataLink<BaseGeometry> d_dest;
 
     CollisionDetectionAlgorithm()
-    : d_from("from", this)
-    , d_dest("dest", this) {}
+    : d_from(initData(&d_from,"from", "this"))
+    , d_dest(initData(&d_dest,"dest", "this")) {}
 
     void processAlgorithm();
 
