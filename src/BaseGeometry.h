@@ -17,6 +17,7 @@ namespace collisionAlgorithm {
 
 class BaseGeometry : public core::objectmodel::BaseObject {
 public:
+    SOFA_CLASS(BaseGeometry,core::objectmodel::BaseObject);
 
     typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
 

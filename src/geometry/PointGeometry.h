@@ -9,8 +9,9 @@ namespace collisionAlgorithm {
 
 class PointGeometry : public BaseGeometry {
     friend class PointElement;
-
 public:
+    SOFA_CLASS(PointGeometry,BaseGeometry);
+
     Data<defaulttype::Vector4> d_color;
     DataLink<core::topology::BaseMeshTopology> d_topology;
 
