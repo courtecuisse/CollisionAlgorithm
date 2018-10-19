@@ -1,6 +1,5 @@
 #pragma once
 
-#include <collisionAlgorithm.h>
 #include <memory>
 #include <map>
 #include <vector>

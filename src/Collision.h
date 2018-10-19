@@ -1,6 +1,5 @@
 #pragma once
 
-#include <collisionAlgorithm.h>
 #include <BaseGeometry.h>
 #include <BaseElement.h>
 #include <sofa/core/collision/Pipeline.h>

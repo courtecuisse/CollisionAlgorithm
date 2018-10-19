@@ -1,6 +1,5 @@
 #pragma once
 
-#include <collisionAlgorithm.h>
 #include <memory>
 #include <map>
 #include <vector>
@@ -9,7 +8,8 @@
 #include <sofa/simulation/AnimateBeginEvent.h>
 #include <sofa/core/objectmodel/BaseObject.h>
 #include <sofa/core/behavior/MechanicalState.h>
-#include <core/DataLink.h>
+#include <sofa/core/objectmodel/DataLink.h>
+#include <qopengl.h>
 
 namespace sofa {
 
