@@ -2,10 +2,15 @@
 
 #include <geometry/TriangleGeometry.h>
 #include <element/TriangleElement.h>
+#include <proximity/TriangleProximity.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
+
+ConstraintProximity::SPtr TriangleGeometry::createProximity(const TriangleElement * elmt,double f1,double f2,double f3) {
+    return std::shared_ptr<TriangleProximity>(new TriangleProximity(elmt,f1,f2,f3));
+}
 
 void TriangleGeometry::prepareDetection() {
     if (m_elements.size() != d_topology->getNbTriangles()) init();
@@ -14,18 +19,17 @@ void TriangleGeometry::prepareDetection() {
 
     m_pointNormal.resize(d_topology->getNbPoints());
 
-    m_triangle_info.resize(d_topology->getTriangles().size());
+    m_triangle_info.resize(d_topology->getNbTriangles());
 
     for (unsigned t=0;t<d_topology->getNbTriangles();t++) {
-        TriangleInfo & tinfo = m_triangle_info[t];
-
         const core::topology::BaseMeshTopology::Triangle tri = d_topology->getTriangle(t);
 
         //Compute Bezier Positions
-        defaulttype::Vector3 p0 = pos[tri[0]];
-        defaulttype::Vector3 p1 = pos[tri[1]];
-        defaulttype::Vector3 p2 = pos[tri[2]];
+        const defaulttype::Vector3 & p0 = pos[tri[0]];
+        const defaulttype::Vector3 & p1 = pos[tri[1]];
+        const defaulttype::Vector3 & p2 = pos[tri[2]];
 
+        TriangleInfo & tinfo = m_triangle_info[t];
         tinfo.v0 = p1 - p0;
         tinfo.v1 = p2 - p0;
 
@@ -55,11 +59,11 @@ void TriangleGeometry::prepareDetection() {
     }
 }
 
-void TriangleGeometry::initialize() {
+void TriangleGeometry::init() {
     m_elements.clear();
 
     for (unsigned i=0;i<d_topology->getNbTriangles();i++) {
-        m_elements.push_back(std::make_shared<TriangleElement>(this,i));
+        m_elements.push_back(TriangleElement::createElement(this,i));
     }
 
     prepareDetection();

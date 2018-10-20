@@ -13,13 +13,13 @@ Collision::PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIte
     PairProximity min_pair;
     double min_dist = std::numeric_limits<double>::max();
 
-    ConstraintProximityPtr pfrom = it_element.efrom->getControlPoint(); //centered control point
+    ConstraintProximity::SPtr pfrom = it_element.efrom->getControlPoint(); //centered control point
     if (pfrom == NULL) return min_pair;
     defaulttype::Vector3 P = pfrom->getPosition();
 
     for (unsigned i=0;i<it_element.size();i++) {
-        ConstraintElementPtr edest = it_element.element(i);
-        ConstraintProximityPtr pdest = edest->project(P);
+        const ConstraintElement * edest = it_element.element(i);
+        ConstraintProximity::SPtr pdest = edest->project(P);
 
 //        pfrom = it_element.efrom->project(pdest->getPosition());
 //        //iterate until to find the correct location on pfrom
@@ -30,7 +30,7 @@ Collision::PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIte
 //        }
 
         //compute all the distances with to elements
-        double dist = pfrom->distance(pdest->getPosition());
+        double dist = (pfrom->getPosition() - pdest->getPosition()).norm();
 
         if (dist<min_dist) {
             min_dist = dist;
@@ -45,7 +45,7 @@ Collision::PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIte
 class AABBElementIterator {
 public :
 
-    AABBElementIterator(ConstraintElementPtr from,AABBDecorator * aabb) {
+    AABBElementIterator(const ConstraintElement *from,AABBDecorator * aabb) {
         m_aabb = aabb;
         m_geo = aabb->d_geometry.get();
         efrom = from;
@@ -179,19 +179,19 @@ public :
         return (unsigned) m_selectElements.size();
     }
 
-    inline ConstraintElementPtr element(unsigned i) {
+    inline const ConstraintElement * element(unsigned i) {
         return m_geo->getElement(m_selectElements[i]);
     }
 
     BaseGeometry * m_geo;
-    ConstraintElementPtr efrom;
+    const ConstraintElement * efrom;
     AABBDecorator * m_aabb;
     std::vector<int> m_selectElements;
 };
 
 class DefaultIterator {
 public:
-    DefaultIterator(ConstraintElementPtr from, BaseGeometry * geo) {
+    DefaultIterator(const ConstraintElement * from, BaseGeometry * geo) {
         efrom = from;
         m_geo = geo;
     }
@@ -200,11 +200,11 @@ public:
         return m_geo->getNbElements();
     }
 
-    inline ConstraintElementPtr element(unsigned i) {
+    inline const ConstraintElement * element(unsigned i) {
         return m_geo->getElement(i);
     }
 
-    ConstraintElementPtr efrom;
+    const ConstraintElement * efrom;
     BaseGeometry * m_geo;
 };
 
@@ -221,7 +221,7 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
 
     //we do the collision from first to second
     for (unsigned i=0;i<d_from->getNbElements();i++) {
-        ConstraintElementPtr elmt = d_from->getElement(i);
+        const ConstraintElement * elmt = d_from->getElement(i);
         PairProximity pair = (dest == NULL) ? getClosestPoint(DefaultIterator(elmt, d_dest.get())) : getClosestPoint(AABBElementIterator(elmt, dest));
 
         if (pair.first == NULL) continue;

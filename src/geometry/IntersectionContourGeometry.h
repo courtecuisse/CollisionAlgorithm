@@ -7,6 +7,8 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
+class IntersectionContourElement;
+
 class IntersectionContourGeometry : public PointGeometry {
 public:
     Data<defaulttype::Vector3> d_planePos;

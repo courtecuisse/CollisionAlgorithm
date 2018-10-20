@@ -6,57 +6,11 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-/**************************************************************************/
-/******************************ELEMENT*************************************/
-/**************************************************************************/
-
 class EdgeElement : public ConstraintElement {
     friend class EdgeGeometry;
     friend class EdgeProximity;
 
 public:
-
-    /**************************************************************************/
-    /******************************PROXIMITY***********************************/
-    /**************************************************************************/
-
-    class EdgeProximity : public ConstraintProximity {
-    public :
-
-        inline EdgeElement * element() const {
-            return (EdgeElement*) m_element;
-        }
-
-        EdgeProximity(EdgeElement * elmt,double f1,double f2) : ConstraintProximity(elmt) {
-            m_fact[0] = f1;
-            m_fact[1] = f2;
-        }
-
-        defaulttype::Vector3 getPosition(core::VecCoordId v) const {
-            const helper::ReadAccessor<DataVecCoord> pos = m_state->read(v);
-            return pos[element()->m_pid[0]] * m_fact[0] + pos[element()->m_pid[1]] * m_fact[1];
-        }
-
-        defaulttype::Vector3 getNormal() const {
-            return defaulttype::Vector3(1,0,0);
-        }
-
-        std::map<unsigned,double> getContributions() {
-            std::map<unsigned,double> res;
-
-            res[element()->m_pid[0]] = m_fact[0];
-            res[element()->m_pid[1]] = m_fact[1];
-
-            return res;
-        }
-
-    protected:
-        double m_fact[2];
-    };
-
-    inline ConstraintProximityPtr createProximity(EdgeElement * elmt,double f1,double f2) {
-        return std::make_shared<EdgeProximity>(elmt,f1,f2);
-    }
 
     EdgeElement(EdgeGeometry * geo,unsigned eid) : ConstraintElement(geo,2) {
         m_eid = eid;
@@ -67,14 +21,18 @@ public:
         m_pid[1] = edges[eid][1];
     }
 
-    ConstraintProximityPtr getControlPoint(const int cid) {
-        if (cid == 0) return createProximity(this,1,0);
-        else if (cid == 1) return createProximity(this,0,1);
-        return createProximity(this,1.0/2.0,1.0/2.0);
+    static ConstraintElement::UPtr createElement(EdgeGeometry * geo,unsigned eid) {
+        return std::unique_ptr<EdgeElement>(new EdgeElement(geo,eid));
+    }
+
+    ConstraintProximity::SPtr getControlPoint(int cid) const {
+        if (cid == 0) return EdgeGeometry::createProximity(this,1,0);
+        else if (cid == 1) return EdgeGeometry::createProximity(this,0,1);
+        return EdgeGeometry::createProximity(this,1.0/2.0,1.0/2.0);
     }
 
     //this function project the point P on the element and return the corresponding proximity
-    ConstraintProximityPtr project(defaulttype::Vector3 P) {
+    ConstraintProximity::SPtr project(defaulttype::Vector3 P) const {
         double fact_u,fact_v;
 
         const helper::ReadAccessor<DataVecCoord> & pos = geometry()->getState()->read(core::VecCoordId::position());
@@ -90,15 +48,14 @@ public:
 
         fact_u = 1.0-fact_v;
 
-        return createProximity(this,fact_u,fact_v);
+        return EdgeGeometry::createProximity(this,fact_u,fact_v);
     }
 
-    EdgeGeometry * geometry() {
+    EdgeGeometry * geometry() const {
         return (EdgeGeometry * )m_geometry;
     }
 
-
-    void draw(const core::visual::VisualParams * /*vparams*/) {
+    void draw(const core::visual::VisualParams * /*vparams*/) const {
         glColor4dv(geometry()->d_color.getValue().data());
 
         glBegin(GL_LINES);

@@ -7,15 +7,20 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
+class TriangleElement;
+
 class TriangleGeometry : public EdgeGeometry {
     friend class TriangleElement;
     friend class TriangleProximity;
 
 public:
+    SOFA_CLASS(TriangleGeometry,EdgeGeometry);
 
-    virtual void initialize();
+    void init();
 
-    virtual void prepareDetection();
+    void prepareDetection();
+
+    static ConstraintProximity::SPtr createProximity(const TriangleElement * elmt,double f1,double f2,double f3);
 
     typedef struct {
         defaulttype::Vector3 v0,v1;

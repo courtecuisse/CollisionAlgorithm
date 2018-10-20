@@ -51,7 +51,7 @@ void IntersectionContourGeometry::prepareDetection() {
         double alpha=1.0 - (d-dot(planeNormal,p1))/(dot(planeNormal,p2-p1));
 
         if (alpha>=0 && alpha<=1) {
-            m_elements.push_back(std::make_shared<IntersectionContourElement>(this,e[0],e[1],alpha,1.0-alpha));
+            m_elements.push_back(IntersectionContourElement::createElement(this,e[0],e[1],alpha,1.0-alpha));
         }
     }
 }

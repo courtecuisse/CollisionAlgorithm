@@ -4,10 +4,6 @@
 
 namespace collisionAlgorithm {
 
-/**************************************************************************/
-/******************************ELEMENT*************************************/
-/**************************************************************************/
-
 class ProjectiveContourElement : public TriangleGeometry {
 public:
         typedef TriangleGeometry Inherit;

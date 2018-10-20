@@ -9,13 +9,14 @@
 #include <sofa/core/objectmodel/BaseObject.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/DataLink.h>
+#include <sofa/core/BehaviorModel.h>
 #include <qopengl.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
-class BaseGeometry : public core::objectmodel::BaseObject {
+class BaseGeometry : public core::BehaviorModel {
 public:
     SOFA_CLASS(BaseGeometry,core::objectmodel::BaseObject);
 
@@ -24,47 +25,19 @@ public:
     DataLink<sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> > d_state;
 
     BaseGeometry()
-    : d_state(initData(&d_state, "mstate", "this")) {
-        m_dirty = true;
-    }
+    : d_state(initData(&d_state, "mstate", "this")) {}
 
-    virtual void handleEvent(core::objectmodel::Event * e) {
-        if (dynamic_cast<simulation::AnimateBeginEvent *>(e)) m_dirty=true;
+    void updatePosition(SReal ) {
+        prepareDetection();
     }
 
     unsigned getNbElements() {
-        if (m_dirty) {
-            prepareDetection();
-            m_dirty = false;
-        }
-
         return (unsigned) m_elements.size();
     }
 
-    ConstraintElementPtr getElement(unsigned i) {
-        if (m_dirty) {
-            prepareDetection();
-            m_dirty = false;
-        }
-
-        return m_elements[i];
+    const ConstraintElement * getElement(unsigned i) {
+        return m_elements[i].get();
     }
-
-//    ConstraintProximityPtr project(const Vector3 & P) {
-//        double min_dist = std::numeric_limits<double>::max();
-//        ConstraintProximityPtr min_prox = NULL;
-
-//        for (unsigned i=0;i<m_elements.size();i++) {
-//            ConstraintProximityPtr pdest = m_elements[i]->project(P);
-//            double dist = (P - pdest->getPosition()).norm();
-//            if (dist<min_dist) {
-//                min_dist = dist;
-//                min_prox = pdest;
-//            }
-//        }
-
-//        return min_prox;
-//    }
 
     virtual sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * getState() {
         return d_state.get();
@@ -81,8 +54,7 @@ public:
     }
 
 protected:
-    std::vector<ConstraintElementPtr> m_elements;
-    bool m_dirty;
+    std::vector<ConstraintElement::UPtr> m_elements;
 
     virtual void prepareDetection() {}
 };

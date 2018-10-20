@@ -1,6 +1,7 @@
 #pragma once
 
 #include <BaseGeometry.h>
+#include <geometry/IntersectionContourGeometry.h>
 
 namespace sofa {
 
@@ -11,50 +12,6 @@ class IntersectionContourElement : public ConstraintElement {
     friend class IntersectionContourGeometry;
 public:
 
-    /**************************************************************************/
-    /******************************PROXIMITY***********************************/
-    /**************************************************************************/
-
-    class IntersectionContourProximity : public ConstraintProximity {
-    public :
-        IntersectionContourProximity(IntersectionContourElement * elmt) : ConstraintProximity(elmt) {}
-
-        defaulttype::Vector3 getPosition(core::VecCoordId v) const {
-            const helper::ReadAccessor<Data<helper::vector<defaulttype::Vector3> > > & pos = m_state->read(v);
-
-            defaulttype::Vector3 P = pos[element()->m_pid[0]] * element()->m_fact[0];
-            defaulttype::Vector3 Q = pos[element()->m_pid[1]] * element()->m_fact[1];
-
-            return (P+Q);
-        }
-
-        defaulttype::Vector3 getNormal() const {
-            return element()->geometry()->m_pointNormal[element()->m_pid[0]] * element()->m_fact[0] +
-                   element()->geometry()->m_pointNormal[element()->m_pid[1]] * element()->m_fact[1];
-        }
-
-        std::map<unsigned,double> getContributions() {
-            std::map<unsigned,double> res;
-
-            res[element()->m_pid[0]] = element()->m_fact[0];
-            res[element()->m_pid[1]] = element()->m_fact[1];
-
-            return res;
-        }
-
-        inline IntersectionContourElement * element() const {
-            return (IntersectionContourElement*) m_element;
-        }
-    };
-
-    /**************************************************************************/
-    /******************************ELEMENT*************************************/
-    /**************************************************************************/
-
-    inline ConstraintProximityPtr createProximity() {
-        return std::make_shared<IntersectionContourProximity>(this);
-    }
-
     IntersectionContourElement(IntersectionContourGeometry *geo, unsigned pid1, unsigned pid2,double f1,double f2) : ConstraintElement(geo,1) {
         m_pid[0] = pid1;
         m_pid[1] = pid2;
@@ -63,19 +20,23 @@ public:
         m_fact[1] = f2;
     }
 
-    ConstraintProximityPtr project(defaulttype::Vector3 /*P*/) {
-        return createProximity();
+    static ConstraintElement::UPtr createElement(IntersectionContourGeometry *geo, unsigned pid1, unsigned pid2,double f1,double f2) {
+        return std::unique_ptr<IntersectionContourElement>(new IntersectionContourElement(geo,pid1,pid2,f1,f2));
     }
 
-    ConstraintProximityPtr getControlPoint(const int /*i*/) {
-        return createProximity();
+    ConstraintProximity::SPtr project(defaulttype::Vector3 /*P*/) const {
+//        return createProximity();
     }
 
-    IntersectionContourGeometry * geometry() {
+    ConstraintProximity::SPtr getControlPoint(const int /*i*/) const {
+//        return createProximity();
+    }
+
+    IntersectionContourGeometry * geometry() const {
         return (IntersectionContourGeometry *)m_geometry;
     }
 
-    void draw(const core::visual::VisualParams * /*vparams*/) {
+    void draw(const core::visual::VisualParams * /*vparams*/) const {
         glColor4dv(geometry()->d_color.getValue().data());
 
         glBegin(GL_POINTS);

@@ -8,7 +8,10 @@ namespace collisionAlgorithm {
 
 AABBDecorator::AABBDecorator()
 : d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox", "number of bbox"))
-, d_geometry(initData(&d_geometry, "geometry", "this")) {}
+, d_geometry(initData(&d_geometry, "geometry", "this"))
+, c_geometry(d_geometry) {
+    c_geometry.addCallback(this,&AABBDecorator::setDecorator);
+}
 
 void AABBDecorator::prepareDetection() {
     const helper::ReadAccessor<DataVecCoord> & pos = d_geometry->getState()->read(core::VecCoordId::position());
@@ -58,7 +61,7 @@ void AABBDecorator::prepareDetection() {
     m_Bmax -= m_cellSize * 0.5;
 
     for (unsigned itE = 0; itE < d_geometry->getNbElements(); itE++) {
-        ConstraintElementPtr elmt = d_geometry->getElement(itE);
+        const ConstraintElement * elmt = d_geometry->getElement(itE);
         if (elmt->getNbControlPoints() == 0) continue;
 
         defaulttype::Vector3 minbox = elmt->getControlPoint(0)->getPosition();

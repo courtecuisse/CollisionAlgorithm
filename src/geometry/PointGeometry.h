@@ -7,6 +7,8 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
+class PointElement;
+
 class PointGeometry : public BaseGeometry {
     friend class PointElement;
 public:
@@ -19,9 +21,11 @@ public:
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
     , d_topology(initData(&d_topology, "topology", "this")) {}
 
+    static ConstraintProximity::SPtr createProximity(const PointElement * elmt);
+
     void prepareDetection();
 
-    void initialize();
+    void init();
 
 };
 

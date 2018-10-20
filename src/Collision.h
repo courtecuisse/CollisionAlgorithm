@@ -11,7 +11,7 @@ namespace collisionAlgorithm {
 class Collision : public /*core::collision::Pipeline */ core::objectmodel::BaseObject {
 public :
 
-    typedef std::pair<ConstraintProximityPtr,ConstraintProximityPtr> PairProximity;
+    typedef std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr> PairProximity;
     typedef std::vector<PairProximity> PairProximityVector;
 
     Collision();

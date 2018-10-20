@@ -2,16 +2,22 @@
 
 #include <geometry/EdgeGeometry.h>
 #include <element/EdgeElement.h>
+#include <proximity/EdgeProximity.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
-void EdgeGeometry::initialize() {
+ConstraintProximity::SPtr EdgeGeometry::createProximity(const EdgeElement * elmt,double f1,double f2) {
+    return std::shared_ptr<EdgeProximity>(new EdgeProximity(elmt, f1, f2));
+}
+
+
+void EdgeGeometry::init() {
     m_elements.clear();
 
     for (unsigned i=0;i<d_topology->getNbEdges();i++) {
-        m_elements.push_back(std::make_shared<EdgeElement>(this,i));
+        m_elements.push_back(EdgeElement::createElement(this,i));
     }
 }
 
