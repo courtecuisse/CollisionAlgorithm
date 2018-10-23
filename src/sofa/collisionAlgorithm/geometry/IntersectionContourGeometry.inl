@@ -10,6 +10,7 @@ namespace collisionAlgorithm {
 IntersectionContourGeometry::IntersectionContourGeometry()
 : d_planePos(initData(&d_planePos,defaulttype::Vector3(0,0,0),"planePos","Position of the plane"))
 , d_planeNormal(initData(&d_planeNormal, defaulttype::Vector3(0,0,1),"planeNormal","Normal of the plane"))
+, d_topology(initData(&d_topology, "topology", "this"))
 {}
 
 void IntersectionContourGeometry::prepareDetection() {

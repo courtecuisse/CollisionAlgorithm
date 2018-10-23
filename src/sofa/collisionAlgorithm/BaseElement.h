@@ -3,9 +3,6 @@
 #include <memory>
 #include <map>
 #include <vector>
-#include <Eigen/Dense>
-#include <Eigen/Core>
-#include <Eigen/SVD>
 #include <sofa/core/objectmodel/BaseObject.h>
 #include <sofa/core/VecId.h>
 #include <sofa/core/behavior/MechanicalState.h>

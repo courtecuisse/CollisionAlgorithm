@@ -13,7 +13,10 @@ class EdgeGeometry : public PointGeometry {
 public:
     SOFA_CLASS(EdgeGeometry,BaseGeometry);
 
-    EdgeGeometry() {}
+    DataLink<core::topology::BaseMeshTopology> d_topology;
+
+    EdgeGeometry()
+    : d_topology(initData(&d_topology, "topology", "this")) {}
 
     static ConstraintProximity::SPtr createProximity(const EdgeElement * elmt,double f1,double f2);
 

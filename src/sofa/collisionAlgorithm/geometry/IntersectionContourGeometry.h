@@ -13,6 +13,7 @@ class IntersectionContourGeometry : public PointGeometry {
 public:
     Data<defaulttype::Vector3> d_planePos;
     Data<defaulttype::Vector3> d_planeNormal;
+    DataLink<core::topology::BaseMeshTopology> d_topology;
 
     IntersectionContourGeometry();
 

@@ -15,11 +15,9 @@ public:
     SOFA_CLASS(PointGeometry,BaseGeometry);
 
     Data<defaulttype::Vector4> d_color;
-    DataLink<core::topology::BaseMeshTopology> d_topology;
 
     PointGeometry()
-    : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , d_topology(initData(&d_topology, "topology", "this")) {}
+    : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model")) {}
 
     static ConstraintProximity::SPtr createProximity(const PointElement * elmt);
 

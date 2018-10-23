@@ -10,15 +10,14 @@ namespace collisionAlgorithm {
 
 void PointGeometry::init() {
     m_elements.clear();
-    if (d_topology == NULL) return;
 
-    for (unsigned i=0;i<(unsigned) d_topology->getNbPoints();i++) {
+    for (unsigned i=0;i<(unsigned) d_state->getSize();i++) {
         m_elements.push_back(PointElement::createElement(this,i));
     }
 }
 
 void PointGeometry::prepareDetection() {
-    if (m_elements.size() != (unsigned) d_topology->getNbPoints()) init();
+    if (m_elements.size() != (unsigned) d_state->getSize()) init();
 }
 
 ConstraintProximity::SPtr PointGeometry::createProximity(const PointElement * elmt) {
