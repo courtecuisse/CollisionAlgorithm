@@ -25,34 +25,21 @@ public :
             glVertex3dv(m_pairDetection[i].second->getPosition().data());
         }
         glEnd();
-
-//        for (unsigned i=0;i<m_pairDetection.size();i++) {
-//            vparams->drawTool()->drawArrow(m_pairDetection[i].second->getPosition(),
-//                                           m_pairDetection[i].second->getPosition() + m_pairDetection[i].second->getNormal(),
-//                                           0.1,
-//                                           defaulttype::Vector4(0,0,1,1));
-
-//            vparams->drawTool()->drawArrow(m_pairDetection[i].first->getPosition(),
-//                                           m_pairDetection[i].first->getPosition() + m_pairDetection[i].first->getNormal(),
-//                                           0.1,
-//                                           defaulttype::Vector4(0,0,1,1));
-//        }
-
     }
 
     virtual void reset() {}
 
-    virtual void computeCollisionReset() {}
+    virtual void computeCollisionReset() {
+        m_pairDetection.clear();
+    }
 
     virtual void computeCollisionResponse() {}
 
     void computeCollisionDetection() {
-        m_pairDetection.clear();
         processAlgorithm();
     }
 
     PairProximityVector & getCollisionPairs() {
-        computeCollisionDetection();
         return m_pairDetection;
     }
 
@@ -65,7 +52,7 @@ public :
 
 protected:
     virtual void doCollisionReset() {
-         m_pairDetection.clear();
+//         m_pairDetection.clear();
     }
 
     virtual void doCollisionDetection(const sofa::helper::vector<core::CollisionModel*>& /*collisionModels*/) {
