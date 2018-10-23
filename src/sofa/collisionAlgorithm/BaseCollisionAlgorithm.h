@@ -26,17 +26,17 @@ public :
         }
         glEnd();
 
-        for (unsigned i=0;i<m_pairDetection.size();i++) {
-            vparams->drawTool()->drawArrow(m_pairDetection[i].second->getPosition(),
-                                           m_pairDetection[i].second->getPosition() + m_pairDetection[i].second->getNormal(),
-                                           0.1,
-                                           defaulttype::Vector4(0,0,1,1));
+//        for (unsigned i=0;i<m_pairDetection.size();i++) {
+//            vparams->drawTool()->drawArrow(m_pairDetection[i].second->getPosition(),
+//                                           m_pairDetection[i].second->getPosition() + m_pairDetection[i].second->getNormal(),
+//                                           0.1,
+//                                           defaulttype::Vector4(0,0,1,1));
 
-            vparams->drawTool()->drawArrow(m_pairDetection[i].first->getPosition(),
-                                           m_pairDetection[i].first->getPosition() + m_pairDetection[i].first->getNormal(),
-                                           0.1,
-                                           defaulttype::Vector4(0,0,1,1));
-        }
+//            vparams->drawTool()->drawArrow(m_pairDetection[i].first->getPosition(),
+//                                           m_pairDetection[i].first->getPosition() + m_pairDetection[i].first->getNormal(),
+//                                           0.1,
+//                                           defaulttype::Vector4(0,0,1,1));
+//        }
 
     }
 
@@ -55,6 +55,8 @@ public :
         computeCollisionDetection();
         return m_pairDetection;
     }
+
+    virtual void getState(std::set<sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes>* > & list_state) = 0;
 
     virtual std::set< std::string > getResponseList() const {
         std::set< std::string > res;
