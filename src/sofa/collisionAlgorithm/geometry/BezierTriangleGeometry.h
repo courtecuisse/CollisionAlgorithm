@@ -25,7 +25,7 @@ public:
 
     BezierTriangleGeometry();
 
-    void prepareDetection();
+    virtual void prepareDetection();
 
     void createElements();
 

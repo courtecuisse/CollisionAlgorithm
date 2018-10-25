@@ -14,16 +14,11 @@ class PointGeometry : public BaseGeometry {
 public:
     SOFA_CLASS(PointGeometry,BaseGeometry);
 
-    Data<defaulttype::Vector4> d_color;
-
-    PointGeometry()
-    : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model")) {}
-
     static ConstraintProximity::SPtr createProximity(const PointElement * elmt);
 
-    void prepareDetection();
+    virtual void prepareDetection();
 
-    void init();
+    virtual void init();
 
 };
 

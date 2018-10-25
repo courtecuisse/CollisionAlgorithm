@@ -23,10 +23,10 @@ public :
     }
 
     defaulttype::Vector3 getNormal() const {
-        const std::vector<defaulttype::Vector3> & pos = element()->geometry()->m_pointNormal;
-        return pos[element()->m_pid[0]] * m_fact[0] +
-               pos[element()->m_pid[1]] * m_fact[1] +
-               pos[element()->m_pid[2]] * m_fact[2];
+        const std::vector<defaulttype::Vector3> & normals = element()->geometry()->m_pointNormal;
+        return normals[element()->m_pid[0]] * m_fact[0] +
+               normals[element()->m_pid[1]] * m_fact[1] +
+               normals[element()->m_pid[2]] * m_fact[2];
     }
 
     std::map<unsigned,double> getContributions() const {

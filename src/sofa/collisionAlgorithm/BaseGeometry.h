@@ -23,9 +23,11 @@ public:
     typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
 
     DataLink<sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> > d_state;
+    Data<defaulttype::Vector4> d_color;
 
     BaseGeometry()
-    : d_state(initData(&d_state, "mstate", "this")) {}
+    : d_state(initData(&d_state, "mstate", "this"))
+    , d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model")) {}
 
     void updatePosition(SReal ) {
         prepareDetection();
@@ -45,6 +47,7 @@ public:
 
     void draw(const core::visual::VisualParams *vparams) {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
+        if (d_color.getValue()[3] == 0.0) return;
 
         glDisable(GL_LIGHTING);
 

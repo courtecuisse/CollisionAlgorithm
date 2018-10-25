@@ -20,9 +20,9 @@ public:
 
     static ConstraintProximity::SPtr createProximity(const EdgeElement * elmt,double f1,double f2);
 
-    void prepareDetection();
+    virtual void prepareDetection();
 
-    void init();
+    virtual void init();
 
 };
 

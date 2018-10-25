@@ -12,10 +12,15 @@ public:
 
     DataLink<BaseGeometry> d_from;
     DataLink<BaseGeometry> d_dest;
+    Data<double> d_minDist;
+    Data<double> d_minAngle;
 
     CollisionDetectionAlgorithm()
     : d_from(initData(&d_from,"from", "this"))
-    , d_dest(initData(&d_dest,"dest", "this")) {}
+    , d_dest(initData(&d_dest,"dest", "this"))
+    , d_minDist(initData(&d_minDist, std::numeric_limits<double>::max(), "dist", "this"))
+    , d_minAngle(initData(&d_minAngle, -1.0, "angle","this"))
+    {}
 
     void processAlgorithm();
 
