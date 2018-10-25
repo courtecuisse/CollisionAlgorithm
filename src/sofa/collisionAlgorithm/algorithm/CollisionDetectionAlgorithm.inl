@@ -35,16 +35,13 @@ PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_el
         defaulttype::Vector3 N = pfrom->getPosition() - pdest->getPosition();
         double dist = N.norm();
 
-        if (dist < d_minDist.getValue()) {
-            N.normalize();
-            if (-dot(pfrom->getNormal(),N) < d_minAngle.getValue()) continue;
-            if ( dot(pdest->getNormal(),N) < d_minAngle.getValue()) continue;
+        if (dist > d_minDist.getValue()) continue;
+        if (dot(pfrom->getNormal(),pdest->getNormal()) > -d_minAngle.getValue()) continue;
 
-            if (dist<min_dist) {
-                min_dist = dist;
-                min_pair.first = pfrom;
-                min_pair.second = pdest;
-            }
+        if (dist<min_dist) {
+            min_dist = dist;
+            min_pair.first = pfrom;
+            min_pair.second = pdest;
         }
     }
 
