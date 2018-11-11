@@ -1,15 +1,10 @@
-#ifndef SOFA_COMPONENT_CONSTRAINT_COLLISIONALGORITHM_H
-#define SOFA_COMPONENT_CONSTRAINT_COLLISIONALGORITHM_H
+#pragma once
 
-#include <sofa/defaulttype/SolidTypes.h>
-#include <sofa/core/behavior/BaseController.h>
 #include <sofa/core/behavior/MechanicalState.h>
 
 namespace sofa {
 
-namespace core {
-
-namespace behavior {
+namespace collisionAlgorithm {
 
 class CollisionAlgorithm {
 public:
@@ -25,10 +20,7 @@ public:
     static double Score(helper::vector<defaulttype::Vector3> & p_dst, helper::vector<defaulttype::Vector3> & p_from, helper::vector<int> & bindId);
     static void ManualBind(const helper::vector<defaulttype::Vector3> & p1, const helper::vector<defaulttype::Vector3> & p2 , helper::vector<int> & bindId, double minDist = 0.0);
 };
-} // namespace controller
 
-} // namespace component
+}
 
-} // namespace sofa
-
-#endif // SOFA_COMPONENT_CONTROLLER_NeedleConstraint_H
+}

@@ -1,46 +1,21 @@
-#ifndef SOFA_COMPONENT_CONSTRAINT_FINDCLOSESTALGO_H
-#define SOFA_COMPONENT_CONSTRAINT_FINDCLOSESTALGO_H
-
 #include "CollisionAlgorithm.h"
-#include <sofa/defaulttype/SolidTypes.h>
-#include <sofa/core/behavior/BaseController.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <math.h>
-#include <sofa/defaulttype/Vec.h>
-
-#include <sofa/core/behavior/ForceField.inl>
 #include <sofa/simulation/AnimateBeginEvent.h>
-#include <sofa/simulation/Simulation.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/core/objectmodel/KeypressedEvent.h>
-#include <sofa/core/objectmodel/KeyreleasedEvent.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <SofaOpenglVisual/OglModel.h>
-#include <sofa/defaulttype/RigidTypes.h>
 #include <Eigen/Dense>
 #include <Eigen/Core>
 #include <Eigen/SVD>
 
-#include <sofa/defaulttype/VecTypes.h>
-#include <SofaBaseTopology/PointSetTopologyContainer.h>
-#include <SofaBaseTopology/PointSetTopologyModifier.h>
-#include <SofaBaseTopology/EdgeSetTopologyContainer.h>
-#include <SofaBaseTopology/TriangleSetTopologyContainer.h>
-#include <SofaBaseTopology/TetrahedronSetTopologyContainer.h>
 #include <sofa/core/behavior/MechanicalState.h>
-#include <sofa/core/collision/Intersection.h>
-#include <sofa/core/collision/NarrowPhaseDetection.h>
 
-#include <sofa/core/behavior/PairInteractionConstraint.h>
 #include <sofa/core/behavior/MechanicalState.h>
-#include <sofa/defaulttype/SolidTypes.h>
 
 namespace sofa {
 
-namespace core {
-
-namespace behavior {
-
+namespace collisionAlgorithm {
 
 void CollisionAlgorithm::PCAPointCloud(helper::vector<defaulttype::Vector3> & pos, defaulttype::Vector3 & C,defaulttype::Quat & R1, defaulttype::Quat & R2, defaulttype::Quat & R3, defaulttype::Quat & R4) {
 
@@ -304,11 +279,7 @@ double CollisionAlgorithm::Score(helper::vector<defaulttype::Vector3> & p_from,h
     }
     return score;
 }
-} // namespace controller
 
-} // namespace component
+}
 
-} // namespace sofa
-
-#endif // SOFA_COMPONENT_CONTROLLER_NeedleConstraint_H
-
+}

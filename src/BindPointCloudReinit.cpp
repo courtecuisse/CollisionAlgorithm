@@ -1,19 +1,10 @@
-#ifndef SOFA_COMPONENT_CONSTRAINT_FINDCLOSESTALGO_H
-#define SOFA_COMPONENT_CONSTRAINT_FINDCLOSESTALGO_H
-
 #include "CollisionAlgorithm.h"
-#include <sofa/defaulttype/SolidTypes.h>
-#include <sofa/core/behavior/BaseController.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <math.h>
-#include <sofa/defaulttype/Vec.h>
 
 namespace sofa {
 
-namespace core {
-
-namespace behavior {
-
+namespace collisionAlgorithm {
 
 void CollisionAlgorithm::BindPointCloudReinit(const helper::vector<defaulttype::Vector3> & p1, const helper::vector<defaulttype::Vector3> & p2 , helper::vector<int> & bindId, double minDist) {
     helper::vector<int> reinit(p1.size(),-1);
@@ -111,10 +102,7 @@ void CollisionAlgorithm::BindPointCloudReinit(const helper::vector<defaulttype::
 
 }
 
-} // namespace controller
+}
 
-} // namespace component
+}
 
-} // namespace sofa
-
-#endif // SOFA_COMPONENT_CONTROLLER_NeedleConstraint_H

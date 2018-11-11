@@ -1,18 +1,10 @@
-#ifndef SOFA_COMPONENT_CONSTRAINT_FINDCLOSESTALGO_H
-#define SOFA_COMPONENT_CONSTRAINT_FINDCLOSESTALGO_H
-
 #include "CollisionAlgorithm.h"
-#include <sofa/defaulttype/SolidTypes.h>
-#include <sofa/core/behavior/BaseController.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <math.h>
-#include <sofa/defaulttype/Vec.h>
 
 namespace sofa {
 
-namespace core {
-
-namespace behavior {
+namespace collisionAlgorithm {
 
 #ifdef PCL_ENABLE
 
@@ -138,10 +130,6 @@ void CollisionAlgorithm::KdTreeClosestPoint(const helper::vector<defaulttype::Ve
 }
 #endif
 
-} // namespace controller
+}
 
-} // namespace component
-
-} // namespace sofa
-
-#endif // SOFA_COMPONENT_CONTROLLER_NeedleConstraint_H
+}

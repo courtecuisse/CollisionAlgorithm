@@ -1,15 +1,10 @@
 #include "CollisionAlgorithm.h"
-#include <sofa/defaulttype/SolidTypes.h>
-#include <sofa/core/behavior/BaseController.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <math.h>
-#include <sofa/defaulttype/Vec.h>
 
 namespace sofa {
 
-namespace core {
-
-namespace behavior {
+namespace collisionAlgorithm {
 
 void treeBranch(const helper::vector<defaulttype::Vector3> & pointCloud, helper::vector<int> & branch, helper::vector<int> & tree, int axis ) {
 
@@ -194,9 +189,6 @@ void CollisionAlgorithm::kdtreeBind(const helper::vector<defaulttype::Vector3> &
 //    std::cout << "BIND=" << bindId << std::endl;
 //    std::cout << "IBIND=" << invBind << std::endl;
 
+}
 
-} // namespace controller
-
-} // namespace component
-
-} // namespace sofa
+}
