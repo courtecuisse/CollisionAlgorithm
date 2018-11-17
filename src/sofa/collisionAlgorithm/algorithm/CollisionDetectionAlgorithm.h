@@ -9,30 +9,32 @@ namespace collisionAlgorithm {
 
 class CollisionDetectionAlgorithm : public BaseCollisionAlgorithm {
 public:
+    SOFA_CLASS(CollisionDetectionAlgorithm, BaseCollisionAlgorithm);
 
-    DataLink<BaseGeometry> d_from;
-    DataLink<BaseGeometry> d_dest;
     Data<double> d_minDist;
     Data<double> d_minAngle;
 
     CollisionDetectionAlgorithm()
-    : d_from(initData(&d_from,"from", "this"))
-    , d_dest(initData(&d_dest,"dest", "this"))
-    , d_minDist(initData(&d_minDist, std::numeric_limits<double>::max(), "dist", "this"))
+    : d_minDist(initData(&d_minDist, std::numeric_limits<double>::max(), "dist", "this"))
     , d_minAngle(initData(&d_minAngle, -1.0, "angle","this"))
+    , l_from(initLink("from", "Link to from geometry"))
+    , l_dest(initLink("dest", "Link to dest geometry"))
     {}
 
     void processAlgorithm();
 
     void getState(std::set<sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes>* > & list_state) {
-        list_state.insert(d_from->getState());
-        list_state.insert(d_dest->getState());
+        list_state.insert(l_from->getState());
+        list_state.insert(l_dest->getState());
     }
 
 private:
     template<class ElementIterator>
     PairProximity getClosestPoint(ElementIterator geo);
 
+
+    core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
+    core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
 };
 
 }

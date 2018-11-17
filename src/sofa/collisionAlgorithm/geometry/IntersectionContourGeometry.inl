@@ -10,7 +10,7 @@ namespace collisionAlgorithm {
 IntersectionContourGeometry::IntersectionContourGeometry()
 : d_planePos(initData(&d_planePos,defaulttype::Vector3(0,0,0),"planePos","Position of the plane"))
 , d_planeNormal(initData(&d_planeNormal, defaulttype::Vector3(0,0,1),"planeNormal","Normal of the plane"))
-, d_topology(initData(&d_topology, "topology", "this"))
+, l_topology(initLink("topology", "Link to topology"))
 {}
 
 void IntersectionContourGeometry::prepareDetection() {
@@ -20,10 +20,10 @@ void IntersectionContourGeometry::prepareDetection() {
 
     m_pointNormal.resize(pos.size());
     for (unsigned p=0;p<pos.size();p++) {
-        const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = d_topology->getTrianglesAroundVertex(p);
+        const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = l_topology->getTrianglesAroundVertex(p);
         m_pointNormal[p] = defaulttype::Vector3(0,0,0);
         for (unsigned t=0;t<tav.size();t++) {
-            core::topology::BaseMeshTopology::Triangle tri = d_topology->getTriangle(tav[t]);
+            core::topology::BaseMeshTopology::Triangle tri = l_topology->getTriangle(tav[t]);
 
             //Compute Bezier Positions
             defaulttype::Vector3 p0 = pos[tri[0]];
@@ -43,8 +43,8 @@ void IntersectionContourGeometry::prepareDetection() {
     double d=dot(planeNormal,pointOnPlane);
 
     //inspect the plane edge intersection
-    for(unsigned i=0;i<d_topology->getNbEdges();i++) {
-        const core::topology::BaseMeshTopology::Edge & e = d_topology->getEdge(i);
+    for(unsigned i=0;i<l_topology->getNbEdges();i++) {
+        const core::topology::BaseMeshTopology::Edge & e = l_topology->getEdge(i);
 
         defaulttype::Vector3 p1 = pos[e[0]];
         defaulttype::Vector3 p2 = pos[e[1]];

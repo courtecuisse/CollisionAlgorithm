@@ -22,7 +22,7 @@ ConstraintProximity::SPtr BezierTriangleGeometry::createProximity(const BezierTr
 void BezierTriangleGeometry::createElements() {
     m_elements.clear();
 
-    for (unsigned i=0;i<d_topology->getNbTriangles();i++) {
+    for (unsigned i=0;i<l_topology->getNbTriangles();i++) {
         m_elements.push_back(BezierTriangleElement::createElement(this,i));
     }
 
@@ -32,12 +32,12 @@ void BezierTriangleGeometry::createElements() {
 void BezierTriangleGeometry::prepareDetection() {
     Inherit::prepareDetection();
 
-    const helper::ReadAccessor<DataVecCoord> & x = d_state->read(core::VecCoordId::position());
+    const helper::ReadAccessor<DataVecCoord> & x = l_state->read(core::VecCoordId::position());
 
-    m_beziertriangle_info.resize(d_topology->getNbTriangles());
-    for (unsigned t=0;t<(unsigned) d_topology->getNbTriangles();t++) {
+    m_beziertriangle_info.resize(l_topology->getNbTriangles());
+    for (unsigned t=0;t<(unsigned) l_topology->getNbTriangles();t++) {
         BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[t];
-        const core::topology::BaseMeshTopology::Triangle trpids = d_topology->getTriangle(t);
+        const core::topology::BaseMeshTopology::Triangle trpids = l_topology->getTriangle(t);
 
         const defaulttype::Vector3 & p300 = x[trpids[2]];
         const defaulttype::Vector3 & p030 = x[trpids[1]];

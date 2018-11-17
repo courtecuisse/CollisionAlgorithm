@@ -13,16 +13,19 @@ class EdgeGeometry : public PointGeometry {
 public:
     SOFA_CLASS(EdgeGeometry,BaseGeometry);
 
-    DataLink<core::topology::BaseMeshTopology> d_topology;
-
     EdgeGeometry()
-    : d_topology(initData(&d_topology, "topology", "this")) {}
+    : l_topology(initLink("topology", "Link to topology")) {
+        l_topology.setPath("@.");
+    }
 
     static ConstraintProximity::SPtr createProximity(const EdgeElement * elmt,double f1,double f2);
 
     virtual void prepareDetection();
 
     virtual void init();
+
+protected:
+    core::objectmodel::SingleLink<EdgeGeometry,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
 
 };
 

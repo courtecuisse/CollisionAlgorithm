@@ -5,7 +5,6 @@
 #include <sofa/simulation/AnimateBeginEvent.h>
 #include <sofa/core/objectmodel/BaseObject.h>
 #include <sofa/core/behavior/MechanicalState.h>
-#include <sofa/core/objectmodel/DataLink.h>
 #include <sofa/core/BehaviorModel.h>
 #include <memory>
 #include <map>
@@ -22,12 +21,14 @@ public:
 
     typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
 
-    DataLink<sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> > d_state;
+    
     Data<defaulttype::Vector4> d_color;
 
     BaseGeometry()
-    : d_state(initData(&d_state, "mstate", "this"))
-    , d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model")) {}
+    : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
+    , l_state(initLink("mstate", "link to state")) {
+        l_state.setPath("@.");
+    }
 
     void updatePosition(SReal ) {
         prepareDetection();
@@ -42,7 +43,7 @@ public:
     }
 
     virtual sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * getState() {
-        return d_state.get();
+        return l_state.get();
     }
 
     void draw(const core::visual::VisualParams *vparams) {
@@ -60,6 +61,8 @@ protected:
     std::vector<ConstraintElement::UPtr> m_elements;
 
     virtual void prepareDetection() {}
+
+    core::objectmodel::SingleLink<BaseGeometry,sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes>,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
 };
 
 }

@@ -8,13 +8,12 @@ namespace collisionAlgorithm {
 
 AABBDecorator::AABBDecorator()
 : d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox", "number of bbox"))
-, d_geometry(initData(&d_geometry, "geometry", "this"))
-, c_geometry(d_geometry) {
-    c_geometry.addCallback(this,&AABBDecorator::setDecorator);
+, l_geometry(initLink("geometry", "link to geometry")) {
+    l_geometry.setPath("@.");
 }
 
 void AABBDecorator::prepareDetection() {
-    const helper::ReadAccessor<DataVecCoord> & pos = d_geometry->getState()->read(core::VecCoordId::position());
+    const helper::ReadAccessor<DataVecCoord> & pos = l_geometry->getState()->read(core::VecCoordId::position());
     if (pos.empty()) return;
 
     m_Bmin = pos[0];
@@ -60,8 +59,8 @@ void AABBDecorator::prepareDetection() {
     m_Bmin -= m_cellSize * 0.5;
     m_Bmax -= m_cellSize * 0.5;
 
-    for (unsigned itE = 0; itE < d_geometry->getNbElements(); itE++) {
-        const ConstraintElement * elmt = d_geometry->getElement(itE);
+    for (unsigned itE = 0; itE < l_geometry->getNbElements(); itE++) {
+        const ConstraintElement * elmt = l_geometry->getElement(itE);
         if (elmt->getNbControlPoints() == 0) continue;
 
         defaulttype::Vector3 minbox = elmt->getControlPoint(0)->getPosition();

@@ -53,7 +53,7 @@ public :
 
     AABBElementIterator(const ConstraintElement *from,AABBDecorator * aabb) {
         m_aabb = aabb;
-        m_geo = aabb->d_geometry.get();
+        m_geo = aabb->l_geometry.get();
         efrom = from;
 
         defaulttype::Vector3 P = from->getControlPoint()->getPosition();
@@ -215,10 +215,12 @@ public:
 };
 
 void CollisionDetectionAlgorithm::processAlgorithm() {
+    std::cout << l_from->getName() << std::endl;
+
     m_pairDetection.clear();
 
 //    AABBDecorator * from = NULL;
-    AABBDecorator * dest = d_dest->getContext()->get<AABBDecorator>();
+    AABBDecorator * dest = l_dest->getContext()->get<AABBDecorator>();
 
 //    //first we search if there is a AABB connected to the geometry
 //    for (unsigned i=0;i<p_from->p_type.size();i++) {
@@ -226,9 +228,9 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
 //    }
 
     //we do the collision from first to second
-    for (unsigned i=0;i<d_from->getNbElements();i++) {
-        const ConstraintElement * elmt = d_from->getElement(i);
-        PairProximity pair = (dest == NULL) ? getClosestPoint(DefaultIterator(elmt, d_dest.get())) : getClosestPoint(AABBElementIterator(elmt, dest));
+    for (unsigned i=0;i<l_from->getNbElements();i++) {
+        const ConstraintElement * elmt = l_from->getElement(i);
+        PairProximity pair = (dest == NULL) ? getClosestPoint(DefaultIterator(elmt, l_dest.get())) : getClosestPoint(AABBElementIterator(elmt, dest));
 
         if (pair.first == NULL) continue;
         if (pair.second == NULL) continue;

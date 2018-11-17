@@ -11,13 +11,13 @@ namespace collisionAlgorithm {
 void PointGeometry::init() {
     m_elements.clear();
 
-    for (unsigned i=0;i<(unsigned) d_state->getSize();i++) {
+    for (unsigned i=0;i<(unsigned) l_state->getSize();i++) {
         m_elements.push_back(PointElement::createElement(this,i));
     }
 }
 
 void PointGeometry::prepareDetection() {
-    if (m_elements.size() != (unsigned) d_state->getSize()) init();
+    if (m_elements.size() != (unsigned) l_state->getSize()) init();
 }
 
 ConstraintProximity::SPtr PointGeometry::createProximity(const PointElement * elmt) {

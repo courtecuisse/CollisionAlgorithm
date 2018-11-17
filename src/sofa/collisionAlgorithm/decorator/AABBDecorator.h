@@ -13,9 +13,9 @@ class AABBDecorator : public core::BehaviorModel {
 public:
     typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
 
+    SOFA_CLASS(AABBDecorator, core::BehaviorModel);
+
     Data<defaulttype::Vec3i> d_nbox;
-    DataLink<BaseGeometry> d_geometry;
-    DataCallback c_geometry;
 
     AABBDecorator();
 
@@ -27,9 +27,9 @@ public:
         prepareDetection();
     }
 
-    void setDecorator() {
-        if (d_geometry != NULL) {
-            d_geometry->addSlave(this);
+    void init() {
+        if (l_geometry != NULL) {
+            l_geometry->addSlave(this);
             prepareDetection();
         }
     }
@@ -45,6 +45,8 @@ protected:
     defaulttype::Vec3i m_nbox;
     defaulttype::Vec2i m_offset;
     std::vector<std::set<unsigned> >  m_indexedElement;
+
+    core::objectmodel::SingleLink<AABBDecorator,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 };
 
 }

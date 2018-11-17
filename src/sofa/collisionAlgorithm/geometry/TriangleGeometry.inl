@@ -13,16 +13,16 @@ ConstraintProximity::SPtr TriangleGeometry::createProximity(const TriangleElemen
 }
 
 void TriangleGeometry::prepareDetection() {
-    if (m_elements.size() != d_topology->getNbTriangles()) init();
+    if (m_elements.size() != l_topology->getNbTriangles()) init();
 
     const helper::ReadAccessor<DataVecCoord> & pos = getState()->read(core::VecCoordId::position());
 
-    m_pointNormal.resize(d_topology->getNbPoints());
+    m_pointNormal.resize(l_topology->getNbPoints());
 
-    m_triangle_info.resize(d_topology->getNbTriangles());
+    m_triangle_info.resize(l_topology->getNbTriangles());
 
-    for (unsigned t=0;t<d_topology->getNbTriangles();t++) {
-        const core::topology::BaseMeshTopology::Triangle tri = d_topology->getTriangle(t);
+    for (unsigned t=0;t<l_topology->getNbTriangles();t++) {
+        const core::topology::BaseMeshTopology::Triangle tri = l_topology->getTriangle(t);
 
         //Compute Bezier Positions
         const defaulttype::Vector3 & p0 = pos[tri[0]];
@@ -50,7 +50,7 @@ void TriangleGeometry::prepareDetection() {
 
     m_pointNormal.resize(pos.size());
     for (unsigned p=0;p<pos.size();p++) {
-        const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = d_topology->getTrianglesAroundVertex(p);
+        const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = l_topology->getTrianglesAroundVertex(p);
         m_pointNormal[p] = defaulttype::Vector3(0,0,0);
         for (unsigned t=0;t<tav.size();t++) {
             m_pointNormal[p] += this->m_triangle_info[tav[t]].tn;
@@ -62,7 +62,7 @@ void TriangleGeometry::prepareDetection() {
 void TriangleGeometry::init() {
     m_elements.clear();
 
-    for (unsigned i=0;i<d_topology->getNbTriangles();i++) {
+    for (unsigned i=0;i<l_topology->getNbTriangles();i++) {
         m_elements.push_back(TriangleElement::createElement(this,i));
     }
 

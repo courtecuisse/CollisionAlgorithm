@@ -13,6 +13,7 @@ typedef helper::vector<PairProximity> PairProximityVector;
 
 class BaseCollisionAlgorithm : public core::collision::Pipeline {
 public :
+    SOFA_CLASS(BaseCollisionAlgorithm, core::collision::Pipeline);
 
     void draw(const core::visual::VisualParams * vparams) {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
