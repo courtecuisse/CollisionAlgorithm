@@ -215,8 +215,6 @@ public:
 };
 
 void CollisionDetectionAlgorithm::processAlgorithm() {
-    std::cout << l_from->getName() << std::endl;
-
     m_pairDetection.clear();
 
 //    AABBDecorator * from = NULL;
