@@ -85,8 +85,8 @@ void CollisionAlgorithm::PCAPointCloud(helper::vector<defaulttype::Vector3> & po
     }
 
 
-    defaulttype::Vector3 rX = e_vec[order[1]];
-    defaulttype::Vector3 rY = e_vec[order[2]];
+    defaulttype::Vector3 rX = e_vec[order[2]];
+    defaulttype::Vector3 rY = e_vec[order[1]];
     defaulttype::Vector3 rZ = defaulttype::cross(rX,rY);
 
     rX.normalize();
@@ -187,12 +187,12 @@ void CollisionAlgorithm::PCAPointCloud(helper::vector<defaulttype::Vector3> & po
 
     Eigen::Matrix3d Cov = Eigen::MatrixXd::Zero(3,3);
 
-    double norm=std::numeric_limits<double>::min();
-    unsigned pid_far=0;
+//    double norm=std::numeric_limits<double>::min();
+//    unsigned pid_far=0;
     for (unsigned k=0;k<pos.size();k++) {
         defaulttype::Vector3 P = pos[k] - C;
 
-        if (P.norm()>norm) pid_far=k;
+//        if (P.norm()>norm) pid_far=k;
 
         for (unsigned j=0;j<3;j++) {
             for (unsigned i=0;i<3;i++) {
@@ -225,20 +225,20 @@ void CollisionAlgorithm::PCAPointCloud(helper::vector<defaulttype::Vector3> & po
     }
 
 
-    defaulttype::Vector3 rX = e_vec[order[1]];
-    defaulttype::Vector3 rY = e_vec[order[2]];
+    defaulttype::Vector3 rX = e_vec[order[2]];
+    defaulttype::Vector3 rY = e_vec[order[1]];
     defaulttype::Vector3 rZ = defaulttype::cross(rX,rY);
 
     rX.normalize();
     rY.normalize();
     rZ.normalize();
 
-    defaulttype::Quat R;
-    R.fromFrame(rX,rY,rZ);
-    R.normalize();
-    if (dot(rX,R.rotate(pos[pid_far]-C))<0) rX*=-1.0;
-    if (dot(rY,R.rotate(pos[pid_far]-C))<0) rY*=-1.0;
-    rZ = defaulttype::cross(rX,rY);
+//    defaulttype::Quat R;
+//    R.fromFrame(rX,rY,rZ);
+//    R.normalize();
+//    if (dot(rX,R.rotate(pos[pid_far]-C))<0) rX*=-1.0;
+//    if (dot(rY,R.rotate(pos[pid_far]-C))<0) rY*=-1.0;
+//    rZ = defaulttype::cross(rX,rY);
 
     R1.fromFrame(rX,rY,rZ);
     R1.normalize();
