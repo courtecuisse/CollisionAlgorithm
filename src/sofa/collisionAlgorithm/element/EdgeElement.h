@@ -2,17 +2,23 @@
 
 #include <sofa/collisionAlgorithm/geometry/EdgeGeometry.h>
 
-namespace sofa {
+namespace sofa
+{
 
-namespace collisionAlgorithm {
+namespace collisionAlgorithm
+{
 
-class EdgeElement : public ConstraintElement {
+class EdgeElement : public ConstraintElement
+{
     friend class EdgeGeometry;
     friend class EdgeProximity;
 
 public:
 
-    EdgeElement(EdgeGeometry * geo,unsigned eid) : ConstraintElement(geo,2) {
+    EdgeElement(EdgeGeometry * geo,unsigned eid)
+        : ConstraintElement()
+        , m_geometry(geo)
+    {
         m_eid = eid;
 
         const std::vector<core::topology::BaseMeshTopology::Edge> & edges = geometry()->l_topology->getEdges();
@@ -21,18 +27,31 @@ public:
         m_pid[1] = edges[eid][1];
     }
 
-    static ConstraintElement::UPtr createElement(EdgeGeometry * geo,unsigned eid) {
-        return std::unique_ptr<EdgeElement>(new EdgeElement(geo,eid));
+    inline const EdgeGeometry* geometry() const override
+    {
+        return m_geometry;
     }
 
-    ConstraintProximity::SPtr getControlPoint(int cid) const {
+    static ConstraintElement::UPtr createElement(EdgeGeometry * geo,unsigned eid)
+    {
+        return EdgeElement::UPtr(new EdgeElement(geo,eid));
+    }
+
+    inline size_t getNbControlPoints() const override
+    {
+        return 2;
+    }
+
+    ConstraintProximity::SPtr getControlPoint(int cid) const override
+    {
         if (cid == 0) return EdgeGeometry::createProximity(this,1,0);
         else if (cid == 1) return EdgeGeometry::createProximity(this,0,1);
         return EdgeGeometry::createProximity(this,1.0/2.0,1.0/2.0);
     }
 
     //this function project the point P on the element and return the corresponding proximity
-    ConstraintProximity::SPtr project(defaulttype::Vector3 P) const {
+    ConstraintProximity::SPtr project(defaulttype::Vector3 P) const override
+    {
         double fact_u,fact_v;
 
         const helper::ReadAccessor<DataVecCoord> & pos = geometry()->getState()->read(core::VecCoordId::position());
@@ -51,11 +70,8 @@ public:
         return EdgeGeometry::createProximity(this,fact_u,fact_v);
     }
 
-    EdgeGeometry * geometry() const {
-        return (EdgeGeometry * )m_geometry;
-    }
-
-    void draw(const core::visual::VisualParams * /*vparams*/) const {
+    void draw(const core::visual::VisualParams * /*vparams*/) const
+    {
         glColor4dv(geometry()->d_color.getValue().data());
 
         glBegin(GL_LINES);
@@ -65,6 +81,7 @@ public:
     }
 
 protected:
+    const EdgeGeometry* m_geometry;
     unsigned m_pid[2];
     unsigned m_eid;
 };

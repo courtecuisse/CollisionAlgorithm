@@ -4,25 +4,34 @@
 #include <sofa/collisionAlgorithm/element/TriangleElement.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 
-namespace sofa {
+namespace sofa
+{
 
-namespace collisionAlgorithm {
+namespace collisionAlgorithm
+{
 
-class BezierTriangleElement : public TriangleElement {
+class BezierTriangleElement : public TriangleElement
+{
     friend class BezierTriangleProximity;
 public:
 
-    BezierTriangleElement(BezierTriangleGeometry * geo, unsigned eid) : TriangleElement(geo,eid) {}
+    BezierTriangleElement(BezierTriangleGeometry * geo, unsigned eid)
+        : TriangleElement(geo,eid)
+        , m_bezierGeometry(geo)
+    {}
 
-    ConstraintProximity::SPtr project(defaulttype::Vector3 P) const {
+    ConstraintProximity::SPtr project(defaulttype::Vector3 P) const override
+    {
         return geometry()->newtonProject(this,P);
     }
 
-    inline BezierTriangleGeometry * geometry() const {
-        return (BezierTriangleGeometry*) m_geometry;
+    inline const BezierTriangleGeometry* geometry() const override
+    {
+        return m_bezierGeometry;
     }
 
-    void tesselate(const core::visual::VisualParams * vparams, unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C) const {
+    void tesselate(const core::visual::VisualParams * vparams, unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C) const
+    {
         if (level >= geometry()->d_draw_tesselation.getValue()) {
 
             defaulttype::Vector3 pA = BezierTriangleGeometry::createProximity(this,bary_A[0],bary_A[1],bary_A[2])->getPosition();
@@ -50,9 +59,13 @@ public:
         tesselate(vparams,level+1,tid,bary_A,bary_G,bary_E);
     }
 
-    virtual void draw(const core::visual::VisualParams *vparams) const {
+    virtual void draw(const core::visual::VisualParams *vparams) const override
+    {
         tesselate(vparams,0,m_eid,defaulttype::Vector3(1,0,0),defaulttype::Vector3(0,1,0),defaulttype::Vector3(0,0,1));
     }
+
+private:
+    const BezierTriangleGeometry* m_bezierGeometry;
 };
 
 }

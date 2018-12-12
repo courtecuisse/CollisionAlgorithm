@@ -12,11 +12,13 @@ template<class ElementIterator>
 PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_element) {
     PairProximity min_pair;
     double min_dist = std::numeric_limits<double>::max();
-    min_pair.first = NULL;
-    min_pair.second = NULL;
+    min_pair.first = nullptr;
+    min_pair.second = nullptr;
 
     ConstraintProximity::SPtr pfrom = it_element.efrom->getControlPoint(); //centered control point
-    if (pfrom == NULL) return min_pair;
+    if (pfrom == nullptr)
+        return min_pair;
+
     defaulttype::Vector3 P = pfrom->getPosition();
 
     for (unsigned i=0;i<it_element.size();i++) {
@@ -66,9 +68,15 @@ public :
 
         //project the box in the bounding box of the object
         //search with the closest box in bbox
-        for (int i=0;i<3;i++) {
-            if (cbox[i] < 0) cbox[i] = 0;
-            else if (cbox[i] > m_aabb->m_nbox[i]) cbox[i] = m_aabb->m_nbox[i];
+        for (int i=0;i<3;i++)
+        {
+            if (cbox[i] < 0)
+                cbox[i] = 0;
+            else
+            {
+                if (cbox[i] > m_aabb->m_nbox[i])
+                    cbox[i] = m_aabb->m_nbox[i];
+            }
         }
 
         int d = 0;

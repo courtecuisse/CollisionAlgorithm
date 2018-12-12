@@ -21,9 +21,10 @@ public:
     , l_dest(initLink("dest", "Link to dest geometry"))
     {}
 
-    void processAlgorithm();
+    void processAlgorithm() override;
 
-    void getState(std::set<sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes>* > & list_state) {
+    void getState(std::set<sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes>* > & list_state) override
+    {
         list_state.insert(l_from->getState());
         list_state.insert(l_dest->getState());
     }

@@ -19,17 +19,20 @@ ConstraintProximity::SPtr BezierTriangleGeometry::createProximity(const BezierTr
     return std::shared_ptr<BezierTriangleProximity>(new BezierTriangleProximity(elmt, f1, f2, f3));
 }
 
-void BezierTriangleGeometry::createElements() {
+void BezierTriangleGeometry::createElements()
+{
     m_elements.clear();
 
-    for (unsigned i=0;i<l_topology->getNbTriangles();i++) {
+    for (unsigned i=0;i<l_topology->getNbTriangles();i++)
+    {
         m_elements.push_back(BezierTriangleElement::createElement(this,i));
     }
 
     prepareDetection();
 }
 
-void BezierTriangleGeometry::prepareDetection() {
+void BezierTriangleGeometry::prepareDetection()
+{
     Inherit::prepareDetection();
 
     const helper::ReadAccessor<DataVecCoord> & x = l_state->read(core::VecCoordId::position());
@@ -82,7 +85,8 @@ void BezierTriangleGeometry::prepareDetection() {
     }
 }
 
-ConstraintProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTriangleElement *elmt, defaulttype::Vector3 P) {
+ConstraintProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTriangleElement *elmt, defaulttype::Vector3 P) const
+{
     //initialize the algorithm xith the projection on a linear triangle
 
     TriangleProximity * linear_prox = reinterpret_cast<TriangleProximity*>(elmt->TriangleElement::project(P).get());
@@ -102,8 +106,9 @@ ConstraintProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTria
 
     BezierTriangleProximity pinfo(elmt,fact[0],fact[1],fact[2]);
 
-    while(it< max_it) {
-        defaulttype::Vector3 Q = pinfo.getPosition();
+    while(it< max_it)
+    {
+        defaulttype::Vector3 Q = pinfo.getPosition(core::VecCoordId::position());
 
         defaulttype::Vector3 nQP = P - Q;
         if (nQP.norm() < tolerance) break;
@@ -132,7 +137,7 @@ ConstraintProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTria
         double P_v_fact1 = pinfo.m_fact[1];
         double P_v_fact2 = pinfo.m_fact[2] - delta * fact_v;
         BezierTriangleProximity P_v(elmt,P_v_fact0,P_v_fact1,P_v_fact2);
-        defaulttype::Vector3 p_v = (P - P_v.getPosition()).normalized();
+        defaulttype::Vector3 p_v = (P - P_v.getPosition(core::VecCoordId::position())).normalized();
         defaulttype::Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
 
         //variation point along u
@@ -140,7 +145,7 @@ ConstraintProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTria
         double P_u_fact1 = pinfo.m_fact[1] + delta * fact_u;
         double P_u_fact2 = pinfo.m_fact[2] - delta * fact_u;
         BezierTriangleProximity P_u(elmt,P_u_fact0,P_u_fact1,P_u_fact2);
-        defaulttype::Vector3 p_u = (P - P_u.getPosition()).normalized();
+        defaulttype::Vector3 p_u = (P - P_u.getPosition(core::VecCoordId::position())).normalized();
         defaulttype::Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
 
         if (P_v.m_fact[0] < 0 || P_v.m_fact[1] < 0 || P_v.m_fact[2] < 0) break;
@@ -181,7 +186,7 @@ ConstraintProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTria
 
         if (P_a.m_fact[0] < 0 || P_a.m_fact[1] < 0 || P_a.m_fact[2] < 0) break;
 
-        defaulttype::Vector3 QA = P_a.getPosition();
+        defaulttype::Vector3 QA = P_a.getPosition(core::VecCoordId::position());
 
         double fact;
         if (fabs(dot(nQP,N1))>0.8) {

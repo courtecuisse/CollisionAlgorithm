@@ -15,12 +15,12 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-class BaseGeometry : public core::BehaviorModel {
+class BaseGeometry : public core::BehaviorModel
+{
 public:
     SOFA_CLASS(BaseGeometry,core::objectmodel::BaseObject);
 
     typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
-
     
     Data<defaulttype::Vector4> d_color;
 
@@ -30,29 +30,37 @@ public:
         l_state.setPath("@.");
     }
 
-    void updatePosition(SReal ) {
+    void updatePosition(SReal ) override
+    {
         prepareDetection();
     }
 
-    unsigned getNbElements() {
-        return (unsigned) m_elements.size();
+    std::size_t getNbElements()
+    {
+        return m_elements.size();
     }
 
-    const ConstraintElement * getElement(unsigned i) {
+    const ConstraintElement* getElement(unsigned i)
+    {
         return m_elements[i].get();
     }
 
-    virtual sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * getState() {
+    virtual sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * getState() const
+    {
         return l_state.get();
     }
 
-    void draw(const core::visual::VisualParams *vparams) {
-        if (! vparams->displayFlags().getShowCollisionModels()) return;
-        if (d_color.getValue()[3] == 0.0) return;
+    void draw(const core::visual::VisualParams *vparams) override
+    {
+        if (! vparams->displayFlags().getShowCollisionModels())
+            return;
+        if (d_color.getValue()[3] == 0.0)
+            return;
 
         glDisable(GL_LIGHTING);
 
-        for(unsigned i=0;i<m_elements.size();i++) {
+        for(unsigned i=0;i<m_elements.size();i++)
+        {
             m_elements[i]->draw(vparams);
         }
     }

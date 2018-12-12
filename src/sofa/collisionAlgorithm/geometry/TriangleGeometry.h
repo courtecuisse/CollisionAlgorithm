@@ -16,9 +16,9 @@ class TriangleGeometry : public EdgeGeometry {
 public:
     SOFA_CLASS(TriangleGeometry,EdgeGeometry);
 
-    virtual void init();
+    virtual void init() override;
 
-    virtual void prepareDetection();
+    virtual void prepareDetection() override;
 
     static ConstraintProximity::SPtr createProximity(const TriangleElement * elmt,double f1,double f2,double f3);
 

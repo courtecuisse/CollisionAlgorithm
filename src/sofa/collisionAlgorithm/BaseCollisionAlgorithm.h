@@ -15,7 +15,8 @@ class BaseCollisionAlgorithm : public core::collision::Pipeline {
 public :
     SOFA_CLASS(BaseCollisionAlgorithm, core::collision::Pipeline);
 
-    void draw(const core::visual::VisualParams * vparams) {
+    void draw(const core::visual::VisualParams * vparams) override
+    {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
         glDisable(GL_LIGHTING);
 
@@ -28,15 +29,17 @@ public :
         glEnd();
     }
 
-    virtual void reset() {}
+    virtual void reset() override {}
 
-    virtual void computeCollisionReset() {
+    virtual void computeCollisionReset() override
+    {
         m_pairDetection.clear();
     }
 
-    virtual void computeCollisionResponse() {}
+    virtual void computeCollisionResponse() override {}
 
-    void computeCollisionDetection() {
+    void computeCollisionDetection() override
+    {
         processAlgorithm();
     }
 
@@ -46,21 +49,25 @@ public :
 
     virtual void getState(std::set<sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes>* > & list_state) = 0;
 
-    virtual std::set< std::string > getResponseList() const {
+    virtual std::set< std::string > getResponseList() const override
+    {
         std::set< std::string > res;
         return res;
     }
 
 protected:
-    virtual void doCollisionReset() {
+    virtual void doCollisionReset() override
+    {
 //         m_pairDetection.clear();
     }
 
-    virtual void doCollisionDetection(const sofa::helper::vector<core::CollisionModel*>& /*collisionModels*/) {
+    virtual void doCollisionDetection(const sofa::helper::vector<core::CollisionModel*>& /*collisionModels*/) override
+    {
 
     }
 
-    virtual void doCollisionResponse() {
+    virtual void doCollisionResponse() override
+    {
 
     }
 

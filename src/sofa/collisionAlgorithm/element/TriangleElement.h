@@ -1,17 +1,24 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
+#include <sofa/collisionAlgorithm/element/TriangleElement.h>
 
-namespace sofa {
+namespace sofa
+{
 
-namespace collisionAlgorithm {
+namespace collisionAlgorithm
+{
 
-class TriangleElement : public ConstraintElement {
+class TriangleElement : public ConstraintElement
+{
     friend class TriangleProximity;
     friend class TriangleGeometry;
 
 public:
-    TriangleElement(TriangleGeometry * geo,unsigned eid) : ConstraintElement(geo,3) {
+    TriangleElement(TriangleGeometry * geo,unsigned eid)
+        : ConstraintElement()
+        , m_geometry(geo)
+    {
         m_eid = eid;
 
         const std::vector<core::topology::BaseMeshTopology::Triangle> & triangles = geometry()->l_topology->getTriangles();
@@ -21,11 +28,18 @@ public:
         m_pid[2] = triangles[eid][2];
     }
 
-    static ConstraintElement::UPtr createElement(TriangleGeometry * geo,unsigned eid) {
+    static ConstraintElement::UPtr createElement(TriangleGeometry * geo,unsigned eid)
+    {
         return std::unique_ptr<TriangleElement>(new TriangleElement(geo,eid));
     }
 
-    ConstraintProximity::SPtr getControlPoint(int cid) const {
+    inline size_t getNbControlPoints() const override
+    {
+        return 3;
+    }
+
+    ConstraintProximity::SPtr getControlPoint(int cid) const override
+    {
         if (cid == 0) return TriangleGeometry::createProximity(this,1,0,0);
         else if (cid == 1) return TriangleGeometry::createProximity(this,0,1,0);
         else if (cid == 2) return TriangleGeometry::createProximity(this,0,0,1);
@@ -47,7 +61,8 @@ public:
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 
-    ConstraintProximity::SPtr project(defaulttype::Vector3 P) const {
+    ConstraintProximity::SPtr project(defaulttype::Vector3 P) const override
+    {
         const helper::ReadAccessor<DataVecCoord> & pos = geometry()->getState()->read(core::VecCoordId::position());
 
         defaulttype::Vector3 P0 = pos[m_pid[0]];
@@ -105,11 +120,13 @@ public:
         return TriangleGeometry::createProximity(this,fact_u,fact_v,fact_w);
     }
 
-    inline TriangleGeometry * geometry() const {
-        return (TriangleGeometry*) m_geometry;
+    inline const TriangleGeometry * geometry() const override
+    {
+        return m_geometry;
     }
 
-    void drawTriangle(const core::visual::VisualParams * /*vparams*/,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C) const {
+    void drawTriangle(const core::visual::VisualParams * /*vparams*/,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C) const
+    {
         double delta = 0.1;
         defaulttype::Vector4 color = geometry()->d_color.getValue();
 
@@ -123,13 +140,15 @@ public:
         glEnd();
     }
 
-    virtual void draw(const core::visual::VisualParams *vparams) const {
+    virtual void draw(const core::visual::VisualParams *vparams) const override
+    {
         drawTriangle(vparams,getControlPoint(0)->getPosition(),
                              getControlPoint(1)->getPosition(),
                              getControlPoint(2)->getPosition());
     }
 
 protected:
+    const TriangleGeometry* m_geometry;
     unsigned m_pid[3];
     unsigned m_eid;
 };

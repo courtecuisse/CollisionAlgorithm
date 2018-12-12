@@ -1,16 +1,23 @@
 #pragma once
 
-#include <geometry/IntersectionContourGeometry.h>
+#include <sofa/collisionAlgorithm/geometry/IntersectionContourGeometry.h>
+#include <sofa/collisionAlgorithm/element/IntersectionContourElement.h>
 
-namespace sofa {
+namespace sofa
+{
 
-namespace collisionAlgorithm {
+namespace collisionAlgorithm
+{
 
-class IntersectionContourProximity : public ConstraintProximity {
+class IntersectionContourProximity : public ConstraintProximity
+{
 public :
-    IntersectionContourProximity(const IntersectionContourElement * elmt) : ConstraintProximity(elmt) {}
+    IntersectionContourProximity(const IntersectionContourElement * elmt)
+        : ConstraintProximity(elmt)
+    {}
 
-    defaulttype::Vector3 getPosition(core::VecCoordId v) const {
+    defaulttype::Vector3 getPosition(core::VecCoordId v) const
+    {
         const helper::ReadAccessor<Data<helper::vector<defaulttype::Vector3> > > & pos = m_state->read(v);
 
         defaulttype::Vector3 P = pos[element()->m_pid[0]] * element()->m_fact[0];
@@ -19,7 +26,8 @@ public :
         return (P+Q);
     }
 
-    defaulttype::Vector3 getNormal() const {
+    defaulttype::Vector3 getNormal() const
+    {
         return element()->geometry()->m_pointNormal[element()->m_pid[0]] * element()->m_fact[0] +
                element()->geometry()->m_pointNormal[element()->m_pid[1]] * element()->m_fact[1];
     }
@@ -33,9 +41,12 @@ public :
         return res;
     }
 
-    inline IntersectionContourElement * element() const {
-        return (IntersectionContourElement*) m_element;
+    inline const IntersectionContourElement * element() const {
+        return m_element;
     }
+
+private:
+    const IntersectionContourElement* m_element;
 };
 
 }
