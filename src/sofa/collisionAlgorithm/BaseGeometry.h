@@ -26,7 +26,8 @@ public:
 
     BaseGeometry()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , l_state(initLink("mstate", "link to state")) {
+    , l_state(initLink("mstate", "link to state"))
+    {
         l_state.setPath("@.");
     }
 

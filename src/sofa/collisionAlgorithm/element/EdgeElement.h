@@ -44,9 +44,12 @@ public:
 
     ConstraintProximity::SPtr getControlPoint(int cid) const override
     {
-        if (cid == 0) return EdgeGeometry::createProximity(this,1,0);
-        else if (cid == 1) return EdgeGeometry::createProximity(this,0,1);
-        return EdgeGeometry::createProximity(this,1.0/2.0,1.0/2.0);
+        if (cid == 0)
+            return m_geometry->createProximity(this,1,0);
+        else if (cid == 1)
+            return m_geometry->createProximity(this,0,1);
+
+        return m_geometry->createProximity(this,1.0/2.0,1.0/2.0);
     }
 
     //this function project the point P on the element and return the corresponding proximity
@@ -67,7 +70,7 @@ public:
 
         fact_u = 1.0-fact_v;
 
-        return EdgeGeometry::createProximity(this,fact_u,fact_v);
+        return m_geometry->createProximity(this,fact_u,fact_v);
     }
 
     void draw(const core::visual::VisualParams * /*vparams*/) const

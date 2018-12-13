@@ -19,7 +19,7 @@ public:
         l_topology.setPath("@.");
     }
 
-    static ConstraintProximity::SPtr createProximity(const EdgeElement * elmt,double f1,double f2);
+    ConstraintProximity::SPtr createProximity(const EdgeElement * elmt,double f1,double f2) const;
 
     virtual void prepareDetection() override;
 

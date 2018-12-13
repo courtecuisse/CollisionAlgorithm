@@ -15,7 +15,8 @@ BezierTriangleGeometry::BezierTriangleGeometry()
 , d_draw_tesselation(initData(&d_draw_tesselation,(unsigned) 0.0, "tesselation", "Number of tesselation"))
 {}
 
-ConstraintProximity::SPtr BezierTriangleGeometry::createProximity(const BezierTriangleElement * elmt, double f1, double f2, double f3) {
+ConstraintProximity::SPtr BezierTriangleGeometry::createProximity(const BezierTriangleElement * elmt, double f1, double f2, double f3) const
+{
     return std::shared_ptr<BezierTriangleProximity>(new BezierTriangleProximity(elmt, f1, f2, f3));
 }
 
@@ -38,7 +39,8 @@ void BezierTriangleGeometry::prepareDetection()
     const helper::ReadAccessor<DataVecCoord> & x = l_state->read(core::VecCoordId::position());
 
     m_beziertriangle_info.resize(l_topology->getNbTriangles());
-    for (unsigned t=0;t<(unsigned) l_topology->getNbTriangles();t++) {
+    for (size_t t=0;t< l_topology->getNbTriangles();t++)
+    {
         BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[t];
         const core::topology::BaseMeshTopology::Triangle trpids = l_topology->getTriangle(t);
 

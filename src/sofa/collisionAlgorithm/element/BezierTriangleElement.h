@@ -34,9 +34,9 @@ public:
     {
         if (level >= geometry()->d_draw_tesselation.getValue()) {
 
-            defaulttype::Vector3 pA = BezierTriangleGeometry::createProximity(this,bary_A[0],bary_A[1],bary_A[2])->getPosition();
-            defaulttype::Vector3 pB = BezierTriangleGeometry::createProximity(this,bary_B[0],bary_B[1],bary_B[2])->getPosition();
-            defaulttype::Vector3 pC = BezierTriangleGeometry::createProximity(this,bary_C[0],bary_C[1],bary_C[2])->getPosition();
+            defaulttype::Vector3 pA = m_geometry->createProximity(this,bary_A[0],bary_A[1],bary_A[2])->getPosition();
+            defaulttype::Vector3 pB = m_geometry->createProximity(this,bary_B[0],bary_B[1],bary_B[2])->getPosition();
+            defaulttype::Vector3 pC = m_geometry->createProximity(this,bary_C[0],bary_C[1],bary_C[2])->getPosition();
 
             drawTriangle(vparams,pA,pB,pC);
 

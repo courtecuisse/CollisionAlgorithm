@@ -10,7 +10,7 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-ConstraintProximity::SPtr EdgeGeometry::createProximity(const EdgeElement * elmt,double f1,double f2)
+ConstraintProximity::SPtr EdgeGeometry::createProximity(const EdgeElement * elmt,double f1,double f2) const
 {
     return std::shared_ptr<EdgeProximity>(new EdgeProximity(elmt, f1, f2));
 }

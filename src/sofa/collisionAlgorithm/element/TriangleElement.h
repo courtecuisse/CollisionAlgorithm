@@ -18,6 +18,7 @@ public:
     TriangleElement(TriangleGeometry * geo,unsigned eid)
         : ConstraintElement()
         , m_geometry(geo)
+        , phongInterpolation(geo->d_phongInterpolation.getValue())
     {
         m_eid = eid;
 
@@ -40,14 +41,19 @@ public:
 
     ConstraintProximity::SPtr getControlPoint(int cid) const override
     {
-        if (cid == 0) return TriangleGeometry::createProximity(this,1,0,0);
-        else if (cid == 1) return TriangleGeometry::createProximity(this,0,1,0);
-        else if (cid == 2) return TriangleGeometry::createProximity(this,0,0,1);
-        return TriangleGeometry::createProximity(this,1.0/3.0,1.0/3.0,1.0/3.0);
+        if (cid == 0)
+            return m_geometry->createProximity(this,1,0,0, phongInterpolation);
+        else if (cid == 1)
+            return m_geometry->createProximity(this,0,1,0, phongInterpolation);
+        else if (cid == 2)
+            return m_geometry->createProximity(this,0,0,1, phongInterpolation);
+
+        return m_geometry->createProximity(this,1.0/3.0,1.0/3.0,1.0/3.0, phongInterpolation);
     }
 
     //proj_P must be on the plane
-    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleGeometry::TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const {
+    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleGeometry::TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const
+    {
         defaulttype::Vector3 v2 = proj_P - p0;
 
         double d20 = dot(v2,tinfo.v0);
@@ -82,7 +88,8 @@ public:
 
         computeBaryCoords(proj_P, tinfo, P0, fact_u,fact_v,fact_w);
 
-        if (fact_u<0) {
+        if (fact_u<0)
+        {
             defaulttype::Vector3 v3 = P1 - P2;
             defaulttype::Vector3 v4 = proj_P - P2;
             double alpha = dot(v4,v3) / dot(v3,v3);
@@ -93,7 +100,9 @@ public:
             fact_u = 0;
             fact_v = alpha;
             fact_w = 1.0 - alpha;
-        } else if (fact_v<0) {
+        }
+        else if (fact_v<0)
+        {
             defaulttype::Vector3 v3 = P0 - P2;
             defaulttype::Vector3 v4 = proj_P - P2;
             double alpha = dot(v4,v3) / dot(v3,v3);
@@ -104,7 +113,9 @@ public:
             fact_u = alpha;
             fact_v = 0;
             fact_w = 1.0 - alpha;
-        } else if (fact_w<0) {
+        }
+        else if (fact_w<0)
+        {
             defaulttype::Vector3 v3 = P1 - P0;
             defaulttype::Vector3 v4 = proj_P - P0;
             double alpha = dot(v4,v3) / dot(v3,v3);
@@ -117,7 +128,7 @@ public:
             fact_w = 0;
         }
 
-        return TriangleGeometry::createProximity(this,fact_u,fact_v,fact_w);
+        return m_geometry->createProximity(this,fact_u,fact_v,fact_w, phongInterpolation);
     }
 
     inline const TriangleGeometry * geometry() const override
@@ -151,6 +162,7 @@ protected:
     const TriangleGeometry* m_geometry;
     unsigned m_pid[3];
     unsigned m_eid;
+    const bool phongInterpolation;
 };
 
 }

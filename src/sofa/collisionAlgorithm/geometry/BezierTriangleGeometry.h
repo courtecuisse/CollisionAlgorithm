@@ -25,11 +25,11 @@ public:
 
     BezierTriangleGeometry();
 
-    virtual void prepareDetection();
+    virtual void prepareDetection() override;
 
     void createElements();
 
-    static ConstraintProximity::SPtr createProximity(const BezierTriangleElement * elmt, double f1, double f2, double f3);
+    ConstraintProximity::SPtr createProximity(const BezierTriangleElement * elmt, double f1, double f2, double f3) const;
 
 protected:
     ConstraintProximity::SPtr newtonProject(const BezierTriangleElement *elmt, defaulttype::Vector3 P) const;

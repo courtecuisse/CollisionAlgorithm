@@ -38,7 +38,7 @@ public:
 
     ConstraintProximity::SPtr getControlPoint(int /*i*/) const override
     {
-        return PointGeometry::createProximity(this);
+        return m_geometry->createProximity(this);
     }
 
     //this function project the point P on the element and return the corresponding proximity
