@@ -4,16 +4,20 @@
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/core/collision/Pipeline.h>
 
-namespace sofa {
+namespace sofa
+{
 
-namespace collisionAlgorithm {
+namespace collisionAlgorithm
+{
 
 typedef std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr> PairProximity;
 typedef helper::vector<PairProximity> PairProximityVector;
+typedef helper::vector<ConstraintProximity::SPtr> ProximityVector;
 
-class BaseCollisionAlgorithm : public core::collision::Pipeline {
+class BaseCollisionAlgorithm : public core::collision::Pipeline
+{
 public :
-    SOFA_CLASS(BaseCollisionAlgorithm, core::collision::Pipeline);
+    SOFA_ABSTRACT_CLASS(BaseCollisionAlgorithm, core::collision::Pipeline);
 
     void draw(const core::visual::VisualParams * vparams) override
     {
@@ -22,7 +26,8 @@ public :
 
         glColor4f(0,1,0,1);
         glBegin(GL_LINES);
-        for (unsigned i=0;i<m_pairDetection.size();i++) {
+        for (unsigned i=0;i<m_pairDetection.size();i++)
+        {
             glVertex3dv(m_pairDetection[i].first->getPosition().data());
             glVertex3dv(m_pairDetection[i].second->getPosition().data());
         }
@@ -43,7 +48,8 @@ public :
         processAlgorithm();
     }
 
-    PairProximityVector & getCollisionPairs() {
+    PairProximityVector& getCollisionPairs()
+    {
         return m_pairDetection;
     }
 

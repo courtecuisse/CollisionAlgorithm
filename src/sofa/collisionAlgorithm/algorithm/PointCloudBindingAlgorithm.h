@@ -1,30 +1,43 @@
-//#ifndef SOFA_COMPONENT_CONSTRAINT_BINDPOINTNALGORITHM_H
-//#define SOFA_COMPONENT_CONSTRAINT_BINDPOINTNALGORITHM_H
+#pragma once
 
-//#include "CollisionAlgorithm.h"
-//#include "ConstraintProximity.h"
-//#include "geometry/PointGeometry.h"
-//#include <sofa/defaulttype/SolidTypes.h>
-//#include <sofa/core/behavior/BaseController.h>
-//#include <sofa/core/behavior/MechanicalState.h>
-//#include <math.h>
-//#include <sofa/defaulttype/Vec.h>
+#include <sofa/collisionAlgorithm/BaseCollisionAlgorithm.h>
+#include <sofa/collisionAlgorithm/decorator/AABBDecorator.h>
 
-//namespace sofa {
+namespace sofa
+{
 
-//namespace core {
+namespace collisionAlgorithm
+{
 
-//namespace behavior {
+class PointCloudBindingAlgorithm : public BaseCollisionAlgorithm
+{
+public:
+    typedef sofa::defaulttype::Vector3 Vector3;
+    SOFA_CLASS(PointCloudBindingAlgorithm, BaseCollisionAlgorithm);
 
-//class PointCloudBindingAlgorithm : public CollisionAlgorithm {
-//public:
+    Data<double> d_maxDist;
 
-//    SOFA_CLASS(PointCloudBindingAlgorithm , CollisionAlgorithm );
+    PointCloudBindingAlgorithm();
 
-//    Data<double> d_maxDist;
+    void processAlgorithm() override;
 
-//    PointCloudBindingAlgorithm();
+    void getState(std::set<sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes>* > & list_state) override
+    {
+        list_state.insert(l_from->getState());
+        list_state.insert(l_dest->getState());
+    }
 
+private:
+    template<class ElementIterator>
+    PairProximity getClosestPoint(ElementIterator geo);
+
+    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
+    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
+};
+
+}
+
+}
 //    void init();
 
 //    PariProximityVector processAlgorithm(BaseGeometry * from,BaseGeometry * dest);

@@ -3,11 +3,14 @@
 #include <sofa/collisionAlgorithm/BaseCollisionAlgorithm.h>
 #include <sofa/collisionAlgorithm/decorator/AABBDecorator.h>
 
-namespace sofa {
+namespace sofa
+{
 
-namespace collisionAlgorithm {
+namespace collisionAlgorithm
+{
 
-class CollisionDetectionAlgorithm : public BaseCollisionAlgorithm {
+class CollisionDetectionAlgorithm : public BaseCollisionAlgorithm
+{
 public:
     SOFA_CLASS(CollisionDetectionAlgorithm, BaseCollisionAlgorithm);
 
@@ -32,7 +35,6 @@ public:
 private:
     template<class ElementIterator>
     PairProximity getClosestPoint(ElementIterator geo);
-
 
     core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
     core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;

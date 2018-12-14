@@ -41,7 +41,7 @@ public:
         return m_elements.size();
     }
 
-    const ConstraintElement* getElement(unsigned i)
+    const ConstraintElement* getElement(size_t i)
     {
         return m_elements[i].get();
     }

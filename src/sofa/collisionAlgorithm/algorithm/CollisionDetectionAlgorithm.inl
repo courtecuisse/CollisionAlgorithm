@@ -4,12 +4,15 @@
 #include <sofa/collisionAlgorithm/decorator/AABBDecorator.h>
 #include <limits>
 
-namespace sofa {
+namespace sofa
+{
 
-namespace collisionAlgorithm {
+namespace collisionAlgorithm
+{
 
 template<class ElementIterator>
-PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_element) {
+PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_element)
+{
     PairProximity min_pair;
     double min_dist = std::numeric_limits<double>::max();
     min_pair.first = nullptr;
@@ -21,7 +24,8 @@ PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_el
 
     defaulttype::Vector3 P = pfrom->getPosition();
 
-    for (unsigned i=0;i<it_element.size();i++) {
+    for (unsigned i=0;i<it_element.size();i++)
+    {
         const ConstraintElement * edest = it_element.element(i);
         ConstraintProximity::SPtr pdest = edest->project(P);
 
@@ -37,10 +41,13 @@ PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_el
         defaulttype::Vector3 N = pfrom->getPosition() - pdest->getPosition();
         double dist = N.norm();
 
-        if (dist > d_minDist.getValue()) continue;
-        if (dot(pfrom->getNormal(),pdest->getNormal()) > -d_minAngle.getValue()) continue;
+        if (dist > d_minDist.getValue())
+            continue;
+        if (dot(pfrom->getNormal(),pdest->getNormal()) > -d_minAngle.getValue())
+            continue;
 
-        if (dist<min_dist) {
+        if (dist<min_dist)
+        {
             min_dist = dist;
             min_pair.first = pfrom;
             min_pair.second = pdest;
@@ -50,10 +57,12 @@ PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_el
     return min_pair;
 }
 
-class AABBElementIterator {
+class AABBElementIterator
+{
 public :
 
-    AABBElementIterator(const ConstraintElement *from,AABBDecorator * aabb) {
+    AABBElementIterator(const ConstraintElement *from,AABBDecorator * aabb)
+    {
         m_aabb = aabb;
         m_geo = aabb->l_geometry.get();
         efrom = from;
@@ -68,7 +77,7 @@ public :
 
         //project the box in the bounding box of the object
         //search with the closest box in bbox
-        for (int i=0;i<3;i++)
+        for (unsigned int i=0;i<3;i++)
         {
             if (cbox[i] < 0)
                 cbox[i] = 0;
@@ -91,7 +100,8 @@ public :
         for (std::set<int>::iterator it = selectElements.begin();it != selectElements.end(); it++) m_selectElements.push_back(*it);
     }
 
-    void fillElementSet(defaulttype::Vec3i cbox, int d, std::set<int> & selectElements) {
+    void fillElementSet(defaulttype::Vec3i cbox, int d, std::set<int> & selectElements)
+    {
         {
             int i=-d;
             if (cbox[0]+i >= 0 && cbox[0]+i < m_aabb->m_nbox[0]) {
@@ -189,11 +199,13 @@ public :
         }
     }
 
-    unsigned size() {
-        return (unsigned) m_selectElements.size();
+    size_t size()
+    {
+        return m_selectElements.size();
     }
 
-    inline const ConstraintElement * element(unsigned i) {
+    inline const ConstraintElement * element(unsigned i)
+    {
         return m_geo->getElement(m_selectElements[i]);
     }
 
@@ -210,7 +222,7 @@ public:
         m_geo = geo;
     }
 
-    unsigned size() {
+    size_t size() {
         return m_geo->getNbElements();
     }
 
@@ -234,12 +246,15 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
 //    }
 
     //we do the collision from first to second
-    for (unsigned i=0;i<l_from->getNbElements();i++) {
+    for (unsigned i=0;i<l_from->getNbElements();i++)
+    {
         const ConstraintElement * elmt = l_from->getElement(i);
-        PairProximity pair = (dest == NULL) ? getClosestPoint(DefaultIterator(elmt, l_dest.get())) : getClosestPoint(AABBElementIterator(elmt, dest));
+        PairProximity pair = (dest == nullptr) ? getClosestPoint(DefaultIterator(elmt, l_dest.get())) : getClosestPoint(AABBElementIterator(elmt, dest));
 
-        if (pair.first == NULL) continue;
-        if (pair.second == NULL) continue;
+        if (pair.first == nullptr)
+            continue;
+        if (pair.second == nullptr)
+            continue;
 
         m_pairDetection.push_back(PairProximity(pair.first,pair.second));
     }

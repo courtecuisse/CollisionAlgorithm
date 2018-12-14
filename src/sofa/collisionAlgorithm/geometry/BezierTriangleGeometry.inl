@@ -4,9 +4,11 @@
 #include <sofa/collisionAlgorithm/element/BezierTriangleElement.h>
 #include <sofa/collisionAlgorithm/proximity/BezierTriangleProximity.h>
 
-namespace sofa {
+namespace sofa
+{
 
-namespace collisionAlgorithm {
+namespace collisionAlgorithm
+{
 
 BezierTriangleGeometry::BezierTriangleGeometry()
 : d_nonlin_max_it(initData(&d_nonlin_max_it,(unsigned) 20,"nonlin_max_it", "number of iterations"))

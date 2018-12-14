@@ -2,13 +2,16 @@
 
 #include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
 
-namespace sofa {
+namespace sofa
+{
 
-namespace collisionAlgorithm {
+namespace collisionAlgorithm
+{
 
 class BezierTriangleElement;
 
-class BezierTriangleGeometry : public TriangleGeometry {
+class BezierTriangleGeometry : public TriangleGeometry
+{
     friend class BezierTriangleElement;
     friend class BezierTriangleProximity;
 
@@ -34,7 +37,8 @@ public:
 protected:
     ConstraintProximity::SPtr newtonProject(const BezierTriangleElement *elmt, defaulttype::Vector3 P) const;
 
-    typedef struct {
+    typedef struct
+    {
         defaulttype::Vector3 p210,p120,p021,p012,p102,p201,p111;
         defaulttype::Vector3 n110,n011,n101;
     } BezierTriangleInfo;

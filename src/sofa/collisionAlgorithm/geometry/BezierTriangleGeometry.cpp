@@ -1,9 +1,11 @@
 #include <sofa/collisionAlgorithm/geometry/BezierTriangleGeometry.inl>
 #include <sofa/core/ObjectFactory.h>
 
-namespace sofa {
+namespace sofa
+{
 
-namespace collisionAlgorithm {
+namespace collisionAlgorithm
+{
 
 SOFA_DECL_CLASS(BezierTriangleGeometry)
 

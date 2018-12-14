@@ -1,26 +1,21 @@
-//#include "PointCloudBindingAlgorithm.inl"
-//#include <sofa/core/ObjectFactory.h>
-//#include <sofa/core/visual/VisualParams.h>
-//#include <math.h>
-//#include <assert.h>     /* assert */
+#include <sofa/collisionAlgorithm/algorithm/PointCloudBindingAlgorithm.inl>
+
+#include <sofa/core/ObjectFactory.h>
+#include <sofa/core/visual/VisualParams.h>
+
+namespace sofa
+{
+
+namespace collisionAlgorithm
+{
 
 
-//namespace sofa
-//{
+SOFA_DECL_CLASS(PointCloudBindingAlgorithm)
 
-//namespace core
-//{
+int PointCloudBindingAlgorithmClass = core::RegisterObject("Point Cloud Binding Algorithm")
+.add<PointCloudBindingAlgorithm >()
+;
 
-//namespace behavior
-//{
+} // namespace collisionAlgorithm
 
-//SOFA_DECL_CLASS(PointCloudBindingAlgorithm)
-
-//int PointCloudBindingAlgorithmClass = core::RegisterObject("Triangle liear interpolation")
-//.add<PointCloudBindingAlgorithm >()
-//;
-//} // namespace controller
-
-//} // namespace component
-
-//} // namespace sofa
+} // namespace sofa
