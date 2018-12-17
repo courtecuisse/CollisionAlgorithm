@@ -36,12 +36,12 @@ public:
         prepareDetection();
     }
 
-    std::size_t getNbElements()
+    std::size_t getNbElements() const
     {
         return m_elements.size();
     }
 
-    const ConstraintElement* getElement(size_t i)
+    const ConstraintElement* getElement(size_t i) const
     {
         return m_elements[i].get();
     }

@@ -2,23 +2,27 @@
 
 #include <sofa/collisionAlgorithm/decorator/AABBDecorator.h>
 
-namespace sofa {
+namespace sofa
+{
 
-namespace collisionAlgorithm {
+namespace collisionAlgorithm
+{
 
-AABBDecorator::AABBDecorator()
-: d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox", "number of bbox"))
-, l_geometry(initLink("geometry", "link to geometry")) {
-    l_geometry.setPath("@.");
+AABBDecorator::AABBDecorator(BaseGeometry* geometry)
+: BaseElementFilter(geometry)
+, d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox", "number of bbox"))
+{
 }
 
-void AABBDecorator::prepareDetection() {
+void AABBDecorator::prepareDetection()
+{
     const helper::ReadAccessor<DataVecCoord> & pos = l_geometry->getState()->read(core::VecCoordId::position());
     if (pos.empty()) return;
 
     m_Bmin = pos[0];
     m_Bmax = pos[0];
-    for (unsigned i=1;i<pos.size();i++) {
+    for (unsigned i=1;i<pos.size();i++)
+    {
         if (pos[i][0]<m_Bmin[0]) m_Bmin[0] = pos[i][0];
         if (pos[i][1]<m_Bmin[1]) m_Bmin[1] = pos[i][1];
         if (pos[i][2]<m_Bmin[2]) m_Bmin[2] = pos[i][2];
@@ -33,25 +37,35 @@ void AABBDecorator::prepareDetection() {
     m_cellSize[2] = (m_Bmax[2] - m_Bmin[2]) / d_nbox.getValue()[2];
 
     if (m_cellSize[0] == 0) {
+
         m_cellSize[0] = (m_cellSize[1]+m_cellSize[2])*0.5;
         m_nbox[0] = 1;
-    } else m_nbox[0] = d_nbox.getValue()[0] + 1;
+    }
+    else
+        m_nbox[0] = d_nbox.getValue()[0] + 1;
 
-    if (m_cellSize[1] == 0) {
+    if (m_cellSize[1] == 0)
+    {
         m_cellSize[1] = (m_cellSize[0]+m_cellSize[2])*0.5;
         m_nbox[1] = 1;
-    } else m_nbox[1] = d_nbox.getValue()[1] + 1;
+    }
+    else
+        m_nbox[1] = d_nbox.getValue()[1] + 1;
 
-    if (m_cellSize[2] == 0) {
+    if (m_cellSize[2] == 0)
+    {
         m_cellSize[2] = (m_cellSize[0]+m_cellSize[1])*0.5;
         m_nbox[2] = 1;
-    } else m_nbox[2] = d_nbox.getValue()[2] + 1;
+    }
+    else
+        m_nbox[2] = d_nbox.getValue()[2] + 1;
 
     m_indexedElement.resize(m_nbox[0]*m_nbox[1]*m_nbox[2]);
     m_offset[0] = m_nbox[1]*m_nbox[2];
     m_offset[1] = m_nbox[2];
 
-    for (unsigned i=0;i<m_indexedElement.size();i++) {
+    for (unsigned i=0;i<m_indexedElement.size();i++)
+    {
         m_indexedElement[i].clear();
     }
 
@@ -59,13 +73,15 @@ void AABBDecorator::prepareDetection() {
     m_Bmin -= m_cellSize * 0.5;
     m_Bmax -= m_cellSize * 0.5;
 
-    for (unsigned itE = 0; itE < l_geometry->getNbElements(); itE++) {
+    for (unsigned itE = 0; itE < l_geometry->getNbElements(); itE++)
+    {
         const ConstraintElement * elmt = l_geometry->getElement(itE);
         if (elmt->getNbControlPoints() == 0) continue;
 
         defaulttype::Vector3 minbox = elmt->getControlPoint(0)->getPosition();
         defaulttype::Vector3 maxbox = elmt->getControlPoint(0)->getPosition();
-        for (unsigned p=1;p<elmt->getNbControlPoints();p++) {
+        for (unsigned p=1;p<elmt->getNbControlPoints();p++)
+        {
             defaulttype::Vector3 P = elmt->getControlPoint(p)->getPosition();
 
             minbox[0] = std::min(minbox[0],P[0]);
@@ -88,9 +104,12 @@ void AABBDecorator::prepareDetection() {
         cmaxbox[1] = ceil((maxbox[1] - m_Bmin[1])/m_cellSize[1]);
         cmaxbox[2] = ceil((maxbox[2] - m_Bmin[2])/m_cellSize[2]);
 
-        for (int i=cminbox[0];i<cmaxbox[0];i++) {
-            for (int j=cminbox[1];j<cmaxbox[1];j++) {
-                for (int k=cminbox[2];k<cmaxbox[2];k++) {
+        for (int i=cminbox[0];i<cmaxbox[0];i++)
+        {
+            for (int j=cminbox[1];j<cmaxbox[1];j++)
+            {
+                for (int k=cminbox[2];k<cmaxbox[2];k++)
+                {
                     getIndexedElements(i,j,k).insert(itE);
                 }
             }
@@ -101,10 +120,14 @@ void AABBDecorator::prepareDetection() {
 void AABBDecorator::draw(const core::visual::VisualParams * vparams) {
     if (! vparams->displayFlags().getShowCollisionModels()) return;
 
-    for (int i=0;i<m_nbox[0];i++) {
-        for (int j=0;j<m_nbox[1];j++) {
-            for (int k=0;k<m_nbox[2];k++) {
-                if (getIndexedElements(i,j,k).empty()) continue;
+    for (int i=0;i<m_nbox[0];i++)
+    {
+        for (int j=0;j<m_nbox[1];j++)
+        {
+            for (int k=0;k<m_nbox[2];k++)
+            {
+                if (getIndexedElements(i,j,k).empty())
+                    continue;
 
                 defaulttype::Vector3 points[8];
 
@@ -140,6 +163,174 @@ void AABBDecorator::draw(const core::visual::VisualParams * vparams) {
 
 
 }
+
+AABBElementIterator::AABBElementIterator(const ConstraintElement *from, const AABBDecorator * aabb)
+    : BaseElementFilterIterator(from, aabb)
+    , m_aabb(aabb)
+{
+    defaulttype::Vector3 P = from->getControlPoint()->getPosition();
+
+    //compute the box where is P
+    defaulttype::Vec3i cbox;
+    cbox[0] = floor((P[0] - m_aabb->m_Bmin[0])/m_aabb->m_cellSize[0]);
+    cbox[1] = floor((P[1] - m_aabb->m_Bmin[1])/m_aabb->m_cellSize[1]);
+    cbox[2] = floor((P[2] - m_aabb->m_Bmin[2])/m_aabb->m_cellSize[2]);
+
+    //project the box in the bounding box of the object
+    //search with the closest box in bbox
+    for (unsigned int i=0;i<3;i++)
+    {
+        if (cbox[i] < 0)
+            cbox[i] = 0;
+        else
+        {
+            if (cbox[i] > m_aabb->m_nbox[i])
+                cbox[i] = m_aabb->m_nbox[i];
+        }
+    }
+
+    int d = 0;
+    int max = std::max(std::max(m_aabb->m_nbox[0],m_aabb->m_nbox[1]),m_aabb->m_nbox[2]);
+    std::set<int> selectElements;
+    while (selectElements.empty() && d<max)
+    {
+        fillElementSet(cbox,d,selectElements);
+        d++;// we look for boxed located at d+1
+    }
+
+    m_selectElements.clear();
+    for (std::set<int>::iterator it = selectElements.begin();it != selectElements.end(); it++) m_selectElements.push_back(*it);
+}
+
+void AABBElementIterator::fillElementSet(defaulttype::Vec3i cbox, int d, std::set<int> & selectElements)
+{
+    {
+        int i=-d;
+        if (cbox[0]+i >= 0 && cbox[0]+i < m_aabb->m_nbox[0])
+        {
+            for (int j=-d;j<=d;j++)
+            {
+                if (cbox[1]+j < 0 || cbox[1]+j >= m_aabb->m_nbox[1])
+                    continue;
+                for (int k=-d;k<=d;k++)
+                {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= m_aabb->m_nbox[2])
+                        continue;
+
+                    const std::set<unsigned> & elemntsID = m_aabb->getConstIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                    selectElements.insert(elemntsID.begin(),elemntsID.end());
+                }
+            }
+        }
+    }
+
+    {
+        int i=d;
+        if (cbox[0]+i >= 0 && cbox[0]+i < m_aabb->m_nbox[0])
+        {
+            for (int j=-d;j<=d;j++)
+            {
+                if (cbox[1]+j < 0 || cbox[1]+j >= m_aabb->m_nbox[1])
+                    continue;
+
+                for (int k=-d;k<=d;k++)
+                {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= m_aabb->m_nbox[2])
+                        continue;
+
+                    const std::set<unsigned> & elemntsID = m_aabb->getConstIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                    selectElements.insert(elemntsID.begin(),elemntsID.end());
+                }
+            }
+        }
+    }
+
+
+    {
+        int j=-d;
+        if (cbox[1]+j >= 0 && cbox[1]+j < m_aabb->m_nbox[1])
+        {
+            for (int i=-d+1;i<d;i++)
+            {
+                if (cbox[0]+i < 0 || cbox[0]+i >= m_aabb->m_nbox[0])
+                    continue;
+
+                for (int k=-d;k<=d;k++)
+                {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= m_aabb->m_nbox[2])
+                        continue;
+
+                    const std::set<unsigned> & elemntsID = m_aabb->getConstIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                    selectElements.insert(elemntsID.begin(),elemntsID.end());
+                }
+            }
+        }
+    }
+
+    {
+        int j=d;
+        if (cbox[1]+j >= 0 && cbox[1]+j < m_aabb->m_nbox[1])
+        {
+            for (int i=-d+1;i<d;i++)
+            {
+                if (cbox[0]+i < 0 || cbox[0]+i >= m_aabb->m_nbox[0])
+                    continue;
+
+                for (int k=-d;k<=d;k++)
+                {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= m_aabb->m_nbox[2])
+                        continue;
+
+                    const std::set<unsigned> & elemntsID = m_aabb->getConstIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                    selectElements.insert(elemntsID.begin(),elemntsID.end());
+                }
+            }
+        }
+    }
+
+    {
+        int k=-d;
+        if (cbox[2]+k >= 0 && cbox[2]+k < m_aabb->m_nbox[2])
+        {
+            for (int i=-d+1;i<d;i++)
+            {
+                if (cbox[0]+i < 0 || cbox[0]+i >= m_aabb->m_nbox[0])
+                    continue;
+
+                for (int j=-d+1;j<d;j++)
+                {
+                    if (cbox[1]+j < 0 || cbox[1]+j >= m_aabb->m_nbox[1])
+                        continue;
+
+                    const std::set<unsigned> & elemntsID = m_aabb->getConstIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                    selectElements.insert(elemntsID.begin(),elemntsID.end());
+                }
+            }
+        }
+    }
+
+    {
+        int k=d;
+        if (cbox[2]+k >= 0 && cbox[2]+k < m_aabb->m_nbox[2])
+        {
+            for (int i=-d+1;i<d;i++)
+            {
+                if (cbox[0]+i < 0 || cbox[0]+i >= m_aabb->m_nbox[0])
+                    continue;
+
+                for (int j=-d+1;j<d;j++)
+                {
+                    if (cbox[1]+j < 0 || cbox[1]+j >= m_aabb->m_nbox[1])
+                        continue;
+
+                    const std::set<unsigned> & elemntsID = m_aabb->getConstIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                    selectElements.insert(elemntsID.begin(),elemntsID.end());
+                }
+            }
+        }
+    }
+}
+
 
 }
 

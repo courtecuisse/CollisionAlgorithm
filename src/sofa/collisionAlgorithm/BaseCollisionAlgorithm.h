@@ -2,6 +2,7 @@
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseElementFilter.h>
 #include <sofa/core/collision/Pipeline.h>
 
 namespace sofa
@@ -18,6 +19,13 @@ class BaseCollisionAlgorithm : public core::collision::Pipeline
 {
 public :
     SOFA_ABSTRACT_CLASS(BaseCollisionAlgorithm, core::collision::Pipeline);
+
+    BaseCollisionAlgorithm()
+        : l_filter(initLink("filter", "Link to an optional filter"))
+    {
+
+    }
+    virtual ~BaseCollisionAlgorithm() override {}
 
     void draw(const core::visual::VisualParams * vparams) override
     {
@@ -79,7 +87,10 @@ protected:
 
     virtual void processAlgorithm() = 0;
 
+protected:
     PairProximityVector m_pairDetection;
+    core::objectmodel::SingleLink<BaseCollisionAlgorithm,BaseElementFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filter;
+
 };
 
 }

@@ -1,8 +1,9 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/algorithm/CollisionDetectionAlgorithm.h>
-#include <sofa/collisionAlgorithm/decorator/AABBDecorator.h>
+#include <sofa/collisionAlgorithm/BaseElementFilter.h>
 #include <limits>
+
 
 namespace sofa
 {
@@ -11,22 +12,22 @@ namespace collisionAlgorithm
 {
 
 template<class ElementIterator>
-PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_element)
+PairProximity CollisionDetectionAlgorithm::getClosestPoint(std::unique_ptr<ElementIterator> it_element)
 {
     PairProximity min_pair;
     double min_dist = std::numeric_limits<double>::max();
     min_pair.first = nullptr;
     min_pair.second = nullptr;
 
-    ConstraintProximity::SPtr pfrom = it_element.efrom->getControlPoint(); //centered control point
+    ConstraintProximity::SPtr pfrom = it_element->getFrom()->getControlPoint(); //centered control point
     if (pfrom == nullptr)
         return min_pair;
 
     defaulttype::Vector3 P = pfrom->getPosition();
 
-    for (unsigned i=0;i<it_element.size();i++)
+    for (unsigned i=0;i<it_element->size();i++)
     {
-        const ConstraintElement * edest = it_element.element(i);
+        const ConstraintElement * edest = it_element->element(i);
         ConstraintProximity::SPtr pdest = edest->project(P);
 
 //        pfrom = it_element.efrom->project(pdest->getPosition());
@@ -57,199 +58,26 @@ PairProximity CollisionDetectionAlgorithm::getClosestPoint(ElementIterator it_el
     return min_pair;
 }
 
-class AABBElementIterator
+void CollisionDetectionAlgorithm::processAlgorithm()
 {
-public :
-
-    AABBElementIterator(const ConstraintElement *from,AABBDecorator * aabb)
-    {
-        m_aabb = aabb;
-        m_geo = aabb->l_geometry.get();
-        efrom = from;
-
-        defaulttype::Vector3 P = from->getControlPoint()->getPosition();
-
-        //compute the box where is P
-        defaulttype::Vec3i cbox;
-        cbox[0] = floor((P[0] - m_aabb->m_Bmin[0])/m_aabb->m_cellSize[0]);
-        cbox[1] = floor((P[1] - m_aabb->m_Bmin[1])/m_aabb->m_cellSize[1]);
-        cbox[2] = floor((P[2] - m_aabb->m_Bmin[2])/m_aabb->m_cellSize[2]);
-
-        //project the box in the bounding box of the object
-        //search with the closest box in bbox
-        for (unsigned int i=0;i<3;i++)
-        {
-            if (cbox[i] < 0)
-                cbox[i] = 0;
-            else
-            {
-                if (cbox[i] > m_aabb->m_nbox[i])
-                    cbox[i] = m_aabb->m_nbox[i];
-            }
-        }
-
-        int d = 0;
-        int max = std::max(std::max(m_aabb->m_nbox[0],m_aabb->m_nbox[1]),m_aabb->m_nbox[2]);
-        std::set<int> selectElements;
-        while (selectElements.empty() && d<max) {
-            fillElementSet(cbox,d,selectElements);
-            d++;// we look for boxed located at d+1
-        }
-
-        m_selectElements.clear();
-        for (std::set<int>::iterator it = selectElements.begin();it != selectElements.end(); it++) m_selectElements.push_back(*it);
-    }
-
-    void fillElementSet(defaulttype::Vec3i cbox, int d, std::set<int> & selectElements)
-    {
-        {
-            int i=-d;
-            if (cbox[0]+i >= 0 && cbox[0]+i < m_aabb->m_nbox[0]) {
-                for (int j=-d;j<=d;j++) {
-                    if (cbox[1]+j < 0 || cbox[1]+j >= m_aabb->m_nbox[1]) continue;
-                    for (int k=-d;k<=d;k++) {
-                        if (cbox[2]+k < 0 || cbox[2]+k >= m_aabb->m_nbox[2]) continue;
-
-                        const std::set<unsigned> & elemntsID = m_aabb->getIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        selectElements.insert(elemntsID.begin(),elemntsID.end());
-                    }
-                }
-            }
-        }
-
-        {
-            int i=d;
-            if (cbox[0]+i >= 0 && cbox[0]+i < m_aabb->m_nbox[0]) {
-                for (int j=-d;j<=d;j++) {
-                    if (cbox[1]+j < 0 || cbox[1]+j >= m_aabb->m_nbox[1]) continue;
-
-                    for (int k=-d;k<=d;k++) {
-                        if (cbox[2]+k < 0 || cbox[2]+k >= m_aabb->m_nbox[2]) continue;
-
-                        const std::set<unsigned> & elemntsID = m_aabb->getIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        selectElements.insert(elemntsID.begin(),elemntsID.end());
-                    }
-                }
-            }
-        }
-
-
-        {
-            int j=-d;
-            if (cbox[1]+j >= 0 && cbox[1]+j < m_aabb->m_nbox[1]) {
-                for (int i=-d+1;i<d;i++) {
-                    if (cbox[0]+i < 0 || cbox[0]+i >= m_aabb->m_nbox[0]) continue;
-
-                    for (int k=-d;k<=d;k++) {
-                        if (cbox[2]+k < 0 || cbox[2]+k >= m_aabb->m_nbox[2]) continue;
-
-                        const std::set<unsigned> & elemntsID = m_aabb->getIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        selectElements.insert(elemntsID.begin(),elemntsID.end());
-                    }
-                }
-            }
-        }
-
-        {
-            int j=d;
-            if (cbox[1]+j >= 0 && cbox[1]+j < m_aabb->m_nbox[1]) {
-                for (int i=-d+1;i<d;i++) {
-                    if (cbox[0]+i < 0 || cbox[0]+i >= m_aabb->m_nbox[0]) continue;
-
-                    for (int k=-d;k<=d;k++) {
-                        if (cbox[2]+k < 0 || cbox[2]+k >= m_aabb->m_nbox[2]) continue;
-
-                        const std::set<unsigned> & elemntsID = m_aabb->getIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        selectElements.insert(elemntsID.begin(),elemntsID.end());
-                    }
-                }
-            }
-        }
-
-        {
-            int k=-d;
-            if (cbox[2]+k >= 0 && cbox[2]+k < m_aabb->m_nbox[2]) {
-                for (int i=-d+1;i<d;i++) {
-                    if (cbox[0]+i < 0 || cbox[0]+i >= m_aabb->m_nbox[0]) continue;
-
-                    for (int j=-d+1;j<d;j++) {
-                        if (cbox[1]+j < 0 || cbox[1]+j >= m_aabb->m_nbox[1]) continue;
-
-                        const std::set<unsigned> & elemntsID = m_aabb->getIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        selectElements.insert(elemntsID.begin(),elemntsID.end());
-                    }
-                }
-            }
-        }
-
-        {
-            int k=d;
-            if (cbox[2]+k >= 0 && cbox[2]+k < m_aabb->m_nbox[2]) {
-                for (int i=-d+1;i<d;i++) {
-                    if (cbox[0]+i < 0 || cbox[0]+i >= m_aabb->m_nbox[0]) continue;
-
-                    for (int j=-d+1;j<d;j++) {
-                        if (cbox[1]+j < 0 || cbox[1]+j >= m_aabb->m_nbox[1]) continue;
-
-                        const std::set<unsigned> & elemntsID = m_aabb->getIndexedElements(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        selectElements.insert(elemntsID.begin(),elemntsID.end());
-                    }
-                }
-            }
-        }
-    }
-
-    size_t size()
-    {
-        return m_selectElements.size();
-    }
-
-    inline const ConstraintElement * element(unsigned i)
-    {
-        return m_geo->getElement(m_selectElements[i]);
-    }
-
-    BaseGeometry * m_geo;
-    const ConstraintElement * efrom;
-    AABBDecorator * m_aabb;
-    std::vector<int> m_selectElements;
-};
-
-class DefaultIterator {
-public:
-    DefaultIterator(const ConstraintElement * from, BaseGeometry * geo) {
-        efrom = from;
-        m_geo = geo;
-    }
-
-    size_t size() {
-        return m_geo->getNbElements();
-    }
-
-    inline const ConstraintElement * element(unsigned i) {
-        return m_geo->getElement(i);
-    }
-
-    const ConstraintElement * efrom;
-    BaseGeometry * m_geo;
-};
-
-void CollisionDetectionAlgorithm::processAlgorithm() {
-    m_pairDetection.clear();
+    this->m_pairDetection.clear();
 
 //    AABBDecorator * from = NULL;
-    AABBDecorator * dest = l_dest->getContext()->get<AABBDecorator>();
+    BaseElementFilter* filter = l_filter.get();
 
 //    //first we search if there is a AABB connected to the geometry
 //    for (unsigned i=0;i<p_from->p_type.size();i++) {
 //        if ((from = dynamic_cast<AABBDecorator *>(p_from->p_type[i]))) break;
 //    }
 
+    if(!filter)
+        filter = new DefaultElementFilter(l_dest.get());
+
     //we do the collision from first to second
     for (unsigned i=0;i<l_from->getNbElements();i++)
     {
         const ConstraintElement * elmt = l_from->getElement(i);
-        PairProximity pair = (dest == nullptr) ? getClosestPoint(DefaultIterator(elmt, l_dest.get())) : getClosestPoint(AABBElementIterator(elmt, dest));
+        PairProximity pair = getClosestPoint(filter->iterator(elmt));
 
         if (pair.first == nullptr)
             continue;
@@ -259,6 +87,7 @@ void CollisionDetectionAlgorithm::processAlgorithm() {
         m_pairDetection.push_back(PairProximity(pair.first,pair.second));
     }
 
+    delete filter;
 //    //then from second to first
 //    for (unsigned i=0;i<p_dest->getNbElements();i++) {
 //        ConstraintElementPtr elmt = p_dest->getElement(i);
