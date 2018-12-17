@@ -12,9 +12,8 @@ namespace collisionAlgorithm
 {
 
 template<class ElementIterator>
-PairProximity CollisionDetectionAlgorithm::getClosestPoint(std::unique_ptr<ElementIterator> it_element)
-{
-    PairProximity min_pair;
+void CollisionDetectionAlgorithm::findClosestPoint(std::unique_ptr<ElementIterator> it_element) {
+    std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr> min_pair;
     double min_dist = std::numeric_limits<double>::max();
     min_pair.first = nullptr;
     min_pair.second = nullptr;
@@ -55,13 +54,24 @@ PairProximity CollisionDetectionAlgorithm::getClosestPoint(std::unique_ptr<Eleme
         }
     }
 
-    return min_pair;
+    if (min_pair.first == nullptr) return;
+    if (min_pair.second == nullptr) return;
+
+
+    defaulttype::Vector3 mainDir = min_pair.second->getNormal();//pair.first->getPosition() - pair.second->getPosition();
+    defaulttype::Vector3 secondDir = -min_pair.first->getNormal();
+
+    if (mainDir.norm()<0.01) mainDir = secondDir;
+    else {
+        mainDir.normalize();
+        if (dot(mainDir,secondDir) < 0) mainDir = secondDir;
+    }
+
+    addDetectionOutput(mainDir, min_pair.first,min_pair.second);
 }
 
 void CollisionDetectionAlgorithm::processAlgorithm()
 {
-    this->m_pairDetection.clear();
-
 //    AABBDecorator * from = NULL;
     BaseElementFilter* filter = l_filter.get();
 
@@ -77,14 +87,8 @@ void CollisionDetectionAlgorithm::processAlgorithm()
     for (unsigned i=0;i<l_from->getNbElements();i++)
     {
         const ConstraintElement * elmt = l_from->getElement(i);
-        PairProximity pair = getClosestPoint(filter->iterator(elmt));
 
-        if (pair.first == nullptr)
-            continue;
-        if (pair.second == nullptr)
-            continue;
-
-        m_pairDetection.push_back(PairProximity(pair.first,pair.second));
+        findClosestPoint(filter->iterator(elmt));
     }
 
     delete filter;

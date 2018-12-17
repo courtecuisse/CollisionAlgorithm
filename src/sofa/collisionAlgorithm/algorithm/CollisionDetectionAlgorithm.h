@@ -35,7 +35,8 @@ public:
 
 private:
     template<class ElementIterator>
-    PairProximity getClosestPoint(std::unique_ptr<ElementIterator> geo);
+
+    void findClosestPoint(std::unique_ptr<ElementIterator> geo);
 
     core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
     core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;

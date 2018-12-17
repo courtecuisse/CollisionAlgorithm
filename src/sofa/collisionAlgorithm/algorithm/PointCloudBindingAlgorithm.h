@@ -28,9 +28,6 @@ public:
     }
 
 private:
-    template<class ElementIterator>
-    PairProximity getClosestPoint(ElementIterator geo);
-
     core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
     core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
 };
