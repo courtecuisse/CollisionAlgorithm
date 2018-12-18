@@ -12,7 +12,8 @@ namespace collisionAlgorithm
 {
 
 template<class ElementIterator>
-void CollisionDetectionAlgorithm::findClosestPoint(std::unique_ptr<ElementIterator> it_element) {
+void CollisionDetectionAlgorithm::findClosestPoint(std::unique_ptr<ElementIterator> it_element)
+{
     std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr> min_pair;
     double min_dist = std::numeric_limits<double>::max();
     min_pair.first = nullptr;
@@ -20,7 +21,7 @@ void CollisionDetectionAlgorithm::findClosestPoint(std::unique_ptr<ElementIterat
 
     ConstraintProximity::SPtr pfrom = it_element->getFrom()->getControlPoint(); //centered control point
     if (pfrom == nullptr)
-        return min_pair;
+        return ;
 
     defaulttype::Vector3 P = pfrom->getPosition();
 

@@ -97,6 +97,8 @@ public :
     }
 
 protected:
+    core::objectmodel::SingleLink<BaseCollisionAlgorithm,BaseElementFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filter;
+
     virtual void doCollisionReset() override
     {
 //         m_pairDetection.clear();
@@ -125,6 +127,7 @@ private:
             m_prox[0] = p1;
             m_prox[1] = p2;
         }
+        virtual ~PairDetectionOutput() {}
 
         unsigned size() const { return 2; }
 
@@ -141,6 +144,7 @@ private:
         SingleDetectionOutput(const defaulttype::Vector3 & mainDir, ConstraintProximity::SPtr p1) : DetectionOutput(mainDir){
             m_prox = p1;
         }
+        virtual ~SingleDetectionOutput() {}
 
         unsigned size() const { return 1; }
 
