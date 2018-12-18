@@ -23,7 +23,8 @@ public:
     }
     virtual ~BaseElementFilterIterator() {}
 
-    virtual inline const ConstraintElement* element(size_t i) const = 0;
+    virtual const ConstraintElement* element(size_t i) const = 0;
+
     virtual size_t size() const = 0;
 
     inline const ConstraintElement* getFrom() { return m_from; }

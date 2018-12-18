@@ -64,10 +64,10 @@ public:
     virtual ConstraintProximity::SPtr project(defaulttype::Vector3 P) const = 0;
 
     //return the geometry // See covariant return type !
-    virtual inline const BaseGeometry* geometry() const = 0;
+    virtual const BaseGeometry* geometry() const = 0;
 
     // return the number of control points
-    virtual inline size_t getNbControlPoints() const = 0;
+    virtual size_t getNbControlPoints() const = 0;
 
     virtual void draw(const core::visual::VisualParams *vparams) const = 0;
 
