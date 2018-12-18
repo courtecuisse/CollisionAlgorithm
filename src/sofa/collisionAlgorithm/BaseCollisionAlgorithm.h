@@ -24,7 +24,7 @@ public:
         return m_dir;
     }
 
-    DetectionOutput(const defaulttype::Vector3 & d) : m_dir(d.normalized()) {}
+    DetectionOutput(defaulttype::Vector3 d) : m_dir(d.normalized()) {}
 
     virtual void draw() const {}
 //        for (unsigned i=0;i<size();i++) {

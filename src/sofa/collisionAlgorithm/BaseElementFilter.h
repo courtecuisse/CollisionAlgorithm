@@ -103,7 +103,7 @@ class DefaultElementFilter : public BaseElementFilter
 public:
     SOFA_CLASS(DefaultElementFilter, core::BehaviorModel);
 
-    Data<defaulttype::Vec3i> d_nbox;
+//    Data<defaulttype::Vec3i> d_nbox;
 
     DefaultElementFilter(BaseGeometry* geometry = nullptr)
         : BaseElementFilter(geometry)
