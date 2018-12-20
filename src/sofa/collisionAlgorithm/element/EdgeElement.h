@@ -21,7 +21,7 @@ public:
     {
         m_eid = eid;
 
-        const std::vector<core::topology::BaseMeshTopology::Edge> & edges = geometry()->l_topology->getEdges();
+        const EdgeGeometry::VecEdges & edges = geometry()->edges();
 
         m_pid[0] = edges[eid][0];
         m_pid[1] = edges[eid][1];
@@ -73,7 +73,7 @@ public:
         return m_geometry->createProximity(this,fact_u,fact_v);
     }
 
-    void draw(const core::visual::VisualParams * /*vparams*/) const
+    void draw(const core::visual::VisualParams * /*vparams*/) const override
     {
         glColor4dv(geometry()->d_color.getValue().data());
 

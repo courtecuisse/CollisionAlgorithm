@@ -68,6 +68,7 @@ public:
 protected:
     std::vector<ConstraintElement::UPtr> m_elements;
 
+
     virtual void prepareDetection() {}
 
     core::objectmodel::SingleLink<BaseGeometry,sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes>,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;

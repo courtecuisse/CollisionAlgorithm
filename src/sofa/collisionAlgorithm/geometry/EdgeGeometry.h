@@ -8,15 +8,18 @@ namespace collisionAlgorithm {
 
 class EdgeElement;
 
-class EdgeGeometry : public PointGeometry {
+class EdgeGeometry : public BaseGeometry {
     friend class EdgeElement;
 public:
+    typedef sofa::core::topology::BaseMeshTopology::Edge Edge;
+    typedef helper::vector<Edge> VecEdges;
+
     SOFA_CLASS(EdgeGeometry,BaseGeometry);
 
     EdgeGeometry()
-    : l_topology(initLink("topology", "Link to topology"))
+        : d_edges(initData(&d_edges, VecEdges(), "edges", "Vector of Edges"))
     {
-        l_topology.setPath("@.");
+
     }
 
     ConstraintProximity::SPtr createProximity(const EdgeElement * elmt,double f1,double f2) const;
@@ -25,8 +28,10 @@ public:
 
     virtual void init() override;
 
+    inline const VecEdges& edges() const { return d_edges.getValue(); }
+
 protected:
-    core::objectmodel::SingleLink<EdgeGeometry,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
+    Data<VecEdges> d_edges;
 
 };
 

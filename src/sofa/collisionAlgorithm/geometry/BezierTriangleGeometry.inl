@@ -26,7 +26,9 @@ void BezierTriangleGeometry::createElements()
 {
     m_elements.clear();
 
-    for (unsigned i=0;i<l_topology->getNbTriangles();i++)
+    const VecTriangles& triangles = d_triangles.getValue();
+
+    for (size_t i=0;i<triangles.size();i++)
     {
         m_elements.push_back(BezierTriangleElement::createElement(this,i));
     }
@@ -38,13 +40,15 @@ void BezierTriangleGeometry::prepareDetection()
 {
     Inherit::prepareDetection();
 
+    const VecTriangles& triangles = d_triangles.getValue();
     const helper::ReadAccessor<DataVecCoord> & x = l_state->read(core::VecCoordId::position());
 
-    m_beziertriangle_info.resize(l_topology->getNbTriangles());
-    for (size_t t=0;t< l_topology->getNbTriangles();t++)
+    size_t nbTriangles = triangles.size();
+    m_beziertriangle_info.resize(nbTriangles);
+    for (size_t t=0;t< nbTriangles;t++)
     {
         BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[t];
-        const core::topology::BaseMeshTopology::Triangle trpids = l_topology->getTriangle(t);
+        const Triangle& trpids = triangles[t];
 
         const defaulttype::Vector3 & p300 = x[trpids[2]];
         const defaulttype::Vector3 & p030 = x[trpids[1]];

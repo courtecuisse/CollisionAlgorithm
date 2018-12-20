@@ -18,9 +18,15 @@ ConstraintProximity::SPtr EdgeGeometry::createProximity(const EdgeElement * elmt
 
 void EdgeGeometry::init()
 {
+    if(d_edges.getValue().empty())
+    {
+        msg_error(this) << "Edges are not set (data is empty). Giving up.";
+    }
+
     m_elements.clear();
 
-    for (unsigned i=0;i<l_topology->getNbEdges();i++)
+    const VecEdges& edges = d_edges.getValue();
+    for (size_t i=0;i<edges.size();i++)
     {
         m_elements.push_back(EdgeElement::createElement(this,i));
     }
@@ -28,7 +34,8 @@ void EdgeGeometry::init()
 
 void EdgeGeometry::prepareDetection()
 {
-    if (m_elements.size() != l_topology->getNbEdges())
+    const VecEdges& edges = d_edges.getValue();
+    if (m_elements.size() != edges.size())
         init();
 }
 

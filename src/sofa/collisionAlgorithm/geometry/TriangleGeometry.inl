@@ -17,18 +17,20 @@ ConstraintProximity::SPtr TriangleGeometry::createProximity(const TriangleElemen
 
 void TriangleGeometry::prepareDetection()
 {
-    if (m_elements.size() != l_topology->getNbTriangles())
+    const VecTriangles& triangles = d_triangles.getValue();
+
+    if (m_elements.size() != triangles.size())
         init();
 
     const helper::ReadAccessor<DataVecCoord> & pos = getState()->read(core::VecCoordId::position());
 
-    m_pointNormal.resize(l_topology->getNbPoints());
+    m_pointNormal.resize(pos.size());
 
-    m_triangle_info.resize(l_topology->getNbTriangles());
+    m_triangle_info.resize(triangles.size());
 
-    for (size_t t=0 ; t<l_topology->getNbTriangles() ; t++)
+    for (size_t t=0 ; t<triangles.size() ; t++)
     {
-        const core::topology::BaseMeshTopology::Triangle& tri = l_topology->getTriangle(t);
+        const Triangle& tri = triangles[t];
 
         //Compute Bezier Positions
         const defaulttype::Vector3 & p0 = pos[tri[0]];
@@ -54,25 +56,49 @@ void TriangleGeometry::prepareDetection()
         tinfo.ax2.normalize();
     }
 
-    m_pointNormal.resize(pos.size());
-    for (size_t p=0;p<pos.size();p++)
+    if(triangles.size() > 0)
     {
-        const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = l_topology->getTrianglesAroundVertex(p);
-        m_pointNormal[p] = defaulttype::Vector3(0,0,0);
-        for (size_t t=0;t<tav.size();t++)
+        m_pointNormal.resize(pos.size());
+        //TODO: remove need of topologycontainer
+        for (size_t p=0;p<pos.size();p++)
         {
-            m_pointNormal[p] += this->m_triangle_info[tav[t]].tn;
-        }
-        m_pointNormal[p].normalize();
+            const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = l_topology->getTrianglesAroundVertex(p);
+            m_pointNormal[p] = defaulttype::Vector3(0,0,0);
+            for (size_t t=0;t<tav.size();t++)
+            {
+                m_pointNormal[p] += this->m_triangle_info[tav[t]].tn;
+            }
+            m_pointNormal[p].normalize();
 
+        }
     }
 }
 
 void TriangleGeometry::init()
 {
-    m_elements.clear();
+    if(d_phongInterpolation.getValue() && !l_topology.get())
+    {
+        msg_error(this) << "Phong Interpolation needs (entire) topology.Phong will be disabled.";
+        d_phongInterpolation.setValue(false);
+    }
 
-    for (size_t i=0;i<l_topology->getNbTriangles();i++)
+    if(d_triangles.getValue().empty())
+    {
+        msg_warning(this) << "Triangles are not set (data is empty). Will set from topology if given";
+        if(!l_topology.get())
+        {
+            msg_error(this) << "No topology to work with ; giving up.";
+        }
+        else
+        {
+            d_triangles.setParent(l_topology->findData("triangles"));
+        }
+    }
+
+    m_elements.clear();
+    const VecTriangles& triangles = d_triangles.getValue();
+
+    for (size_t i=0;i<triangles.size();i++)
     {
         m_elements.push_back(TriangleElement::createElement(this,i));
     }

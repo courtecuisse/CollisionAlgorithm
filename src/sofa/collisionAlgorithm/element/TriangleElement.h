@@ -22,7 +22,7 @@ public:
     {
         m_eid = eid;
 
-        const std::vector<core::topology::BaseMeshTopology::Triangle> & triangles = geometry()->l_topology->getTriangles();
+        const TriangleGeometry::VecTriangles & triangles = geometry()->triangles();
 
         m_pid[0] = triangles[eid][0];
         m_pid[1] = triangles[eid][1];
