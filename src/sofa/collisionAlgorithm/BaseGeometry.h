@@ -11,9 +11,13 @@
 #include <vector>
 #include <GL/gl.h>
 
-namespace sofa {
+namespace sofa
+{
 
-namespace collisionAlgorithm {
+namespace collisionAlgorithm
+{
+
+class SofaBaseNormalHandler;
 
 class BaseGeometry : public core::BehaviorModel {
 public:
@@ -65,7 +69,16 @@ public:
         }
     }
 
+    void setNormalHandler(const SofaBaseNormalHandler* normalHandler)
+    {
+        m_normalHandler = normalHandler;
+    }
+
+    defaulttype::Vector3 getNormal(const unsigned elementID, const double* fact) const;
+
 protected:
+    const SofaBaseNormalHandler* m_normalHandler;
+
     std::vector<ConstraintElement::UPtr> m_elements;
 
 

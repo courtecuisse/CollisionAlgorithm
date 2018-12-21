@@ -3,13 +3,16 @@
 #include <sofa/core/topology/BaseMeshTopology.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 
-namespace sofa {
+namespace sofa
+{
 
-namespace collisionAlgorithm {
+namespace collisionAlgorithm
+{
 
 class PointElement;
 
-class PointGeometry : public BaseGeometry {
+class PointGeometry : public BaseGeometry
+{
     friend class PointElement;
 public:
     SOFA_CLASS(PointGeometry,BaseGeometry);

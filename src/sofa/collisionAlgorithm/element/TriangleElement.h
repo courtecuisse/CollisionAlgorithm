@@ -42,13 +42,13 @@ public:
     ConstraintProximity::SPtr getControlPoint(int cid) const override
     {
         if (cid == 0)
-            return m_geometry->createProximity(this,1,0,0, phongInterpolation);
+            return m_geometry->createProximity(this,1,0,0);
         else if (cid == 1)
-            return m_geometry->createProximity(this,0,1,0, phongInterpolation);
+            return m_geometry->createProximity(this,0,1,0);
         else if (cid == 2)
-            return m_geometry->createProximity(this,0,0,1, phongInterpolation);
+            return m_geometry->createProximity(this,0,0,1);
 
-        return m_geometry->createProximity(this,1.0/3.0,1.0/3.0,1.0/3.0, phongInterpolation);
+        return m_geometry->createProximity(this,1.0/3.0,1.0/3.0,1.0/3.0);
     }
 
     //proj_P must be on the plane
@@ -128,12 +128,22 @@ public:
             fact_w = 0;
         }
 
-        return m_geometry->createProximity(this,fact_u,fact_v,fact_w, phongInterpolation);
+        return m_geometry->createProximity(this,fact_u,fact_v,fact_w);
     }
 
     inline const TriangleGeometry * geometry() const override
     {
         return m_geometry;
+    }
+
+    inline const unsigned* pointIDs() const
+    {
+        return m_pid;
+    }
+
+    inline unsigned id() const
+    {
+        return m_eid;
     }
 
     void drawTriangle(const core::visual::VisualParams * /*vparams*/,const defaulttype::Vector3 & A,const defaulttype::Vector3 & B, const defaulttype::Vector3 & C) const

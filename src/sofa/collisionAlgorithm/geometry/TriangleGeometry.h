@@ -31,6 +31,7 @@ public:
     {
         if(!l_topology.get())
             l_topology.setPath("@.");
+
     }
 
     virtual ~TriangleGeometry() override {}
@@ -39,9 +40,12 @@ public:
 
     virtual void prepareDetection() override;
 
-    ConstraintProximity::SPtr createProximity(const TriangleElement * elmt,double f1,double f2,double f3, bool phongNormals = true) const;
+    ConstraintProximity::SPtr createProximity(const TriangleElement * elmt,double f1,double f2,double f3) const;
 
-    inline const VecTriangles& triangles() const { return d_triangles.getValue(); }
+    inline const VecTriangles& triangles() const
+    {
+        return d_triangles.getValue();
+    }
 
     typedef struct
     {
@@ -53,6 +57,16 @@ public:
 
         defaulttype::Vector3 tn,ax1,ax2;
     } TriangleInfo;
+
+    inline const std::vector<defaulttype::Vector3>& pointNormals() const
+    {
+        return this->m_pointNormal;
+    }
+
+    inline const TriangleInfo& triangleInfo(size_t index) const
+    {
+        return this->m_triangle_info[index];
+    }
 
     Data<VecTriangles> d_triangles;
     Data<bool> d_phongInterpolation;

@@ -1,6 +1,17 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <sofa/collisionAlgorithm/BaseGeometryModifier.h>
 
-namespace collisionAlgorithm {
+namespace sofa
+{
+
+namespace collisionAlgorithm
+{
+
+defaulttype::Vector3 BaseGeometry::getNormal(const unsigned elementID, const double* fact) const
+{
+    return m_normalHandler->getNormal(elementID, fact);
+}
+
 
 //ConstraintElement::ConstraintProximity::ConstraintProximity(ConstraintElement * elmt)
 //: m_element(elmt) {
@@ -56,6 +67,6 @@ namespace collisionAlgorithm {
 
 //} // namespace controller
 
-//} // namespace component
+}
 
 }

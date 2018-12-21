@@ -3,6 +3,7 @@
 #include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
 #include <sofa/collisionAlgorithm/element/TriangleElement.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
+#include <sofa/collisionAlgorithm/BaseGeometryModifier.h>
 
 namespace sofa
 {
@@ -10,9 +11,9 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-ConstraintProximity::SPtr TriangleGeometry::createProximity(const TriangleElement * elmt,double f1,double f2,double f3,bool phongNormals) const
+ConstraintProximity::SPtr TriangleGeometry::createProximity(const TriangleElement * elmt,double f1,double f2,double f3) const
 {
-    return std::shared_ptr<TriangleProximity>(new TriangleProximity(elmt,f1,f2,f3,phongNormals));
+    return std::shared_ptr<TriangleProximity>(new TriangleProximity(elmt,f1,f2,f3));
 }
 
 void TriangleGeometry::prepareDetection()
