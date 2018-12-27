@@ -21,7 +21,8 @@ defaulttype::Vector3 FlatNormalHandler<TriangleGeometry>::internalGetNormal(cons
 }
 
 int FlatNormalHandlerClass = core::RegisterObject("FlatNormalHandler")
-.add< SofaFlatNormalHandler >();
+.add< SofaFlatNormalHandler >()
+.addAlias("FlatNormalHandler");
 
 SofaFlatNormalHandler::SofaFlatNormalHandler()
 : SofaBaseNormalHandler()

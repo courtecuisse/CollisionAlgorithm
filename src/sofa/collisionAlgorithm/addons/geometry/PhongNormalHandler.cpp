@@ -3,6 +3,8 @@
 #include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
 #include <sofa/collisionAlgorithm/element/TriangleElement.h>
 
+#include <sofa/core/ObjectFactory.h>
+
 namespace sofa
 {
 
@@ -25,6 +27,26 @@ defaulttype::Vector3 PhongNormalHandler<TriangleGeometry>::internalGetNormal(con
     return normals[element->pointIDs()[0]] * fact[0] +
            normals[element->pointIDs()[1]] * fact[1] +
            normals[element->pointIDs()[2]] * fact[2];
+}
+
+
+int PhongNormalHandlerClass = core::RegisterObject("PhongNormalHandler")
+.add< SofaPhongNormalHandler >()
+.addAlias("PhongNormalHandler");
+
+SofaPhongNormalHandler::SofaPhongNormalHandler()
+: SofaBaseNormalHandler()
+{
+    if(dynamic_cast<TriangleGeometry*>(l_geometry.get()))
+    {
+        m_impl = new PhongNormalHandler<TriangleGeometry>();
+    }
+
+}
+
+SofaPhongNormalHandler::~SofaPhongNormalHandler()
+{
+
 }
 
 }

@@ -42,11 +42,15 @@ protected:
 class SofaBaseNormalHandler : public sofa::core::objectmodel::BaseObject
 {
 public:
-    SOFA_CLASS(SofaBaseNormalHandler, sofa::core::objectmodel::BaseObject);
+    typedef sofa::core::objectmodel::BaseObject Inherit;
+
+    SOFA_ABSTRACT_CLASS(SofaBaseNormalHandler, Inherit);
 
     SofaBaseNormalHandler()
-        : sofa::core::objectmodel::BaseObject()
+        : Inherit()
         , m_impl(nullptr)
+        , l_geometry(initLink("geometry", "link to the geometry"))
+
     {}
     virtual ~SofaBaseNormalHandler() override
     {}
@@ -83,6 +87,8 @@ public:
     SOFA_CLASS(SofaFlatNormalHandler, SofaBaseNormalHandler);
 
     SofaFlatNormalHandler();
+
+    virtual ~SofaFlatNormalHandler() override {}
 
 
 };
