@@ -19,7 +19,8 @@ namespace collisionAlgorithm
 
 class SofaBaseNormalHandler;
 
-class BaseGeometry : public core::BehaviorModel {
+class BaseGeometry : public core::BehaviorModel
+{
 public:
     SOFA_CLASS(BaseGeometry,core::objectmodel::BaseObject);
 

@@ -8,14 +8,12 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class TElement>
-class PhongNormalHandler : TNormalHandler<TElement>
+template<typename TGeometry>
+class PhongNormalHandler : public TNormalHandler<TGeometry>
 {
-public:
-    defaulttype::Vector3 internalGetNormal(const TElement*, const double* fact) const;
-
+protected:
+    defaulttype::Vector3 internalGetNormal(const BaseGeometry*, const size_t, const double* fact) const ;
 };
-
 
 }
 

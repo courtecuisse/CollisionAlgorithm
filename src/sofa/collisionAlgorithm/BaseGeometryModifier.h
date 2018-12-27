@@ -14,28 +14,28 @@ namespace collisionAlgorithm
 class BaseNormalHandler
 {
 public:
-    virtual defaulttype::Vector3 getNormal(const BaseGeometry*,const unsigned, const double* fact) const = 0;
+    virtual defaulttype::Vector3 getNormal(const BaseGeometry*,const size_t, const double* fact) const = 0;
 
 };
 
-template<class TElement>
+template<class TGeometry>
 class TNormalHandler : public BaseNormalHandler
 {
 public:
-    virtual defaulttype::Vector3 getNormal(const BaseGeometry* geometry, const unsigned id, const double* fact) const
+    virtual defaulttype::Vector3 getNormal(const BaseGeometry* geometry, const size_t id, const double* fact) const
     {
-        return internalGetNormal(geometry->getElement(id), fact);
+        return internalGetNormal(geometry, id, fact);
     }
 protected:
-    virtual defaulttype::Vector3 internalGetNormal(const TElement*, const double* fact) const = 0;
+    virtual defaulttype::Vector3 internalGetNormal(const BaseGeometry*, const size_t id, const double* fact) const = 0;
 
 };
 
-template<typename TElement>
-class FlatNormalHandler : public TNormalHandler<TElement>
+template<typename TGeometry>
+class FlatNormalHandler : public TNormalHandler<TGeometry>
 {
 protected:
-    defaulttype::Vector3 internalGetNormal(const TElement*, const double* fact) const ;
+    defaulttype::Vector3 internalGetNormal(const BaseGeometry*, const size_t, const double* fact) const ;
 };
 
 
@@ -55,7 +55,7 @@ public:
     {
         if(!l_geometry.get())
         {
-            msg_warning(this) << "NO geometry given, finding one...";
+            msg_warning(this) << "No geometry given, finding one...";
             l_geometry.setPath("@.");
         }
         if(!l_geometry.get())
@@ -67,7 +67,7 @@ public:
         l_geometry->setNormalHandler(this);
     }
 
-    defaulttype::Vector3 getNormal(const unsigned elementID, const double* fact) const
+    defaulttype::Vector3 getNormal(const size_t elementID, const double* fact) const
     {
         return m_impl->getNormal(l_geometry.get(), elementID, fact);
     }

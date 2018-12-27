@@ -7,17 +7,17 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class TElement>
-defaulttype::Vector3 FlatNormalHandler<TElement>::internalGetNormal(const TElement*, const double* ) const
+template<class TGeometry>
+defaulttype::Vector3 FlatNormalHandler<TGeometry>::internalGetNormal(const BaseGeometry*, const size_t, const double* ) const
 {
-    msg_error("FlatNormalHandler") << "Element does not implement Phong Normal";
+    msg_error("FlatNormalHandler") << "Geometry does not implement Flat Normal";
     return defaulttype::Vector3();
 }
 
 template<>
-defaulttype::Vector3 FlatNormalHandler<TriangleElement>::internalGetNormal(const TriangleElement* element, const double* ) const
+defaulttype::Vector3 FlatNormalHandler<TriangleGeometry>::internalGetNormal(const BaseGeometry* geometry, const size_t id, const double* ) const
 {
-    return element->geometry()->triangleInfo(element->id()).tn;
+    return static_cast<const TriangleGeometry*>(geometry)->triangleInfo(id).tn;
 }
 
 int FlatNormalHandlerClass = core::RegisterObject("FlatNormalHandler")
@@ -28,8 +28,9 @@ SofaFlatNormalHandler::SofaFlatNormalHandler()
 {
     if(dynamic_cast<TriangleGeometry*>(l_geometry.get()))
     {
-        m_impl = new FlatNormalHandler<TriangleElement>();
+        m_impl = new FlatNormalHandler<TriangleGeometry>();
     }
+
 }
 
 
