@@ -60,10 +60,10 @@ void TriangleGeometry::prepareDetection()
     if(triangles.size() > 0)
     {
         m_pointNormal.resize(pos.size());
-        //TODO: remove need of topologycontainer
+
         for (size_t p=0;p<pos.size();p++)
         {
-            const core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = l_topology->getTrianglesAroundVertex(p);
+            const std::vector<TriangleID> & tav = m_trianglesAroundVertex[p];
             m_pointNormal[p] = defaulttype::Vector3(0,0,0);
             for (size_t t=0;t<tav.size();t++)
             {
@@ -77,22 +77,26 @@ void TriangleGeometry::prepareDetection()
 
 void TriangleGeometry::init()
 {
-    if(d_phongInterpolation.getValue() && !l_topology.get())
-    {
-        msg_error(this) << "Phong Interpolation needs (entire) topology.Phong will be disabled.";
-        d_phongInterpolation.setValue(false);
-    }
-
+    ///To remove if we think every input has to be explicit
     if(d_triangles.getValue().empty())
     {
-        msg_warning(this) << "Triangles are not set (data is empty). Will set from topology if given";
-        if(!l_topology.get())
+        msg_warning(this) << "Triangles are not set (data is empty). Will set from topology if present in the same context";
+        sofa::core::topology::BaseMeshTopology* topology{nullptr};
+        this->getContext()->get(topology);
+        if(!topology)
         {
             msg_error(this) << "No topology to work with ; giving up.";
         }
         else
         {
-            d_triangles.setParent(l_topology->findData("triangles"));
+            if(topology->getTriangles().empty())
+            {
+                msg_error(this) << "No topology with triangles to work with ; giving up.";
+            }
+            else
+            {
+                d_triangles.setParent(topology->findData("triangles"));
+            }
         }
     }
 
@@ -102,6 +106,16 @@ void TriangleGeometry::init()
     for (size_t i=0;i<triangles.size();i++)
     {
         m_elements.push_back(TriangleElement::createElement(this,i));
+    }
+
+    //store triangles around vertex information
+    const helper::ReadAccessor<DataVecCoord> & pos = getState()->read(core::VecCoordId::position());
+    m_trianglesAroundVertex.resize(pos.size());
+    for (size_t i = 0; i < triangles.size(); ++i)
+    {
+        // adding edge i in the edge shell of both points
+        for (size_t j=0; j<3; ++j)
+            m_trianglesAroundVertex[triangles[i][j]].push_back(i);
     }
 
     prepareDetection();

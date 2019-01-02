@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseGeometryModifier.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
 #include <sofa/core/objectmodel/BaseObject.h>
@@ -17,8 +18,6 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class SofaBaseNormalHandler;
-
 class BaseGeometry : public core::BehaviorModel
 {
 public:
@@ -31,8 +30,16 @@ public:
     BaseGeometry()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
     , l_state(initLink("mstate", "link to state"))
+    , l_normalHandler(initLink("normalHandler", "link to the normal handler"))
     {
         l_state.setPath("@.");
+    }
+
+    void bwdInit( ) override
+    {
+        setNormalHandler();
+
+        prepareDetection();
     }
 
     void updatePosition(SReal ) override
@@ -70,22 +77,33 @@ public:
         }
     }
 
-    void setNormalHandler(const SofaBaseNormalHandler* normalHandler)
-    {
-        m_normalHandler = normalHandler;
-    }
-
     defaulttype::Vector3 getNormal(const unsigned elementID, const double* fact) const;
 
 protected:
-    const SofaBaseNormalHandler* m_normalHandler;
+
+    virtual void setNormalHandler()
+    {
+        if(!l_normalHandler.get())
+        {
+            msg_warning(this) << "No normal handler given, finding one...";
+            l_normalHandler.setPath("@.");
+        }
+        if(!l_normalHandler.get())
+        {
+            msg_warning(this) << "No normal handler found, creating a null one";
+            SofaBaseNormalHandler::SPtr normalHandler = sofa::core::objectmodel::New<SofaBaseNormalHandler>(this);
+            this->getContext()->addObject(normalHandler);
+            l_normalHandler.set(normalHandler);
+        }
+    }
 
     std::vector<ConstraintElement::UPtr> m_elements;
-
 
     virtual void prepareDetection() {}
 
     core::objectmodel::SingleLink<BaseGeometry,sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes>,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
+    core::objectmodel::SingleLink<BaseGeometry,SofaBaseNormalHandler,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_normalHandler;
+
 };
 
 }

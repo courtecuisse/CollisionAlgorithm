@@ -7,32 +7,38 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class TGeometry>
-defaulttype::Vector3 FlatNormalHandler<TGeometry>::internalGetNormal(const BaseGeometry*, const size_t, const double* ) const
+void SofaBaseNormalHandler::draw(const sofa::core::visual::VisualParams* vparams)
 {
-    msg_error("FlatNormalHandler") << "Geometry does not implement Flat Normal";
-    return defaulttype::Vector3();
-}
+    if(!vparams->displayFlags().getShowNormals())
+        return;
 
-template<>
-defaulttype::Vector3 FlatNormalHandler<TriangleGeometry>::internalGetNormal(const BaseGeometry* geometry, const size_t id, const double* ) const
-{
-    return static_cast<const TriangleGeometry*>(geometry)->triangleInfo(id).tn;
-}
-
-int FlatNormalHandlerClass = core::RegisterObject("FlatNormalHandler")
-.add< SofaFlatNormalHandler >()
-.addAlias("FlatNormalHandler");
-
-SofaFlatNormalHandler::SofaFlatNormalHandler()
-: SofaBaseNormalHandler()
-{
-    if(dynamic_cast<TriangleGeometry*>(l_geometry.get()))
+    double fact[16];
+    std::fill_n(fact, 16, 1.0); // suppose that element will never be bigger than 16 subparts...
+    for(size_t i = 0 ; i<m_geometry->getNbElements() ; i++)
     {
-        m_impl = new FlatNormalHandler<TriangleGeometry>();
+        const ConstraintElement* element = m_geometry->getElement(i);
+        const defaulttype::Vector3& normal = this->getNormal(i,fact);
+        // center
+        defaulttype::Vector3 center;// = element->getControlPoint(-1)->getPosition(); //supposed to give the center but seems not...
+        for(size_t p = 0 ; p<element->getNbControlPoints() ; p++)
+            center += element->getControlPoint(p)->getPosition();
+        center /= element->getNbControlPoints();
+
+        vparams->drawTool()->drawArrow(center, center+normal, 0.1f, helper::types::RGBAColor::gray());
     }
 
 }
+
+template<>
+defaulttype::Vector3 SofaFlatNormalHandler<TriangleGeometry>::getNormal(const size_t id, const double* ) const
+{
+    return static_cast<const TriangleGeometry*>(m_geometry)->triangleInfo(id).tn;
+}
+
+int FlatNormalHandlerClass = core::RegisterObject("FlatNormalHandler")
+.add< SofaFlatNormalHandler<TriangleGeometry> >()
+.addAlias("FlatNormalHandler");
+
 
 
 }

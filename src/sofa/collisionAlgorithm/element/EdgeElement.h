@@ -15,7 +15,7 @@ class EdgeElement : public ConstraintElement
 
 public:
 
-    EdgeElement(EdgeGeometry * geo,unsigned eid)
+    EdgeElement(EdgeGeometry * geo,size_t eid)
         : ConstraintElement()
         , m_geometry(geo)
     {
@@ -85,8 +85,8 @@ public:
 
 protected:
     const EdgeGeometry* m_geometry;
-    unsigned m_pid[2];
-    unsigned m_eid;
+    size_t m_pid[2];
+    size_t m_eid;
 };
 
 }

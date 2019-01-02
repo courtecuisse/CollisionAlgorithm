@@ -15,10 +15,9 @@ class TriangleElement : public ConstraintElement
     friend class TriangleGeometry;
 
 public:
-    TriangleElement(TriangleGeometry * geo,unsigned eid)
+    TriangleElement(TriangleGeometry * geo,size_t eid)
         : ConstraintElement()
         , m_geometry(geo)
-        , phongInterpolation(geo->d_phongInterpolation.getValue())
     {
         m_eid = eid;
 
@@ -29,7 +28,7 @@ public:
         m_pid[2] = triangles[eid][2];
     }
 
-    static ConstraintElement::UPtr createElement(TriangleGeometry * geo,unsigned eid)
+    static ConstraintElement::UPtr createElement(TriangleGeometry * geo,size_t eid)
     {
         return std::unique_ptr<TriangleElement>(new TriangleElement(geo,eid));
     }
@@ -136,12 +135,12 @@ public:
         return m_geometry;
     }
 
-    inline const unsigned* pointIDs() const
+    inline const size_t* pointIDs() const
     {
         return m_pid;
     }
 
-    inline unsigned id() const
+    inline size_t id() const
     {
         return m_eid;
     }
@@ -170,9 +169,8 @@ public:
 
 protected:
     const TriangleGeometry* m_geometry;
-    unsigned m_pid[3];
-    unsigned m_eid;
-    const bool phongInterpolation;
+    size_t m_pid[3];
+    size_t m_eid;
 };
 
 }

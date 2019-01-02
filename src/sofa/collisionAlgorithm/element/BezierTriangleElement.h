@@ -15,7 +15,7 @@ class BezierTriangleElement : public TriangleElement
     friend class BezierTriangleProximity;
 public:
 
-    BezierTriangleElement(BezierTriangleGeometry * geo, unsigned eid)
+    BezierTriangleElement(BezierTriangleGeometry * geo, size_t eid)
         : TriangleElement(geo,eid)
         , m_bezierGeometry(geo)
     {}

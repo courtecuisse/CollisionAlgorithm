@@ -14,7 +14,7 @@ class PointElement : public ConstraintElement
     friend class PointGeometry;
 
 public:
-    PointElement(PointGeometry *geo, unsigned pid)
+    PointElement(PointGeometry *geo, size_t pid)
         : ConstraintElement()
         , m_geometry(geo)
     {
@@ -26,7 +26,7 @@ public:
         return  m_geometry;
     }
 
-    static ConstraintElement::UPtr createElement(PointGeometry *geo, unsigned pid)
+    static ConstraintElement::UPtr createElement(PointGeometry *geo, size_t pid)
     {
         return std::unique_ptr<PointElement>(new PointElement(geo,pid));
     }
@@ -57,7 +57,7 @@ public:
     }
 
 protected:
-    unsigned m_pid;
+    size_t m_pid;
     const PointGeometry* m_geometry;
 };
 

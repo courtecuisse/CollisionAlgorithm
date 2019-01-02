@@ -9,7 +9,7 @@ namespace collisionAlgorithm
 
 defaulttype::Vector3 BaseGeometry::getNormal(const unsigned elementID, const double* fact) const
 {
-    return m_normalHandler->getNormal(elementID, fact);
+    return l_normalHandler->getNormal(elementID, fact);
 }
 
 

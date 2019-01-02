@@ -19,6 +19,8 @@ class TriangleGeometry : public BaseGeometry
 
 public:
     typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
+    //typedef sofa::core::topology::BaseMeshTopology::TriangleID TriangleID;
+    typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
     typedef helper::vector<Triangle> VecTriangles;
 
     SOFA_CLASS(TriangleGeometry,BaseGeometry);
@@ -26,11 +28,7 @@ public:
     TriangleGeometry()
         : BaseGeometry()
         , d_triangles(initData(&d_triangles, VecTriangles(), "triangles", "Vector of Triangles"))
-        , d_phongInterpolation(initData(&d_phongInterpolation, true, "phongInterpolation", "Consider Phong Normals (normals from each point) instead of normal at each triangle"))
-        , l_topology(initLink("topology", "Link to topology"))
     {
-        if(!l_topology.get())
-            l_topology.setPath("@.");
 
     }
 
@@ -69,13 +67,11 @@ public:
     }
 
     Data<VecTriangles> d_triangles;
-    Data<bool> d_phongInterpolation;
 
 protected:
     std::vector<TriangleInfo> m_triangle_info;
     std::vector<defaulttype::Vector3> m_pointNormal;
-
-    core::objectmodel::SingleLink<TriangleGeometry,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
+    std::vector< std::vector<TriangleID> > m_trianglesAroundVertex;
 };
 
 
