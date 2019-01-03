@@ -69,6 +69,22 @@ public:
     Data<VecTriangles> d_triangles;
 
 protected:
+    virtual void setNormalHandler() override
+    {
+        if(!l_normalHandler.get())
+        {
+            msg_warning(this) << "No normal handler given, finding one...";
+            l_normalHandler.setPath("@.");
+        }
+        if(!l_normalHandler.get())
+        {
+            msg_warning(this) << "No normal handler found, creating a flat one";
+            SofaBaseNormalHandler::SPtr normalHandler = sofa::core::objectmodel::New<SofaFlatNormalHandler<TriangleGeometry> >(this);
+            this->getContext()->addObject(normalHandler);
+            l_normalHandler.set(normalHandler);
+        }
+    }
+
     std::vector<TriangleInfo> m_triangle_info;
     std::vector<defaulttype::Vector3> m_pointNormal;
     std::vector< std::vector<TriangleID> > m_trianglesAroundVertex;
