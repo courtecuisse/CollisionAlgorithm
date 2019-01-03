@@ -1,4 +1,4 @@
-#include <sofa/collisionAlgorithm/addons/geometry/AABBDecorator.inl>
+#include <sofa/collisionAlgorithm/decorator/AABBDecorator.inl>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa {

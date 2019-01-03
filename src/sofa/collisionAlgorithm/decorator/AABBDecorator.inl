@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <sofa/collisionAlgorithm/addons/geometry/AABBDecorator.h>
+#include <sofa/collisionAlgorithm/decorator/AABBDecorator.h>
 
 namespace sofa
 {
