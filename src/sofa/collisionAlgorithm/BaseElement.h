@@ -6,43 +6,14 @@
 #include <sofa/core/objectmodel/BaseObject.h>
 #include <sofa/core/VecId.h>
 #include <sofa/core/behavior/MechanicalState.h>
+#include <sofa/core/MultiVecId.h>
+#include <sofa/collisionAlgorithm/BaseProximity.h>
 
 namespace sofa
 {
 
 namespace collisionAlgorithm
 {
-
-class ConstraintElement;
-class BaseGeometry;
-
-class ConstraintProximity
-{
-public :
-    typedef std::shared_ptr<ConstraintProximity> SPtr;
-    typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
-
-    ConstraintProximity(const ConstraintElement *elmt);
-
-    virtual ~ConstraintProximity() {}
-
-    virtual inline const ConstraintElement* element() const = 0;
-
-    virtual defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
-
-    virtual defaulttype::Vector3 getNormal() const = 0;
-
-    virtual std::map<unsigned,double> getContributions() const = 0;
-
-    inline sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * getState() const
-    {
-        return m_state;
-    }
-
-protected:
-//    const ConstraintElement * m_element;
-    sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * m_state;
-};
 
 class ConstraintElement
 {
@@ -73,6 +44,6 @@ public:
 
 };
 
-} // namespace controller
+}
 
 }

@@ -16,24 +16,24 @@ class BezierTriangleProximity : public TriangleProximity
     friend class BezierTriangleGeometry;
 public:
 
-    BezierTriangleProximity(const BezierTriangleElement * geo, double f1, double f2, double f3)
-        : TriangleProximity(geo,f1,f2,f3)
-        , m_bezierElement(geo)
+    BezierTriangleProximity(const BezierTriangleElement * elmt, double f1, double f2, double f3)
+    : TriangleProximity(elmt,f1,f2,f3)
+    , m_bezierElement(elmt)
     {}
 
     ////Bezier triangle are computed according to :
     ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
     defaulttype::Vector3 getPosition(core::VecCoordId v) const override
     {
-        const BezierTriangleGeometry::BezierTriangleInfo & tbinfo = element()->geometry()->m_beziertriangle_info[element()->m_eid];
+        const BezierTriangleGeometry::BezierTriangleInfo & tbinfo = m_bezierElement->geometry()->m_beziertriangle_info[m_bezierElement->m_eid];
 
         if(v == core::VecCoordId::position())
         {
             const helper::ReadAccessor<DataVecCoord> & x = m_state->read(v);
 
-            const defaulttype::Vector3 & p300 = x[element()->m_pid[2]];
-            const defaulttype::Vector3 & p030 = x[element()->m_pid[1]];
-            const defaulttype::Vector3 & p003 = x[element()->m_pid[0]];
+            const defaulttype::Vector3 & p300 = x[m_bezierElement->m_pid[2]];
+            const defaulttype::Vector3 & p030 = x[m_bezierElement->m_pid[1]];
+            const defaulttype::Vector3 & p003 = x[m_bezierElement->m_pid[0]];
 
             double fact_w = m_fact[2];
             double fact_u = m_fact[1];
@@ -58,13 +58,13 @@ public:
 
             const helper::ReadAccessor<DataVecCoord> & x = m_state->read(core::VecCoordId::freePosition());
 
-            const defaulttype::Vector3 & p300_Free = x[element()->m_pid[2]];
-            const defaulttype::Vector3 & p030_Free = x[element()->m_pid[1]];
-            const defaulttype::Vector3 & p003_Free = x[element()->m_pid[0]];
+            const defaulttype::Vector3 & p300_Free = x[m_bezierElement->m_pid[2]];
+            const defaulttype::Vector3 & p030_Free = x[m_bezierElement->m_pid[1]];
+            const defaulttype::Vector3 & p003_Free = x[m_bezierElement->m_pid[0]];
 
-            const defaulttype::Vector3 & n200_Free = element()->geometry()->m_pointNormal[element()->m_pid[2]];
-            const defaulttype::Vector3 & n020_Free = element()->geometry()->m_pointNormal[element()->m_pid[1]];
-            const defaulttype::Vector3 & n002_Free = element()->geometry()->m_pointNormal[element()->m_pid[0]];
+            const defaulttype::Vector3 & n200_Free = m_bezierElement->geometry()->m_pointNormal[m_bezierElement->m_pid[2]];
+            const defaulttype::Vector3 & n020_Free = m_bezierElement->geometry()->m_pointNormal[m_bezierElement->m_pid[1]];
+            const defaulttype::Vector3 & n002_Free = m_bezierElement->geometry()->m_pointNormal[m_bezierElement->m_pid[0]];
 
             double w12_free = dot(p030_Free - p300_Free,n200_Free);
             double w21_free = dot(p300_Free - p030_Free,n020_Free);
@@ -106,11 +106,11 @@ public:
 
     defaulttype::Vector3 getNormal() const override
     {
-        const BezierTriangleGeometry::BezierTriangleInfo & tbinfo = element()->geometry()->m_beziertriangle_info[element()->m_eid];
+        const BezierTriangleGeometry::BezierTriangleInfo & tbinfo = m_bezierElement->geometry()->m_beziertriangle_info[m_bezierElement->m_eid];
 
-        const defaulttype::Vector3 &n200 = element()->geometry()->m_pointNormal[element()->m_pid[2]];
-        const defaulttype::Vector3 &n020 = element()->geometry()->m_pointNormal[element()->m_pid[1]];
-        const defaulttype::Vector3 &n002 = element()->geometry()->m_pointNormal[element()->m_pid[0]];
+        const defaulttype::Vector3 &n200 = m_bezierElement->geometry()->m_pointNormal[m_bezierElement->m_pid[2]];
+        const defaulttype::Vector3 &n020 = m_bezierElement->geometry()->m_pointNormal[m_bezierElement->m_pid[1]];
+        const defaulttype::Vector3 &n002 = m_bezierElement->geometry()->m_pointNormal[m_bezierElement->m_pid[0]];
 
         double fact_w = m_fact[2];
         double fact_u = m_fact[1];
@@ -129,10 +129,6 @@ public:
         return N1;
     }
 
-    inline const BezierTriangleElement * element() const override
-    {
-        return m_bezierElement;
-    }
 
 private:
     const BezierTriangleElement* m_bezierElement;

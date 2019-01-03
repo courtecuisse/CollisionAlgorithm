@@ -1,0 +1,81 @@
+﻿#pragma once
+
+#include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
+#include <sofa/collisionAlgorithm/element/TriangleElement.h>
+
+namespace sofa
+{
+
+namespace collisionAlgorithm
+{
+
+class TriangleProximity : public ConstraintProximity
+{
+public :
+
+    static ConstraintProximity::SPtr createProximity(const TriangleElement * elmt,double f1,double f2,double f3);
+
+<<<<<<< Updated upstream
+    TriangleProximity(const TriangleElement * elmt,double f1,double f2,double f3)
+        : ConstraintProximity (elmt)
+        , m_element(elmt)
+    {
+=======
+
+    TriangleProximity(const TriangleElement * elmt,double f1,double f2,double f3, bool phongNormals = true)
+    : m_element(elmt)
+    , m_state(elmt->geometry()->getState()) {
+>>>>>>> Stashed changes
+        m_fact[0] = f1;
+        m_fact[1] = f2;
+        m_fact[2] = f3;
+    }
+
+    virtual ~TriangleProximity()
+    {
+    }
+
+    virtual defaulttype::Vector3 getPosition(core::VecCoordId v) const
+    {
+        const helper::ReadAccessor<DataVecCoord> & pos = m_state->read(v);
+
+        return pos[element()->m_pid[0]] * m_fact[0] +
+               pos[element()->m_pid[1]] * m_fact[1] +
+               pos[element()->m_pid[2]] * m_fact[2];
+    }
+
+    virtual defaulttype::Vector3 getNormal() const
+    {
+        return element()->geometry()->getNormal(element()->id(), m_fact);
+    }
+
+    virtual std::map<unsigned,double> getContributions() const
+    {
+        std::map<unsigned,double> res;
+
+        res[element()->m_pid[0]] = m_fact[0];
+        res[element()->m_pid[1]] = m_fact[1];
+        res[element()->m_pid[2]] = m_fact[2];
+
+        return res;
+    }
+
+    virtual inline const TriangleElement* element() const
+    {
+        return m_element;
+    }
+
+    double m_fact[3];
+protected:
+    const TriangleElement* m_element;
+<<<<<<< Updated upstream
+=======
+    sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * m_state;
+
+    std::function<defaulttype::Vector3(const TriangleElement*, const double [3]) > m_normalFunction;
+>>>>>>> Stashed changes
+};
+
+}
+
+}

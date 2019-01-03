@@ -16,8 +16,8 @@ class TriangleElement : public ConstraintElement
 
 public:
     TriangleElement(TriangleGeometry * geo,size_t eid)
-        : ConstraintElement()
-        , m_geometry(geo)
+    : ConstraintElement()
+    , m_geometry(geo)
     {
         m_eid = eid;
 

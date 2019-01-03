@@ -7,6 +7,7 @@
 #include <sofa/core/objectmodel/BaseObject.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/BehaviorModel.h>
+#include <sofa/core/collision/Pipeline.h>
 #include <memory>
 #include <map>
 #include <vector>
@@ -18,10 +19,10 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class BaseGeometry : public core::BehaviorModel
+class BaseGeometry : public core::collision::Pipeline
 {
 public:
-    SOFA_CLASS(BaseGeometry,core::objectmodel::BaseObject);
+    SOFA_CLASS(BaseGeometry,core::collision::Pipeline);
 
     typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
     
@@ -42,10 +43,15 @@ public:
         prepareDetection();
     }
 
-    void updatePosition(SReal ) override
-    {
+    virtual void reset() override {}
+
+    virtual void computeCollisionReset() override {
         prepareDetection();
     }
+
+    virtual void computeCollisionResponse() override {}
+
+    void computeCollisionDetection() override {}
 
     std::size_t getNbElements() const
     {
@@ -95,6 +101,17 @@ protected:
             this->getContext()->addObject(normalHandler);
             l_normalHandler.set(normalHandler);
         }
+    }
+
+    virtual void doCollisionReset() override {}
+
+    virtual void doCollisionDetection(const sofa::helper::vector<core::CollisionModel*>& /*collisionModels*/) override {}
+
+    virtual void doCollisionResponse() override {}
+
+    virtual std::set< std::string > getResponseList() const override {
+        std::set< std::string > res;
+        return res;
     }
 
     std::vector<ConstraintElement::UPtr> m_elements;
