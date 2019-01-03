@@ -9,7 +9,7 @@
 #include <memory>
 #include <map>
 #include <vector>
-#include <qopengl.h>
+#include <GL/gl.h>
 
 namespace sofa {
 

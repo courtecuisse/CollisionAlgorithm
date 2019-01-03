@@ -37,7 +37,7 @@ public :
         }
         else
         {
-            m_normalFunction = [](const TriangleElement* elm, const double fact[3]) -> defaulttype::Vector3
+            m_normalFunction = [](const TriangleElement* elm, const double /*fact*/[3]) -> defaulttype::Vector3
             {
                 return elm->geometry()->m_triangle_info[elm->m_eid].tn;
             };
