@@ -35,10 +35,6 @@ public :
         m_fact[2] = f3;
     }
 
-    virtual ~TriangleProximity()
-    {
-    }
-
     virtual defaulttype::Vector3 getPosition(core::VecCoordId v) const
     {
         const helper::ReadAccessor<DataVecCoord> & pos = m_state->read(v);

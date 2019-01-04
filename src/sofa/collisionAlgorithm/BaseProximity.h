@@ -70,6 +70,10 @@ public :
     virtual defaulttype::Vector3 getNormal() const = 0;
 
     virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, ConstraintNormal & normals, double fact, unsigned constraintId) const = 0;
+
+//    virtual sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * getState() = 0;
+
+//    virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda, unsigned constraintId) const = 0;
 };
 
 class FixedProximity : public ConstraintProximity {
@@ -90,6 +94,10 @@ public:
     }
 
     void buildJacobianConstraint(core::MultiMatrixDerivId /*cId*/, ConstraintNormal & /*m_normals*/, double /*fact*/, unsigned /*constraintId*/) const {}
+
+//    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId /*res*/, const sofa::defaulttype::BaseVector* /*lambda*/, unsigned /*constraintId*/) const {}
+
+//    virtual sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * getState() { return NULL; }
 
     defaulttype::Vector3 m_position;
 };

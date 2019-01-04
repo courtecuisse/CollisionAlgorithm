@@ -26,20 +26,15 @@ public :
 
     EdgeProximity(const EdgeElement * elmt,double f1,double f2)
     : m_element(elmt)
-    , m_state(elmt->geometry()->getState()) {
+    , m_state(m_element->geometry()->getState()) {
         m_fact[0] = f1;
         m_fact[1] = f2;
-    }
-
-    inline const EdgeElement* element() const
-    {
-        return  m_element;
     }
 
     defaulttype::Vector3 getPosition(core::VecCoordId v) const
     {
         const helper::ReadAccessor<DataVecCoord> pos = m_state->read(v);
-        return pos[element()->m_pid[0]] * m_fact[0] + pos[element()->m_pid[1]] * m_fact[1];
+        return pos[m_element->m_pid[0]] * m_fact[0] + pos[m_element->m_pid[1]] * m_fact[1];
     }
 
     defaulttype::Vector3 getNormal() const
@@ -54,8 +49,8 @@ public :
         for (unsigned j=0;j<normals.size();j++) {
             MatrixDerivRowIterator c_it = c1.writeLine(constraintId+j);
 
-            c_it.addCol(element()->m_pid[0], normals[j] * m_fact[0] * fact);
-            c_it.addCol(element()->m_pid[1], normals[j] * m_fact[1] * fact);
+            c_it.addCol(m_element->m_pid[0], normals[j] * m_fact[0] * fact);
+            c_it.addCol(m_element->m_pid[1], normals[j] * m_fact[1] * fact);
         }
 
         c1_d.endEdit();

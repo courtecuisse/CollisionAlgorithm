@@ -31,7 +31,7 @@ public :
     defaulttype::Vector3 getPosition(core::VecCoordId v) const
     {
         const helper::ReadAccessor<DataVecCoord> & pos = m_state->read(v);
-        return pos[element()->m_pid];
+        return pos[m_element->m_pid];
     }
 
     defaulttype::Vector3 getNormal() const
@@ -46,16 +46,13 @@ public :
         for (unsigned j=0;j<normals.size();j++) {
             MatrixDerivRowIterator c_it = c1.writeLine(constraintId+j);
 
-            c_it.addCol(element()->m_pid, normals[j] * fact);
+            c_it.addCol(m_element->m_pid, normals[j] * fact);
         }
 
         c1_d.endEdit();
     }
 
-    inline const PointElement * element() const
-    {
-        return m_element;
-    }
+//    sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * getState() { return m_state; }
 
 protected:
     const PointElement* m_element;
