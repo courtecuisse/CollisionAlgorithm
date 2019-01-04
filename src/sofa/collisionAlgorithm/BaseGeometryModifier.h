@@ -99,7 +99,7 @@ class SofaFlatNormalHandler : public SofaTNormalHandler<TGeometry>
 public:
     SOFA_CLASS(SofaFlatNormalHandler, SofaBaseNormalHandler);
 
-    SofaFlatNormalHandler(const BaseGeometry* geometry)
+    SofaFlatNormalHandler(const BaseGeometry* geometry = NULL)
         : SofaTNormalHandler<TGeometry>(geometry)
     {
 

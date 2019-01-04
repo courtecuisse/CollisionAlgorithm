@@ -15,7 +15,7 @@ class SofaPhongNormalHandler : public SofaTNormalHandler<TGeometry>
 public:
     SOFA_CLASS(SofaPhongNormalHandler, SofaBaseNormalHandler);
 
-    SofaPhongNormalHandler(const BaseGeometry* geometry)
+    SofaPhongNormalHandler(const BaseGeometry* geometry = NULL)
         : SofaTNormalHandler<TGeometry>(geometry)
     {
 

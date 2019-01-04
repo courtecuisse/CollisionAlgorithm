@@ -1,6 +1,8 @@
 #include <sofa/collisionAlgorithm/BaseGeometryModifier.h>
 #include <sofa/collisionAlgorithm/element/TriangleElement.h>
 #include <sofa/core/ObjectFactory.h>
+#include <sofa/helper/types/RGBAColor.h>
+
 namespace sofa
 {
 
