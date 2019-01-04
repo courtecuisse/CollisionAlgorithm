@@ -100,9 +100,9 @@ ConstraintProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTria
     TriangleProximity * linear_prox = reinterpret_cast<TriangleProximity*>(elmt->TriangleElement::project(P).get());
 
     double fact[3];
-    fact[0] = linear_prox->m_fact[0];
-    fact[1] = linear_prox->m_fact[1];
-    fact[2] = linear_prox->m_fact[2];
+    fact[0] = linear_prox->getFactors()[0];
+    fact[1] = linear_prox->getFactors()[1];
+    fact[2] = linear_prox->getFactors()[2];
 //    ConstraintProximityPtr((ConstraintProximity *)pfrom)->refineToClosestPoint(P);
 
     unsigned max_it = d_nonlin_max_it.getValue();

@@ -64,10 +64,13 @@ public :
         c1_d.endEdit();
     }
 
-    double m_fact[3];
+    double * getFactors() { return m_fact; }
+
 protected:
     const TriangleElement* m_element;
     sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * m_state;
+    double m_fact[3];
+
 };
 
 }

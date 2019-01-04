@@ -34,7 +34,7 @@ protected:
     const BaseElementFilter* m_filter;
 };
 
-class BaseElementFilter : public core::BehaviorModel
+class BaseElementFilter : public core::collision::Pipeline
 {
 public:
     SOFA_ABSTRACT_CLASS(BaseElementFilter, core::BehaviorModel);
@@ -49,12 +49,15 @@ public:
                 l_geometry.setPath("@.");
     }
 
-    virtual ~BaseElementFilter() override {}
+    virtual void reset() override {}
 
-    void updatePosition(SReal ) override
-    {
+    virtual void computeCollisionReset() override {
         prepareDetection();
     }
+
+    virtual void computeCollisionResponse() override {}
+
+    void computeCollisionDetection() override {}
 
     void init() override
     {
@@ -66,6 +69,7 @@ public:
     }
 
     virtual void prepareDetection() = 0;
+
     virtual std::unique_ptr<BaseElementFilterIterator> iterator(const ConstraintElement *from) = 0;
 
     inline const BaseGeometry* geometry() const { return l_geometry.get(); }
@@ -73,6 +77,18 @@ public:
 
 protected:
     core::objectmodel::SingleLink<BaseElementFilter,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+
+    virtual void doCollisionReset() override {}
+
+    virtual void doCollisionDetection(const sofa::helper::vector<core::CollisionModel*>& /*collisionModels*/) override {}
+
+    virtual void doCollisionResponse() override {}
+
+    virtual std::set< std::string > getResponseList() const override {
+        std::set< std::string > res;
+        return res;
+    }
+
 };
 
 
