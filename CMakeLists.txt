@@ -21,6 +21,7 @@ file(GLOB_RECURSE SCENES_FILES
 set (CMAKE_CXX_STANDARD 11)
 
 find_package( OpenGL REQUIRED )
+find_package( Qt5 COMPONENTS OpenGL REQUIRED)
 find_package( Eigen3 REQUIRED )
 
 include_directories(${EIGEN3_INCLUDE_DIR})
@@ -34,7 +35,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${Collision
 target_include_directories(${PROJECT_NAME} PUBLIC "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DPLUGIN_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\"")
-target_link_libraries(${PROJECT_NAME} SofaCore SofaSimulationCommon ${OPENGL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} SofaCore SofaSimulationCommon Qt5::OpenGL)
 
 ## Install rules for the library and headers; CMake package configurations files
 sofa_create_package(${PROJECT_NAME} 0.1 ${PROJECT_NAME} ${PROJECT_NAME})

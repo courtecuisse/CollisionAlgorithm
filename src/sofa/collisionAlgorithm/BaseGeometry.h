@@ -11,7 +11,7 @@
 #include <memory>
 #include <map>
 #include <vector>
-#include <GL/gl.h>
+#include <qopengl.h>
 
 namespace sofa
 {
