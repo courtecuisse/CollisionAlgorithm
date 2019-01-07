@@ -135,7 +135,7 @@ void PointCloudBindingAlgorithm::processAlgorithm()
         pair.first = l_from->getElement(bindId[i])->getControlPoint();
         pair.second = l_dest->getElement(invBind[i])->getControlPoint();
 
-        addDetectionOutput(pair.first->getPosition() - pair.second->getPosition(), pair.first,pair.second);
+        addDetectionOutput(pair.first,pair.second);
     }
 
 }

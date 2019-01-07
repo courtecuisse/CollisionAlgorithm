@@ -58,17 +58,7 @@ void CollisionDetectionAlgorithm::findClosestPoint(std::unique_ptr<ElementIterat
     if (min_pair.first == nullptr) return;
     if (min_pair.second == nullptr) return;
 
-
-    defaulttype::Vector3 mainDir = min_pair.second->getNormal();//pair.first->getPosition() - pair.second->getPosition();
-    defaulttype::Vector3 secondDir = -min_pair.first->getNormal();
-
-    if (mainDir.norm()<0.01) mainDir = secondDir;
-    else {
-        mainDir.normalize();
-        if (dot(mainDir,secondDir) < 0) mainDir = secondDir;
-    }
-
-    addDetectionOutput(mainDir, min_pair.first,min_pair.second);
+    addDetectionOutput(min_pair.first,min_pair.second);
 }
 
 void CollisionDetectionAlgorithm::processAlgorithm()

@@ -49,7 +49,7 @@ public :
         return m_element->geometry()->getNormal(m_element->id(), m_fact);
     }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, ConstraintNormal & normals, double fact, unsigned constraintId) const {
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId,  const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
         DataMatrixDeriv & c1_d = *cId[m_state].write();
         MatrixDeriv & c1 = *c1_d.beginEdit();
 
@@ -65,6 +65,12 @@ public :
     }
 
     double * getFactors() { return m_fact; }
+
+    sofa::core::behavior::BaseMechanicalState * getState() const { return m_state; }
+
+    virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) const {
+        TstoreLambda<DataTypes>(cParams, *res[m_state].write(), *cParams->readJ(m_state), lambda);
+    }
 
 protected:
     const TriangleElement* m_element;

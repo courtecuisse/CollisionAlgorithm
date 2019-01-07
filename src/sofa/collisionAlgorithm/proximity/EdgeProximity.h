@@ -42,7 +42,7 @@ public :
         return defaulttype::Vector3(1,0,0);
     }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, ConstraintNormal & normals, double fact, unsigned constraintId) const {
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
         DataMatrixDeriv & c1_d = *cId[m_state].write();
         MatrixDeriv & c1 = *c1_d.beginEdit();
 
@@ -54,6 +54,12 @@ public :
         }
 
         c1_d.endEdit();
+    }
+
+    sofa::core::behavior::BaseMechanicalState * getState() const { return m_state; }
+
+    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) const {
+        ConstraintProximity::TstoreLambda<DataTypes>(cParams, *res[m_state].write(), *cParams->readJ(m_state), lambda);
     }
 
 protected:

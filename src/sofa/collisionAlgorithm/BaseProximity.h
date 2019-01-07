@@ -5,6 +5,8 @@
 #include <vector>
 #include <sofa/core/VecId.h>
 #include <sofa/core/MultiVecId.h>
+#include <sofa/defaulttype/BaseVector.h>
+#include <sofa/core/ConstraintParams.h>
 
 namespace sofa
 {
@@ -16,47 +18,6 @@ class ConstraintElement;
 class BaseGeometry;
 class ConstraintProximity;
 
-class ConstraintNormal {
-public:
-    unsigned size() const {
-        return m_normals.size();
-    }
-
-    ConstraintNormal(defaulttype::Vector3 n1) {
-        m_normals.push_back(n1.normalized());
-    }
-
-    ConstraintNormal(defaulttype::Vector3 n1,defaulttype::Vector3 n2) {
-        m_normals.push_back(n1.normalized());
-        m_normals.push_back(n2.normalized());
-    }
-
-    ConstraintNormal(defaulttype::Vector3 n1,defaulttype::Vector3 n2,defaulttype::Vector3 n3) {
-        m_normals.push_back(n1.normalized());
-        m_normals.push_back(n2.normalized());
-        m_normals.push_back(n3.normalized());
-    }
-
-    void normalize(unsigned sz) {
-        if (m_normals.size() > sz) m_normals.resize(sz);
-    }
-
-    static ConstraintNormal createFrame(defaulttype::Vector3 N1 = defaulttype::Vector3()) {
-        if (N1.norm() == 0) N1 = defaulttype::Vector3(1,0,0);
-        defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(0,1,0)))>0.99) ? defaulttype::Vector3(0,0,1) : defaulttype::Vector3(0,1,0)));
-        defaulttype::Vector3 N3 = cross(N1,N2);
-
-        return ConstraintNormal(N1,N2,N3);
-    }
-
-    defaulttype::Vector3 operator[](unsigned sz) {
-        return m_normals[sz];
-    }
-
-    std::vector<defaulttype::Vector3> m_normals;
-    std::shared_ptr<ConstraintProximity> m_prox;
-};
-
 class ConstraintProximity {
 public :
     typedef std::shared_ptr<ConstraintProximity> SPtr;
@@ -66,11 +27,20 @@ public :
 
     virtual defaulttype::Vector3 getNormal() const = 0;
 
-    virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, ConstraintNormal & normals, double fact, unsigned constraintId) const = 0;
+    virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & dir, double fact, unsigned constraintId) const = 0;
 
-//    virtual sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * getState() = 0;
+    virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
-//    virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda, unsigned constraintId) const = 0;
+    virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) const = 0;
+
+protected:
+    template<class DataTypes>
+    static void TstoreLambda(const core::ConstraintParams* cParams, Data<typename DataTypes::VecDeriv>& result, const Data<typename DataTypes::MatrixDeriv>& jacobian, const sofa::defaulttype::BaseVector* lambda) {
+        auto res = sofa::helper::write(result, cParams);
+        const typename DataTypes::MatrixDeriv& j = jacobian.getValue(cParams);
+        j.multTransposeBaseVector(res, lambda ); // lambda is a vector of scalar value so block size is one.
+    }
+
 };
 
 //Default Proximity for fixed position
@@ -87,17 +57,15 @@ public:
         return defaulttype::Vector3();
     }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId /*cId*/, ConstraintNormal & /*m_normals*/, double /*fact*/, unsigned /*constraintId*/) const {}
+    void buildJacobianConstraint(core::MultiMatrixDerivId /*cId*/, const helper::vector<defaulttype::Vector3> & /*m_normals*/, double /*fact*/, unsigned /*constraintId*/) const {}
 
-//    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId /*res*/, const sofa::defaulttype::BaseVector* /*lambda*/, unsigned /*constraintId*/) const {}
+    void storeLambda(const core::ConstraintParams* /*cParams*/, core::MultiVecDerivId /*res*/, const sofa::defaulttype::BaseVector* /*lambda*/) const {}
 
-//    virtual sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * getState() { return NULL; }
+    sofa::core::behavior::BaseMechanicalState * getState() const { return NULL; }
 
     defaulttype::Vector3 m_position;
 };
 
 }
-
-using ConstraintNormal=collisionAlgorithm::ConstraintNormal;
 
 }

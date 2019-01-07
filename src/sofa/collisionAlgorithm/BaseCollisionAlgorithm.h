@@ -13,9 +13,8 @@ namespace collisionAlgorithm
 
 class DetectionOutput {
 public:
-    DetectionOutput(const defaulttype::Vector3 & mainDir, ConstraintProximity::SPtr p1, ConstraintProximity::SPtr p2)
-    : m_dir(mainDir.normalized())
-    , m_firstProx(p1)
+    DetectionOutput(ConstraintProximity::SPtr p1, ConstraintProximity::SPtr p2)
+    : m_firstProx(p1)
     , m_secondProx(p2) {}
 
     inline ConstraintProximity::SPtr getFirstProximity() const {
@@ -26,12 +25,7 @@ public:
         return m_secondProx;
     }
 
-    inline defaulttype::Vector3 getNormal() const {
-        return m_dir;
-    }
-
 protected:
-    const defaulttype::Vector3 m_dir;
     ConstraintProximity::SPtr m_firstProx;
     ConstraintProximity::SPtr m_secondProx;
 };
@@ -79,12 +73,12 @@ public :
         return res;
     }
 
-    inline void addDetectionOutput(defaulttype::Vector3 mainDir, ConstraintProximity::SPtr p1,defaulttype::Vector3 & P) {
-        m_output.push_back(DetectionOutput(mainDir,p1,std::shared_ptr<FixedProximity>(new FixedProximity(P))));
+    inline void addDetectionOutput(ConstraintProximity::SPtr p1,defaulttype::Vector3 & P) {
+        m_output.push_back(DetectionOutput(p1,std::shared_ptr<FixedProximity>(new FixedProximity(P))));
     }
 
-    inline void addDetectionOutput(defaulttype::Vector3 mainDir, ConstraintProximity::SPtr p1, ConstraintProximity::SPtr p2) {
-        m_output.push_back(DetectionOutput(mainDir,p1,p2));
+    inline void addDetectionOutput(ConstraintProximity::SPtr p1, ConstraintProximity::SPtr p2) {
+        m_output.push_back(DetectionOutput(p1,p2));
     }
 
     const helper::vector<DetectionOutput> & getOutput() {
