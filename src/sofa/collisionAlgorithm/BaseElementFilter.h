@@ -37,7 +37,7 @@ protected:
 class BaseElementFilter : public core::collision::Pipeline
 {
 public:
-    SOFA_ABSTRACT_CLASS(BaseElementFilter, core::BehaviorModel);
+    SOFA_ABSTRACT_CLASS(BaseElementFilter, core::collision::Pipeline);
 
     BaseElementFilter(BaseGeometry* geometry = nullptr)
         :l_geometry(initLink("geometry", "link to the filtered geometry"))
@@ -118,7 +118,7 @@ protected:
 class DefaultElementFilter : public BaseElementFilter
 {
 public:
-    SOFA_CLASS(DefaultElementFilter, core::BehaviorModel);
+    SOFA_CLASS(DefaultElementFilter, BaseElementFilter);
 
 //    Data<defaulttype::Vec3i> d_nbox;
 

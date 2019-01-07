@@ -45,7 +45,7 @@ class AABBDecorator : public BaseElementFilter
 public:
     typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
 
-    SOFA_CLASS(AABBDecorator, core::BehaviorModel);
+    SOFA_CLASS(AABBDecorator, BaseElementFilter);
 
     Data<defaulttype::Vec3i> d_nbox;
 

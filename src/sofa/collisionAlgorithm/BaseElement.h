@@ -3,10 +3,6 @@
 #include <memory>
 #include <map>
 #include <vector>
-#include <sofa/core/objectmodel/BaseObject.h>
-#include <sofa/core/VecId.h>
-#include <sofa/core/behavior/MechanicalState.h>
-#include <sofa/core/MultiVecId.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 
 namespace sofa
@@ -18,12 +14,10 @@ namespace collisionAlgorithm
 class ConstraintElement
 {
     friend class ConstraintProximity;
+
 public:
     typedef std::unique_ptr<ConstraintElement> UPtr;
     typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
-
-    ConstraintElement()
-    {}
 
     virtual ~ConstraintElement() {}
 
