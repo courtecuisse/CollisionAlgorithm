@@ -37,8 +37,16 @@ defaulttype::Vector3 SofaFlatNormalHandler<TriangleGeometry>::getNormal(const si
     return static_cast<const TriangleGeometry*>(m_geometry)->triangleInfo(id).tn;
 }
 
+template<>
+defaulttype::Vector3 SofaFlatNormalHandler<PointGeometry>::getNormal(const size_t id, const double* ) const
+{
+    ///TODO !
+    return defaulttype::Vector3(0,0,1);
+}
+
 int FlatNormalHandlerClass = core::RegisterObject("FlatNormalHandler")
 .add< SofaFlatNormalHandler<TriangleGeometry> >()
+.add< SofaFlatNormalHandler<PointGeometry> >()
 .addAlias("FlatNormalHandler");
 
 

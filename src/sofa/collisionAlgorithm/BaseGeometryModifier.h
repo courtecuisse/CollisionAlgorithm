@@ -70,7 +70,7 @@ public:
         context->get(geometry);
         if (!geometry)
             return false;
-        if(!static_cast<TGeometry*>(geometry))
+        if(!dynamic_cast<TGeometry*>(geometry))
             return false;
 
         return BaseObject::canCreate(obj, context, arg);
@@ -99,7 +99,7 @@ class SofaFlatNormalHandler : public SofaTNormalHandler<TGeometry>
 public:
     SOFA_CLASS(SofaFlatNormalHandler, SofaBaseNormalHandler);
 
-    SofaFlatNormalHandler(const BaseGeometry* geometry = NULL)
+    SofaFlatNormalHandler(const BaseGeometry* geometry = nullptr)
         : SofaTNormalHandler<TGeometry>(geometry)
     {
 
