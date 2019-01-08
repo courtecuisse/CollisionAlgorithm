@@ -17,7 +17,7 @@ BezierTriangleGeometry::BezierTriangleGeometry()
 , d_draw_tesselation(initData(&d_draw_tesselation,(unsigned) 0.0, "tesselation", "Number of tesselation"))
 {}
 
-ConstraintProximity::SPtr BezierTriangleGeometry::createProximity(const BezierTriangleElement * elmt, double f1, double f2, double f3) const
+BaseProximity::SPtr BezierTriangleGeometry::createProximity(const BezierTriangleElement * elmt, double f1, double f2, double f3) const
 {
     return std::shared_ptr<BezierTriangleProximity>(new BezierTriangleProximity(elmt, f1, f2, f3));
 }
@@ -93,7 +93,7 @@ void BezierTriangleGeometry::prepareDetection()
     }
 }
 
-ConstraintProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTriangleElement *elmt, defaulttype::Vector3 P) const
+BaseProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTriangleElement *elmt, defaulttype::Vector3 P) const
 {
     //initialize the algorithm xith the projection on a linear triangle
 
@@ -103,7 +103,7 @@ ConstraintProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTria
     fact[0] = linear_prox->getFactors()[0];
     fact[1] = linear_prox->getFactors()[1];
     fact[2] = linear_prox->getFactors()[2];
-//    ConstraintProximityPtr((ConstraintProximity *)pfrom)->refineToClosestPoint(P);
+//    BaseProximityPtr((BaseProximity *)pfrom)->refineToClosestPoint(P);
 
     unsigned max_it = d_nonlin_max_it.getValue();
     double tolerance = d_nonlin_tolerance.getValue();

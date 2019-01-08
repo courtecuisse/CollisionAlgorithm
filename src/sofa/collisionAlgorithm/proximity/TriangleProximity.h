@@ -9,7 +9,7 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class TriangleProximity : public ConstraintProximity
+class TriangleProximity : public BaseProximity
 {
 public :
 
@@ -25,11 +25,11 @@ public :
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef MatrixDeriv::RowIterator MatrixDerivRowIterator;
 
-    static ConstraintProximity::SPtr createProximity(const TriangleElement * elmt,double f1,double f2,double f3);
+    static BaseProximity::SPtr createProximity(const TriangleElement * elmt,double f1,double f2,double f3);
 
     TriangleProximity(const TriangleElement * elmt,double f1,double f2,double f3)
     : m_element(elmt)
-    , m_state(elmt->geometry()->getState()) {
+    , m_state(elmt->m_geometry->l_state.get()) {
         m_fact[0] = f1;
         m_fact[1] = f2;
         m_fact[2] = f3;
@@ -46,7 +46,7 @@ public :
 
     virtual defaulttype::Vector3 getNormal() const
     {
-        return m_element->geometry()->getNormal(m_element->id(), m_fact);
+        return m_element->m_geometry->getNormal(m_element->id(), m_fact);
     }
 
     void buildJacobianConstraint(core::MultiMatrixDerivId cId,  const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {

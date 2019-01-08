@@ -14,13 +14,12 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class ConstraintElement;
+class BaseElement;
 class BaseGeometry;
-class ConstraintProximity;
 
-class ConstraintProximity {
+class BaseProximity {
 public :
-    typedef std::shared_ptr<ConstraintProximity> SPtr;
+    typedef std::shared_ptr<BaseProximity> SPtr;
     typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
 
     virtual defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
@@ -44,7 +43,7 @@ protected:
 };
 
 //Default Proximity for fixed position
-class FixedProximity : public ConstraintProximity {
+class FixedProximity : public BaseProximity {
 public:
 
     FixedProximity(defaulttype::Vector3 & p) : m_position(p) {}

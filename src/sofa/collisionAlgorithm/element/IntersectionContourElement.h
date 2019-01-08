@@ -10,14 +10,14 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class IntersectionContourElement : public ConstraintElement
+class IntersectionContourElement : public BaseElement
 {
     friend class IntersectionContourProximity;
     friend class IntersectionContourGeometry;
 public:
 
     IntersectionContourElement(IntersectionContourGeometry *geo, unsigned pid1, unsigned pid2,double f1,double f2)
-        : ConstraintElement()
+        : BaseElement()
         , m_geometry(geo)
     {
         m_pid[0] = pid1;
@@ -27,7 +27,7 @@ public:
         m_fact[1] = f2;
     }
 
-    static ConstraintElement::UPtr createElement(IntersectionContourGeometry *geo, unsigned pid1, unsigned pid2,double f1,double f2)
+    static BaseElement::UPtr createElement(IntersectionContourGeometry *geo, unsigned pid1, unsigned pid2,double f1,double f2)
     {
         return std::unique_ptr<IntersectionContourElement>(new IntersectionContourElement(geo,pid1,pid2,f1,f2));
     }
@@ -38,16 +38,16 @@ public:
     }
 
     // TODO?
-    ConstraintProximity::SPtr project(defaulttype::Vector3 /*P*/) const override
+    BaseProximity::SPtr project(defaulttype::Vector3 /*P*/) const override
     {
-        return ConstraintProximity::SPtr();
+        return BaseProximity::SPtr();
 //        return createProximity();
     }
 
     // TODO?
-    ConstraintProximity::SPtr getControlPoint(const int /*i*/) const override
+    BaseProximity::SPtr getControlPoint(const int /*i*/) const override
     {
-        return ConstraintProximity::SPtr();
+        return BaseProximity::SPtr();
 //        return createProximity();
     }
 

@@ -14,12 +14,12 @@ namespace collisionAlgorithm
 template<class ElementIterator>
 void CollisionDetectionAlgorithm::findClosestPoint(std::unique_ptr<ElementIterator> it_element)
 {
-    std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr> min_pair;
+    std::pair<BaseProximity::SPtr,BaseProximity::SPtr> min_pair;
     double min_dist = std::numeric_limits<double>::max();
     min_pair.first = nullptr;
     min_pair.second = nullptr;
 
-    ConstraintProximity::SPtr pfrom = it_element->getFrom()->getControlPoint(); //centered control point
+    BaseProximity::SPtr pfrom = it_element->getFrom()->getControlPoint(); //centered control point
     if (pfrom == nullptr)
         return ;
 
@@ -27,8 +27,8 @@ void CollisionDetectionAlgorithm::findClosestPoint(std::unique_ptr<ElementIterat
 
     for (unsigned i=0;i<it_element->size();i++)
     {
-        const ConstraintElement * edest = it_element->element(i);
-        ConstraintProximity::SPtr pdest = edest->project(P);
+        const BaseElement * edest = it_element->element(i);
+        BaseProximity::SPtr pdest = edest->project(P);
 
 //        pfrom = it_element.efrom->project(pdest->getPosition());
 //        //iterate until to find the correct location on pfrom
@@ -77,7 +77,7 @@ void CollisionDetectionAlgorithm::processAlgorithm()
     //we do the collision from first to second
     for (unsigned i=0;i<l_from->getNbElements();i++)
     {
-        const ConstraintElement * elmt = l_from->getElement(i);
+        const BaseElement * elmt = l_from->getElement(i);
 
         findClosestPoint(filter->iterator(elmt));
     }
@@ -85,7 +85,7 @@ void CollisionDetectionAlgorithm::processAlgorithm()
     delete filter;
 //    //then from second to first
 //    for (unsigned i=0;i<p_dest->getNbElements();i++) {
-//        ConstraintElementPtr elmt = p_dest->getElement(i);
+//        BaseElementPtr elmt = p_dest->getElement(i);
 //        PairProximity pair = (from == NULL) ? getClosestPoint(DefaultIterator(elmt, p_from())) : getClosestPoint(AABBElementIterator(elmt, from));
 
 //        if (pair.first == NULL) continue;

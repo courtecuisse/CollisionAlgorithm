@@ -8,14 +8,14 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class PointElement : public ConstraintElement
+class PointElement : public BaseElement
 {
     friend class PointProximity;
     friend class PointGeometry;
 
 public:
     PointElement(PointGeometry *geo, size_t pid)
-        : ConstraintElement()
+        : BaseElement()
         , m_geometry(geo)
     {
         m_pid = pid;
@@ -26,7 +26,7 @@ public:
         return  m_geometry;
     }
 
-    static ConstraintElement::UPtr createElement(PointGeometry *geo, size_t pid)
+    static BaseElement::UPtr createElement(PointGeometry *geo, size_t pid)
     {
         return std::unique_ptr<PointElement>(new PointElement(geo,pid));
     }
@@ -36,13 +36,13 @@ public:
         return 1;
     }
 
-    ConstraintProximity::SPtr getControlPoint(int /*i*/) const override
+    BaseProximity::SPtr getControlPoint(int /*i*/) const override
     {
         return m_geometry->createProximity(this);
     }
 
     //this function project the point P on the element and return the corresponding proximity
-    ConstraintProximity::SPtr project(defaulttype::Vector3 /*P*/) const override
+    BaseProximity::SPtr project(defaulttype::Vector3 /*P*/) const override
     {
         return getControlPoint(0);
     }

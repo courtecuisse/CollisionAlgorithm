@@ -32,10 +32,10 @@ public:
 
     void createElements();
 
-    ConstraintProximity::SPtr createProximity(const BezierTriangleElement * elmt, double f1, double f2, double f3) const;
+    BaseProximity::SPtr createProximity(const BezierTriangleElement * elmt, double f1, double f2, double f3) const;
 
 protected:
-    ConstraintProximity::SPtr newtonProject(const BezierTriangleElement *elmt, defaulttype::Vector3 P) const;
+    BaseProximity::SPtr newtonProject(const BezierTriangleElement *elmt, defaulttype::Vector3 P) const;
 
     typedef struct
     {

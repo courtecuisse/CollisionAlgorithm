@@ -22,7 +22,7 @@ public:
 
     }
 
-    ConstraintProximity::SPtr createProximity(const EdgeElement * elmt,double f1,double f2) const;
+    BaseProximity::SPtr createProximity(const EdgeElement * elmt,double f1,double f2) const;
 
     virtual void prepareDetection() override;
 

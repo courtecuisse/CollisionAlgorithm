@@ -9,14 +9,14 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class TriangleElement : public ConstraintElement
+class TriangleElement : public BaseElement
 {
     friend class TriangleProximity;
     friend class TriangleGeometry;
 
 public:
     TriangleElement(TriangleGeometry * geo,size_t eid)
-    : ConstraintElement()
+    : BaseElement()
     , m_geometry(geo)
     {
         m_eid = eid;
@@ -28,7 +28,7 @@ public:
         m_pid[2] = triangles[eid][2];
     }
 
-    static ConstraintElement::UPtr createElement(TriangleGeometry * geo,size_t eid)
+    static BaseElement::UPtr createElement(TriangleGeometry * geo,size_t eid)
     {
         return std::unique_ptr<TriangleElement>(new TriangleElement(geo,eid));
     }
@@ -38,7 +38,7 @@ public:
         return 3;
     }
 
-    ConstraintProximity::SPtr getControlPoint(int cid) const override
+    BaseProximity::SPtr getControlPoint(int cid) const override
     {
         if (cid == 0)
             return m_geometry->createProximity(this,1,0,0);
@@ -66,7 +66,7 @@ public:
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 
-    ConstraintProximity::SPtr project(defaulttype::Vector3 P) const override
+    BaseProximity::SPtr project(defaulttype::Vector3 P) const override
     {
         const helper::ReadAccessor<DataVecCoord> & pos = geometry()->getState()->read(core::VecCoordId::position());
 

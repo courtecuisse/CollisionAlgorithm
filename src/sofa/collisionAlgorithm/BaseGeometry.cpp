@@ -13,7 +13,7 @@ defaulttype::Vector3 BaseGeometry::getNormal(const unsigned elementID, const dou
 }
 
 
-//ConstraintElement::ConstraintProximity::ConstraintProximity(ConstraintElement * elmt)
+//BaseElement::BaseProximity::BaseProximity(BaseElement * elmt)
 //: m_element(elmt) {
 //    m_state = m_element->m_geometry->getState();
 //}
@@ -22,7 +22,7 @@ defaulttype::Vector3 BaseGeometry::getNormal(const unsigned elementID, const dou
 
 //namespace behavior {
 
-////void ConstraintProximity::getControlPoints(helper::vector<Vector3> & controlPoints) {
+////void BaseProximity::getControlPoints(helper::vector<Vector3> & controlPoints) {
 ////    helper::vector<double> prev = m_fact;
 ////    m_fact.clear();
 ////    m_fact.resize(prev.size(),0.0);
@@ -34,7 +34,7 @@ defaulttype::Vector3 BaseGeometry::getNormal(const unsigned elementID, const dou
 ////    m_fact = prev;
 ////}
 
-////void ConstraintProximity::inc(const helper::vector<double> & dir) {
+////void BaseProximity::inc(const helper::vector<double> & dir) {
 ////    //apply dx
 ////    for (unsigned i=0;i<dir.size();i++) m_fact[i]+=dir[i];
 

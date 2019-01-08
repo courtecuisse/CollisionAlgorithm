@@ -9,11 +9,11 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class IntersectionContourProximity : public ConstraintProximity
+class IntersectionContourProximity : public BaseProximity
 {
 public :
     IntersectionContourProximity(const IntersectionContourElement * elmt)
-        : ConstraintProximity(elmt)
+        : BaseProximity(elmt)
     {}
 
     defaulttype::Vector3 getPosition(core::VecCoordId v) const

@@ -20,7 +20,7 @@ public:
         , m_bezierGeometry(geo)
     {}
 
-    ConstraintProximity::SPtr project(defaulttype::Vector3 P) const override
+    BaseProximity::SPtr project(defaulttype::Vector3 P) const override
     {
         return geometry()->newtonProject(this,P);
     }

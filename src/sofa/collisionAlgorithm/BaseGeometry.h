@@ -58,7 +58,7 @@ public:
         return m_elements.size();
     }
 
-    const ConstraintElement* getElement(size_t i) const
+    const BaseElement* getElement(size_t i) const
     {
         return m_elements[i].get();
     }
@@ -114,7 +114,7 @@ protected:
         return res;
     }
 
-    std::vector<ConstraintElement::UPtr> m_elements;
+    std::vector<BaseElement::UPtr> m_elements;
 
     virtual void prepareDetection() {}
 

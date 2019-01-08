@@ -13,21 +13,21 @@ namespace collisionAlgorithm
 
 class DetectionOutput {
 public:
-    DetectionOutput(ConstraintProximity::SPtr p1, ConstraintProximity::SPtr p2)
+    DetectionOutput(BaseProximity::SPtr p1, BaseProximity::SPtr p2)
     : m_firstProx(p1)
     , m_secondProx(p2) {}
 
-    inline ConstraintProximity::SPtr getFirstProximity() const {
+    inline BaseProximity::SPtr getFirstProximity() const {
         return m_firstProx;
     }
 
-    inline ConstraintProximity::SPtr getSecondProximity() const {
+    inline BaseProximity::SPtr getSecondProximity() const {
         return m_secondProx;
     }
 
 protected:
-    ConstraintProximity::SPtr m_firstProx;
-    ConstraintProximity::SPtr m_secondProx;
+    BaseProximity::SPtr m_firstProx;
+    BaseProximity::SPtr m_secondProx;
 };
 
 class BaseCollisionAlgorithm : public core::collision::Pipeline
@@ -73,11 +73,11 @@ public :
         return res;
     }
 
-    inline void addDetectionOutput(ConstraintProximity::SPtr p1,defaulttype::Vector3 & P) {
+    inline void addDetectionOutput(BaseProximity::SPtr p1,defaulttype::Vector3 & P) {
         m_output.push_back(DetectionOutput(p1,std::shared_ptr<FixedProximity>(new FixedProximity(P))));
     }
 
-    inline void addDetectionOutput(ConstraintProximity::SPtr p1, ConstraintProximity::SPtr p2) {
+    inline void addDetectionOutput(BaseProximity::SPtr p1, BaseProximity::SPtr p2) {
         m_output.push_back(DetectionOutput(p1,p2));
     }
 

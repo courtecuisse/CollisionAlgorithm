@@ -25,7 +25,7 @@ void PointGeometry::prepareDetection()
     if (m_elements.size() != (unsigned) l_state->getSize()) init();
 }
 
-ConstraintProximity::SPtr PointGeometry::createProximity(const PointElement * elmt) const
+BaseProximity::SPtr PointGeometry::createProximity(const PointElement * elmt) const
 {
     return std::shared_ptr<PointProximity>(new PointProximity(elmt));
 }

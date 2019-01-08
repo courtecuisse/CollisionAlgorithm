@@ -9,7 +9,7 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class PointProximity : public ConstraintProximity
+class PointProximity : public BaseProximity
 {
 public :
     typedef sofa::defaulttype::Vec3dTypes DataTypes;
@@ -26,7 +26,7 @@ public :
 
     PointProximity(const PointElement * elmt)
     : m_element(elmt)
-    , m_state(elmt->geometry()->getState()) {}
+    , m_state(elmt->m_geometry->l_state.get()) {}
 
     defaulttype::Vector3 getPosition(core::VecCoordId v) const
     {
@@ -34,7 +34,7 @@ public :
         return pos[m_element->m_pid];
     }
 
-    defaulttype::Vector3 getNormal() const
+    virtual defaulttype::Vector3 getNormal() const
     {
         return defaulttype::Vector3(1,0,0);
     }
@@ -55,7 +55,7 @@ public :
     sofa::core::behavior::BaseMechanicalState * getState() const { return m_state; }
 
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, const sofa::defaulttype::BaseVector* lambda) const {
-        ConstraintProximity::TstoreLambda<DataTypes>(cParams, *res[m_state].write(), *cParams->readJ(m_state), lambda);
+        BaseProximity::TstoreLambda<DataTypes>(cParams, *res[m_state].write(), *cParams->readJ(m_state), lambda);
     }
 
 protected:

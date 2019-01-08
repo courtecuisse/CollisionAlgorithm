@@ -16,7 +16,7 @@ class AABBDecorator;
 class AABBElementIterator : public BaseElementFilterIterator
 {
 public :
-    AABBElementIterator(const ConstraintElement *from, const AABBDecorator * aabb);
+    AABBElementIterator(const BaseElement *from, const AABBDecorator * aabb);
 
     virtual ~AABBElementIterator() override {}
 
@@ -26,7 +26,7 @@ public :
         return m_selectElements.size();
     }
 
-    inline const ConstraintElement* element(size_t i) const override
+    inline const BaseElement* element(size_t i) const override
     {
         return m_geo->getElement(m_selectElements[i]);
     }
@@ -56,7 +56,7 @@ public:
     void prepareDetection() override;
 
     //replace with a factory ?
-    std::unique_ptr<BaseElementFilterIterator> iterator(const ConstraintElement *from) override
+    std::unique_ptr<BaseElementFilterIterator> iterator(const BaseElement *from) override
     {
         return std::unique_ptr<BaseElementFilterIterator>(new AABBElementIterator(from, this));
     }

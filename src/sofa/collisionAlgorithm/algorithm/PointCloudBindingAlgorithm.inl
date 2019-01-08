@@ -18,7 +18,7 @@ PointCloudBindingAlgorithm::PointCloudBindingAlgorithm()
 
 void PointCloudBindingAlgorithm::processAlgorithm()
 {
-    std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr> res;
+    std::pair<BaseProximity::SPtr,BaseProximity::SPtr> res;
 
     if (l_from.get() == nullptr)
         return ;
@@ -131,7 +131,7 @@ void PointCloudBindingAlgorithm::processAlgorithm()
         if (bindId[i] == -1 || invBind[i] == -1)
             continue;
 
-        std::pair<ConstraintProximity::SPtr,ConstraintProximity::SPtr> pair;
+        std::pair<BaseProximity::SPtr,BaseProximity::SPtr> pair;
         pair.first = l_from->getElement(bindId[i])->getControlPoint();
         pair.second = l_dest->getElement(invBind[i])->getControlPoint();
 

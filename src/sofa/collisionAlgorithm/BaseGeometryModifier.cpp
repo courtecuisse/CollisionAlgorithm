@@ -18,7 +18,7 @@ void SofaBaseNormalHandler::draw(const sofa::core::visual::VisualParams* vparams
     std::fill_n(fact, 16, 1.0); // suppose that element will never be bigger than 16 subparts...
     for(size_t i = 0 ; i<m_geometry->getNbElements() ; i++)
     {
-        const ConstraintElement* element = m_geometry->getElement(i);
+        const BaseElement* element = m_geometry->getElement(i);
         const defaulttype::Vector3& normal = this->getNormal(i,fact);
         // center
         defaulttype::Vector3 center;// = element->getControlPoint(-1)->getPosition(); //supposed to give the center but seems not...

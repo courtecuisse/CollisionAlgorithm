@@ -11,7 +11,7 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-ConstraintProximity::SPtr TriangleGeometry::createProximity(const TriangleElement * elmt,double f1,double f2,double f3) const
+BaseProximity::SPtr TriangleGeometry::createProximity(const TriangleElement * elmt,double f1,double f2,double f3) const
 {
     return std::shared_ptr<TriangleProximity>(new TriangleProximity(elmt,f1,f2,f3));
 }

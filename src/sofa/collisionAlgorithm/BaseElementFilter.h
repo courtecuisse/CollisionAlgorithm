@@ -15,7 +15,7 @@ class BaseElementFilter;
 class BaseElementFilterIterator
 {
 public:
-    BaseElementFilterIterator(const ConstraintElement * from, const BaseElementFilter * filter)
+    BaseElementFilterIterator(const BaseElement * from, const BaseElementFilter * filter)
         : m_from(from)
         , m_filter(filter)
     {
@@ -23,14 +23,14 @@ public:
     }
     virtual ~BaseElementFilterIterator() {}
 
-    virtual const ConstraintElement* element(size_t i) const = 0;
+    virtual const BaseElement* element(size_t i) const = 0;
 
     virtual size_t size() const = 0;
 
-    inline const ConstraintElement* getFrom() { return m_from; }
+    inline const BaseElement* getFrom() { return m_from; }
 
 protected:
-    const ConstraintElement * m_from;
+    const BaseElement * m_from;
     const BaseElementFilter* m_filter;
 };
 
@@ -70,7 +70,7 @@ public:
 
     virtual void prepareDetection() = 0;
 
-    virtual std::unique_ptr<BaseElementFilterIterator> iterator(const ConstraintElement *from) = 0;
+    virtual std::unique_ptr<BaseElementFilterIterator> iterator(const BaseElement *from) = 0;
 
     inline const BaseGeometry* geometry() const { return l_geometry.get(); }
 
@@ -95,7 +95,7 @@ protected:
 class DefaultElementIterator : public BaseElementFilterIterator
 {
 public:
-    DefaultElementIterator(const ConstraintElement * from, const BaseElementFilter * filter)
+    DefaultElementIterator(const BaseElement * from, const BaseElementFilter * filter)
         : BaseElementFilterIterator(from, filter)
     {
     }
@@ -107,7 +107,7 @@ public:
         return m_filter->geometry()->getNbElements();
     }
 
-    inline const ConstraintElement* element(size_t i) const override
+    inline const BaseElement* element(size_t i) const override
     {
         return m_filter->geometry()->getElement(i);
     }
@@ -131,7 +131,7 @@ public:
     void prepareDetection() override {}
 
     //replace with a factory ?
-    std::unique_ptr<BaseElementFilterIterator> iterator(const ConstraintElement *from) override
+    std::unique_ptr<BaseElementFilterIterator> iterator(const BaseElement *from) override
     {
         return std::unique_ptr<BaseElementFilterIterator>(new DefaultElementIterator(from, this));
     }

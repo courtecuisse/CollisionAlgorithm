@@ -14,10 +14,11 @@ class PointElement;
 class PointGeometry : public BaseGeometry
 {
     friend class PointElement;
+    friend class PointProximity;
 public:
     SOFA_CLASS(PointGeometry,BaseGeometry);
 
-    ConstraintProximity::SPtr createProximity(const PointElement * elmt) const;
+    BaseProximity::SPtr createProximity(const PointElement * elmt) const;
 
     virtual void prepareDetection() override;
 

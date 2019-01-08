@@ -38,7 +38,7 @@ public:
 
     virtual void prepareDetection() override;
 
-    ConstraintProximity::SPtr createProximity(const TriangleElement * elmt,double f1,double f2,double f3) const;
+    BaseProximity::SPtr createProximity(const TriangleElement * elmt,double f1,double f2,double f3) const;
 
     inline const VecTriangles& triangles() const
     {

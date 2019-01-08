@@ -257,7 +257,7 @@
 //    return Vector2 (rx,ry) * 1.0/rz;
 //}
 
-//double ProjectiveContourGeometry::projectPoint(unsigned eid,const defaulttype::Vector3 & s,ConstraintProximity & pinfo) {
+//double ProjectiveContourGeometry::projectPoint(unsigned eid,const defaulttype::Vector3 & s,BaseProximity & pinfo) {
 //    defaulttype::Vector2 P = project3d(s);
 
 //    const helper::ReadAccessor<Data <VecCoord> >& x = *this->getMstate()->read(core::VecCoordId::position());
@@ -283,7 +283,7 @@
 //    return (project3d(pinfo.getPosition()) - P).norm();
 //}
 
-//defaulttype::Vector3 ProjectiveContourGeometry::getNormal(const ConstraintProximity & pinfo) {
+//defaulttype::Vector3 ProjectiveContourGeometry::getNormal(const BaseProximity & pinfo) {
 //    Vector3 P = pinfo.getPosition();
 
 //    Vector3 N1g = this->m_pointNormal[pinfo.m_pid[0]] * pinfo.m_fact[0] + this->m_pointNormal[pinfo.m_pid[1]] * pinfo.m_fact[1];

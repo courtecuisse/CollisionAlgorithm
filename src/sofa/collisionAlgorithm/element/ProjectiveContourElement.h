@@ -15,11 +15,11 @@ public:
 
         int getNbElements();
 
-        double projectPoint(unsigned tid,const Vector3 & s,ConstraintProximity & pinfo);
+        double projectPoint(unsigned tid,const Vector3 & s,BaseProximity & pinfo);
 
         void draw(const VisualParams* vparams);
 
-        Vector3 getNormal(const ConstraintProximity & pinfo);
+        Vector3 getNormal(const BaseProximity & pinfo);
 
         BaseDecorator * getDecorator();
 

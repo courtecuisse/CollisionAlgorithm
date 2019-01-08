@@ -6,7 +6,7 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-class GenericElement : public ConstraintElement {
+class GenericElement : public BaseElement {
 public:
 
 
@@ -26,16 +26,16 @@ protected:
         return m_inverse;
     }
 
-    virtual ConstraintProximityPtr newton_project(defaulttype::Vector3 Q) {
+    virtual BaseProximityPtr newton_project(defaulttype::Vector3 Q) {
         const int maxIt = 1;
         const double tolerance = 0.0001;
 //        const double threshold = 0.0000001;
         double delta = 0.001;
 
-        std::vector<ConstraintProximityPtr> controlPoints;
+        std::vector<BaseProximityPtr> controlPoints;
         for (unsigned i=0;i<m_controlPoints;i++) controlPoints.push_back(getControlPoint(i));
 
-        ConstraintProximityPtr res = getControlPoint();
+        BaseProximityPtr res = getControlPoint();
 
         if (controlPoints.size() <= 1) return res;
 
@@ -71,7 +71,7 @@ protected:
             for (unsigned j=0;j<JLin;j++) {
     //            helper::vector<double> inc(controlPoints.size(), 0.0);
     //            inc[j] = delta;
-    //            ConstraintProximityPtr sigma = move(inc.ptr());
+    //            BaseProximityPtr sigma = move(inc.ptr());
                 normals.push_back(controlPoints[j]->getPosition() - P);
                 double e = dot(PQ,normals[j]);
                 e0(j) = e;

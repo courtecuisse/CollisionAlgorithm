@@ -75,7 +75,7 @@ void AABBDecorator::prepareDetection()
 
     for (unsigned itE = 0; itE < l_geometry->getNbElements(); itE++)
     {
-        const ConstraintElement * elmt = l_geometry->getElement(itE);
+        const BaseElement * elmt = l_geometry->getElement(itE);
         if (elmt->getNbControlPoints() == 0) continue;
 
         defaulttype::Vector3 minbox = elmt->getControlPoint(0)->getPosition();
@@ -164,7 +164,7 @@ void AABBDecorator::draw(const core::visual::VisualParams * vparams) {
 
 }
 
-AABBElementIterator::AABBElementIterator(const ConstraintElement *from, const AABBDecorator * aabb)
+AABBElementIterator::AABBElementIterator(const BaseElement *from, const AABBDecorator * aabb)
     : BaseElementFilterIterator(from, aabb)
     , m_aabb(aabb)
 {

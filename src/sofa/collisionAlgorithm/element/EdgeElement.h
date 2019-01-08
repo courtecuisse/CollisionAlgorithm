@@ -8,7 +8,7 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class EdgeElement : public ConstraintElement
+class EdgeElement : public BaseElement
 {
     friend class EdgeGeometry;
     friend class EdgeProximity;
@@ -16,7 +16,7 @@ class EdgeElement : public ConstraintElement
 public:
 
     EdgeElement(EdgeGeometry * geo,size_t eid)
-        : ConstraintElement()
+        : BaseElement()
         , m_geometry(geo)
     {
         m_eid = eid;
@@ -32,7 +32,7 @@ public:
         return m_geometry;
     }
 
-    static ConstraintElement::UPtr createElement(EdgeGeometry * geo,unsigned eid)
+    static BaseElement::UPtr createElement(EdgeGeometry * geo,unsigned eid)
     {
         return EdgeElement::UPtr(new EdgeElement(geo,eid));
     }
@@ -42,7 +42,7 @@ public:
         return 2;
     }
 
-    ConstraintProximity::SPtr getControlPoint(int cid) const override
+    BaseProximity::SPtr getControlPoint(int cid) const override
     {
         if (cid == 0)
             return m_geometry->createProximity(this,1,0);
@@ -53,7 +53,7 @@ public:
     }
 
     //this function project the point P on the element and return the corresponding proximity
-    ConstraintProximity::SPtr project(defaulttype::Vector3 P) const override
+    BaseProximity::SPtr project(defaulttype::Vector3 P) const override
     {
         double fact_u,fact_v;
 
