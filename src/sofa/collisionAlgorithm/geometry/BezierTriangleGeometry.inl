@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/geometry/BezierTriangleGeometry.h>
-#include <sofa/collisionAlgorithm/element/BezierTriangleElement.h>
 #include <sofa/collisionAlgorithm/proximity/BezierTriangleProximity.h>
+#include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 
 namespace sofa
 {
@@ -10,38 +10,21 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-BezierTriangleGeometry::BezierTriangleGeometry()
+template<class DataTypes>
+BezierTriangleGeometry<DataTypes>::BezierTriangleGeometry()
 : d_nonlin_max_it(initData(&d_nonlin_max_it,(unsigned) 20,"nonlin_max_it", "number of iterations"))
 , d_nonlin_tolerance(initData(&d_nonlin_tolerance,(double) 0.001,"nonlin_tol", "Tolerance"))
 , d_nonlin_threshold(initData(&d_nonlin_threshold,(double) 0.00001,"nonlin_th", "Threshold"))
 , d_draw_tesselation(initData(&d_draw_tesselation,(unsigned) 0.0, "tesselation", "Number of tesselation"))
 {}
 
-BaseProximity::SPtr BezierTriangleGeometry::createProximity(const BezierTriangleElement * elmt, double f1, double f2, double f3) const
-{
-    return std::shared_ptr<BezierTriangleProximity>(new BezierTriangleProximity(elmt, f1, f2, f3));
-}
-
-void BezierTriangleGeometry::createElements()
-{
-    m_elements.clear();
-
-    const VecTriangles& triangles = d_triangles.getValue();
-
-    for (size_t i=0;i<triangles.size();i++)
-    {
-        m_elements.push_back(BezierTriangleElement::createElement(this,i));
-    }
-
-    prepareDetection();
-}
-
-void BezierTriangleGeometry::prepareDetection()
+template<class DataTypes>
+void BezierTriangleGeometry<DataTypes>::prepareDetection()
 {
     Inherit::prepareDetection();
 
-    const VecTriangles& triangles = d_triangles.getValue();
-    const helper::ReadAccessor<DataVecCoord> & x = l_state->read(core::VecCoordId::position());
+    const VecTriangles& triangles = this->d_triangles.getValue();
+    const helper::ReadAccessor<DataVecCoord> & x = this->l_state->read(core::VecCoordId::position());
 
     size_t nbTriangles = triangles.size();
     m_beziertriangle_info.resize(nbTriangles);
@@ -93,17 +76,47 @@ void BezierTriangleGeometry::prepareDetection()
     }
 }
 
-BaseProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTriangleElement *elmt, defaulttype::Vector3 P) const
-{
+
+//void tesselate(const core::visual::VisualParams * vparams, unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C) const
+//{
+//    if (level >= geometry()->d_draw_tesselation.getValue()) {
+
+//        defaulttype::Vector3 pA = m_geometry->createProximity(this,bary_A[0],bary_A[1],bary_A[2])->getPosition();
+//        defaulttype::Vector3 pB = m_geometry->createProximity(this,bary_B[0],bary_B[1],bary_B[2])->getPosition();
+//        defaulttype::Vector3 pC = m_geometry->createProximity(this,bary_C[0],bary_C[1],bary_C[2])->getPosition();
+
+//        drawTriangle(vparams,pA,pB,pC);
+
+//        return;
+//    }
+
+//    defaulttype::Vector3 bary_D = (bary_A + bary_B)/2.0;
+//    defaulttype::Vector3 bary_E = (bary_A + bary_C)/2.0;
+//    defaulttype::Vector3 bary_F = (bary_B + bary_C)/2.0;
+
+//    defaulttype::Vector3 bary_G = (bary_A + bary_B + bary_C)/3.0;
+
+//    tesselate(vparams,level+1,tid,bary_A,bary_D,bary_G);
+//    tesselate(vparams,level+1,tid,bary_D,bary_B,bary_G);
+
+//    tesselate(vparams,level+1,tid,bary_G,bary_B,bary_F);
+//    tesselate(vparams,level+1,tid,bary_G,bary_F,bary_C);
+
+//    tesselate(vparams,level+1,tid,bary_G,bary_C,bary_E);
+//    tesselate(vparams,level+1,tid,bary_A,bary_G,bary_E);
+//}
+
+//virtual void draw(const core::visual::VisualParams *vparams) const override
+//{
+//    tesselate(vparams,0,m_eid,defaulttype::Vector3(1,0,0),defaulttype::Vector3(0,1,0),defaulttype::Vector3(0,0,1));
+//}
+
+
+template<class DataTypes>
+void BezierTriangleGeometry<DataTypes>::project(unsigned elmt, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & fact) const {
+
     //initialize the algorithm xith the projection on a linear triangle
-
-    TriangleProximity * linear_prox = reinterpret_cast<TriangleProximity*>(elmt->TriangleElement::project(P).get());
-
-    double fact[3];
-    fact[0] = linear_prox->getFactors()[0];
-    fact[1] = linear_prox->getFactors()[1];
-    fact[2] = linear_prox->getFactors()[2];
-//    BaseProximityPtr((BaseProximity *)pfrom)->refineToClosestPoint(P);
+    TriangleGeometry<DataTypes>::project(elmt, P, triangle, fact);
 
     unsigned max_it = d_nonlin_max_it.getValue();
     double tolerance = d_nonlin_tolerance.getValue();
@@ -112,7 +125,8 @@ BaseProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTriangleEl
     unsigned int it=0;
     double delta = 0.00001;
 
-    BezierTriangleProximity pinfo(elmt,fact[0],fact[1],fact[2]);
+    State * state = this->l_state.get();
+    BezierTriangleProximity<DataTypes> pinfo(elmt,triangle[0],triangle[1],triangle[2], fact[0],fact[1],fact[2], this, state);
 
     while(it< max_it)
     {
@@ -144,7 +158,7 @@ BaseProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTriangleEl
         double P_v_fact0 = pinfo.m_fact[0] + delta * fact_v;
         double P_v_fact1 = pinfo.m_fact[1];
         double P_v_fact2 = pinfo.m_fact[2] - delta * fact_v;
-        BezierTriangleProximity P_v(elmt,P_v_fact0,P_v_fact1,P_v_fact2);
+        BezierTriangleProximity<DataTypes> P_v(elmt,triangle[0],triangle[1],triangle[2], P_v_fact0,P_v_fact1,P_v_fact2, this, state);
         defaulttype::Vector3 p_v = (P - P_v.getPosition(core::VecCoordId::position())).normalized();
         defaulttype::Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
 
@@ -152,7 +166,7 @@ BaseProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTriangleEl
         double P_u_fact0 = pinfo.m_fact[0];
         double P_u_fact1 = pinfo.m_fact[1] + delta * fact_u;
         double P_u_fact2 = pinfo.m_fact[2] - delta * fact_u;
-        BezierTriangleProximity P_u(elmt,P_u_fact0,P_u_fact1,P_u_fact2);
+        BezierTriangleProximity<DataTypes> P_u(elmt,triangle[0],triangle[1],triangle[2], P_u_fact0,P_u_fact1,P_u_fact2, this, state);
         defaulttype::Vector3 p_u = (P - P_u.getPosition(core::VecCoordId::position())).normalized();
         defaulttype::Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
 
@@ -190,7 +204,7 @@ BaseProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTriangleEl
         double P_a_fact0 = pinfo.m_fact[0] + dir2d[0] * delta * fact_a;
         double P_a_fact1 = pinfo.m_fact[1] + dir2d[1] * delta * fact_a;
         double P_a_fact2 = pinfo.m_fact[2] + dir2d[2] * delta * fact_a;
-        BezierTriangleProximity P_a(elmt,P_a_fact0,P_a_fact1,P_a_fact2);
+        BezierTriangleProximity<DataTypes> P_a(elmt,triangle[0],triangle[1],triangle[2], P_a_fact0,P_a_fact1,P_a_fact2, this, state);
 
         if (P_a.m_fact[0] < 0 || P_a.m_fact[1] < 0 || P_a.m_fact[2] < 0) break;
 
@@ -228,8 +242,6 @@ BaseProximity::SPtr BezierTriangleGeometry::newtonProject(const BezierTriangleEl
 
         it++;
     }
-
-    return createProximity(elmt,pinfo.m_fact[0],pinfo.m_fact[1],pinfo.m_fact[2]);
 }
 
 }

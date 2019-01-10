@@ -10,7 +10,7 @@ namespace collisionAlgorithm
 SOFA_DECL_CLASS(BezierTriangleGeometry)
 
 int BezierTriangleGeometryClass = core::RegisterObject("BezierTriangleGeometry")
-.add< BezierTriangleGeometry >();
+.add< BezierTriangleGeometry<sofa::defaulttype::Vec3dTypes> >();
 
 }
 

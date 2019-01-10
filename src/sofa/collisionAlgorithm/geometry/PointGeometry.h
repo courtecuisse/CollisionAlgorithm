@@ -1,6 +1,5 @@
 #pragma once
 
-#include <sofa/core/topology/BaseMeshTopology.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 
 namespace sofa
@@ -9,20 +8,17 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class PointElement;
-
-class PointGeometry : public BaseGeometry
-{
-    friend class PointElement;
-    friend class PointProximity;
+template<class DataTypes>
+class PointGeometry : public TBaseGeometry<DataTypes> {
 public:
-    SOFA_CLASS(PointGeometry,BaseGeometry);
+    typedef TBaseGeometry<DataTypes> Inherit;
+    SOFA_CLASS(SOFA_TEMPLATE(PointGeometry,DataTypes),Inherit);
 
-    BaseProximity::SPtr createProximity(const PointElement * elmt) const;
+    virtual ElementIterator::UPtr begin() const;
 
-    virtual void prepareDetection() override;
+    ElementIterator::End end() const;
 
-    virtual void init() override;
+    virtual void draw(const core::visual::VisualParams *vparams) override;
 
 };
 

@@ -11,24 +11,23 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class ElementIterator>
-void CollisionDetectionAlgorithm::findClosestPoint(std::unique_ptr<ElementIterator> it_element)
+void CollisionDetectionAlgorithm::findClosestPoint(ElementIterator::UPtr & efrom)
 {
     std::pair<BaseProximity::SPtr,BaseProximity::SPtr> min_pair;
     double min_dist = std::numeric_limits<double>::max();
     min_pair.first = nullptr;
     min_pair.second = nullptr;
 
-    BaseProximity::SPtr pfrom = it_element->getFrom()->getControlPoint(); //centered control point
-    if (pfrom == nullptr)
-        return ;
+//    BaseProximity::SPtr pfrom = it_element->getFrom()->getControlPoint(); //centered control point
+//    if (pfrom == nullptr)
+//        return ;
 
+    BaseProximity::SPtr pfrom = efrom->center();
     defaulttype::Vector3 P = pfrom->getPosition();
 
-    for (unsigned i=0;i<it_element->size();i++)
+    for (auto it = l_dest->begin();it!=l_dest->end();it++)
     {
-        const BaseElement * edest = it_element->element(i);
-        BaseProximity::SPtr pdest = edest->project(P);
+        BaseProximity::SPtr pdest = it->project(P);
 
 //        pfrom = it_element.efrom->project(pdest->getPosition());
 //        //iterate until to find the correct location on pfrom
@@ -39,13 +38,13 @@ void CollisionDetectionAlgorithm::findClosestPoint(std::unique_ptr<ElementIterat
 //        }
 
         //compute all the distances with to elements
-        defaulttype::Vector3 N = pfrom->getPosition() - pdest->getPosition();
+        defaulttype::Vector3 N = P - pdest->getPosition();
         double dist = N.norm();
 
         if (dist > d_minDist.getValue())
             continue;
-        if (dot(pfrom->getNormal(),pdest->getNormal()) > -d_minAngle.getValue())
-            continue;
+//        if (dot(pfrom->getNormal(),pdest->getNormal()) > -d_minAngle.getValue())
+//            continue;
 
         if (dist<min_dist)
         {
@@ -64,25 +63,22 @@ void CollisionDetectionAlgorithm::findClosestPoint(std::unique_ptr<ElementIterat
 void CollisionDetectionAlgorithm::processAlgorithm()
 {
 //    AABBDecorator * from = NULL;
-    BaseElementFilter* filter = l_filter.get();
+//    BaseElementFilter* filter = l_filter.get();
 
 //    //first we search if there is a AABB connected to the geometry
 //    for (unsigned i=0;i<p_from->p_type.size();i++) {
 //        if ((from = dynamic_cast<AABBDecorator *>(p_from->p_type[i]))) break;
 //    }
 
-    if(!filter)
-        filter = new DefaultElementFilter(l_dest.get());
+//    if(!filter)
+//        filter = new DefaultElementFilter(l_dest.get());
 
     //we do the collision from first to second
-    for (unsigned i=0;i<l_from->getNbElements();i++)
-    {
-        const BaseElement * elmt = l_from->getElement(i);
-
-        findClosestPoint(filter->iterator(elmt));
+    for (auto it=l_from->begin();it!=l_from->end();it++) {
+        findClosestPoint(it);
     }
 
-    delete filter;
+//    delete filter;
 //    //then from second to first
 //    for (unsigned i=0;i<p_dest->getNbElements();i++) {
 //        BaseElementPtr elmt = p_dest->getElement(i);

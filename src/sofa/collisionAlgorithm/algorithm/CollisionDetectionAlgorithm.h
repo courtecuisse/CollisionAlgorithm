@@ -27,16 +27,9 @@ public:
 
     void processAlgorithm() override;
 
-    void getState(std::set<sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes>* > & list_state) override
-    {
-        list_state.insert(l_from->getState());
-        list_state.insert(l_dest->getState());
-    }
-
 private:
-    template<class ElementIterator>
-
-    void findClosestPoint(std::unique_ptr<ElementIterator> geo);
+//    template<class ElementIterator>
+    void findClosestPoint(ElementIterator::UPtr & efrom);
 
     core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
     core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;

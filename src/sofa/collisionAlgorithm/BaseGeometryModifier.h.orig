@@ -63,6 +63,17 @@
 
 //    }
 
+<<<<<<< HEAD
+    template<class T>
+    static bool canCreate(T*& obj, core::objectmodel::BaseContext* context, core::objectmodel::BaseObjectDescription* arg)
+    {
+        BaseGeometry* geometry = nullptr;
+        context->get(geometry);
+        if (!geometry)
+            return false;
+        if(!dynamic_cast<TGeometry*>(geometry))
+            return false;
+=======
 //    template<class T>
 //    static bool canCreate(T*& obj, core::objectmodel::BaseContext* context, core::objectmodel::BaseObjectDescription* arg)
 //    {
@@ -72,6 +83,7 @@
 //            return false;
 //        if(!static_cast<TGeometry*>(geometry))
 //            return false;
+>>>>>>>  Change elements to iterators
 
 //        return BaseObject::canCreate(obj, context, arg);
 //    }
@@ -99,9 +111,15 @@
 //public:
 //    SOFA_CLASS(SofaFlatNormalHandler, SofaBaseNormalHandler);
 
+<<<<<<< HEAD
+    SofaFlatNormalHandler(const BaseGeometry* geometry = nullptr)
+        : SofaTNormalHandler<TGeometry>(geometry)
+    {
+=======
 //    SofaFlatNormalHandler(const BaseGeometry* geometry = NULL)
 //        : SofaTNormalHandler<TGeometry>(geometry)
 //    {
+>>>>>>>  Change elements to iterators
 
 //    }
 

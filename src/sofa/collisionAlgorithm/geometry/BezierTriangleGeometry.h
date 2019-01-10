@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
+#include <sofa/collisionAlgorithm/geometry/PhongTriangleGeometry.h>
 
 namespace sofa
 {
@@ -8,18 +8,17 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class BezierTriangleElement;
-
-class BezierTriangleGeometry : public TriangleGeometry
-{
-    friend class BezierTriangleElement;
-    friend class BezierTriangleProximity;
-
+template<class DataTypes>
+class BezierTriangleGeometry : public PhongTriangleGeometry<DataTypes> {
 public:
-    SOFA_CLASS(BezierTriangleGeometry,TriangleGeometry);
+    typedef PhongTriangleGeometry<DataTypes> Inherit;
+    SOFA_CLASS(SOFA_TEMPLATE(BezierTriangleGeometry,DataTypes),Inherit);
 
-    typedef TriangleGeometry Inherit;
+    typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
     typedef typename Inherit::TriangleInfo TriangleInfo;
+    typedef helper::vector<Triangle> VecTriangles;
+    typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
+    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
     Data <unsigned> d_nonlin_max_it;
     Data <double> d_nonlin_tolerance;
@@ -30,12 +29,7 @@ public:
 
     virtual void prepareDetection() override;
 
-    void createElements();
-
-    BaseProximity::SPtr createProximity(const BezierTriangleElement * elmt, double f1, double f2, double f3) const;
-
-protected:
-    BaseProximity::SPtr newtonProject(const BezierTriangleElement *elmt, defaulttype::Vector3 P) const;
+    virtual void project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const;
 
     typedef struct
     {

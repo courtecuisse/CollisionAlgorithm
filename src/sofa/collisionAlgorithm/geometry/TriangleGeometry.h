@@ -1,8 +1,7 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
-#include <sofa/collisionAlgorithm/geometry/EdgeGeometry.h>
-#include <sofa/core/topology/BaseMeshTopology.h>
+#include <sofa/collisionAlgorithm/BaseGeometry.h>
+
 
 namespace sofa
 {
@@ -10,27 +9,31 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class TriangleElement;
+template<class DataTypes>
+class TriangleProximity;
 
-class TriangleGeometry : public BaseGeometry
-{
-    friend class TriangleElement;
-    friend class TriangleProximity;
+template<class DataTypes>
+class TriangleElementIterator;
+
+template<class DataTypes>
+class TriangleGeometry : public TBaseGeometry<DataTypes> {
+    friend class TriangleElementIterator<DataTypes>;
 
 public:
+    typedef TBaseGeometry<DataTypes> Inherit;
+    SOFA_CLASS(SOFA_TEMPLATE(TriangleGeometry,DataTypes),Inherit);
+
+    typedef typename DataTypes::Coord Coord;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef Data<VecCoord> DataVecCoord;
     typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
-    //typedef sofa::core::topology::BaseMeshTopology::TriangleID TriangleID;
     typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
     typedef helper::vector<Triangle> VecTriangles;
 
-    SOFA_CLASS(TriangleGeometry,BaseGeometry);
+    Data<VecTriangles> d_triangles;
 
     TriangleGeometry()
-        : BaseGeometry()
-        , d_triangles(initData(&d_triangles, VecTriangles(), "triangles", "Vector of Triangles"))
-    {
-
-    }
+    : d_triangles(initData(&d_triangles, VecTriangles(), "triangles", "Vector of Triangles")) {}
 
     virtual ~TriangleGeometry() override {}
 
@@ -38,12 +41,13 @@ public:
 
     virtual void prepareDetection() override;
 
-    BaseProximity::SPtr createProximity(const TriangleElement * elmt,double f1,double f2,double f3) const;
+    virtual ElementIterator::UPtr begin() const;
 
-    inline const VecTriangles& triangles() const
-    {
-        return d_triangles.getValue();
-    }
+    ElementIterator::End end() const;
+
+    virtual defaulttype::Vector3 getNormal(const TriangleProximity<DataTypes> * prox) const;
+
+    virtual void project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const;
 
     typedef struct
     {
@@ -56,38 +60,20 @@ public:
         defaulttype::Vector3 tn,ax1,ax2;
     } TriangleInfo;
 
-    inline const std::vector<defaulttype::Vector3>& pointNormals() const
-    {
-        return this->m_pointNormal;
-    }
-
     inline const TriangleInfo& triangleInfo(size_t index) const
     {
         return this->m_triangle_info[index];
-    }
+    }    
 
-    Data<VecTriangles> d_triangles;
+    inline const VecTriangles& triangles() const
+    {
+        return d_triangles.getValue();
+    }
 
 protected:
-    virtual void setNormalHandler() override
-    {
-        if(!l_normalHandler.get())
-        {
-            msg_warning(this) << "No normal handler given, finding one...";
-            l_normalHandler.setPath("@.");
-        }
-        if(!l_normalHandler.get())
-        {
-            msg_warning(this) << "No normal handler found, creating a flat one";
-            SofaBaseNormalHandler::SPtr normalHandler = sofa::core::objectmodel::New<SofaFlatNormalHandler<TriangleGeometry> >(this);
-            this->getContext()->addObject(normalHandler);
-            l_normalHandler.set(normalHandler);
-        }
-    }
-
     std::vector<TriangleInfo> m_triangle_info;
-    std::vector<defaulttype::Vector3> m_pointNormal;
-    std::vector< std::vector<TriangleID> > m_trianglesAroundVertex;
+
+    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const;
 };
 
 

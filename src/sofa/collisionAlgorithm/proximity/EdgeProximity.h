@@ -1,7 +1,6 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/geometry/EdgeGeometry.h>
-#include <sofa/collisionAlgorithm/element/EdgeElement.h>
 
 namespace sofa
 {
@@ -9,24 +8,26 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+template<class DataTypes>
 class EdgeProximity : public BaseProximity
 {
 public :
-    typedef sofa::defaulttype::Vec3dTypes DataTypes;
-    typedef DataTypes::VecCoord VecCoord;
-    typedef DataTypes::Coord Coord;
-    typedef DataTypes::Real Real;
-    typedef DataTypes::VecDeriv VecDeriv;
-    typedef DataTypes::MatrixDeriv MatrixDeriv;
-    typedef DataTypes::Deriv Deriv1;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef typename DataTypes::Coord Coord;
+    typedef typename DataTypes::Real Real;
+    typedef typename DataTypes::VecDeriv VecDeriv;
+    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
+    typedef typename DataTypes::Deriv Deriv1;
+    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    EdgeProximity(const EdgeElement * elmt,double f1,double f2)
-    : m_element(elmt)
-    , m_state(m_element->geometry()->getState()) {
+    EdgeProximity(unsigned p1,unsigned p2,double f1,double f2, State * state)
+    : m_state(state) {
+        m_pid[0] = p1;
+        m_pid[1] = p2;
         m_fact[0] = f1;
         m_fact[1] = f2;
     }
@@ -34,7 +35,7 @@ public :
     defaulttype::Vector3 getPosition(core::VecCoordId v) const
     {
         const helper::ReadAccessor<DataVecCoord> pos = m_state->read(v);
-        return pos[m_element->m_pid[0]] * m_fact[0] + pos[m_element->m_pid[1]] * m_fact[1];
+        return pos[m_pid[0]] * m_fact[0] + pos[m_pid[1]] * m_fact[1];
     }
 
     defaulttype::Vector3 getNormal() const
@@ -49,8 +50,8 @@ public :
         for (unsigned j=0;j<normals.size();j++) {
             MatrixDerivRowIterator c_it = c1.writeLine(constraintId+j);
 
-            c_it.addCol(m_element->m_pid[0], normals[j] * m_fact[0] * fact);
-            c_it.addCol(m_element->m_pid[1], normals[j] * m_fact[1] * fact);
+            c_it.addCol(m_pid[0], normals[j] * m_fact[0] * fact);
+            c_it.addCol(m_pid[1], normals[j] * m_fact[1] * fact);
         }
 
         c1_d.endEdit();
@@ -63,9 +64,9 @@ public :
     }
 
 protected:
+    double m_pid[2];
     double m_fact[2];
-    const EdgeElement* m_element;
-    sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes> * m_state;
+    State * m_state;
 };
 
 }

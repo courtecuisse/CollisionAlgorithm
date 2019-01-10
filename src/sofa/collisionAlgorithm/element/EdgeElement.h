@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/geometry/EdgeGeometry.h>
+#include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
 
 namespace sofa
 {
@@ -8,86 +9,47 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class EdgeElement : public BaseElement
-{
-    friend class EdgeGeometry;
-    friend class EdgeProximity;
-
+//Internal iterator of elements
+template<class DataTypes>
+class EdgeElementIterator : public ElementIterator {
 public:
+    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    EdgeElement(EdgeGeometry * geo,size_t eid)
-        : BaseElement()
-        , m_geometry(geo)
-    {
-        m_eid = eid;
-
-        const EdgeGeometry::VecEdges & edges = geometry()->edges();
-
-        m_pid[0] = edges[eid][0];
-        m_pid[1] = edges[eid][1];
+    EdgeElementIterator(const EdgeGeometry<DataTypes> * geo) : m_geometry(geo) {
+        m_state = m_geometry->l_state.get();
     }
 
-    inline const EdgeGeometry* geometry() const override
-    {
-        return m_geometry;
+    BaseProximity::SPtr project(const defaulttype::Vector3 & /*P*/) const {
+        const core::topology::BaseMeshTopology::Edge edge = m_geometry->d_edges.getValue()[id()];
+        return BaseProximity::SPtr(new EdgeProximity<DataTypes>(edge[0],edge[1],0.5,0.5,m_state));
     }
 
-    static BaseElement::UPtr createElement(EdgeGeometry * geo,unsigned eid)
-    {
-        return EdgeElement::UPtr(new EdgeElement(geo,eid));
+    virtual BaseProximity::SPtr center() const {
+        const core::topology::BaseMeshTopology::Edge edge = m_geometry->d_edges.getValue()[id()];
+        return BaseProximity::SPtr(new EdgeProximity<DataTypes>(edge[0],edge[1],0.5,0.5,m_state));
     }
 
-    inline size_t getNbControlPoints() const override
-    {
-        return 2;
-    }
-
-    BaseProximity::SPtr getControlPoint(int cid) const override
-    {
-        if (cid == 0)
-            return m_geometry->createProximity(this,1,0);
-        else if (cid == 1)
-            return m_geometry->createProximity(this,0,1);
-
-        return m_geometry->createProximity(this,1.0/2.0,1.0/2.0);
-    }
-
-    //this function project the point P on the element and return the corresponding proximity
-    BaseProximity::SPtr project(defaulttype::Vector3 P) const override
-    {
-        double fact_u,fact_v;
-
-        const helper::ReadAccessor<DataVecCoord> & pos = geometry()->getState()->read(core::VecCoordId::position());
-
-        defaulttype::Vector3 P1 = pos[m_pid[0]];
-        defaulttype::Vector3 P2 = pos[m_pid[1]];
-
-        defaulttype::Vector3 v = P2-P1;
-        fact_v = dot(P - P1,v) / dot(v,v);
-
-        if (fact_v<0.0) fact_v = 0.0;
-        else if (fact_v>1.0) fact_v = 1.0;
-
-        fact_u = 1.0-fact_v;
-
-        return m_geometry->createProximity(this,fact_u,fact_v);
-    }
-
-    void draw(const core::visual::VisualParams * /*vparams*/) const override
-    {
-        glColor4dv(geometry()->d_color.getValue().data());
-
-        glBegin(GL_LINES);
-            glVertex3dv(getControlPoint(0)->getPosition().data());
-            glVertex3dv(getControlPoint(1)->getPosition().data());
-        glEnd();
-    }
-
-protected:
-    const EdgeGeometry* m_geometry;
-    size_t m_pid[2];
-    size_t m_eid;
+    const EdgeGeometry<DataTypes> * m_geometry;
+    State * m_state;
+    unsigned m_size;
 };
+
+
+//    void draw(const core::visual::VisualParams * /*vparams*/) const override
+//    {
+//        glColor4dv(geometry()->d_color.getValue().data());
+
+//        glBegin(GL_LINES);
+//            glVertex3dv(getControlPoint(0)->getPosition().data());
+//            glVertex3dv(getControlPoint(1)->getPosition().data());
+//        glEnd();
+//    }
+
+//protected:
+//    const EdgeGeometry* m_geometry;
+//    size_t m_pid[2];
+//    size_t m_eid;
+//};
 
 }
 

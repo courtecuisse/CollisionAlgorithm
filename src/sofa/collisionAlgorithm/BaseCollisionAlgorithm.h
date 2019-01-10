@@ -1,9 +1,9 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/BaseElementFilter.h>
 #include <sofa/core/collision/Pipeline.h>
+#include <sofa/collisionAlgorithm/proximity/FixedProximity.h>
 
 namespace sofa
 {
@@ -36,7 +36,7 @@ public :
     SOFA_ABSTRACT_CLASS(BaseCollisionAlgorithm, core::collision::Pipeline);
 
     BaseCollisionAlgorithm()
-        : l_filter(initLink("filter", "Link to an optional filter"))
+//        : l_filter(initLink("filter", "Link to an optional filter"))
     {
 
     }
@@ -65,8 +65,6 @@ public :
         processAlgorithm();
     }
 
-    virtual void getState(std::set<sofa::core::behavior::MechanicalState<defaulttype::Vec3dTypes>* > & list_state) = 0;
-
     virtual std::set< std::string > getResponseList() const override
     {
         std::set< std::string > res;
@@ -86,7 +84,7 @@ public :
     }
 
 protected:
-    core::objectmodel::SingleLink<BaseCollisionAlgorithm,BaseElementFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filter;
+//    core::objectmodel::SingleLink<BaseCollisionAlgorithm,BaseElementFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filter;
 
     virtual void doCollisionReset() override {}
 

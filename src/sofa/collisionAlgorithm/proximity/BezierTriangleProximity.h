@@ -1,8 +1,6 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/geometry/BezierTriangleGeometry.h>
-#include <sofa/collisionAlgorithm/element/TriangleElement.h>
-#include <sofa/collisionAlgorithm/element/BezierTriangleElement.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 
 namespace sofa
@@ -11,29 +9,47 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class BezierTriangleProximity : public TriangleProximity
-{
-    friend class BezierTriangleGeometry;
+template<class DataTypes>
+class BezierTriangleProximity : public TBaseProximity<DataTypes> {
 public:
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef typename DataTypes::Coord Coord;
+    typedef typename DataTypes::Real Real;
+    typedef typename DataTypes::VecDeriv VecDeriv;
+    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
+    typedef typename DataTypes::Deriv Deriv1;
+    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
+    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
+    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    BezierTriangleProximity(const BezierTriangleElement * elmt, double f1, double f2, double f3)
-    : TriangleProximity(elmt,f1,f2,f3)
-    , m_bezierElement(elmt)
-    {}
+    BezierTriangleProximity(unsigned eid, unsigned p1,unsigned p2,unsigned p3,double f1,double f2,double f3, const BezierTriangleGeometry<DataTypes> * geometry, State * state)
+    : TBaseProximity<DataTypes>(state)
+    , m_eid(eid)
+    , m_geometry(geometry) {
+        m_pid[0] = p1;
+        m_pid[1] = p2;
+        m_pid[2] = p3;
+
+        m_fact[0] = f1;
+        m_fact[1] = f2;
+        m_fact[2] = f3;
+    }
 
     ////Bezier triangle are computed according to :
     ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
     defaulttype::Vector3 getPosition(core::VecCoordId v) const override
     {
-        const BezierTriangleGeometry::BezierTriangleInfo & tbinfo = m_bezierElement->geometry()->m_beziertriangle_info[m_bezierElement->m_eid];
+        const typename BezierTriangleGeometry<DataTypes>::BezierTriangleInfo & tbinfo = m_geometry->m_beziertriangle_info[m_eid];
 
         if(v == core::VecCoordId::position())
         {
-            const helper::ReadAccessor<DataVecCoord> & x = m_state->read(v);
+            const helper::ReadAccessor<DataVecCoord> & x = this->m_state->read(v);
 
-            const defaulttype::Vector3 & p300 = x[m_bezierElement->m_pid[2]];
-            const defaulttype::Vector3 & p030 = x[m_bezierElement->m_pid[1]];
-            const defaulttype::Vector3 & p003 = x[m_bezierElement->m_pid[0]];
+            const defaulttype::Vector3 & p300 = x[m_pid[2]];
+            const defaulttype::Vector3 & p030 = x[m_pid[1]];
+            const defaulttype::Vector3 & p003 = x[m_pid[0]];
 
             double fact_w = m_fact[2];
             double fact_u = m_fact[1];
@@ -50,21 +66,21 @@ public:
                    tbinfo.p012 * 3*fact_u*fact_v*fact_v +
                    tbinfo.p111 * 6*fact_w*fact_u*fact_v;
         }
-        else if (v == core::VecCoordId::position())
+        else if (v == core::VecCoordId::freePosition())
         {
             double fact_w = m_fact[2];
             double fact_u = m_fact[1];
             double fact_v = m_fact[0];
 
-            const helper::ReadAccessor<DataVecCoord> & x = m_state->read(core::VecCoordId::freePosition());
+            const helper::ReadAccessor<DataVecCoord> & x = this->m_state->read(core::VecCoordId::freePosition());
 
-            const defaulttype::Vector3 & p300_Free = x[m_bezierElement->m_pid[2]];
-            const defaulttype::Vector3 & p030_Free = x[m_bezierElement->m_pid[1]];
-            const defaulttype::Vector3 & p003_Free = x[m_bezierElement->m_pid[0]];
+            const defaulttype::Vector3 & p300_Free = x[m_pid[2]];
+            const defaulttype::Vector3 & p030_Free = x[m_pid[1]];
+            const defaulttype::Vector3 & p003_Free = x[m_pid[0]];
 
-            const defaulttype::Vector3 & n200_Free = m_bezierElement->geometry()->m_pointNormal[m_bezierElement->m_pid[2]];
-            const defaulttype::Vector3 & n020_Free = m_bezierElement->geometry()->m_pointNormal[m_bezierElement->m_pid[1]];
-            const defaulttype::Vector3 & n002_Free = m_bezierElement->geometry()->m_pointNormal[m_bezierElement->m_pid[0]];
+            const defaulttype::Vector3 & n200_Free = m_geometry->pointNormals()[m_pid[2]];
+            const defaulttype::Vector3 & n020_Free = m_geometry->pointNormals()[m_pid[1]];
+            const defaulttype::Vector3 & n002_Free = m_geometry->pointNormals()[m_pid[0]];
 
             double w12_free = dot(p030_Free - p300_Free,n200_Free);
             double w21_free = dot(p300_Free - p030_Free,n020_Free);
@@ -106,11 +122,11 @@ public:
 
     defaulttype::Vector3 getNormal() const override
     {
-        const BezierTriangleGeometry::BezierTriangleInfo & tbinfo = m_bezierElement->geometry()->m_beziertriangle_info[m_bezierElement->m_eid];
+        const typename BezierTriangleGeometry<DataTypes>::BezierTriangleInfo & tbinfo = m_geometry->m_beziertriangle_info[m_eid];
 
-        const defaulttype::Vector3 &n200 = m_bezierElement->geometry()->m_pointNormal[m_bezierElement->m_pid[2]];
-        const defaulttype::Vector3 &n020 = m_bezierElement->geometry()->m_pointNormal[m_bezierElement->m_pid[1]];
-        const defaulttype::Vector3 &n002 = m_bezierElement->geometry()->m_pointNormal[m_bezierElement->m_pid[0]];
+        const defaulttype::Vector3 &n200 = m_geometry->pointNormals()[m_pid[2]];
+        const defaulttype::Vector3 &n020 = m_geometry->pointNormals()[m_pid[1]];
+        const defaulttype::Vector3 &n002 = m_geometry->pointNormals()[m_pid[0]];
 
         double fact_w = m_fact[2];
         double fact_u = m_fact[1];
@@ -129,10 +145,16 @@ public:
         return N1;
     }
 
+    void addConstributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
+        it.addCol(m_pid[0], N * m_fact[0]);
+        it.addCol(m_pid[1], N * m_fact[1]);
+        it.addCol(m_pid[2], N * m_fact[2]);
+    }
 
-private:
-    const BezierTriangleElement* m_bezierElement;
-
+    unsigned m_eid;
+    const BezierTriangleGeometry<DataTypes> * m_geometry;
+    unsigned m_pid[3];
+    double m_fact[3];
 };
 
 }

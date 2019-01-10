@@ -37,9 +37,23 @@
 //    return static_cast<const TriangleGeometry*>(m_geometry)->triangleInfo(id).tn;
 //}
 
+<<<<<<< HEAD
+template<>
+defaulttype::Vector3 SofaFlatNormalHandler<PointGeometry>::getNormal(const size_t id, const double* ) const
+{
+    ///TODO !
+    return defaulttype::Vector3(0,0,1);
+}
+
+int FlatNormalHandlerClass = core::RegisterObject("FlatNormalHandler")
+.add< SofaFlatNormalHandler<TriangleGeometry> >()
+.add< SofaFlatNormalHandler<PointGeometry> >()
+.addAlias("FlatNormalHandler");
+=======
 //int FlatNormalHandlerClass = core::RegisterObject("FlatNormalHandler")
 //.add< SofaFlatNormalHandler<TriangleGeometry> >()
 //.addAlias("FlatNormalHandler");
+>>>>>>>  Change elements to iterators
 
 
 

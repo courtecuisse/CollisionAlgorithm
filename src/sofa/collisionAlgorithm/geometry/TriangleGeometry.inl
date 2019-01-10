@@ -3,7 +3,6 @@
 #include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
 #include <sofa/collisionAlgorithm/element/TriangleElement.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
-#include <sofa/collisionAlgorithm/BaseGeometryModifier.h>
 
 namespace sofa
 {
@@ -11,21 +10,27 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-BaseProximity::SPtr TriangleGeometry::createProximity(const TriangleElement * elmt,double f1,double f2,double f3) const
-{
-    return std::shared_ptr<TriangleProximity>(new TriangleProximity(elmt,f1,f2,f3));
+template<class DataTypes>
+ElementIterator::UPtr TriangleGeometry<DataTypes>::begin() const {
+    return ElementIterator::UPtr(new TriangleElementIterator<DataTypes>(this));
 }
 
-void TriangleGeometry::prepareDetection()
+template<class DataTypes>
+ElementIterator::End TriangleGeometry<DataTypes>::end() const {
+    return d_triangles.getValue().size();
+}
+
+template<class DataTypes>
+defaulttype::Vector3 TriangleGeometry<DataTypes>::getNormal(const TriangleProximity<DataTypes> *prox) const {
+    return m_triangle_info[prox->m_eid].tn;
+}
+
+template<class DataTypes>
+void TriangleGeometry<DataTypes>::prepareDetection()
 {
     const VecTriangles& triangles = d_triangles.getValue();
 
-    if (m_elements.size() != triangles.size())
-        init();
-
-    const helper::ReadAccessor<DataVecCoord> & pos = getState()->read(core::VecCoordId::position());
-
-    m_pointNormal.resize(pos.size());
+    const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
 
     m_triangle_info.resize(triangles.size());
 
@@ -56,26 +61,93 @@ void TriangleGeometry::prepareDetection()
         tinfo.tn.normalize();
         tinfo.ax2.normalize();
     }
-
-    if(triangles.size() > 0)
-    {
-        m_pointNormal.resize(pos.size());
-
-        for (size_t p=0;p<pos.size();p++)
-        {
-            const std::vector<TriangleID> & tav = m_trianglesAroundVertex[p];
-            m_pointNormal[p] = defaulttype::Vector3(0,0,0);
-            for (size_t t=0;t<tav.size();t++)
-            {
-                m_pointNormal[p] += this->m_triangle_info[tav[t]].tn;
-            }
-            m_pointNormal[p].normalize();
-
-        }
-    }
 }
 
-void TriangleGeometry::init()
+
+//proj_P must be on the plane
+template<class DataTypes>
+void TriangleGeometry<DataTypes>::computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const
+{
+    defaulttype::Vector3 v2 = proj_P - p0;
+
+    double d20 = dot(v2,tinfo.v0);
+    double d21 = dot(v2,tinfo.v1);
+
+    fact_v = (tinfo.d11 * d20 - tinfo.d01 * d21) * tinfo.invDenom;
+    fact_w = (tinfo.d00 * d21 - tinfo.d01 * d20) * tinfo.invDenom;
+    fact_u = 1.0 - fact_v  - fact_w;
+}
+
+//Barycentric coordinates are computed according to
+//http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
+template<class DataTypes>
+void TriangleGeometry<DataTypes>::project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const {
+    const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
+    const TriangleInfo & tinfo = m_triangle_info[eid];
+    triangle = d_triangles.getValue()[eid];
+
+    defaulttype::Vector3 P0 = pos[triangle[0]];
+    defaulttype::Vector3 P1 = pos[triangle[1]];
+    defaulttype::Vector3 P2 = pos[triangle[2]];
+
+    defaulttype::Vector3 x1x2 = P - P0;
+
+    //corrdinate on the plane
+    double c0 = dot(x1x2,tinfo.ax1);
+    double c1 = dot(x1x2,tinfo.ax2);
+    defaulttype::Vector3 proj_P = P0 + tinfo.ax1 * c0 + tinfo.ax2 * c1;
+
+    double fact_u,fact_v,fact_w;
+
+    computeBaryCoords(proj_P, tinfo, P0, fact_u,fact_v,fact_w);
+
+    if (fact_u<0)
+    {
+        defaulttype::Vector3 v3 = P1 - P2;
+        defaulttype::Vector3 v4 = proj_P - P2;
+        double alpha = dot(v4,v3) / dot(v3,v3);
+
+        if (alpha<0) alpha = 0;
+        else if (alpha>1) alpha = 1;
+
+        fact_u = 0;
+        fact_v = alpha;
+        fact_w = 1.0 - alpha;
+    }
+    else if (fact_v<0)
+    {
+        defaulttype::Vector3 v3 = P0 - P2;
+        defaulttype::Vector3 v4 = proj_P - P2;
+        double alpha = dot(v4,v3) / dot(v3,v3);
+
+        if (alpha<0) alpha = 0;
+        else if (alpha>1) alpha = 1;
+
+        fact_u = alpha;
+        fact_v = 0;
+        fact_w = 1.0 - alpha;
+    }
+    else if (fact_w<0)
+    {
+        defaulttype::Vector3 v3 = P1 - P0;
+        defaulttype::Vector3 v4 = proj_P - P0;
+        double alpha = dot(v4,v3) / dot(v3,v3);
+
+        if (alpha<0) alpha = 0;
+        else if (alpha>1) alpha = 1;
+
+        fact_u = 1.0 - alpha;
+        fact_v = alpha;
+        fact_w = 0;
+    }
+
+    factor[0] = fact_u;
+    factor[1] = fact_v;
+    factor[2] = fact_w;
+}
+
+template<class DataTypes>
+void TriangleGeometry<DataTypes>::init()
 {
     ///To remove if we think every input has to be explicit
     if(d_triangles.getValue().empty())
@@ -99,26 +171,6 @@ void TriangleGeometry::init()
             }
         }
     }
-
-    m_elements.clear();
-    const VecTriangles& triangles = d_triangles.getValue();
-
-    for (size_t i=0;i<triangles.size();i++)
-    {
-        m_elements.push_back(TriangleElement::createElement(this,i));
-    }
-
-    //store triangles around vertex information
-    const helper::ReadAccessor<DataVecCoord> & pos = getState()->read(core::VecCoordId::position());
-    m_trianglesAroundVertex.resize(pos.size());
-    for (size_t i = 0; i < triangles.size(); ++i)
-    {
-        // adding edge i in the edge shell of both points
-        for (size_t j=0; j<3; ++j)
-            m_trianglesAroundVertex[triangles[i][j]].push_back(i);
-    }
-
-    prepareDetection();
 }
 
 }

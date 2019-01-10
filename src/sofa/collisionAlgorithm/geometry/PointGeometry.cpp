@@ -8,7 +8,7 @@ namespace collisionAlgorithm {
 SOFA_DECL_CLASS(PointGeometry)
 
 int PointGeometryClass = core::RegisterObject("PointGeometry")
-.add< PointGeometry >();
+.add< PointGeometry<sofa::defaulttype::Vec3dTypes> >();
 
 }
 

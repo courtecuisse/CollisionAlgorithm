@@ -1,15 +1,15 @@
-#include <sofa/collisionAlgorithm/geometry/IntersectionContourGeometry.inl>
-#include <sofa/core/ObjectFactory.h>
+//#include <sofa/collisionAlgorithm/geometry/IntersectionContourGeometry.inl>
+//#include <sofa/core/ObjectFactory.h>
 
-namespace sofa {
+//namespace sofa {
 
-namespace collisionAlgorithm {
+//namespace collisionAlgorithm {
 
-SOFA_DECL_CLASS(IntersectionContourGeometry)
+//SOFA_DECL_CLASS(IntersectionContourGeometry)
 
-int IntersectionContourGeometryClass = core::RegisterObject("IntersectionContourGeometry")
-.add< IntersectionContourGeometry >();
+//int IntersectionContourGeometryClass = core::RegisterObject("IntersectionContourGeometry")
+//.add< IntersectionContourGeometry >();
 
-}
+//}
 
-}
+//}

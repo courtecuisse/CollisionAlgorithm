@@ -11,32 +11,47 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class BaseElement
-{
-    friend class BaseProximity;
-
+class ElementIterator {
 public:
-    typedef std::unique_ptr<BaseElement> UPtr;
-    typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
 
-    virtual ~BaseElement() {}
+    typedef unsigned End;
 
-    //this function returns a vector with all the control points of the element
-    //if an id is not >=0 and <getNbControlPoints() this function should return the gravity center of the element
-    virtual BaseProximity::SPtr getControlPoint(int i = -1) const = 0;
+    class UPtr : public std::unique_ptr<ElementIterator> {
+    public:
 
-    //this function project the point P on the element and return the corresponding proximity
-    virtual BaseProximity::SPtr project(defaulttype::Vector3 P) const = 0;
+        UPtr(ElementIterator * ptr) : std::unique_ptr<ElementIterator>(ptr) {}
 
-    //return the geometry // See covariant return type !
-    virtual const BaseGeometry* geometry() const = 0;
+        bool operator != (End end) {
+            return this->get()->m_id < end;
+        }
 
-    // return the number of control points
-    virtual size_t getNbControlPoints() const = 0;
+        UPtr& operator++() {
+            this->get()->m_id++;
+            return *this;
+        }
 
-    virtual void draw(const core::visual::VisualParams *vparams) const = 0;
+        void operator++(int /*n*/) {
+            this->get()->m_id++;
+        }
+    };
 
+    ElementIterator() {
+        m_id = 0;
+    }
+
+    virtual BaseProximity::SPtr project(const defaulttype::Vector3 & P) const = 0;
+
+    virtual BaseProximity::SPtr center() const = 0;
+
+    unsigned id() const {
+        return m_id;
+    }
+
+
+private:
+    unsigned m_id;
 };
+
 
 }
 

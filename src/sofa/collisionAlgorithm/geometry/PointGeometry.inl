@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
-#include <sofa/collisionAlgorithm/element/PointElement.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
+#include <sofa/collisionAlgorithm/element/PointElement.h>
 
 namespace sofa
 {
@@ -10,24 +10,29 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-void PointGeometry::init()
-{
-    m_elements.clear();
-
-    for (unsigned i=0;i<(unsigned) l_state->getSize();i++)
-    {
-        m_elements.push_back(PointElement::createElement(this,i));
-    }
+template<class DataTypes>
+ElementIterator::UPtr PointGeometry<DataTypes>::begin() const {
+    return ElementIterator::UPtr(new PointElementIterator<DataTypes>(this));
 }
 
-void PointGeometry::prepareDetection()
-{
-    if (m_elements.size() != (unsigned) l_state->getSize()) init();
+template<class DataTypes>
+ElementIterator::End PointGeometry<DataTypes>::end() const {
+    return this->l_state->getSize();
 }
 
-BaseProximity::SPtr PointGeometry::createProximity(const PointElement * elmt) const
-{
-    return std::shared_ptr<PointProximity>(new PointProximity(elmt));
+template<class DataTypes>
+void PointGeometry<DataTypes>::draw(const core::visual::VisualParams *vparams) {
+    if (! vparams->displayFlags().getShowCollisionModels())
+        return;
+
+    if (this->d_color.getValue()[3] == 0.0)
+        return;
+
+    glDisable(GL_LIGHTING);
+
+//    for(ElementIterator it=elementIterator();!it.end();it.next()) {
+//        m_elements[i]->draw(vparams);
+//    }
 }
 
 }

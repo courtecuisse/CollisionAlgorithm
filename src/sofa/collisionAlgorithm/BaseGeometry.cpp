@@ -7,10 +7,10 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-defaulttype::Vector3 BaseGeometry::getNormal(const unsigned elementID, const double* fact) const
-{
-    return l_normalHandler->getNormal(elementID, fact);
-}
+//defaulttype::Vector3 BaseGeometry::getNormal(const unsigned elementID, const double* fact) const
+//{
+//    return l_normalHandler->getNormal(elementID, fact);
+//}
 
 
 //BaseElement::BaseProximity::BaseProximity(BaseElement * elmt)

@@ -6,32 +6,24 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-class EdgeElement;
 
-class EdgeGeometry : public BaseGeometry {
-    friend class EdgeElement;
+template<class DataTypes>
+class EdgeGeometry : public TBaseGeometry<DataTypes> {
 public:
+    typedef TBaseGeometry<DataTypes> Inherit;
+    SOFA_CLASS(SOFA_TEMPLATE(EdgeGeometry,DataTypes),Inherit);
+
     typedef sofa::core::topology::BaseMeshTopology::Edge Edge;
     typedef helper::vector<Edge> VecEdges;
 
-    SOFA_CLASS(EdgeGeometry,BaseGeometry);
+    Data<VecEdges> d_edges;
 
     EdgeGeometry()
-        : d_edges(initData(&d_edges, VecEdges(), "edges", "Vector of Edges"))
-    {
+    : d_edges(initData(&d_edges, VecEdges(), "edges", "Vector of Edges")) {}
 
-    }
+    virtual ElementIterator::UPtr begin() const;
 
-    BaseProximity::SPtr createProximity(const EdgeElement * elmt,double f1,double f2) const;
-
-    virtual void prepareDetection() override;
-
-    virtual void init() override;
-
-    inline const VecEdges& edges() const { return d_edges.getValue(); }
-
-protected:
-    Data<VecEdges> d_edges;
+    ElementIterator::End end() const;
 
 };
 
