@@ -19,7 +19,7 @@ public:
         Iterator(BaseElement* ptr) : std::unique_ptr<BaseElement>(ptr) {}
 
         bool operator != (const BaseGeometry * geo) {
-            return this->get()->end(geo);
+            return ! this->get()->end(geo);
         }
 
         void operator++(int) {

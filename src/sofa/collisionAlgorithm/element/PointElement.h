@@ -28,7 +28,7 @@ public:
     }
 
     bool end(const BaseGeometry */*geo*/) const {
-        return id() < m_state->getSize();
+        return id() >= m_state->getSize();
     }
 
     virtual BaseProximity::SPtr center() const {

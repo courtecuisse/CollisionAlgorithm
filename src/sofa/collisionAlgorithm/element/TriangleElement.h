@@ -50,7 +50,7 @@ public:
     }
 
     bool end(const BaseGeometry * /*geo*/) const {
-        return id() < m_geometry->d_triangles.getValue().size();
+        return id() >= m_geometry->d_triangles.getValue().size();
     }
 
     virtual defaulttype::BoundingBox getBBox() const {

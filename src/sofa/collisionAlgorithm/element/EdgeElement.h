@@ -42,7 +42,7 @@ public:
     }
 
     bool end(const BaseGeometry */*geo*/) const {
-        return id() < m_geometry->d_edges.getValue().size();
+        return id() >= m_geometry->d_edges.getValue().size();
     }
 
     virtual BaseProximity::SPtr center() const {

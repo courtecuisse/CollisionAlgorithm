@@ -12,25 +12,27 @@ namespace collisionAlgorithm
 //Internal iterator of elements
 class AABBElement : public BaseElement {
 public:
-    AABBElement(const AABBGeometry * geometry) : m_geometry(geometry) {
-        m_iterator = geometry->m_indexedElement.cbegin();
-    }
+    AABBElement(std::map<unsigned, std::set<unsigned> >::const_iterator it, const AABBGeometry * geometry) : m_geometry(geometry), m_iterator(it) {}
 
     BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
-
+        if (m_selectElements.empty()) {
+            m_geometry->selectElements(P,m_selectElements);
+            m_iterator_project = m_selectElements.cbegin();
+        }
+        return m_geometry->l_geometry->begin(*m_iterator_project)->project(P);
     }
 
     virtual BaseProximity::SPtr center() const {
         const std::set<unsigned> & selected = m_iterator->second;
         unsigned eid = *(selected.begin());
 
-        return m_geometry->l_geometry->begin(eid)->center();
         defaulttype::BoundingBox bbox = getBBox();
-        return BaseProximity::SPtr(new FixedProximity((bbox.minBBox() + bbox.maxBBox())*0.5));
+        return m_geometry->l_geometry->begin(eid)->project((bbox.minBBox() + bbox.maxBBox())*0.5);
     }
 
     void next() {
-        m_iterator++;
+        if (m_selectElements.empty()) m_iterator++;
+        else m_iterator_project++;
     }
 
     unsigned id() const {
@@ -38,7 +40,8 @@ public:
     }
 
     bool end(const BaseGeometry * /*geo*/) const{
-        return m_iterator!=m_geometry->m_indexedElement.end();
+        if (m_selectElements.empty()) return m_iterator==m_geometry->m_indexedElement.end();
+        else return m_iterator_project==m_selectElements.cend();
     }
 
     virtual defaulttype::BoundingBox getBBox() const {
@@ -55,7 +58,8 @@ public:
     }
 
     const AABBGeometry * m_geometry;
-    std::set<int> m_selectElements;
+    mutable std::set<unsigned> m_selectElements;
+    mutable std::set<unsigned>::const_iterator m_iterator_project;
     std::map<unsigned, std::set<unsigned> >::const_iterator m_iterator;
 };
 
@@ -66,7 +70,7 @@ AABBGeometry::AABBGeometry()
 }
 
 BaseElement::Iterator AABBGeometry::begin(unsigned /*eid*/) const {
-    return BaseElement::Iterator(new AABBElement(this));
+    return BaseElement::Iterator(new AABBElement(m_indexedElement.cbegin(), this));
 }
 
 sofa::core::behavior::BaseMechanicalState * AABBGeometry::getState() const {
@@ -159,9 +163,10 @@ void AABBGeometry::prepareDetection()
 
                     defaulttype::Vector3 D = P - it->project(P)->getPosition();
 
-                    if ((fabs(D[0])<m_cellSize[0]*0.5) &&
-                        (fabs(D[1])<m_cellSize[1]*0.5) &&
-                        (fabs(D[2])<m_cellSize[2]*0.5)) m_indexedElement[getKey(i,j,k)].insert(it->id());
+                    if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
+                        (fabs(D[1])<=m_cellSize[1]*0.5) &&
+                        (fabs(D[2])<=m_cellSize[2]*0.5))
+                        m_indexedElement[getKey(i,j,k)].insert(it->id());
                 }
             }
         }
@@ -176,7 +181,7 @@ void AABBGeometry::draw(const core::visual::VisualParams * vparams) {
 
     glDisable(GL_LIGHTING);
 
-    glColor3dv(this->d_color.getValue().data());
+    glColor4dv(this->d_color.getValue().data());
 
     for (auto it = begin(); it != end() ; it++) {
         defaulttype::BoundingBox bbox = it->getBBox();
@@ -192,22 +197,46 @@ void AABBGeometry::draw(const core::visual::VisualParams * vparams) {
         points[6] = defaulttype::Vector3(bbox.minBBox()[0], bbox.maxBBox()[1], bbox.maxBBox()[2]);
         points[7] = defaulttype::Vector3(bbox.maxBBox()[0], bbox.maxBBox()[1], bbox.maxBBox()[2]);
 
-        glBegin(GL_LINES);
-            glVertex3dv(points[0].data());glVertex3dv(points[1].data());
-            glVertex3dv(points[3].data());glVertex3dv(points[2].data());
-            glVertex3dv(points[7].data());glVertex3dv(points[6].data());
-            glVertex3dv(points[4].data());glVertex3dv(points[5].data());
 
-            glVertex3dv(points[0].data());glVertex3dv(points[2].data());
-            glVertex3dv(points[1].data());glVertex3dv(points[3].data());
-            glVertex3dv(points[4].data());glVertex3dv(points[6].data());
-            glVertex3dv(points[5].data());glVertex3dv(points[7].data());
+        if (vparams->displayFlags().getShowWireFrame()) {
+            glBegin(GL_LINES);
+                glVertex3dv(points[0].data());glVertex3dv(points[1].data());
+                glVertex3dv(points[3].data());glVertex3dv(points[2].data());
+                glVertex3dv(points[7].data());glVertex3dv(points[6].data());
+                glVertex3dv(points[4].data());glVertex3dv(points[5].data());
 
-            glVertex3dv(points[0].data());glVertex3dv(points[4].data());
-            glVertex3dv(points[1].data());glVertex3dv(points[5].data());
-            glVertex3dv(points[2].data());glVertex3dv(points[6].data());
-            glVertex3dv(points[3].data());glVertex3dv(points[7].data());
-        glEnd();
+                glVertex3dv(points[0].data());glVertex3dv(points[2].data());
+                glVertex3dv(points[1].data());glVertex3dv(points[3].data());
+                glVertex3dv(points[4].data());glVertex3dv(points[6].data());
+                glVertex3dv(points[5].data());glVertex3dv(points[7].data());
+
+                glVertex3dv(points[0].data());glVertex3dv(points[4].data());
+                glVertex3dv(points[1].data());glVertex3dv(points[5].data());
+                glVertex3dv(points[2].data());glVertex3dv(points[6].data());
+                glVertex3dv(points[3].data());glVertex3dv(points[7].data());
+            glEnd();
+        } else {
+            glBegin(GL_QUADS);
+                glColor3dv((this->d_color.getValue()*0.8).data());
+                glVertex3dv(points[0].data());glVertex3dv(points[1].data());glVertex3dv(points[3].data());glVertex3dv(points[2].data());
+
+                glColor3dv((this->d_color.getValue()*0.7).data());
+                glVertex3dv(points[4].data());glVertex3dv(points[5].data());glVertex3dv(points[7].data());glVertex3dv(points[6].data());
+
+                glColor3dv((this->d_color.getValue()*0.6).data());
+                glVertex3dv(points[2].data());glVertex3dv(points[3].data());glVertex3dv(points[7].data());glVertex3dv(points[6].data());
+
+                glColor3dv((this->d_color.getValue()*0.5).data());
+                glVertex3dv(points[0].data());glVertex3dv(points[1].data());glVertex3dv(points[5].data());glVertex3dv(points[4].data());
+
+                glColor3dv((this->d_color.getValue()*0.4).data());
+                glVertex3dv(points[3].data());glVertex3dv(points[1].data());glVertex3dv(points[5].data());glVertex3dv(points[7].data());
+
+                glColor3dv((this->d_color.getValue()*0.3).data());
+                glVertex3dv(points[2].data());glVertex3dv(points[0].data());glVertex3dv(points[4].data());glVertex3dv(points[6].data());
+            glEnd();
+        }
+
     }
 }
 
