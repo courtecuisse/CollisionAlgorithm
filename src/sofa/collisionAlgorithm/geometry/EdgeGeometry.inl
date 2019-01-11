@@ -10,13 +10,8 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-ElementIterator::UPtr EdgeGeometry<DataTypes>::begin() const {
-    return ElementIterator::UPtr(new EdgeElementIterator<DataTypes>(this));
-}
-
-template<class DataTypes>
-ElementIterator::End EdgeGeometry<DataTypes>::end() const {
-    return d_edges.getValue().size();
+BaseElement::Iterator EdgeGeometry<DataTypes>::begin(unsigned eid) const {
+    return DefaultElement::Iterator(eid,new EdgeElementIterator<DataTypes>(this));
 }
 
 }

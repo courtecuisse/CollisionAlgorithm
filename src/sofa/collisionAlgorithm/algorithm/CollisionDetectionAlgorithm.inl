@@ -11,7 +11,7 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-void CollisionDetectionAlgorithm::findClosestPoint(ElementIterator::UPtr & efrom)
+void CollisionDetectionAlgorithm::findClosestPoint(BaseElement::Iterator &efrom)
 {
     std::pair<BaseProximity::SPtr,BaseProximity::SPtr> min_pair;
     double min_dist = std::numeric_limits<double>::max();

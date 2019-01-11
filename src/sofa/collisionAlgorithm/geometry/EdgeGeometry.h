@@ -21,9 +21,7 @@ public:
     EdgeGeometry()
     : d_edges(initData(&d_edges, VecEdges(), "edges", "Vector of Edges")) {}
 
-    virtual ElementIterator::UPtr begin() const;
-
-    ElementIterator::End end() const;
+    virtual BaseElement::Iterator begin(unsigned eid = 0) const;
 
 };
 

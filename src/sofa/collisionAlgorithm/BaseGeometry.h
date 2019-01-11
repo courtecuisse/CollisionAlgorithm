@@ -32,6 +32,14 @@ public:
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
     {}
 
+    virtual BaseElement::Iterator begin(unsigned eid = 0) const = 0;
+
+    virtual const BaseGeometry * end() const {
+        return this;
+    }
+
+    virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
+
     void bwdInit( ) override {
         prepareDetection();
     }
@@ -45,12 +53,6 @@ public:
     virtual void computeCollisionResponse() override {}
 
     void computeCollisionDetection() override {}
-
-    virtual ElementIterator::UPtr begin() const = 0;
-
-    virtual unsigned end() const = 0;
-
-    virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
 protected:
     virtual void doCollisionReset() override {}

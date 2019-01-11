@@ -12,7 +12,7 @@ namespace collisionAlgorithm
 class FixedProximity : public BaseProximity {
 public:
 
-    FixedProximity(defaulttype::Vector3 & p) : m_position(p) {}
+    FixedProximity(const defaulttype::Vector3 & p) : m_position(p) {}
 
     defaulttype::Vector3 getPosition(core::VecCoordId ) const {
         return m_position;

@@ -11,13 +11,8 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-ElementIterator::UPtr PointGeometry<DataTypes>::begin() const {
-    return ElementIterator::UPtr(new PointElementIterator<DataTypes>(this));
-}
-
-template<class DataTypes>
-ElementIterator::End PointGeometry<DataTypes>::end() const {
-    return this->l_state->getSize();
+BaseElement::Iterator PointGeometry<DataTypes>::begin(unsigned eid) const {
+    return DefaultElement::Iterator(eid, new PointElementIterator<DataTypes>(this));
 }
 
 template<class DataTypes>

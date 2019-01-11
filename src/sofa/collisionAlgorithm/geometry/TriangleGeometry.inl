@@ -11,13 +11,8 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-ElementIterator::UPtr TriangleGeometry<DataTypes>::begin() const {
-    return ElementIterator::UPtr(new TriangleElementIterator<DataTypes>(this));
-}
-
-template<class DataTypes>
-ElementIterator::End TriangleGeometry<DataTypes>::end() const {
-    return d_triangles.getValue().size();
+BaseElement::Iterator TriangleGeometry<DataTypes>::begin(unsigned eid) const {
+    return DefaultElement::Iterator(eid,new TriangleElementIterator<DataTypes>(this));
 }
 
 template<class DataTypes>

@@ -41,9 +41,7 @@ public:
 
     virtual void prepareDetection() override;
 
-    virtual ElementIterator::UPtr begin() const;
-
-    ElementIterator::End end() const;
+    virtual BaseElement::Iterator begin(unsigned eid = 0) const;
 
     virtual defaulttype::Vector3 getNormal(const TriangleProximity<DataTypes> * prox) const;
 

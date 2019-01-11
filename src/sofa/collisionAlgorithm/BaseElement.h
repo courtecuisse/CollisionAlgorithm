@@ -11,46 +11,60 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class ElementIterator {
+
+class BaseElement {
 public:
-
-    typedef unsigned End;
-
-    class UPtr : public std::unique_ptr<ElementIterator> {
+    class Iterator : public std::unique_ptr<BaseElement> {
     public:
+        Iterator(BaseElement* ptr) : std::unique_ptr<BaseElement>(ptr) {}
 
-        UPtr(ElementIterator * ptr) : std::unique_ptr<ElementIterator>(ptr) {}
-
-        bool operator != (End end) {
-            return this->get()->m_id < end;
+        bool operator != (const BaseGeometry * geo) {
+            return this->get()->end(geo);
         }
 
-        UPtr& operator++() {
-            this->get()->m_id++;
-            return *this;
-        }
-
-        void operator++(int /*n*/) {
-            this->get()->m_id++;
+        void operator++(int) {
+            this->get()->next();
         }
     };
-
-    ElementIterator() {
-        m_id = 0;
-    }
 
     virtual BaseProximity::SPtr project(const defaulttype::Vector3 & P) const = 0;
 
     virtual BaseProximity::SPtr center() const = 0;
 
-    unsigned id() const {
-        return m_id;
+    virtual defaulttype::BoundingBox getBBox() const = 0;
+
+    virtual bool end(const BaseGeometry * geo) const = 0;
+
+    virtual void next() = 0;
+
+    virtual unsigned id() const = 0;
+};
+
+
+class DefaultElement : public BaseElement {
+public:
+    class Iterator : public BaseElement::Iterator {
+    public:
+        Iterator(unsigned id, DefaultElement * ptr) : BaseElement::Iterator(ptr) {
+            ptr->m_id = id;
+        }
+    };
+
+    virtual void next() {
+        this->m_id++;
     }
 
+    virtual bool end(const BaseGeometry * geo) const = 0;
+
+    virtual unsigned id() const {
+        return m_id;
+    }
 
 private:
     unsigned m_id;
 };
+
+
 
 
 }

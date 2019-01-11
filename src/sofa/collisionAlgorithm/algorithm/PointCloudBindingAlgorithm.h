@@ -1,7 +1,6 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseCollisionAlgorithm.h>
-#include <sofa/collisionAlgorithm/decorator/AABBDecorator.h>
 
 namespace sofa
 {
@@ -29,16 +28,3 @@ private:
 }
 
 }
-//    void init();
-
-//    PariProximityVector processAlgorithm(BaseGeometry * from,BaseGeometry * dest);
-
-//};
-
-//} // namespace controller
-
-//} // namespace component
-
-//} // namespace sofa
-
-//#endif // SOFA_COMPONENT_CONTROLLER_NeedleConstraint_H

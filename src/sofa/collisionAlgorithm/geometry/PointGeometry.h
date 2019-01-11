@@ -14,9 +14,7 @@ public:
     typedef TBaseGeometry<DataTypes> Inherit;
     SOFA_CLASS(SOFA_TEMPLATE(PointGeometry,DataTypes),Inherit);
 
-    virtual ElementIterator::UPtr begin() const;
-
-    ElementIterator::End end() const;
+    virtual BaseElement::Iterator begin(unsigned eid = 0) const;
 
     virtual void draw(const core::visual::VisualParams *vparams) override;
 

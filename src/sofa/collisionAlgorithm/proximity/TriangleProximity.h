@@ -63,8 +63,8 @@ public :
     const unsigned * getPid() const { return m_pid; }
 
 protected:
-    const TriangleGeometry<DataTypes> * m_geometry;
     unsigned m_eid;
+    const TriangleGeometry<DataTypes> * m_geometry;
     unsigned m_pid[3];
     double m_fact[3];
 
