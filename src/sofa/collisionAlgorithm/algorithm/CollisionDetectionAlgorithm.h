@@ -34,7 +34,7 @@ private:
     core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
     core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
 
-    BaseElement::Iterator selectElements(const defaulttype::Vector3 & P, BaseDecorator * decorator);
+    BaseElement::Iterator selectElementsOnDest(const defaulttype::Vector3 & P) const;
 
 };
 

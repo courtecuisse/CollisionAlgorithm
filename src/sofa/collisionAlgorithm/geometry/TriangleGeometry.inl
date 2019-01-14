@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
-#include <sofa/collisionAlgorithm/element/TriangleElement.h>
+#include <sofa/collisionAlgorithm/iterator/TriangleElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 
 namespace sofa

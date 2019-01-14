@@ -1,5 +1,5 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/BaseGeometryModifier.h>
+#include <sofa/collisionAlgorithm/BaseDecorator.h>
 
 namespace sofa
 {
@@ -7,10 +7,10 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-//defaulttype::Vector3 BaseGeometry::getNormal(const unsigned elementID, const double* fact) const
-//{
-//    return l_normalHandler->getNormal(elementID, fact);
-//}
+void BaseGeometry::computeCollisionReset() {
+    if (m_decorator) m_decorator->prepareDetection();
+    prepareDetection();
+}
 
 
 //BaseElement::BaseProximity::BaseProximity(BaseElement * elmt)

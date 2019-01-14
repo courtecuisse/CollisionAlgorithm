@@ -1,4 +1,4 @@
-//#include <geometry/ProjectiveContourGeometry.inl>
+//#include <deprecated/ProjectiveContourGeometry.inl>
 
 //namespace collisionAlgorithm {
 

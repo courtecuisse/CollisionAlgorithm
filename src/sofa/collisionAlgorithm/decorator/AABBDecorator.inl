@@ -9,76 +9,35 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-
-//Internal iterator of elements
-class AABBElement : public BaseElement {
-public:
-    AABBElement(std::map<unsigned, std::set<unsigned> >::const_iterator it, const AABBDecorator * geometry) : m_geometry(geometry), m_iterator(it) {}
-
-    BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
-        if (m_selectElements.empty()) {
-            m_geometry->selectElements(P,m_selectElements);
-            m_iterator_project = m_selectElements.cbegin();
-        }
-        return m_geometry->l_geometry->begin(*m_iterator_project)->project(P);
-    }
-
-    virtual BaseProximity::SPtr center() const {
-        const std::set<unsigned> & selected = m_iterator->second;
-        unsigned eid = *(selected.begin());
-
-        defaulttype::BoundingBox bbox = getBBox();
-        return m_geometry->l_geometry->begin(eid)->project((bbox.minBBox() + bbox.maxBBox())*0.5);
-    }
-
-    void next() {
-        if (m_selectElements.empty()) m_iterator++;
-        else m_iterator_project++;
-    }
-
-    unsigned id() const {
-        return m_iterator->first;
-    }
-
-    bool end(const BaseGeometry * /*geo*/) const{
-        if (m_selectElements.empty()) return m_iterator==m_geometry->m_indexedElement.end();
-        else return m_iterator_project==m_selectElements.cend();
-    }
-
-    virtual defaulttype::BoundingBox getBBox() const {
-        unsigned eid = m_iterator->first;
-
-        unsigned i = (eid) / m_geometry->m_offset[0];
-        unsigned j = (eid - i*m_geometry->m_offset[0]) / m_geometry->m_offset[1];
-        unsigned k = (eid - i*m_geometry->m_offset[0] - j*m_geometry->m_offset[1]);
-
-        defaulttype::Vector3 min = m_geometry->m_Bmin + defaulttype::Vector3((i  ) * m_geometry->m_cellSize[0],(j  ) * m_geometry->m_cellSize[1],(k  ) * m_geometry->m_cellSize[2]) ;
-        defaulttype::Vector3 max = m_geometry->m_Bmin + defaulttype::Vector3((i+1) * m_geometry->m_cellSize[0],(j+1) * m_geometry->m_cellSize[1],(k+1) * m_geometry->m_cellSize[2]) ;
-
-        return defaulttype::BoundingBox(min,max);
-    }
-
-    const AABBDecorator * m_geometry;
-    mutable std::set<unsigned> m_selectElements;
-    mutable std::set<unsigned>::const_iterator m_iterator_project;
-    std::map<unsigned, std::set<unsigned> >::const_iterator m_iterator;
-};
-
-
 AABBDecorator::AABBDecorator()
 : d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox", "number of bbox"))
-, l_geometry(initLink("geometry", "link to state")) {
-    l_geometry.setPath("@.");
+, d_refineBBox(initData(&d_refineBBox, true,"refine", "number of bbox")){
 }
 
-
-
-BaseElement::Iterator AABBDecorator::begin(const defaulttype::Vector3 & P) const {
-    return BaseElement::Iterator(new AABBElement(m_indexedElement.cbegin(), this));
+defaulttype::BoundingBox AABBDecorator::getBBox() const {
+    return defaulttype::BoundingBox(m_Bmin,m_Bmax);
 }
 
-sofa::core::behavior::BaseMechanicalState * AABBDecorator::getState() const {
-    return l_geometry->getState();
+bool AABBDecorator::selectElement(const defaulttype::Vector3 & P,std::set<unsigned> & selectElements, unsigned d) const {
+    if (d>std::max(std::max(m_nbox[0],m_nbox[1]),m_nbox[2])) return false; // check that distance is still in the box
+
+    //compute the box where is P
+    defaulttype::Vec3i cbox;
+    cbox[0] = floor((P[0] - m_Bmin[0])/m_cellSize[0]);
+    cbox[1] = floor((P[1] - m_Bmin[1])/m_cellSize[1]);
+    cbox[2] = floor((P[2] - m_Bmin[2])/m_cellSize[2]);
+
+    //project the box in the bounding box of the object
+    //search with the closest box in bbox
+    for (unsigned int i=0;i<3;i++)
+    {
+        if (cbox[i] < 0) return false;
+        else if (cbox[i] > m_nbox[i]) return false;
+    }
+
+    fillElementSet(cbox,selectElements,d);
+
+    return true;
 }
 
 void AABBDecorator::prepareDetection()
@@ -153,24 +112,30 @@ void AABBDecorator::prepareDetection()
         cmaxbox[1] = ceil((maxbox[1] - m_Bmin[1])/m_cellSize[1]);
         cmaxbox[2] = ceil((maxbox[2] - m_Bmin[2])/m_cellSize[2]);
 
+        const bool refine = d_refineBBox.getValue();
+
         for (int i=cminbox[0];i<cmaxbox[0];i++)
         {
             for (int j=cminbox[1];j<cmaxbox[1];j++)
             {
                 for (int k=cminbox[2];k<cmaxbox[2];k++)
                 {
-                    defaulttype::Vector3 P = m_Bmin + m_cellSize*0.5;
+                    if (refine) { // project the point on the element in order to know if the box is empty
+                        defaulttype::Vector3 P = m_Bmin + m_cellSize*0.5;
 
-                    P[0] += i*m_cellSize[0];
-                    P[1] += j*m_cellSize[1];
-                    P[2] += k*m_cellSize[2];
+                        P[0] += i*m_cellSize[0];
+                        P[1] += j*m_cellSize[1];
+                        P[2] += k*m_cellSize[2];
 
-                    defaulttype::Vector3 D = P - it->project(P)->getPosition();
+                        defaulttype::Vector3 D = P - it->project(P)->getPosition();
 
-                    if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
-                        (fabs(D[1])<=m_cellSize[1]*0.5) &&
-                        (fabs(D[2])<=m_cellSize[2]*0.5))
+                        if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
+                            (fabs(D[1])<=m_cellSize[1]*0.5) &&
+                            (fabs(D[2])<=m_cellSize[2]*0.5))
+                            m_indexedElement[getKey(i,j,k)].insert(it->id());
+                    } else {
                         m_indexedElement[getKey(i,j,k)].insert(it->id());
+                    }
                 }
             }
         }
@@ -187,8 +152,16 @@ void AABBDecorator::draw(const core::visual::VisualParams * vparams) {
 
     glColor4dv(this->d_color.getValue().data());
 
-    for (auto it = begin(); it != end() ; it++) {
-        defaulttype::BoundingBox bbox = it->getBBox();
+    for (auto it = m_indexedElement.begin(); it != m_indexedElement.end(); it++) {
+        unsigned eid = it->first;
+
+        unsigned i = (eid) / m_offset[0];
+        unsigned j = (eid - i*m_offset[0]) / m_offset[1];
+        unsigned k = (eid - i*m_offset[0] - j*m_offset[1]);
+
+        defaulttype::Vector3 min = m_Bmin + defaulttype::Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
+        defaulttype::Vector3 max = m_Bmin + defaulttype::Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
+        defaulttype::BoundingBox bbox(min,max);
 
         defaulttype::Vector3 points[8];
 
@@ -202,7 +175,7 @@ void AABBDecorator::draw(const core::visual::VisualParams * vparams) {
         points[7] = defaulttype::Vector3(bbox.maxBBox()[0], bbox.maxBBox()[1], bbox.maxBBox()[2]);
 
 
-        if (vparams->displayFlags().getShowWireFrame()) {
+//        if (vparams->displayFlags().getShowWireFrame()) {
             glBegin(GL_LINES);
                 glVertex3dv(points[0].data());glVertex3dv(points[1].data());
                 glVertex3dv(points[3].data());glVertex3dv(points[2].data());
@@ -219,34 +192,32 @@ void AABBDecorator::draw(const core::visual::VisualParams * vparams) {
                 glVertex3dv(points[2].data());glVertex3dv(points[6].data());
                 glVertex3dv(points[3].data());glVertex3dv(points[7].data());
             glEnd();
-        } else {
-            glBegin(GL_QUADS);
-                glColor3dv((this->d_color.getValue()*0.8).data());
-                glVertex3dv(points[0].data());glVertex3dv(points[1].data());glVertex3dv(points[3].data());glVertex3dv(points[2].data());
+//        } else {
+//            glBegin(GL_QUADS);
+//                glColor3dv((this->d_color.getValue()*0.8).data());
+//                glVertex3dv(points[0].data());glVertex3dv(points[1].data());glVertex3dv(points[3].data());glVertex3dv(points[2].data());
 
-                glColor3dv((this->d_color.getValue()*0.7).data());
-                glVertex3dv(points[4].data());glVertex3dv(points[5].data());glVertex3dv(points[7].data());glVertex3dv(points[6].data());
+//                glColor3dv((this->d_color.getValue()*0.7).data());
+//                glVertex3dv(points[4].data());glVertex3dv(points[5].data());glVertex3dv(points[7].data());glVertex3dv(points[6].data());
 
-                glColor3dv((this->d_color.getValue()*0.6).data());
-                glVertex3dv(points[2].data());glVertex3dv(points[3].data());glVertex3dv(points[7].data());glVertex3dv(points[6].data());
+//                glColor3dv((this->d_color.getValue()*0.6).data());
+//                glVertex3dv(points[2].data());glVertex3dv(points[3].data());glVertex3dv(points[7].data());glVertex3dv(points[6].data());
 
-                glColor3dv((this->d_color.getValue()*0.5).data());
-                glVertex3dv(points[0].data());glVertex3dv(points[1].data());glVertex3dv(points[5].data());glVertex3dv(points[4].data());
+//                glColor3dv((this->d_color.getValue()*0.5).data());
+//                glVertex3dv(points[0].data());glVertex3dv(points[1].data());glVertex3dv(points[5].data());glVertex3dv(points[4].data());
 
-                glColor3dv((this->d_color.getValue()*0.4).data());
-                glVertex3dv(points[3].data());glVertex3dv(points[1].data());glVertex3dv(points[5].data());glVertex3dv(points[7].data());
+//                glColor3dv((this->d_color.getValue()*0.4).data());
+//                glVertex3dv(points[3].data());glVertex3dv(points[1].data());glVertex3dv(points[5].data());glVertex3dv(points[7].data());
 
-                glColor3dv((this->d_color.getValue()*0.3).data());
-                glVertex3dv(points[2].data());glVertex3dv(points[0].data());glVertex3dv(points[4].data());glVertex3dv(points[6].data());
-            glEnd();
-        }
+//                glColor3dv((this->d_color.getValue()*0.3).data());
+//                glVertex3dv(points[2].data());glVertex3dv(points[0].data());glVertex3dv(points[4].data());glVertex3dv(points[6].data());
+//            glEnd();
+//        }
 
     }
 }
 
-
-
-void AABBDecorator::fillElementSet(defaulttype::Vec3i cbox, int d, std::set<unsigned> & selectElements) const
+void AABBDecorator::fillElementSet(defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
 {
     {
         int i=-d;

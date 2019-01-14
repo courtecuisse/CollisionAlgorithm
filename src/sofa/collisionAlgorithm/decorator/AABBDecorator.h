@@ -19,6 +19,7 @@ public:
     SOFA_CLASS(AABBDecorator,BaseDecorator);
 
     Data<defaulttype::Vec3i> d_nbox;
+    Data<bool> d_refineBBox;
 
     AABBDecorator();
 
@@ -26,13 +27,12 @@ public:
 
     virtual void prepareDetection() override;
 
-    virtual BaseElement::Iterator begin(const defaulttype::Vector3 & P) const;
+    virtual defaulttype::BoundingBox getBBox() const;
 
-    virtual sofa::core::behavior::BaseMechanicalState * getState() const;
+    virtual bool selectElement(const defaulttype::Vector3 & P,std::set<unsigned> & eid, unsigned d = 0) const;
 
     void draw(const core::visual::VisualParams * /*vparams*/) override;
 
-    core::objectmodel::SingleLink<AABBDecorator,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
 protected:
     defaulttype::Vector3 m_Bmin,m_Bmax,m_cellSize;
@@ -44,6 +44,8 @@ protected:
     {
         return i*m_offset[0] + j * m_offset[1] + k;
     }
+
+    void fillElementSet(defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int b) const;
 };
 
 

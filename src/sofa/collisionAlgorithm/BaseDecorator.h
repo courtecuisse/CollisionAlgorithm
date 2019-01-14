@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
 #include <sofa/core/objectmodel/BaseObject.h>
@@ -20,52 +20,30 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class BaseDecorator : public core::collision::Pipeline
+class BaseDecorator : public core::objectmodel::BaseObject
 {
 public:
-    SOFA_ABSTRACT_CLASS(BaseDecorator,core::collision::Pipeline);
+    SOFA_ABSTRACT_CLASS(BaseDecorator,core::objectmodel::BaseObject);
 
     Data<defaulttype::Vector4> d_color;
 
     BaseDecorator()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    {}
-
-    virtual BaseElement::Iterator begin(const defaulttype::Vector3 & P) const = 0;
-
-    virtual const BaseDecorator * end() const {
-        return this;
+    , l_geometry(initLink("geometry", "link to state")) {
+        l_geometry.setPath("@.");
     }
 
-    virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
+    virtual defaulttype::BoundingBox getBBox() const = 0;
 
-    void bwdInit( ) override {
-        prepareDetection();
+    virtual bool selectElement(const defaulttype::Vector3 & P,std::set<unsigned> & eid, unsigned d = 0) const = 0;
+
+    void init( ) override {
+        if (l_geometry != NULL) l_geometry->setDecorator(this);
     }
 
-    virtual void reset() override {}
+    virtual void prepareDetection() = 0;
 
-    virtual void computeCollisionReset() override {
-        prepareDetection();
-    }
-
-    virtual void computeCollisionResponse() override {}
-
-    void computeCollisionDetection() override {}
-
-protected:
-    virtual void doCollisionReset() override {}
-
-    virtual void doCollisionDetection(const sofa::helper::vector<core::CollisionModel*>& /*collisionModels*/) override {}
-
-    virtual void doCollisionResponse() override {}
-
-    virtual std::set< std::string > getResponseList() const override {
-        std::set< std::string > res;
-        return res;
-    }
-
-    virtual void prepareDetection() {}
+    core::objectmodel::SingleLink<BaseDecorator,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DOUBLELINK> l_geometry;
 };
 
 

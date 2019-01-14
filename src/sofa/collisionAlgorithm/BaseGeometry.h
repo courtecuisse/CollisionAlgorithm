@@ -1,6 +1,5 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseGeometryModifier.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
@@ -14,13 +13,14 @@
 #include <map>
 #include <vector>
 #include <qopengl.h>
-#include <sofa/collisionAlgorithm/BaseDecorator.h>
 
 namespace sofa
 {
 
 namespace collisionAlgorithm
 {
+
+class BaseDecorator;
 
 class BaseGeometry : public core::collision::Pipeline
 {
@@ -31,7 +31,9 @@ public:
 
     BaseGeometry()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    {}
+    {
+        m_decorator = NULL;
+    }
 
     virtual BaseElement::Iterator begin(unsigned eid = 0) const = 0;
 
@@ -47,16 +49,18 @@ public:
 
     virtual void reset() override {}
 
-    virtual void computeCollisionReset() override {
-        prepareDetection();
-    }
+    virtual void computeCollisionReset() override;
 
     virtual void computeCollisionResponse() override {}
 
     void computeCollisionDetection() override {}
 
     BaseDecorator * getBroadPhase() {
-        return NULL;
+        return m_decorator;
+    }
+
+    void setDecorator(BaseDecorator * d) {
+        m_decorator = d;
     }
 
 protected:
@@ -72,6 +76,8 @@ protected:
     }
 
     virtual void prepareDetection() {}
+
+    BaseDecorator * m_decorator;
 };
 
 

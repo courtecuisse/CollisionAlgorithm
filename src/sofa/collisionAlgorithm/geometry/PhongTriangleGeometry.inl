@@ -2,7 +2,6 @@
 
 #include <sofa/collisionAlgorithm/geometry/PhongTriangleGeometry.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
-#include <sofa/collisionAlgorithm/BaseGeometryModifier.h>
 
 namespace sofa
 {

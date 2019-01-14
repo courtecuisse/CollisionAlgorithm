@@ -23,19 +23,6 @@ public:
         m_state = m_geometry->l_state.get();
     }
 
-    //proj_P must be on the plane
-    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const
-    {
-        defaulttype::Vector3 v2 = proj_P - p0;
-
-        double d20 = dot(v2,tinfo.v0);
-        double d21 = dot(v2,tinfo.v1);
-
-        fact_v = (tinfo.d11 * d20 - tinfo.d01 * d21) * tinfo.invDenom;
-        fact_w = (tinfo.d00 * d21 - tinfo.d01 * d20) * tinfo.invDenom;
-        fact_u = 1.0 - fact_v  - fact_w;
-    }
-
     virtual BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
         core::topology::BaseMeshTopology::Triangle triangle;
         defaulttype::Vector3 factor;

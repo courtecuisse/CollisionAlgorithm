@@ -2,7 +2,7 @@
 
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
-#include <sofa/collisionAlgorithm/element/PointElement.h>
+#include <sofa/collisionAlgorithm/iterator/PointElementIterator.h>
 
 namespace sofa
 {

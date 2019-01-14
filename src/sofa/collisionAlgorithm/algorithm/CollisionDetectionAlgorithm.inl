@@ -2,8 +2,7 @@
 
 #include <sofa/collisionAlgorithm/algorithm/CollisionDetectionAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseElementFilter.h>
-#include <limits>
-
+#include <sofa/collisionAlgorithm/iterator/SubsetIterator.h>
 
 namespace sofa
 {
@@ -60,34 +59,28 @@ void CollisionDetectionAlgorithm::findClosestPoint(BaseProximity::SPtr pfrom, Ba
     addDetectionOutput(min_pair.first,min_pair.second);
 }
 
-BaseElement::Iterator CollisionDetectionAlgorithm::selectElements(const defaulttype::Vector3 & P, BaseDecorator * decorator) {
-    //compute the box where is P
-    defaulttype::Vec3i cbox;
-    cbox[0] = floor((P[0] - m_Bmin[0])/m_cellSize[0]);
-    cbox[1] = floor((P[1] - m_Bmin[1])/m_cellSize[1]);
-    cbox[2] = floor((P[2] - m_Bmin[2])/m_cellSize[2]);
+BaseElement::Iterator CollisionDetectionAlgorithm::selectElementsOnDest(const defaulttype::Vector3 & P) const {
+    BaseDecorator * decorator = l_dest->getBroadPhase();
 
-    //project the box in the bounding box of the object
-    //search with the closest box in bbox
-    for (unsigned int i=0;i<3;i++)
-    {
-        if (cbox[i] < 0)
-            cbox[i] = 0;
-        else
-        {
-            if (cbox[i] > m_nbox[i])
-                cbox[i] = m_nbox[i];
-        }
-    }
+    if (decorator == NULL) return l_dest->begin();
 
-    int d = 0;
-    int max = std::max(std::max(m_nbox[0],m_nbox[1]),m_nbox[2]);
+    defaulttype::BoundingBox bbox = decorator->getBBox();
 
-    while (selectElements.empty() && d<max)
-    {
-        fillElementSet(cbox,d,selectElements);
+    //project P inside the bbox
+    defaulttype::Vector3 cbox;
+    cbox[0] = std::min(std::max(P[0],bbox.minBBox()[0]),bbox.maxBBox()[0]);
+    cbox[1] = std::min(std::max(P[1],bbox.minBBox()[1]),bbox.maxBBox()[1]);
+    cbox[2] = std::min(std::max(P[2],bbox.minBBox()[2]),bbox.maxBBox()[2]);
+
+    unsigned d = 0;
+    std::set<unsigned> selectedElements;
+    while (selectedElements.empty() && decorator->selectElement(P,selectedElements,d)) {
         d++;// we look for boxed located at d+1
     }
+
+    if (selectedElements.empty()) return l_dest->begin();
+
+    return BaseElement::Iterator(new SubsetIterator(l_dest.get(),selectedElements));
 }
 
 
@@ -108,7 +101,7 @@ void CollisionDetectionAlgorithm::processAlgorithm()
     for (auto it=l_from->begin();it!=l_from->end();it++) {
         BaseProximity::SPtr pfrom = it->center();
 
-        BaseElement::Iterator itdest = selectElements(pfrom->getPosition(), l_dest->getBroadPhase());
+        BaseElement::Iterator itdest = selectElementsOnDest(pfrom->getPosition());
 
 
         findClosestPoint(pfrom, itdest);

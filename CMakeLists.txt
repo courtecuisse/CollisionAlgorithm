@@ -5,17 +5,21 @@ project(CollisionAlgorithm)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 file(GLOB_RECURSE HEADER_FILES
-    "*.h"
-    "*.inl"
+    "src/*.h"
+    "src/*.inl"
 )
 
 file(GLOB_RECURSE SOURCE_FILES
-    "*.cpp"
+    "src/*.cpp"
 )
 
 file(GLOB_RECURSE SCENES_FILES
     "scenes/*.scn"
     "scenes/*.xml"
+)
+
+file(GLOB_RECURSE DEPRECATED_FILES
+    "deprecated/*.*"
 )
 
 set (CMAKE_CXX_STANDARD 11)
@@ -28,7 +32,8 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${README_FILES} )
+set_source_files_properties(${DEPRECATED_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${DEPRECATED_FILES}  ${README_FILES} )
 set(CollisionAlgorithm_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${CollisionAlgorithm_INCLUDE_DIRS}>")
