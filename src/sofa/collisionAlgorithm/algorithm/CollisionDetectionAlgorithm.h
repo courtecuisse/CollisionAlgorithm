@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseCollisionAlgorithm.h>
+#include <sofa/collisionAlgorithm/BaseDecorator.h>
 
 namespace sofa
 {
@@ -28,10 +29,12 @@ public:
 
 private:
 //    template<class ElementIterator>
-    void findClosestPoint(BaseElement::Iterator & efrom);
+    void findClosestPoint(BaseProximity::SPtr pfrom, BaseElement::Iterator & it);
 
     core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
     core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
+
+    BaseElement::Iterator selectElements(const defaulttype::Vector3 & P, BaseDecorator * decorator);
 
 };
 

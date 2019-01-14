@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <sofa/collisionAlgorithm/geometry/AABBGeometry.h>
+#include <sofa/collisionAlgorithm/decorator/AABBDecorator.h>
 #include <sofa/collisionAlgorithm/proximity/FixedProximity.h>
 
 namespace sofa
@@ -9,10 +9,11 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+
 //Internal iterator of elements
 class AABBElement : public BaseElement {
 public:
-    AABBElement(std::map<unsigned, std::set<unsigned> >::const_iterator it, const AABBGeometry * geometry) : m_geometry(geometry), m_iterator(it) {}
+    AABBElement(std::map<unsigned, std::set<unsigned> >::const_iterator it, const AABBDecorator * geometry) : m_geometry(geometry), m_iterator(it) {}
 
     BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
         if (m_selectElements.empty()) {
@@ -57,27 +58,30 @@ public:
         return defaulttype::BoundingBox(min,max);
     }
 
-    const AABBGeometry * m_geometry;
+    const AABBDecorator * m_geometry;
     mutable std::set<unsigned> m_selectElements;
     mutable std::set<unsigned>::const_iterator m_iterator_project;
     std::map<unsigned, std::set<unsigned> >::const_iterator m_iterator;
 };
 
-AABBGeometry::AABBGeometry()
+
+AABBDecorator::AABBDecorator()
 : d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox", "number of bbox"))
 , l_geometry(initLink("geometry", "link to state")) {
     l_geometry.setPath("@.");
 }
 
-BaseElement::Iterator AABBGeometry::begin(unsigned /*eid*/) const {
+
+
+BaseElement::Iterator AABBDecorator::begin(const defaulttype::Vector3 & P) const {
     return BaseElement::Iterator(new AABBElement(m_indexedElement.cbegin(), this));
 }
 
-sofa::core::behavior::BaseMechanicalState * AABBGeometry::getState() const {
+sofa::core::behavior::BaseMechanicalState * AABBDecorator::getState() const {
     return l_geometry->getState();
 }
 
-void AABBGeometry::prepareDetection()
+void AABBDecorator::prepareDetection()
 {
     sofa::core::behavior::BaseMechanicalState * mstate = l_geometry->getState();
     l_geometry->bwdInit();
@@ -173,7 +177,7 @@ void AABBGeometry::prepareDetection()
     }
 }
 
-void AABBGeometry::draw(const core::visual::VisualParams * vparams) {
+void AABBDecorator::draw(const core::visual::VisualParams * vparams) {
     if (! vparams->displayFlags().getShowCollisionModels()) return;
 
     if (this->d_color.getValue()[3] == 0.0)
@@ -240,37 +244,9 @@ void AABBGeometry::draw(const core::visual::VisualParams * vparams) {
     }
 }
 
-void AABBGeometry::selectElements(const defaulttype::Vector3 & P, std::set<unsigned> & selectElements) const {
-    //compute the box where is P
-    defaulttype::Vec3i cbox;
-    cbox[0] = floor((P[0] - m_Bmin[0])/m_cellSize[0]);
-    cbox[1] = floor((P[1] - m_Bmin[1])/m_cellSize[1]);
-    cbox[2] = floor((P[2] - m_Bmin[2])/m_cellSize[2]);
 
-    //project the box in the bounding box of the object
-    //search with the closest box in bbox
-    for (unsigned int i=0;i<3;i++)
-    {
-        if (cbox[i] < 0)
-            cbox[i] = 0;
-        else
-        {
-            if (cbox[i] > m_nbox[i])
-                cbox[i] = m_nbox[i];
-        }
-    }
 
-    int d = 0;
-    int max = std::max(std::max(m_nbox[0],m_nbox[1]),m_nbox[2]);
-
-    while (selectElements.empty() && d<max)
-    {
-        fillElementSet(cbox,d,selectElements);
-        d++;// we look for boxed located at d+1
-    }
-}
-
-void AABBGeometry::fillElementSet(defaulttype::Vec3i cbox, int d, std::set<unsigned> & selectElements) const
+void AABBDecorator::fillElementSet(defaulttype::Vec3i cbox, int d, std::set<unsigned> & selectElements) const
 {
     {
         int i=-d;

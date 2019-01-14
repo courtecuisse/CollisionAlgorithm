@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sofa/helper/AdvancedTimer.h>
-#include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <sofa/collisionAlgorithm/BaseDecorator.h>
 #include <sofa/collisionAlgorithm/BaseCollisionAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseElementFilter.h>
 
@@ -11,30 +11,28 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class AABBGeometry : public BaseGeometry {
+class AABBDecorator : public BaseDecorator {
     friend class AABBElement;
 
 public:
 
-    SOFA_CLASS(AABBGeometry,BaseGeometry);
+    SOFA_CLASS(AABBDecorator,BaseDecorator);
 
     Data<defaulttype::Vec3i> d_nbox;
 
-    AABBGeometry();
+    AABBDecorator();
 
-    virtual ~AABBGeometry() override {}
+    virtual ~AABBDecorator() override {}
 
-    void prepareDetection() override;
+    virtual void prepareDetection() override;
 
-    virtual BaseElement::Iterator begin(unsigned eid = 0) const;
+    virtual BaseElement::Iterator begin(const defaulttype::Vector3 & P) const;
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const;
 
     void draw(const core::visual::VisualParams * /*vparams*/) override;
 
-    core::objectmodel::SingleLink<AABBGeometry,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
-
-    void selectElements(const defaulttype::Vector3 & P, std::set<unsigned> & elmt) const;
+    core::objectmodel::SingleLink<AABBDecorator,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
 protected:
     defaulttype::Vector3 m_Bmin,m_Bmax,m_cellSize;
@@ -46,8 +44,6 @@ protected:
     {
         return i*m_offset[0] + j * m_offset[1] + k;
     }
-
-    void fillElementSet(defaulttype::Vec3i cbox, int d, std::set<unsigned> & selectElements) const;
 };
 
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseGeometryModifier.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
@@ -14,7 +13,6 @@
 #include <map>
 #include <vector>
 #include <qopengl.h>
-#include <sofa/collisionAlgorithm/BaseDecorator.h>
 
 namespace sofa
 {
@@ -22,20 +20,20 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class BaseGeometry : public core::collision::Pipeline
+class BaseDecorator : public core::collision::Pipeline
 {
 public:
-    SOFA_ABSTRACT_CLASS(BaseGeometry,core::collision::Pipeline);
+    SOFA_ABSTRACT_CLASS(BaseDecorator,core::collision::Pipeline);
 
     Data<defaulttype::Vector4> d_color;
 
-    BaseGeometry()
+    BaseDecorator()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
     {}
 
-    virtual BaseElement::Iterator begin(unsigned eid = 0) const = 0;
+    virtual BaseElement::Iterator begin(const defaulttype::Vector3 & P) const = 0;
 
-    virtual const BaseGeometry * end() const {
+    virtual const BaseDecorator * end() const {
         return this;
     }
 
@@ -55,10 +53,6 @@ public:
 
     void computeCollisionDetection() override {}
 
-    BaseDecorator * getBroadPhase() {
-        return NULL;
-    }
-
 protected:
     virtual void doCollisionReset() override {}
 
@@ -74,30 +68,6 @@ protected:
     virtual void prepareDetection() {}
 };
 
-
-template<class DataTypes>
-class TBaseGeometry : public BaseGeometry
-{
-public:
-    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(TBaseGeometry,DataTypes),BaseGeometry);
-
-    typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef Data<VecCoord> DataVecCoord;
-    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
-
-    TBaseGeometry()
-    : BaseGeometry()
-    , l_state(initLink("mstate", "link to state")) {
-        l_state.setPath("@.");
-    }
-
-    sofa::core::behavior::BaseMechanicalState * getState() const override {
-        return l_state.get();
-    }
-
-    core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
-};
 
 }
 
