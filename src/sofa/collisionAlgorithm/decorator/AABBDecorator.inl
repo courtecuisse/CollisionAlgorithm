@@ -19,7 +19,7 @@ defaulttype::BoundingBox AABBDecorator::getBBox() const {
 }
 
 bool AABBDecorator::selectElement(const defaulttype::Vector3 & P,std::set<unsigned> & selectElements, unsigned d) const {
-    if (d>std::max(std::max(m_nbox[0],m_nbox[1]),m_nbox[2])) return false; // check that distance is still in the box
+    if ((int) d>std::max(std::max(m_nbox[0],m_nbox[1]),m_nbox[2])) return false; // check that distance is still in the box
 
     //compute the box where is P
     defaulttype::Vec3i cbox;

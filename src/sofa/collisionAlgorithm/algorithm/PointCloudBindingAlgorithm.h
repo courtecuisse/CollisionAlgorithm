@@ -15,10 +15,13 @@ public:
     SOFA_CLASS(PointCloudBindingAlgorithm, BaseCollisionAlgorithm);
 
     Data<double> d_maxDist;
+    Data<DetectionOutput> d_output;
 
     PointCloudBindingAlgorithm();
 
-    void processAlgorithm() override;
+    void computeCollisionReset() override;
+
+    void computeCollisionDetection() override;
 
 private:
     core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;

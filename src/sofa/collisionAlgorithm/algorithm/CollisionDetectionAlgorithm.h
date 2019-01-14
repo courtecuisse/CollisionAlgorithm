@@ -16,25 +16,29 @@ public:
 
     Data<double> d_minDist;
     Data<double> d_minAngle;
+    Data<DetectionOutput> d_output;
 
     CollisionDetectionAlgorithm()
-        : BaseCollisionAlgorithm()
-        , d_minDist(initData(&d_minDist, std::numeric_limits<double>::max(), "dist", "this"))
-        , d_minAngle(initData(&d_minAngle, -1.0, "angle","this"))
-        , l_from(initLink("from", "Link to from geometry"))
-        , l_dest(initLink("dest", "Link to dest geometry"))
+    : BaseCollisionAlgorithm()
+    , d_minDist(initData(&d_minDist, std::numeric_limits<double>::max(), "dist", "this"))
+    , d_minAngle(initData(&d_minAngle, -1.0, "angle","this"))
+    , d_output(initData(&d_output, "output" , "this"))
+    , l_from(initLink("from", "Link to from geometry"))
+    , l_dest(initLink("dest", "Link to dest geometry"))
     {}
 
-    void processAlgorithm() override;
+    virtual void computeCollisionReset() override;
+
+    virtual void computeCollisionDetection() override;
 
 private:
 //    template<class ElementIterator>
-    void findClosestPoint(BaseProximity::SPtr pfrom, BaseElement::Iterator & it);
+    DetectionOutput::PairDetection findClosestPoint(BaseElement::Iterator &itfrom);
 
     core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
     core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
 
-    BaseElement::Iterator selectElementsOnDest(const defaulttype::Vector3 & P) const;
+    BaseElement::Iterator begin(const defaulttype::Vector3 & P) const;
 
 };
 

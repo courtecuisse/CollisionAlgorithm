@@ -13,21 +13,39 @@ namespace collisionAlgorithm
 
 class DetectionOutput {
 public:
-    DetectionOutput(BaseProximity::SPtr p1, BaseProximity::SPtr p2)
-    : m_firstProx(p1)
-    , m_secondProx(p2) {}
+    typedef std::pair<BaseProximity::SPtr,BaseProximity::SPtr> PairDetection;
 
-    inline BaseProximity::SPtr getFirstProximity() const {
-        return m_firstProx;
+    friend std::ostream& operator<<(std::ostream& i, const DetectionOutput& t)  {
+        i << t.m_output.size();
+        return i;
     }
 
-    inline BaseProximity::SPtr getSecondProximity() const {
-        return m_secondProx;
+    friend std::istream& operator>>(std::istream& i, DetectionOutput& /*t*/) {
+        return i;
+    }
+
+    void clear() {
+        m_output.clear();
+    }
+
+    const PairDetection & operator[](int i) const {
+        return m_output[i];
+    }
+
+    unsigned size() const {
+        return m_output.size();
+    }
+
+    inline void add(BaseProximity::SPtr p1,defaulttype::Vector3 & P) {
+        m_output.push_back(PairDetection(p1,std::shared_ptr<FixedProximity>(new FixedProximity(P))));
+    }
+
+    inline void add(BaseProximity::SPtr p1, BaseProximity::SPtr p2) {
+        m_output.push_back(PairDetection(p1,p2));
     }
 
 protected:
-    BaseProximity::SPtr m_firstProx;
-    BaseProximity::SPtr m_secondProx;
+    helper::vector< PairDetection > m_output;
 };
 
 class BaseCollisionAlgorithm : public core::collision::Pipeline
@@ -35,34 +53,18 @@ class BaseCollisionAlgorithm : public core::collision::Pipeline
 public :
     SOFA_ABSTRACT_CLASS(BaseCollisionAlgorithm, core::collision::Pipeline);
 
-    BaseCollisionAlgorithm()
-//        : l_filter(initLink("filter", "Link to an optional filter"))
-    {
-
-    }
     virtual ~BaseCollisionAlgorithm() override {}
 
-    void draw(const core::visual::VisualParams * vparams) override
-    {
-        if (! vparams->displayFlags().getShowCollisionModels()) return;
+    virtual void computeCollisionReset() = 0;
 
-        for (unsigned i=0;i<m_output.size();i++) {
-            vparams->drawTool()->drawLine(m_output[i].getFirstProximity()->getPosition(),
-                                          m_output[i].getSecondProximity()->getPosition(),
-                                          defaulttype::Vector4(0,1,0,1));
-        }
-     }
+    virtual void computeCollisionDetection() = 0;
 
-    virtual void reset() override {}
+private:
+    void reset() {}
 
-    virtual void computeCollisionReset() override {
-        m_output.clear();
-    }
-
-    virtual void computeCollisionResponse() override {}
-
-    void computeCollisionDetection() override {
-        processAlgorithm();
+    virtual void computeCollisionResponse() override {
+        computeCollisionReset();
+        computeCollisionDetection();
     }
 
     virtual std::set< std::string > getResponseList() const override
@@ -71,31 +73,11 @@ public :
         return res;
     }
 
-    inline void addDetectionOutput(BaseProximity::SPtr p1,defaulttype::Vector3 & P) {
-        m_output.push_back(DetectionOutput(p1,std::shared_ptr<FixedProximity>(new FixedProximity(P))));
-    }
-
-    inline void addDetectionOutput(BaseProximity::SPtr p1, BaseProximity::SPtr p2) {
-        m_output.push_back(DetectionOutput(p1,p2));
-    }
-
-    const helper::vector<DetectionOutput> & getOutput() {
-        return m_output;
-    }
-
-protected:
-//    core::objectmodel::SingleLink<BaseCollisionAlgorithm,BaseElementFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filter;
-
     virtual void doCollisionReset() override {}
 
     virtual void doCollisionDetection(const sofa::helper::vector<core::CollisionModel*>& /*collisionModels*/) override {}
 
     virtual void doCollisionResponse() override {}
-
-    virtual void processAlgorithm() = 0;
-
-private:
-    helper::vector<DetectionOutput> m_output;
 
 };
 
