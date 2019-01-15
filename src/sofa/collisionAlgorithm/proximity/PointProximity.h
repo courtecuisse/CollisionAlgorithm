@@ -39,7 +39,7 @@ public :
         return defaulttype::Vector3(1,0,0);
     }
 
-    void addConstributions(MatrixDerivRowIterator & c_it, const defaulttype::Vector3 & N) const {
+    void addContributions(MatrixDerivRowIterator & c_it, const defaulttype::Vector3 & N) const {
         c_it.addCol(m_pid, N);
     }
 

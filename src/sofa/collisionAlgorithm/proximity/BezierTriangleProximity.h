@@ -145,7 +145,7 @@ public:
         return N1;
     }
 
-    void addConstributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
+    void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
         it.addCol(m_pid[0], N * m_fact[0]);
         it.addCol(m_pid[1], N * m_fact[1]);
         it.addCol(m_pid[2], N * m_fact[2]);

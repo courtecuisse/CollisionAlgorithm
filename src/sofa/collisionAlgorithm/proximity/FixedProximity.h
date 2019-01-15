@@ -24,9 +24,7 @@ public:
 
     void buildJacobianConstraint(core::MultiMatrixDerivId /*cId*/, const helper::vector<defaulttype::Vector3> & /*m_normals*/, double /*fact*/, unsigned /*constraintId*/) const {}
 
-    void storeLambda(const core::ConstraintParams* /*cParams*/, core::MultiVecDerivId /*res*/, const sofa::defaulttype::BaseVector* /*lambda*/) const {}
-
-    sofa::core::behavior::BaseMechanicalState * getState() const { return NULL; }
+    void storeLambda(const core::ConstraintParams* /*cParams*/, core::MultiVecDerivId /*res*/, unsigned /*cid*/, const sofa::defaulttype::BaseVector* /*lambda*/) const {}
 
     defaulttype::Vector3 m_position;
 };
