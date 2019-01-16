@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
-#include <sofa/collisionAlgorithm/iterator/TriangleElementIterator.h>
+#include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 
 namespace sofa
@@ -12,7 +12,9 @@ namespace collisionAlgorithm
 
 template<class DataTypes>
 BaseElement::Iterator TriangleGeometry<DataTypes>::begin(unsigned eid) const {
-    return DefaultElement::Iterator(eid,new TriangleElementIterator<DataTypes>(this));
+    return DefaultElement::Iterator(eid,
+                                    d_triangles.getValue().size(),
+                                    new TriangleElement<DataTypes>(this));
 }
 
 template<class DataTypes>

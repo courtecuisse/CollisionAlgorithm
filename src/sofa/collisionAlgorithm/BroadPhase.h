@@ -33,6 +33,10 @@ public:
         l_geometry.setPath("@.");
     }
 
+    virtual ~BroadPhase() {
+        l_geometry->unsetDecorator(this);
+    }
+
     virtual defaulttype::BoundingBox getBBox() const = 0;
 
     virtual bool selectElement(const defaulttype::Vector3 & P,std::set<unsigned> & eid, unsigned d = 0) const = 0;

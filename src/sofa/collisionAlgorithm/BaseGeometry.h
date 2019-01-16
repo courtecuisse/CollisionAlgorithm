@@ -56,12 +56,16 @@ public:
 
     void computeCollisionDetection() override {}
 
-    BroadPhase * getBroadPhase() {
+    BroadPhase * getBroadPhase() const {
         return m_decorator;
     }
 
     void setDecorator(BroadPhase * d) {
         m_decorator = d;
+    }
+
+    void unsetDecorator(BroadPhase * d) {
+        if (m_decorator == d) m_decorator = NULL;
     }
 
 protected:

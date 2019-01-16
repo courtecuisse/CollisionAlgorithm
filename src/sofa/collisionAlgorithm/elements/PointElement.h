@@ -11,7 +11,7 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-class PointElementIterator : public DefaultElement {
+class PointElement : public DefaultElement {
 public:
 
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
@@ -19,20 +19,14 @@ public:
     typedef typename DataTypes::VecCoord VecCoord;
     typedef Data<VecCoord> DataVecCoord;
 
-    PointElementIterator(const PointGeometry<DataTypes> * geo) : m_geometry(geo) {
-        m_state = m_geometry->l_state.get();
-    }
+    PointElement(State * state) : m_state(state) {}
 
     BaseProximity::SPtr project(const defaulttype::Vector3 & /*P*/) const {
         return center();
     }
 
-    bool end() const {
-        return id() >= m_state->getSize();
-    }
-
     virtual BaseProximity::SPtr center() const {
-        return BaseProximity::SPtr(new PointProximity<DataTypes>(id(),m_geometry->l_state.get()));
+        return BaseProximity::SPtr(new PointProximity<DataTypes>(id(),m_state));
     }
 
     virtual defaulttype::BoundingBox getBBox() const {
@@ -42,7 +36,6 @@ public:
         return bbox;
     }
 
-    const PointGeometry<DataTypes> * m_geometry;
     State * m_state;
 };
 

@@ -21,6 +21,7 @@ public:
     }
 
     void init() {
+        l_algo->sout << "Register filter " << this->getName() << l_algo->sendl;
         l_algo->registerFilter(this);
     }
 

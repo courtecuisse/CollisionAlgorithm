@@ -1,0 +1,25 @@
+#pragma once
+
+#include <sofa/collisionAlgorithm/BaseFilter.h>
+
+namespace sofa {
+
+namespace collisionAlgorithm {
+
+class DistanceFilter : public BaseFilter {
+public:
+    SOFA_ABSTRACT_CLASS(BaseFilter, BaseFilter);
+
+    Data<double> d_distance;
+
+    DistanceFilter()
+     : d_distance(initData(&d_distance, std::numeric_limits<double>::max(), "distance", "Min distance")) {}
+
+    bool accept(BaseProximity::SPtr p1,BaseProximity::SPtr p2) const {
+        return (p1->getPosition()-p2->getPosition()).norm()<d_distance.getValue();
+    }
+};
+
+}
+
+}

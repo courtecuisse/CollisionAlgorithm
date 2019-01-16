@@ -10,7 +10,7 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-class TriangleElementIterator : public DefaultElement {
+class TriangleElement : public DefaultElement {
 public:
     typedef typename TriangleGeometry<DataTypes>::TriangleInfo TriangleInfo;
     typedef typename DataTypes::Coord Coord;
@@ -18,7 +18,7 @@ public:
     typedef Data<VecCoord> DataVecCoord;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    TriangleElementIterator(const TriangleGeometry<DataTypes> * geo)
+    TriangleElement(const TriangleGeometry<DataTypes> * geo)
     : m_geometry(geo) {
         m_state = m_geometry->l_state.get();
     }
@@ -34,10 +34,6 @@ public:
     virtual BaseProximity::SPtr center() const {
         const core::topology::BaseMeshTopology::Triangle & triangle = m_geometry->d_triangles.getValue()[id()];
         return BaseProximity::SPtr(new TriangleProximity<DataTypes>(id(), triangle[0],triangle[1],triangle[2],0.3333,0.3333,0.3333,m_geometry,m_state));
-    }
-
-    bool end() const {
-        return id() >= m_geometry->d_triangles.getValue().size();
     }
 
     virtual defaulttype::BoundingBox getBBox() const {

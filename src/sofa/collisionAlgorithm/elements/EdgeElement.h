@@ -11,14 +11,14 @@ namespace collisionAlgorithm
 
 //Internal iterator of elements
 template<class DataTypes>
-class EdgeElementIterator : public DefaultElement {
+class EdgeElement : public DefaultElement {
 public:
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef Data<VecCoord> DataVecCoord;
 
-    EdgeElementIterator(const EdgeGeometry<DataTypes> * geo) : m_geometry(geo) {
+    EdgeElement(const EdgeGeometry<DataTypes> * geo) : m_geometry(geo) {
         m_state = m_geometry->l_state.get();
     }
 
@@ -39,10 +39,6 @@ public:
         fact_u = 1.0-fact_v;
 
         return BaseProximity::SPtr(new EdgeProximity<DataTypes>(edge[0],edge[1],fact_u,fact_v,m_state));
-    }
-
-    bool end() const {
-        return id() >= m_geometry->d_edges.getValue().size();
     }
 
     virtual BaseProximity::SPtr center() const {

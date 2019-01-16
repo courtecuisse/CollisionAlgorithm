@@ -59,7 +59,7 @@ public :
 
     virtual void computeCollisionDetection() = 0;
 
-    void registerFilter(BaseFilter * filter) {
+    void registerFilter(BaseFilter * filter) {        
         m_filters.insert(filter);
     }
 
