@@ -41,7 +41,7 @@ public:
         return BaseProximity::SPtr(new EdgeProximity<DataTypes>(edge[0],edge[1],fact_u,fact_v,m_state));
     }
 
-    bool end(const BaseGeometry */*geo*/) const {
+    bool end() const {
         return id() >= m_geometry->d_edges.getValue().size();
     }
 

@@ -27,7 +27,7 @@ public:
         return center();
     }
 
-    bool end(const BaseGeometry */*geo*/) const {
+    bool end() const {
         return id() >= m_state->getSize();
     }
 

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <sofa/collisionAlgorithm/decorator/AABBDecorator.h>
+#include <sofa/collisionAlgorithm/broadphase/AABBBroadPhase.h>
 #include <sofa/collisionAlgorithm/proximity/FixedProximity.h>
 
 namespace sofa
@@ -9,16 +9,16 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-AABBDecorator::AABBDecorator()
+AABBBroadPhase::AABBBroadPhase()
 : d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox", "number of bbox"))
 , d_refineBBox(initData(&d_refineBBox, true,"refine", "number of bbox")){
 }
 
-defaulttype::BoundingBox AABBDecorator::getBBox() const {
+defaulttype::BoundingBox AABBBroadPhase::getBBox() const {
     return defaulttype::BoundingBox(m_Bmin,m_Bmax);
 }
 
-bool AABBDecorator::selectElement(const defaulttype::Vector3 & P,std::set<unsigned> & selectElements, unsigned d) const {
+bool AABBBroadPhase::selectElement(const defaulttype::Vector3 & P,std::set<unsigned> & selectElements, unsigned d) const {
     if ((int) d>std::max(std::max(m_nbox[0],m_nbox[1]),m_nbox[2])) return false; // check that distance is still in the box
 
     //compute the box where is P
@@ -40,7 +40,7 @@ bool AABBDecorator::selectElement(const defaulttype::Vector3 & P,std::set<unsign
     return true;
 }
 
-void AABBDecorator::prepareDetection()
+void AABBBroadPhase::prepareDetection()
 {
     sofa::core::behavior::BaseMechanicalState * mstate = l_geometry->getState();
     l_geometry->bwdInit();
@@ -142,7 +142,7 @@ void AABBDecorator::prepareDetection()
     }
 }
 
-void AABBDecorator::draw(const core::visual::VisualParams * vparams) {
+void AABBBroadPhase::draw(const core::visual::VisualParams * vparams) {
     if (! vparams->displayFlags().getShowCollisionModels()) return;
 
     if (this->d_color.getValue()[3] == 0.0)
@@ -217,7 +217,7 @@ void AABBDecorator::draw(const core::visual::VisualParams * vparams) {
     }
 }
 
-void AABBDecorator::fillElementSet(defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
+void AABBBroadPhase::fillElementSet(defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
 {
     {
         int i=-d;

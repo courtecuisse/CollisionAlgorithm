@@ -37,7 +37,7 @@ public:
         return *m_iterator;
     }
 
-    bool end(const BaseGeometry * /*geo*/) const{
+    bool end() const{
         return m_iterator==m_subsetElements.cend();
     }
 

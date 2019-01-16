@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/algorithm/CollisionDetectionAlgorithm.h>
-#include <sofa/collisionAlgorithm/BaseElementFilter.h>
+#include <sofa/collisionAlgorithm/BaseFilter.h>
 #include <sofa/collisionAlgorithm/iterator/SubsetIterator.h>
 
 namespace sofa
@@ -15,24 +15,18 @@ void CollisionDetectionAlgorithm::computeCollisionReset() {
     d_output.endEdit();
 }
 
-DetectionOutput::PairDetection CollisionDetectionAlgorithm::findClosestPoint(BaseElement::Iterator & itfrom)
+DetectionOutput::PairDetection CollisionDetectionAlgorithm::findClosestPoint(const BaseElement *itfrom, BaseElement::Iterator & itdest,const std::set<BaseFilter*> & filters)
 {
     double min_dist = std::numeric_limits<double>::max();
     DetectionOutput::PairDetection min_pair(nullptr,nullptr);
 
-//    BaseProximity::SPtr pfrom = it_element->getFrom()->getControlPoint(); //centered control point
-//    if (pfrom == nullptr)
-//        return ;
-
-
     defaulttype::Vector3 P = itfrom->center()->getPosition();
 
-    for (BaseElement::Iterator it = begin(P);it!=l_dest->end();it++)
+    for (;! itdest.end();itdest++)
     {
-        BaseProximity::SPtr pdest = it->project(P);
-        BaseProximity::SPtr pfrom  = itfrom->project(pdest->getPosition());
+        BaseProximity::SPtr pdest = itdest->project(P);
+        BaseProximity::SPtr pfrom  = itfrom->project(pdest->getPosition()); // reproject one on the initial proximity
 
-//        pfrom = it_element.efrom->project(pdest->getPosition());
 //        //iterate until to find the correct location on pfrom
 //        for (int itearation = 0;itearation<10 && pfrom->distance(P)>0.0001;itearation++) {
 //            P = pfrom->getPosition();
@@ -40,14 +34,14 @@ DetectionOutput::PairDetection CollisionDetectionAlgorithm::findClosestPoint(Bas
 //            pfrom = it_element.efrom->project(pdest->getPosition());
 //        }
 
-        //compute all the distances with to elements
+        bool filtered = true;
+        for (auto itfilter=filters.cbegin();filtered && (itfilter != filters.cend());itfilter++) {
+            if (! (*itfilter)->accept(pdest,pfrom)) filtered=false;
+        }
+        if (!filtered) continue;
+
         defaulttype::Vector3 N = pfrom->getPosition() - pdest->getPosition();
         double dist = N.norm();
-
-        if (dist > d_minDist.getValue())
-            continue;
-//        if (dot(pfrom->getNormal(),pdest->getNormal()) > -d_minAngle.getValue())
-//            continue;
 
         if (dist<min_dist)
         {
@@ -60,8 +54,8 @@ DetectionOutput::PairDetection CollisionDetectionAlgorithm::findClosestPoint(Bas
     return min_pair;
 }
 
-BaseElement::Iterator CollisionDetectionAlgorithm::begin(const defaulttype::Vector3 & P) const {
-    BaseDecorator * decorator = l_dest->getBroadPhase();
+BaseElement::Iterator CollisionDetectionAlgorithm::broadPhaseIterator(const defaulttype::Vector3 & P) const {
+    BroadPhase * decorator = l_dest->getBroadPhase();
 
     if (decorator == NULL) return l_dest->begin();
 
@@ -89,8 +83,11 @@ void CollisionDetectionAlgorithm::computeCollisionDetection()
 {
     DetectionOutput * output = d_output.beginEdit();
 
-    for (auto it=l_from->begin();it!=l_from->end();it++) {
-        DetectionOutput::PairDetection min_pair = findClosestPoint(it);
+    for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
+        defaulttype::Vector3 P = itfrom->center()->getPosition();
+        BaseElement::Iterator itdest = broadPhaseIterator(P);
+
+        DetectionOutput::PairDetection min_pair = findClosestPoint(itfrom.get(), itdest, getFilters());
 
         if (min_pair.first == nullptr || min_pair.second == nullptr) continue;
 

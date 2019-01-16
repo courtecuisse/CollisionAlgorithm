@@ -20,14 +20,14 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class BaseDecorator : public core::objectmodel::BaseObject
+class BroadPhase : public core::objectmodel::BaseObject
 {
 public:
-    SOFA_ABSTRACT_CLASS(BaseDecorator,core::objectmodel::BaseObject);
+    SOFA_ABSTRACT_CLASS(BroadPhase,core::objectmodel::BaseObject);
 
     Data<defaulttype::Vector4> d_color;
 
-    BaseDecorator()
+    BroadPhase()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
     , l_geometry(initLink("geometry", "link to state")) {
         l_geometry.setPath("@.");
@@ -43,7 +43,7 @@ public:
 
     virtual void prepareDetection() = 0;
 
-    core::objectmodel::SingleLink<BaseDecorator,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DOUBLELINK> l_geometry;
+    core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DOUBLELINK> l_geometry;
 };
 
 

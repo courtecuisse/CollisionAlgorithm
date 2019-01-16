@@ -1,10 +1,8 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/BaseElementFilter.h>
-#include <sofa/core/collision/Pipeline.h>
 #include <sofa/collisionAlgorithm/proximity/FixedProximity.h>
-
+#include <sofa/core/collision/Pipeline.h>
 namespace sofa
 {
 
@@ -48,16 +46,30 @@ protected:
     helper::vector< PairDetection > m_output;
 };
 
-class BaseCollisionAlgorithm : public core::collision::Pipeline
+class BaseFilter;
+
+class BaseGeometryAlgorithm : public core::collision::Pipeline
 {
 public :
-    SOFA_ABSTRACT_CLASS(BaseCollisionAlgorithm, core::collision::Pipeline);
+    SOFA_ABSTRACT_CLASS(BaseGeometryAlgorithm, core::collision::Pipeline);
 
-    virtual ~BaseCollisionAlgorithm() override {}
+    virtual ~BaseGeometryAlgorithm() override {}
 
     virtual void computeCollisionReset() = 0;
 
     virtual void computeCollisionDetection() = 0;
+
+    void registerFilter(BaseFilter * filter) {
+        m_filters.insert(filter);
+    }
+
+    void unregisterFilter(BaseFilter * filter) {
+        m_filters.erase(filter);
+    }
+
+    const std::set<BaseFilter*> & getFilters() {
+        return m_filters;
+    }
 
 private:
     void reset() {}
@@ -78,6 +90,9 @@ private:
     virtual void doCollisionDetection(const sofa::helper::vector<core::CollisionModel*>& /*collisionModels*/) override {}
 
     virtual void doCollisionResponse() override {}
+
+protected:
+    std::set<BaseFilter*> m_filters;
 
 };
 

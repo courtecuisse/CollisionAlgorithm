@@ -1,13 +1,14 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseProximity.h>
+
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
 #include <sofa/core/objectmodel/BaseObject.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/BehaviorModel.h>
 #include <sofa/core/collision/Pipeline.h>
-#include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/core/topology/BaseMeshTopology.h>
 #include <memory>
 #include <map>
@@ -20,7 +21,7 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class BaseDecorator;
+class BroadPhase;
 
 class BaseGeometry : public core::collision::Pipeline
 {
@@ -55,11 +56,11 @@ public:
 
     void computeCollisionDetection() override {}
 
-    BaseDecorator * getBroadPhase() {
+    BroadPhase * getBroadPhase() {
         return m_decorator;
     }
 
-    void setDecorator(BaseDecorator * d) {
+    void setDecorator(BroadPhase * d) {
         m_decorator = d;
     }
 
@@ -77,7 +78,7 @@ protected:
 
     virtual void prepareDetection() {}
 
-    BaseDecorator * m_decorator;
+    BroadPhase * m_decorator;
 };
 
 

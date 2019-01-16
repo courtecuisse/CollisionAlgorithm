@@ -21,7 +21,7 @@ public:
 
         Vector3 getNormal(const BaseProximity & pinfo);
 
-        BaseDecorator * getDecorator();
+        BroadPhase * getDecorator();
 
 protected:
         std::vector<bool> m_filteredTriangle;
@@ -32,13 +32,13 @@ protected:
 
         ProjectiveContourGeometry();
 
-        void filterTriangleFunctionWithAABB(AABBDecorator * aabb,const unsigned p, const Vector3 & A);
+        void filterTriangleFunctionWithAABB(AABBBroadPhase * aabb,const unsigned p, const Vector3 & A);
 
         void filterTriangleFunction(const unsigned p, const Vector3 &A);
 
         Vector2 project3d(const Vector3 & p);
 
-        void fillTriangleSet(AABBDecorator * decorator, int d,const Vec3i & cbox,std::set<unsigned> & triangleSet);
+        void fillTriangleSet(AABBBroadPhase * decorator, int d,const Vec3i & cbox,std::set<unsigned> & triangleSet);
 
 };
 

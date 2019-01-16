@@ -1,5 +1,5 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/BaseDecorator.h>
+#include <sofa/collisionAlgorithm/BroadPhase.h>
 
 namespace sofa
 {

@@ -1,9 +1,8 @@
 #pragma once
 
 #include <sofa/helper/AdvancedTimer.h>
-#include <sofa/collisionAlgorithm/BaseDecorator.h>
-#include <sofa/collisionAlgorithm/BaseCollisionAlgorithm.h>
-#include <sofa/collisionAlgorithm/BaseElementFilter.h>
+#include <sofa/collisionAlgorithm/BroadPhase.h>
+#include <sofa/collisionAlgorithm/BaseGeometryAlgorithm.h>
 
 namespace sofa
 {
@@ -11,19 +10,19 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class AABBDecorator : public BaseDecorator {
+class AABBBroadPhase : public BroadPhase {
     friend class AABBElement;
 
 public:
 
-    SOFA_CLASS(AABBDecorator,BaseDecorator);
+    SOFA_CLASS(AABBBroadPhase,BroadPhase);
 
     Data<defaulttype::Vec3i> d_nbox;
     Data<bool> d_refineBBox;
 
-    AABBDecorator();
+    AABBBroadPhase();
 
-    virtual ~AABBDecorator() override {}
+    virtual ~AABBBroadPhase() override {}
 
     virtual void prepareDetection() override;
 

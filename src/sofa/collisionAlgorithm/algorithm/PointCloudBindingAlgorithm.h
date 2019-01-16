@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseCollisionAlgorithm.h>
+#include <sofa/collisionAlgorithm/BaseGeometryAlgorithm.h>
 
 namespace sofa
 {
@@ -8,11 +8,11 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class PointCloudBindingAlgorithm : public BaseCollisionAlgorithm
+class PointCloudBindingAlgorithm : public BaseGeometryAlgorithm
 {
 public:
     typedef sofa::defaulttype::Vector3 Vector3;
-    SOFA_CLASS(PointCloudBindingAlgorithm, BaseCollisionAlgorithm);
+    SOFA_CLASS(PointCloudBindingAlgorithm, BaseGeometryAlgorithm);
 
     Data<double> d_maxDist;
     Data<DetectionOutput> d_output;

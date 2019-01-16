@@ -10,7 +10,7 @@ ProjectiveContourGeometry::ProjectiveContourGeometry()
                                                 Vector4(0.0,0.0,1.0,0.0)),this)
 , d_epsilon("epsilon",1e-6, this) {}
 
-void ProjectiveContourGeometry::fillTriangleSet(AABBDecorator * decorator, int d,const Vec3i & cbox,std::set<unsigned> & triangleSet) {
+void ProjectiveContourGeometry::fillTriangleSet(AABBBroadPhase * decorator, int d,const Vec3i & cbox,std::set<unsigned> & triangleSet) {
     for (int i=-d;i<=d;i++) {
         if (cbox[0]+i < 0 || cbox[0]+i > decorator->d_nbox.getValue()[0]) continue;
 
@@ -30,7 +30,7 @@ void ProjectiveContourGeometry::fillTriangleSet(AABBDecorator * decorator, int d
     }
 }
 
-void ProjectiveContourGeometry::filterTriangleFunctionWithAABB(AABBDecorator * decorator,const unsigned p, const Vector3 & A) {
+void ProjectiveContourGeometry::filterTriangleFunctionWithAABB(AABBBroadPhase * decorator,const unsigned p, const Vector3 & A) {
 
     bool hasActiveTriangle = false;
     const Topology::TrianglesAroundVertex & tav = this->getTopology()->getTrianglesAroundVertex(p);
@@ -137,7 +137,7 @@ void ProjectiveContourGeometry::filterTriangleFunctionWithAABB(AABBDecorator * d
     }
 }
 
-BaseDecorator * ProjectiveContourGeometry::getDecorator() {
+BroadPhase * ProjectiveContourGeometry::getDecorator() {
     return NULL;
 }
 
@@ -217,7 +217,7 @@ void ProjectiveContourGeometry::prepareDetection() {
         m_filteredTriangle[t] = dot(Z,this->m_triangle_info[t].tn) < 0;
     }
 
-    AABBDecorator * aabb_decorator;
+    AABBBroadPhase * aabb_decorator;
     this->getContext()->get(aabb_decorator);
 
     // compute the projection and check that there is no triangle in fron of the point

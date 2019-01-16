@@ -13,17 +13,24 @@ namespace collisionAlgorithm
 
 
 class BaseElement {
+    friend class Iterator;
+
 public:
     class Iterator : public std::unique_ptr<BaseElement> {
     public:
         Iterator(BaseElement* ptr) : std::unique_ptr<BaseElement>(ptr) {}
 
-        bool operator != (const BaseGeometry * geo) {
-            return ! this->get()->end(geo);
+        // for iterator compatibility i.e. it != geo.end()
+        bool operator != (const BaseGeometry * /*geo*/) {
+            return ! end();
         }
 
         void operator++(int) {
             this->get()->next();
+        }
+
+        bool end() {
+            return this->get()->end();
         }
     };
 
@@ -33,11 +40,12 @@ public:
 
     virtual defaulttype::BoundingBox getBBox() const = 0;
 
-    virtual bool end(const BaseGeometry * geo) const = 0;
+    virtual unsigned id() const = 0;
+
+protected:
+    virtual bool end() const = 0;
 
     virtual void next() = 0;
-
-    virtual unsigned id() const = 0;
 };
 
 
@@ -54,7 +62,7 @@ public:
         this->m_id++;
     }
 
-    virtual bool end(const BaseGeometry * geo) const = 0;
+    virtual bool end() const = 0;
 
     virtual unsigned id() const {
         return m_id;
