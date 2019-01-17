@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include <sofa/collisionAlgorithm/BaseElement.h>
-#include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
+#include <sofa/collisionAlgorithm/BaseElementIterator.h>
+#include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 
 namespace sofa
@@ -10,16 +10,15 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class DefaultElement : public BaseElementIterator {
+class DefaultElementIterator : public BaseElementIterator {
     friend class Iterator;
 
 public:
-    DefaultElement(unsigned id, unsigned end,const BaseGeometry * geo) {
+    DefaultElementIterator(unsigned id, unsigned end,const BaseGeometry * geo) {
         m_id = id;
         m_end = end;
         m_geometry = geo;
     }
-
 
     inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
         return m_geometry->project(m_id, P);

@@ -26,7 +26,7 @@ public:
 
     virtual void computeCollisionDetection() override;
 
-    static DetectionOutput::PairDetection findClosestPoint(const BaseElement::Iterator & itfrom, const BaseGeometry * dst,const std::set<BaseFilter*> & filters = std::set<BaseFilter*>());
+    static DetectionOutput::PairDetection findClosestPoint(const BaseElementIterator::UPtr & itfrom, const BaseGeometry * dst,const std::set<BaseFilter*> & filters = std::set<BaseFilter*>());
 
 private:
 //    template<class ElementIterator>

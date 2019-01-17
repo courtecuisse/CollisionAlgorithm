@@ -11,11 +11,11 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class BaseElement {
+class BaseElementIterator {
 public:
-    class Iterator : public std::unique_ptr<BaseElement> {
+    class UPtr : public std::unique_ptr<BaseElementIterator> {
     public:
-        Iterator(BaseElement * ptr) : std::unique_ptr<BaseElement>(ptr) {}
+        UPtr(BaseElementIterator * ptr) : std::unique_ptr<BaseElementIterator>(ptr) {}
 
         bool operator != (const BaseGeometry * geo) {
             return ! this->get()->end(geo);

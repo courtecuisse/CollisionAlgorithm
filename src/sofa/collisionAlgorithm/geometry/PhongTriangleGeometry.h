@@ -25,19 +25,21 @@ public:
 
     virtual ~PhongTriangleGeometry() override {}
 
+    virtual BaseProximity::SPtr project(unsigned tid, const defaulttype::Vector3 & P) const;
+
+    virtual BaseProximity::SPtr center(unsigned tid) const;
+
     virtual void init() override;
 
     virtual void prepareDetection() override;
 
-    virtual defaulttype::Vector3 getNormal(const TriangleProximity<DataTypes> * prox) const;
-
     inline const std::vector<defaulttype::Vector3>& pointNormals() const
     {
-        return this->m_pointNormal;
+        return this->m_point_normals;
     }
 
 protected:
-    std::vector<defaulttype::Vector3> m_pointNormal;
+    std::vector<defaulttype::Vector3> m_point_normals;
     std::vector< std::vector<TriangleID> > m_trianglesAroundVertex;
 };
 

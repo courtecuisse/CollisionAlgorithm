@@ -29,7 +29,9 @@ public:
 
     virtual void prepareDetection() override;
 
-    virtual void project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const;
+    virtual BaseProximity::SPtr project(unsigned tid, const defaulttype::Vector3 & P) const;
+
+    virtual BaseProximity::SPtr center(unsigned tid) const;
 
     typedef struct
     {
@@ -39,6 +41,8 @@ public:
 
     std::vector<BezierTriangleInfo> m_beziertriangle_info;
 
+protected:
+    virtual void projectBezier(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const;
 };
 
 }

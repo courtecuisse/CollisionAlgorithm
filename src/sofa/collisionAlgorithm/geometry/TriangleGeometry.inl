@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
-#include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
+#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 
 namespace sofa
 {
@@ -11,15 +11,15 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-BaseElement::Iterator TriangleGeometry<DataTypes>::begin(unsigned eid) const {
-    return typename DefaultElement::Iterator(eid,d_triangles.getValue().size(),this);
+BaseElementIterator::UPtr TriangleGeometry<DataTypes>::begin(unsigned eid) const {
+    return typename BaseElementIterator::UPtr(new DefaultElementIterator(eid,d_triangles.getValue().size(),this));
 }
 
 template<class DataTypes>
 BaseProximity::SPtr TriangleGeometry<DataTypes>::project(unsigned tid, const defaulttype::Vector3 & P) const {
     core::topology::BaseMeshTopology::Triangle triangle;
     defaulttype::Vector3 factor;
-    project(tid,P, triangle, factor);
+    projectLinear(tid, P, triangle, factor);
 
     return BaseProximity::SPtr(new TriangleProximity<DataTypes>(tid,
                                                                 triangle[0],triangle[1],triangle[2],
@@ -107,7 +107,7 @@ void TriangleGeometry<DataTypes>::computeBaryCoords(const defaulttype::Vector3 &
 //Barycentric coordinates are computed according to
 //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 template<class DataTypes>
-void TriangleGeometry<DataTypes>::project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const {
+void TriangleGeometry<DataTypes>::projectLinear(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const {
     const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
     const TriangleInfo & tinfo = m_triangle_info[eid];
     triangle = d_triangles.getValue()[eid];

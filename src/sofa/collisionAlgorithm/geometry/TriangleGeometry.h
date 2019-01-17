@@ -39,15 +39,13 @@ public:
 
     virtual void prepareDetection() override;
 
-    virtual BaseElement::Iterator begin(unsigned eid = 0) const;
+    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const;
 
     virtual BaseProximity::SPtr project(unsigned tid, const defaulttype::Vector3 & P) const;
 
     virtual BaseProximity::SPtr center(unsigned tid) const;
 
     virtual defaulttype::BoundingBox getBBox(unsigned tid) const;
-
-    virtual void project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const;
 
     typedef struct
     {
@@ -75,6 +73,9 @@ protected:
     helper::vector<defaulttype::Vector3> m_triangle_normals;
 
     void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const;
+
+    virtual void projectLinear(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const;
+
 };
 
 

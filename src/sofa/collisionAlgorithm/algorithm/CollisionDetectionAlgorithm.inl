@@ -2,7 +2,7 @@
 
 #include <sofa/collisionAlgorithm/algorithm/CollisionDetectionAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseFilter.h>
-#include <sofa/collisionAlgorithm/elements/SubsetElementIterator.h>
+#include <sofa/collisionAlgorithm/iterators/SubsetElementIterator.h>
 
 namespace sofa
 {
@@ -15,7 +15,7 @@ void CollisionDetectionAlgorithm::computeCollisionReset() {
     d_output.endEdit();
 }
 
-static BaseElement::Iterator breadPhaseBegin(const defaulttype::Vector3 & P, const BaseGeometry * dest) {
+static BaseElementIterator::UPtr breadPhaseBegin(const defaulttype::Vector3 & P, const BaseGeometry * dest) {
     BroadPhase * decorator = dest->getBroadPhase();
 
     if (decorator == NULL) return dest->begin();
@@ -36,18 +36,18 @@ static BaseElement::Iterator breadPhaseBegin(const defaulttype::Vector3 & P, con
 
         if (selectedElements.empty()) return dest->begin();
 
-        return BaseElement::Iterator(new SubsetElementIterator(dest,selectedElements));
+        return BaseElementIterator::UPtr(new SubsetElementIterator(dest,selectedElements));
     }
 }
 
-DetectionOutput::PairDetection CollisionDetectionAlgorithm::findClosestPoint(const BaseElement::Iterator & itfrom, const BaseGeometry * dest,const std::set<BaseFilter*> & filters)
+DetectionOutput::PairDetection CollisionDetectionAlgorithm::findClosestPoint(const BaseElementIterator::UPtr & itfrom, const BaseGeometry * dest,const std::set<BaseFilter*> & filters)
 {
     double min_dist = std::numeric_limits<double>::max();
     DetectionOutput::PairDetection min_pair(nullptr,nullptr);
 
     defaulttype::Vector3 P = itfrom->center()->getPosition();
 
-    BaseElement::Iterator itdest=breadPhaseBegin(P,dest);
+    BaseElementIterator::UPtr itdest=breadPhaseBegin(P,dest);
 
     while (! itdest->end(dest))
     {
