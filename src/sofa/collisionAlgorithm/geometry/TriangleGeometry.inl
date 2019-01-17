@@ -12,15 +12,43 @@ namespace collisionAlgorithm
 
 template<class DataTypes>
 BaseElement::Iterator TriangleGeometry<DataTypes>::begin(unsigned eid) const {
-    return DefaultElement::Iterator(eid,
-                                    d_triangles.getValue().size(),
-                                    new TriangleElement<DataTypes>(this));
+    return typename DefaultElement::Iterator(eid,d_triangles.getValue().size(),this);
 }
 
 template<class DataTypes>
-defaulttype::Vector3 TriangleGeometry<DataTypes>::getNormal(const TriangleProximity<DataTypes> *prox) const {
-    return m_triangle_info[prox->m_eid].tn;
+BaseProximity::SPtr TriangleGeometry<DataTypes>::project(unsigned tid, const defaulttype::Vector3 & P) const {
+    core::topology::BaseMeshTopology::Triangle triangle;
+    defaulttype::Vector3 factor;
+    project(tid,P, triangle, factor);
+
+    return BaseProximity::SPtr(new TriangleProximity<DataTypes>(tid,
+                                                                triangle[0],triangle[1],triangle[2],
+                                                                factor[0],factor[1],factor[2],
+                                                                m_triangle_normals,
+                                                                this->l_state.get()));
 }
+
+template<class DataTypes>
+BaseProximity::SPtr TriangleGeometry<DataTypes>::center(unsigned tid) const {
+    const core::topology::BaseMeshTopology::Triangle & triangle = d_triangles.getValue()[tid];
+    return BaseProximity::SPtr(new TriangleProximity<DataTypes>(tid,
+                                                                triangle[0],triangle[1],triangle[2],
+                                                                0.3333,0.3333,0.3333,
+                                                                m_triangle_normals,
+                                                                this->l_state.get()));
+}
+
+template<class DataTypes>
+defaulttype::BoundingBox TriangleGeometry<DataTypes>::getBBox(unsigned tid) const {
+    const core::topology::BaseMeshTopology::Triangle & triangle = this->d_triangles.getValue()[tid];
+    const helper::ReadAccessor<Data <VecCoord> >& x = *this->l_state->read(core::VecCoordId::position());
+    defaulttype::BoundingBox bbox;
+    bbox.include(x[triangle[0]]);
+    bbox.include(x[triangle[1]]);
+    bbox.include(x[triangle[2]]);
+    return bbox;
+}
+
 
 template<class DataTypes>
 void TriangleGeometry<DataTypes>::prepareDetection()
@@ -30,6 +58,7 @@ void TriangleGeometry<DataTypes>::prepareDetection()
     const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
 
     m_triangle_info.resize(triangles.size());
+    m_triangle_normals.resize(triangles.size());
 
     for (size_t t=0 ; t<triangles.size() ; t++)
     {
@@ -51,11 +80,11 @@ void TriangleGeometry<DataTypes>::prepareDetection()
         tinfo.invDenom = 1.0 / (tinfo.d00 * tinfo.d11 - tinfo.d01 * tinfo.d01);
 
         tinfo.ax1 = tinfo.v0;
-        tinfo.tn = tinfo.v0.cross(tinfo.v1);
-        tinfo.ax2 = tinfo.v0.cross(tinfo.tn);
+        m_triangle_normals[t] = tinfo.v0.cross(tinfo.v1);
+        tinfo.ax2 = tinfo.v0.cross(m_triangle_normals[t]);
 
         tinfo.ax1.normalize();
-        tinfo.tn.normalize();
+        m_triangle_normals[t].normalize();
         tinfo.ax2.normalize();
     }
 }

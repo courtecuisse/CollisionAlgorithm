@@ -26,10 +26,10 @@ public :
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    TriangleProximity(unsigned eid,unsigned p1,unsigned p2,unsigned p3,double f1,double f2,double f3, const TriangleGeometry<DataTypes> * geometry, State * state)
+    TriangleProximity(unsigned eid,unsigned p1,unsigned p2,unsigned p3,double f1,double f2,double f3,const helper::vector<defaulttype::Vector3> & normals, State * state)
     : TBaseProximity<DataTypes>(state)
     , m_eid(eid)
-    , m_geometry(geometry) {
+    , m_elmtNormals(normals) {
         m_pid[0] = p1;
         m_pid[1] = p2;
         m_pid[2] = p3;
@@ -49,7 +49,7 @@ public :
     }
 
     virtual defaulttype::Vector3 getNormal() const {
-        return m_geometry->getNormal(this);
+        return m_elmtNormals[m_eid];
     }
 
     void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
@@ -58,15 +58,11 @@ public :
         it.addCol(m_pid[2], N * m_fact[2]);
     }
 
-    const double * getFactors() const { return m_fact; }
-
-    const unsigned * getPid() const { return m_pid; }
-
 protected:
     unsigned m_eid;
-    const TriangleGeometry<DataTypes> * m_geometry;
     unsigned m_pid[3];
     double m_fact[3];
+    const helper::vector<defaulttype::Vector3> & m_elmtNormals;
 
 };
 

@@ -10,9 +10,6 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-class TriangleProximity;
-
-template<class DataTypes>
 class TriangleElementIterator;
 
 template<class DataTypes>
@@ -23,6 +20,7 @@ public:
     typedef TBaseGeometry<DataTypes> Inherit;
     SOFA_CLASS(SOFA_TEMPLATE(TriangleGeometry,DataTypes),Inherit);
 
+    typedef DataTypes TDataTypes;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef Data<VecCoord> DataVecCoord;
@@ -43,7 +41,11 @@ public:
 
     virtual BaseElement::Iterator begin(unsigned eid = 0) const;
 
-    virtual defaulttype::Vector3 getNormal(const TriangleProximity<DataTypes> * prox) const;
+    virtual BaseProximity::SPtr project(unsigned tid, const defaulttype::Vector3 & P) const;
+
+    virtual BaseProximity::SPtr center(unsigned tid) const;
+
+    virtual defaulttype::BoundingBox getBBox(unsigned tid) const;
 
     virtual void project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const;
 
@@ -55,7 +57,7 @@ public:
         double d11;
         double invDenom;
 
-        defaulttype::Vector3 tn,ax1,ax2;
+        defaulttype::Vector3 ax1,ax2;
     } TriangleInfo;
 
     inline const TriangleInfo& triangleInfo(size_t index) const
@@ -70,6 +72,7 @@ public:
 
 protected:
     std::vector<TriangleInfo> m_triangle_info;
+    helper::vector<defaulttype::Vector3> m_triangle_normals;
 
     void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const;
 };
