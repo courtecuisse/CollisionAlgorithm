@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
-#include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
+#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 
 namespace sofa
 {
@@ -11,15 +11,8 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-BaseElement::Iterator TriangleGeometry<DataTypes>::begin(unsigned eid) const {
-    return DefaultElement::Iterator(eid,
-                                    d_triangles.getValue().size(),
-                                    new TriangleElement<DataTypes>(this));
-}
-
-template<class DataTypes>
-defaulttype::Vector3 TriangleGeometry<DataTypes>::getNormal(const TriangleProximity<DataTypes> *prox) const {
-    return m_triangle_info[prox->m_eid].tn;
+BaseElementIterator::UPtr TriangleGeometry<DataTypes>::begin(unsigned eid) const {
+    return DefaultElementIterator<GEOMETRY, TriangleProximity<GEOMETRY> >::create(this, d_triangles.getValue(), eid);
 }
 
 template<class DataTypes>
@@ -30,6 +23,7 @@ void TriangleGeometry<DataTypes>::prepareDetection()
     const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
 
     m_triangle_info.resize(triangles.size());
+    m_triangle_normals.resize(triangles.size());
 
     for (size_t t=0 ; t<triangles.size() ; t++)
     {
@@ -51,11 +45,11 @@ void TriangleGeometry<DataTypes>::prepareDetection()
         tinfo.invDenom = 1.0 / (tinfo.d00 * tinfo.d11 - tinfo.d01 * tinfo.d01);
 
         tinfo.ax1 = tinfo.v0;
-        tinfo.tn = tinfo.v0.cross(tinfo.v1);
-        tinfo.ax2 = tinfo.v0.cross(tinfo.tn);
+        m_triangle_normals[t] = tinfo.v0.cross(tinfo.v1);
+        tinfo.ax2 = tinfo.v0.cross(m_triangle_normals[t]);
 
         tinfo.ax1.normalize();
-        tinfo.tn.normalize();
+        m_triangle_normals[t].normalize();
         tinfo.ax2.normalize();
     }
 }
@@ -80,6 +74,7 @@ void TriangleGeometry<DataTypes>::computeBaryCoords(const defaulttype::Vector3 &
 template<class DataTypes>
 void TriangleGeometry<DataTypes>::project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const {
     const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
+
     const TriangleInfo & tinfo = m_triangle_info[eid];
     triangle = d_triangles.getValue()[eid];
 
@@ -168,6 +163,34 @@ void TriangleGeometry<DataTypes>::init()
             }
         }
     }
+}
+
+template<class DataTypes>
+void TriangleGeometry<DataTypes>::draw(const core::visual::VisualParams * vparams) {
+    if (! vparams->displayFlags().getShowCollisionModels())
+        return;
+
+    if (this->d_color.getValue()[3] == 0.0)
+        return;
+
+    glDisable(GL_LIGHTING);
+
+    double delta = 0.1;
+    defaulttype::Vector4 color = this->d_color.getValue();
+    const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
+
+    glBegin(GL_TRIANGLES);
+    for (unsigned i=0;i<d_triangles.getValue().size();i++) {
+        const Triangle& tri = this->d_triangles.getValue()[i];
+
+        glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
+        glVertex3dv(pos[tri[0]].data());
+        glColor4f(color[0],fabs(color[1]-delta),color[2],color[3]);
+        glVertex3dv(pos[tri[1]].data());
+        glColor4f(color[0],color[1],fabs(color[2]-delta),color[3]);
+        glVertex3dv(pos[tri[2]].data());
+    }
+    glEnd();
 }
 
 }

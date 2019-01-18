@@ -30,11 +30,17 @@ public :
 
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const = 0;
 
+    template<class PROXIMITY, class ... Args>
+    static BaseProximity::SPtr create(Args&& ... args) {
+        return SPtr(new PROXIMITY(std::forward<Args>(args)...));
+    }
 };
 
-template<class DataTypes>
+template<class GEOMETRY>
 class TBaseProximity : public BaseProximity {
 public:
+
+    typedef typename GEOMETRY::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
@@ -47,13 +53,15 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    TBaseProximity(State * state)
-    : m_state(state) {}
+    TBaseProximity(const GEOMETRY * geometry)
+    : m_geometry(geometry) {}
 
     virtual void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const = 0;
 
     void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
-        DataMatrixDeriv & c1_d = *cId[m_state].write();
+        State * state = m_geometry->getState();
+
+        DataMatrixDeriv & c1_d = *cId[state].write();
         MatrixDeriv & c1 = *c1_d.beginEdit();
 
         for (unsigned j=0;j<normals.size();j++) {
@@ -65,8 +73,10 @@ public:
     }
 
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const {
-        auto res = sofa::helper::write(*resId[m_state].write(), cParams);
-        const typename DataTypes::MatrixDeriv& j = cParams->readJ(m_state)->getValue();
+        State * state = m_geometry->getState();
+
+        auto res = sofa::helper::write(*resId[state].write(), cParams);
+        const typename DataTypes::MatrixDeriv& j = cParams->readJ(state)->getValue();
         auto rowIt = j.readLine(cid);
         const SReal f = lambda->element(cid);
         for (auto colIt = rowIt.begin(), colItEnd = rowIt.end(); colIt != colItEnd; ++colIt)
@@ -77,7 +87,7 @@ public:
 
 
 protected:
-    State * m_state;
+    const GEOMETRY * m_geometry;
 
 };
 

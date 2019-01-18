@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseElementIterator.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 
 #include <sofa/core/visual/VisualParams.h>
@@ -32,11 +32,9 @@ public:
 
     BaseGeometry()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    {
-        m_decorator = NULL;
-    }
+    , m_broadPhase(NULL) {}
 
-    virtual BaseElement::Iterator begin(unsigned eid = 0) const = 0;
+    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const = 0;
 
     virtual const BaseGeometry * end() const {
         return this;
@@ -45,7 +43,7 @@ public:
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
     void bwdInit( ) override {
-        prepareDetection();
+        computeCollisionReset();
     }
 
     virtual void reset() override {}
@@ -57,15 +55,15 @@ public:
     void computeCollisionDetection() override {}
 
     BroadPhase * getBroadPhase() const {
-        return m_decorator;
+        return m_broadPhase;
     }
 
-    void setDecorator(BroadPhase * d) {
-        m_decorator = d;
+    void setBroadPhase(BroadPhase * d) {
+        m_broadPhase = d;
     }
 
-    void unsetDecorator(BroadPhase * d) {
-        if (m_decorator == d) m_decorator = NULL;
+    void unsetBroadPhase(BroadPhase * d) {
+        if (m_broadPhase == d) m_broadPhase = NULL;
     }
 
 protected:
@@ -82,7 +80,7 @@ protected:
 
     virtual void prepareDetection() {}
 
-    BroadPhase * m_decorator;
+    BroadPhase * m_broadPhase;
 };
 
 
@@ -103,7 +101,7 @@ public:
         l_state.setPath("@.");
     }
 
-    sofa::core::behavior::BaseMechanicalState * getState() const override {
+    sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
     }
 

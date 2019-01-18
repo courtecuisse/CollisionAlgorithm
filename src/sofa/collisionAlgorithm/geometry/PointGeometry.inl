@@ -2,7 +2,7 @@
 
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
-#include <sofa/collisionAlgorithm/elements/PointElement.h>
+#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 
 namespace sofa
 {
@@ -11,10 +11,8 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-BaseElement::Iterator PointGeometry<DataTypes>::begin(unsigned eid) const {
-    return DefaultElement::Iterator(eid,
-                                    this->l_state->getSize(),
-                                    new PointElement<DataTypes>(this->l_state.get()));
+BaseElementIterator::UPtr PointGeometry<DataTypes>::begin(unsigned eid) const {
+    return BaseElementIterator::UPtr(new DefaultElementIterator<GEOMETRY, PointProximity<GEOMETRY> >(this, this->l_state->getSize(), eid));
 }
 
 template<class DataTypes>

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseElementIterator.h>
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 
@@ -11,7 +11,7 @@ namespace collisionAlgorithm
 {
 
 //Internal iterator of elements
-class SubsetElementIterator : public BaseElement {
+class SubsetElementIterator : public BaseElementIterator {
 public:
     SubsetElementIterator(const BaseGeometry * geometry, const std::set<unsigned> & subsetElements) : m_geometry(geometry), m_subsetElements(subsetElements) {
         m_iterator = m_subsetElements.cbegin();
