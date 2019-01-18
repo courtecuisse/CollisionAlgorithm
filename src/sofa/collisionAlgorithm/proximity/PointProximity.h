@@ -8,10 +8,15 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class DataTypes>
-class PointProximity : public TBaseProximity<DataTypes>
+template<class GEOMETRY>
+class PointProximity : public TBaseProximity<GEOMETRY>
 {
+    friend class GEOMETRY::GEOMETRY;
+
 public :
+    typedef PointProximity<GEOMETRY> PROXIMITY;
+
+    typedef typename GEOMETRY::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
@@ -24,34 +29,31 @@ public :
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    PointProximity(unsigned pid, State * state)
-    : TBaseProximity<DataTypes>(state)
+    PointProximity(const GEOMETRY * geometry, unsigned pid)
+    : TBaseProximity<GEOMETRY>(geometry)
     , m_pid(pid) {}
 
-    defaulttype::Vector3 getPosition(core::VecCoordId v) const
-    {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->m_state->read(v);
-        return pos[m_pid];
+    defaulttype::Vector3 getPosition(core::VecCoordId v) const {
+        return this->m_geometry->getPosition(v, m_pid);
     }
 
-    virtual defaulttype::Vector3 getNormal() const
-    {
-        return defaulttype::Vector3(1,0,0);
+    virtual defaulttype::Vector3 getNormal() const {
+        return this->m_geometry->getNormal(m_pid);
     }
 
     void addContributions(MatrixDerivRowIterator & c_it, const defaulttype::Vector3 & N) const {
         c_it.addCol(m_pid, N);
     }
 
-    static BaseProximity::SPtr project(const PointGeometry<DataTypes>* geometry, unsigned pid, const defaulttype::Vector3 & /*P*/) {
-        return BaseProximity::create<PointProximity<DataTypes>>(pid,geometry->l_state.get());
+    static BaseProximity::SPtr project(const GEOMETRY * geometry, unsigned pid, const defaulttype::Vector3 & /*P*/) {
+        return BaseProximity::create<PROXIMITY>(geometry,pid);
     }
 
-    static BaseProximity::SPtr center(const PointGeometry<DataTypes>* geometry, unsigned pid) {
-        return BaseProximity::create<PointProximity<DataTypes>>(pid,geometry->l_state.get());
+    static BaseProximity::SPtr center(const GEOMETRY * geometry, unsigned pid) {
+        return BaseProximity::create<PROXIMITY>(geometry,pid);
     }
 
-    static defaulttype::BoundingBox getBBox(const PointGeometry<DataTypes>* geometry, unsigned pid) {
+    static defaulttype::BoundingBox getBBox(const GEOMETRY * geometry, unsigned pid) {
         const helper::ReadAccessor<DataVecCoord>& x = *geometry->l_state->read(core::VecCoordId::position());
         defaulttype::BoundingBox bbox;
         bbox.include(x[pid]);

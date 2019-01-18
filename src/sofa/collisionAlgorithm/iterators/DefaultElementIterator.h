@@ -15,8 +15,8 @@ class DefaultElementIterator : public BaseElementIterator {
     friend class Iterator;
 
 public:
-    DefaultElementIterator(unsigned id, unsigned end,const GEOMETRY * geo) {
-        m_id = id;
+    DefaultElementIterator(const GEOMETRY * geo, unsigned start, unsigned end) {
+        m_id = start;
         m_end = end;
         m_geometry = geo;
     }
@@ -46,8 +46,8 @@ public:
     }
 
     template<class CONTAINER>
-    static BaseElementIterator::UPtr create(const CONTAINER & container, const GEOMETRY * geo, unsigned start = 0) {
-        return BaseElementIterator::UPtr(new DefaultElementIterator(start,container.size(),geo));
+    static BaseElementIterator::UPtr create(const GEOMETRY * geo, const CONTAINER & container, unsigned start = 0) {
+        return BaseElementIterator::UPtr(new DefaultElementIterator(geo,start,container.size()));
     }
 
 private:
@@ -55,8 +55,6 @@ private:
     unsigned m_end;
     const GEOMETRY * m_geometry;
 };
-
-
 
 }
 

@@ -103,7 +103,7 @@ public:
         l_state.setPath("@.");
     }
 
-    sofa::core::behavior::BaseMechanicalState * getState() const override {
+    sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
     }
 

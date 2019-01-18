@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/geometry/PhongTriangleGeometry.h>
-#include <sofa/collisionAlgorithm/proximity/PhongTriangleProximity.h>
+#include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 
 namespace sofa
@@ -12,7 +12,7 @@ namespace collisionAlgorithm
 
 template<class DataTypes>
 BaseElementIterator::UPtr PhongTriangleGeometry<DataTypes>::begin(unsigned eid) const {
-    return DefaultElementIterator<PhongTriangleGeometry<DataTypes>, PhongTriangleProximity<DataTypes> >::create(this->d_triangles.getValue(), this, eid);
+    return DefaultElementIterator<GEOMETRY, TriangleProximity<GEOMETRY> >::create(this, this->d_triangles.getValue(), eid);
 }
 
 template<class DataTypes>

@@ -9,24 +9,25 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class DataTypes>
+template<class GEOMETRY>
 class TriangleProximity;
 
 template<class DataTypes>
 class TriangleGeometry : public TBaseGeometry<DataTypes> {
-    friend class TriangleProximity<DataTypes>;
-
 public:
-    typedef TBaseGeometry<DataTypes> Inherit;
-    SOFA_CLASS(SOFA_TEMPLATE(TriangleGeometry,DataTypes),Inherit);
-
     typedef DataTypes TDataTypes;
+    typedef TBaseGeometry<DataTypes> Inherit;
+    typedef TriangleGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef Data<VecCoord> DataVecCoord;
     typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
     typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
     typedef helper::vector<Triangle> VecTriangles;
+
+    friend class TriangleProximity<GEOMETRY>;
+
+    SOFA_CLASS(GEOMETRY,Inherit);
 
     Data<VecTriangles> d_triangles;
 
@@ -62,13 +63,26 @@ public:
         return d_triangles.getValue();
     }
 
-protected:
-    std::vector<TriangleInfo> m_triangle_info;
-    helper::vector<defaulttype::Vector3> m_triangle_normals;
+    inline defaulttype::Vector3 getNormal(const TriangleProximity<GEOMETRY> * prox) const {
+        std::cout << "TRIANGLE NORMAL" << std::endl;
+
+        return m_triangle_normals[prox->m_eid];
+    }
+
+    inline Coord getPosition(core::VecCoordId v, const TriangleProximity<GEOMETRY> * prox) const {
+        const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(v);
+        return pos[prox->m_pid[0]] * prox->m_fact[0] +
+               pos[prox->m_pid[1]] * prox->m_fact[1] +
+               pos[prox->m_pid[2]] * prox->m_fact[2];
+    }
 
     void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const;
 
     virtual void projectLinear(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const;
+
+protected:
+    std::vector<TriangleInfo> m_triangle_info;
+    helper::vector<defaulttype::Vector3> m_triangle_normals;
 
 };
 

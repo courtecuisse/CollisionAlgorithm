@@ -12,7 +12,7 @@ namespace collisionAlgorithm
 
 template<class DataTypes>
 BaseElementIterator::UPtr PointGeometry<DataTypes>::begin(unsigned eid) const {
-    return DefaultElementIterator<PointGeometry<DataTypes>, PointProximity<DataTypes> >::create(this->l_state->read(core::VecCoordId::position())->getValue(),this,eid);
+    return BaseElementIterator::UPtr(new DefaultElementIterator<GEOMETRY, PointProximity<GEOMETRY> >(this, this->l_state->getSize(), eid));
 }
 
 template<class DataTypes>
