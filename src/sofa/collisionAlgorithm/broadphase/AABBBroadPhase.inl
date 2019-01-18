@@ -40,10 +40,8 @@ bool AABBBroadPhase::selectElement(const defaulttype::Vector3 & P,std::set<unsig
     return true;
 }
 
-void AABBBroadPhase::prepareDetection()
-{
+void AABBBroadPhase::prepareDetection() {
     sofa::core::behavior::BaseMechanicalState * mstate = l_geometry->getState();
-    l_geometry->bwdInit();
 
     m_Bmin = defaulttype::Vector3(mstate->getPX(0),mstate->getPY(0),mstate->getPZ(0));
     m_Bmax = m_Bmin;
@@ -143,7 +141,7 @@ void AABBBroadPhase::prepareDetection()
 }
 
 void AABBBroadPhase::draw(const core::visual::VisualParams * vparams) {
-    if (! vparams->displayFlags().getShowCollisionModels()) return;
+    if (! vparams->displayFlags().getShowBoundingCollisionModels()) return;
 
     if (this->d_color.getValue()[3] == 0.0)
         return;

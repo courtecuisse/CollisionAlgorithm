@@ -11,6 +11,8 @@ namespace collisionAlgorithm
 template<class GEOMETRY>
 class EdgeProximity : public TBaseProximity<GEOMETRY>
 {
+    friend class GEOMETRY::GEOMETRY;
+
 public :
     typedef EdgeProximity<GEOMETRY> PROXIMITY;
 
@@ -35,12 +37,12 @@ public :
         m_fact[1] = f2;
     }
 
-    defaulttype::Vector3 getPosition(core::VecCoordId v) const {
-        return this->m_geometry->getPosition(v, m_pid[0], m_pid[1], m_fact[0], m_fact[1]);
+    defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
+        return this->m_geometry->getPosition(this, v);
     }
 
     defaulttype::Vector3 getNormal() const {
-        return this->m_geometry->getNormal(m_pid[0], m_pid[1], m_fact[0], m_fact[1]);
+        return this->m_geometry->getNormal(this);
     }
 
     virtual void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
@@ -51,7 +53,7 @@ public :
     static BaseProximity::SPtr project(const EdgeGeometry<DataTypes>* geometry, unsigned eid, const defaulttype::Vector3 & P) {
         core::topology::BaseMeshTopology::Edge edge;
         defaulttype::Vector2 factor;
-        geometry->projectLinear(eid, P, edge, factor);
+        geometry->project(eid, P, edge, factor);
         return BaseProximity::create<PROXIMITY>(geometry,edge[0],edge[1],factor[0],factor[1]);
     }
 

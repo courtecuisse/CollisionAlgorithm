@@ -16,7 +16,7 @@ BaseElementIterator::UPtr EdgeGeometry<DataTypes>::begin(unsigned eid) const {
 }
 
 template<class DataTypes>
-void EdgeGeometry<DataTypes>::projectLinear(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Edge & edge, defaulttype::Vector2 & factor) const {
+void EdgeGeometry<DataTypes>::project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Edge & edge, defaulttype::Vector2 & factor) const {
     edge = d_edges.getValue()[eid];
 
     const helper::ReadAccessor<Data <VecCoord> >& x = *this->l_state->read(core::VecCoordId::position());

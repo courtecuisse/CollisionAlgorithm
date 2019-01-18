@@ -42,12 +42,12 @@ public :
         m_fact[2] = f3;
     }
 
-    inline defaulttype::Vector3 getPosition(core::VecCoordId v) const {
-        return this->m_geometry->getPosition(v, this);
+    inline defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
+        return this->m_geometry->GEOMETRY::getPosition(this, v);
     }
 
     inline defaulttype::Vector3 getNormal() const {
-        return this->m_geometry->getNormal(this);
+        return this->m_geometry->GEOMETRY::getNormal(this);
     }
 
     void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
@@ -59,7 +59,7 @@ public :
     static BaseProximity::SPtr project(const GEOMETRY * geometry, unsigned tid, const defaulttype::Vector3 & P) {
         core::topology::BaseMeshTopology::Triangle triangle;
         defaulttype::Vector3 factor;
-        geometry->projectLinear(tid, P, triangle, factor);
+        geometry->project(tid, P, triangle, factor);
 
         return BaseProximity::create<PROXIMITY>(geometry,tid,triangle[0],triangle[1],triangle[2],factor[0],factor[1],factor[2]);
     }

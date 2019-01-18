@@ -20,10 +20,9 @@ public:
     typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
     typedef typename Inherit::TriangleInfo TriangleInfo;
     typedef helper::vector<Triangle> VecTriangles;
+    typedef typename DataTypes::Coord Coord;
     typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
-
-    friend class BezierTriangleProximity<GEOMETRY>;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
@@ -36,6 +35,8 @@ public:
 
     virtual void prepareDetection() override;
 
+    virtual void draw(const core::visual::VisualParams * vparams) override;
+
     virtual BaseElementIterator::UPtr begin(unsigned eid) const;
 
     typedef struct
@@ -44,10 +45,16 @@ public:
         defaulttype::Vector3 n110,n011,n101;
     } BezierTriangleInfo;
 
-    std::vector<BezierTriangleInfo> m_beziertriangle_info;
+    inline Coord getPosition(const TriangleProximity<GEOMETRY> * prox, core::VecCoordId v = core::VecCoordId::position()) const;
+
+    inline defaulttype::Vector3 getNormal(const TriangleProximity<GEOMETRY> * prox) const;
+
+    virtual void project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const;
+
+    void tesselate(unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C);
 
 protected:
-    virtual void projectBezier(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const;
+    std::vector<BezierTriangleInfo> m_beziertriangle_info;
 };
 
 }

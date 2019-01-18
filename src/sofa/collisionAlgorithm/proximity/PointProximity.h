@@ -33,12 +33,12 @@ public :
     : TBaseProximity<GEOMETRY>(geometry)
     , m_pid(pid) {}
 
-    defaulttype::Vector3 getPosition(core::VecCoordId v) const {
-        return this->m_geometry->getPosition(v, m_pid);
+    defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
+        return this->m_geometry->getPosition(this, v);
     }
 
     virtual defaulttype::Vector3 getNormal() const {
-        return this->m_geometry->getNormal(m_pid);
+        return this->m_geometry->getNormal(this);
     }
 
     void addContributions(MatrixDerivRowIterator & c_it, const defaulttype::Vector3 & N) const {

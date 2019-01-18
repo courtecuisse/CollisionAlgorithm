@@ -8,8 +8,8 @@ namespace collisionAlgorithm
 {
 
 void BaseGeometry::computeCollisionReset() {
-    if (m_decorator) m_decorator->prepareDetection();
     prepareDetection();
+    if (m_broadPhase) m_broadPhase->prepareDetection();
 }
 
 

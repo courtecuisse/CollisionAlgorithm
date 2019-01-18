@@ -34,7 +34,7 @@ public:
     }
 
     virtual ~BroadPhase() {
-        l_geometry->unsetDecorator(this);
+        l_geometry->unsetBroadPhase(this);
     }
 
     virtual defaulttype::BoundingBox getBBox() const = 0;
@@ -42,7 +42,9 @@ public:
     virtual bool selectElement(const defaulttype::Vector3 & P,std::set<unsigned> & eid, unsigned d = 0) const = 0;
 
     void init( ) override {
-        if (l_geometry != NULL) l_geometry->setDecorator(this);
+        if (l_geometry != NULL) {
+            l_geometry->setBroadPhase(this);
+        }
     }
 
     virtual void prepareDetection() = 0;

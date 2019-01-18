@@ -22,21 +22,20 @@ public:
     typedef typename DataTypes::VecCoord VecCoord;
     typedef Data<VecCoord> DataVecCoord;
 
-    friend class PointProximity<GEOMETRY>;
-
     SOFA_CLASS(GEOMETRY,Inherit);
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const;
 
     virtual void draw(const core::visual::VisualParams *vparams) override;
 
-protected:
-    inline defaulttype::Vector3 getNormal(unsigned /*pid*/) const {
+    inline defaulttype::Vector3 getNormal(const PointProximity<GEOMETRY> * /*prox*/) const {
         return defaulttype::Vector3(1,0,0);
     }
 
-    inline Coord getPosition(core::VecCoordId v, unsigned pid) const {
-        return this->l_state->read(v)->getValue()[pid];
+    //default implementation
+    template<class DERIVED_GEOMETRY>
+    inline Coord getPosition(const PointProximity<DERIVED_GEOMETRY> * prox, core::VecCoordId v = core::VecCoordId::position()) const {
+        return this->l_state->read(v)->getValue()[prox->m_pid];
     }
 };
 

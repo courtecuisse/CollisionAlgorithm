@@ -15,7 +15,7 @@ void CollisionDetectionAlgorithm::computeCollisionReset() {
     d_output.endEdit();
 }
 
-static BaseElementIterator::UPtr breadPhaseBegin(const defaulttype::Vector3 & P, const BaseGeometry * dest) {
+static BaseElementIterator::UPtr broadPhaseBegin(const defaulttype::Vector3 & P, const BaseGeometry * dest) {
     BroadPhase * decorator = dest->getBroadPhase();
 
     if (decorator == NULL) return dest->begin();
@@ -47,7 +47,7 @@ DetectionOutput::PairDetection CollisionDetectionAlgorithm::findClosestPoint(con
 
     defaulttype::Vector3 P = itfrom->center()->getPosition();
 
-    BaseElementIterator::UPtr itdest=breadPhaseBegin(P,dest);
+    BaseElementIterator::UPtr itdest=broadPhaseBegin(P,dest);
 
     while (! itdest->end(dest))
     {
