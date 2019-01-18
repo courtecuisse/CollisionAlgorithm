@@ -10,11 +10,11 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-class TriangleElementIterator;
+class TriangleProximity;
 
 template<class DataTypes>
 class TriangleGeometry : public TBaseGeometry<DataTypes> {
-    friend class TriangleElementIterator<DataTypes>;
+    friend class TriangleProximity<DataTypes>;
 
 public:
     typedef TBaseGeometry<DataTypes> Inherit;
@@ -40,12 +40,6 @@ public:
     virtual void prepareDetection() override;
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const;
-
-    virtual BaseProximity::SPtr project(unsigned tid, const defaulttype::Vector3 & P) const;
-
-    virtual BaseProximity::SPtr center(unsigned tid) const;
-
-    virtual defaulttype::BoundingBox getBBox(unsigned tid) const;
 
     typedef struct
     {

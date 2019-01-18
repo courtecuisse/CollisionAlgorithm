@@ -18,15 +18,15 @@ public:
     }
 
     BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
-        return m_geometry->project(id(),P);
+        return m_geometry->begin(id())->project(P);
     }
 
     BaseProximity::SPtr center() const {
-        return m_geometry->center(id());
+        return m_geometry->begin(id())->center();
     }
 
     defaulttype::BoundingBox getBBox() const {
-        return m_geometry->getBBox(id());
+        return m_geometry->begin(id())->getBBox();
     }
 
     void next() {

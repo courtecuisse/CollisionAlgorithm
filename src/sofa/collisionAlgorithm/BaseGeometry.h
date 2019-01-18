@@ -38,12 +38,6 @@ public:
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const = 0;
 
-    virtual BaseProximity::SPtr project(unsigned eid, const defaulttype::Vector3 & P) const = 0;
-
-    virtual BaseProximity::SPtr center(unsigned eid) const = 0;
-
-    virtual defaulttype::BoundingBox getBBox(unsigned eid) const = 0;
-
     virtual const BaseGeometry * end() const {
         return this;
     }

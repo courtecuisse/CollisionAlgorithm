@@ -12,27 +12,8 @@ namespace collisionAlgorithm
 
 template<class DataTypes>
 BaseElementIterator::UPtr PointGeometry<DataTypes>::begin(unsigned eid) const {
-    return BaseElementIterator::UPtr(new DefaultElementIterator(eid,this->l_state->getSize(),this));
+    return DefaultElementIterator<PointGeometry<DataTypes>, PointProximity<DataTypes> >::create(this->l_state->read(core::VecCoordId::position())->getValue(),this,eid);
 }
-
-template<class DataTypes>
-BaseProximity::SPtr PointGeometry<DataTypes>::project(unsigned pid, const defaulttype::Vector3 & /*P*/) const {
-    return BaseProximity::SPtr(new PointProximity<DataTypes>(pid,this->l_state.get()));
-}
-
-template<class DataTypes>
-BaseProximity::SPtr PointGeometry<DataTypes>::center(unsigned pid) const {
-    return BaseProximity::SPtr(new PointProximity<DataTypes>(pid,this->l_state.get()));
-}
-
-template<class DataTypes>
-defaulttype::BoundingBox PointGeometry<DataTypes>::getBBox(unsigned pid) const {
-    const helper::ReadAccessor<DataVecCoord>& x = *this->l_state->read(core::VecCoordId::position());
-    defaulttype::BoundingBox bbox;
-    bbox.include(x[pid]);
-    return bbox;
-}
-
 
 template<class DataTypes>
 void PointGeometry<DataTypes>::draw(const core::visual::VisualParams *vparams) {

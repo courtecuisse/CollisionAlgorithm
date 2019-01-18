@@ -10,26 +10,27 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+template<class GEOMETRY, class PROXIMITY>
 class DefaultElementIterator : public BaseElementIterator {
     friend class Iterator;
 
 public:
-    DefaultElementIterator(unsigned id, unsigned end,const BaseGeometry * geo) {
+    DefaultElementIterator(unsigned id, unsigned end,const GEOMETRY * geo) {
         m_id = id;
         m_end = end;
         m_geometry = geo;
     }
 
     inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
-        return m_geometry->project(m_id, P);
+        return PROXIMITY::project(m_geometry, m_id, P);
     }
 
     inline BaseProximity::SPtr center() const {
-        return m_geometry->center(m_id);
+        return PROXIMITY::center(m_geometry, m_id);
     }
 
     inline defaulttype::BoundingBox getBBox() const {
-        return m_geometry->getBBox(m_id);
+        return PROXIMITY::getBBox(m_geometry, m_id);
     }
 
     virtual void next() {
@@ -44,10 +45,15 @@ public:
         return m_id;
     }
 
+    template<class CONTAINER>
+    static BaseElementIterator::UPtr create(const CONTAINER & container, const GEOMETRY * geo, unsigned start = 0) {
+        return BaseElementIterator::UPtr(new DefaultElementIterator(start,container.size(),geo));
+    }
+
 private:
     unsigned m_id;
     unsigned m_end;
-    const BaseGeometry * m_geometry;
+    const GEOMETRY * m_geometry;
 };
 
 

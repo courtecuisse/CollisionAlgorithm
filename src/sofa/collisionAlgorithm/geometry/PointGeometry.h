@@ -21,12 +21,6 @@ public:
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const;
 
-    virtual BaseProximity::SPtr project(unsigned pid, const defaulttype::Vector3 & P) const;
-
-    virtual BaseProximity::SPtr center(unsigned pid) const;
-
-    virtual defaulttype::BoundingBox getBBox(unsigned pid) const;
-
     virtual void draw(const core::visual::VisualParams *vparams) override;
 
 };

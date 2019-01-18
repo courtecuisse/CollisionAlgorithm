@@ -58,6 +58,38 @@ public :
         it.addCol(m_pid[2], N * m_fact[2]);
     }
 
+    static BaseProximity::SPtr project(const TriangleGeometry<DataTypes>* geometry, unsigned tid, const defaulttype::Vector3 & P) {
+        core::topology::BaseMeshTopology::Triangle triangle;
+        defaulttype::Vector3 factor;
+        geometry->projectLinear(tid, P, triangle, factor);
+
+        return BaseProximity::SPtr(new TriangleProximity<DataTypes>(tid,
+                                                                    triangle[0],triangle[1],triangle[2],
+                                                                    factor[0],factor[1],factor[2],
+                                                                    geometry->m_triangle_normals,
+                                                                    geometry->l_state.get()));
+    }
+
+    static BaseProximity::SPtr center(const TriangleGeometry<DataTypes>* geometry, unsigned tid) {
+        const core::topology::BaseMeshTopology::Triangle & triangle = geometry->d_triangles.getValue()[tid];
+        return BaseProximity::SPtr(new TriangleProximity<DataTypes>(tid,
+                                                                    triangle[0],triangle[1],triangle[2],
+                                                                    0.3333,0.3333,0.3333,
+                                                                    geometry->m_triangle_normals,
+                                                                    geometry->l_state.get()));
+    }
+
+    static defaulttype::BoundingBox getBBox(const TriangleGeometry<DataTypes>* geometry, unsigned tid) {
+        const core::topology::BaseMeshTopology::Triangle & triangle = geometry->d_triangles.getValue()[tid];
+        const helper::ReadAccessor<Data <VecCoord> >& x = *geometry->l_state->read(core::VecCoordId::position());
+        defaulttype::BoundingBox bbox;
+        bbox.include(x[triangle[0]]);
+        bbox.include(x[triangle[1]]);
+        bbox.include(x[triangle[2]]);
+        return bbox;
+    }
+
+
 protected:
     unsigned m_eid;
     unsigned m_pid[3];

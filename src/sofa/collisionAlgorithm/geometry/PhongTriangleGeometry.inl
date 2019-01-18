@@ -2,6 +2,7 @@
 
 #include <sofa/collisionAlgorithm/geometry/PhongTriangleGeometry.h>
 #include <sofa/collisionAlgorithm/proximity/PhongTriangleProximity.h>
+#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 
 namespace sofa
 {
@@ -10,27 +11,8 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-BaseProximity::SPtr PhongTriangleGeometry<DataTypes>::project(unsigned tid, const defaulttype::Vector3 & P) const {
-    core::topology::BaseMeshTopology::Triangle triangle;
-    defaulttype::Vector3 factor;
-    TriangleGeometry<DataTypes>::projectLinear(tid, P, triangle, factor);
-
-    return BaseProximity::SPtr(new PhongTriangleProximity<DataTypes>(tid,
-                                                                     triangle[0],triangle[1],triangle[2],
-                                                                     factor[0],factor[1],factor[2],
-                                                                     m_point_normals,
-                                                                     this->l_state.get()));
-}
-
-template<class DataTypes>
-BaseProximity::SPtr PhongTriangleGeometry<DataTypes>::center(unsigned tid) const {
-    const core::topology::BaseMeshTopology::Triangle & triangle = this->d_triangles.getValue()[tid];
-
-    return BaseProximity::SPtr(new PhongTriangleProximity<DataTypes>(tid,
-                                                                     triangle[0],triangle[1],triangle[2],
-                                                                     0.3333,0.3333,0.3333,
-                                                                     m_point_normals,
-                                                                     this->l_state.get()));
+BaseElementIterator::UPtr PhongTriangleGeometry<DataTypes>::begin(unsigned eid) const {
+    return DefaultElementIterator<PhongTriangleGeometry<DataTypes>, PhongTriangleProximity<DataTypes> >::create(this->d_triangles.getValue(), this, eid);
 }
 
 template<class DataTypes>

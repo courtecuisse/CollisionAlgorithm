@@ -43,6 +43,21 @@ public :
         c_it.addCol(m_pid, N);
     }
 
+    static BaseProximity::SPtr project(const PointGeometry<DataTypes>* geometry, unsigned pid, const defaulttype::Vector3 & /*P*/) {
+        return BaseProximity::create<PointProximity<DataTypes>>(pid,geometry->l_state.get());
+    }
+
+    static BaseProximity::SPtr center(const PointGeometry<DataTypes>* geometry, unsigned pid) {
+        return BaseProximity::create<PointProximity<DataTypes>>(pid,geometry->l_state.get());
+    }
+
+    static defaulttype::BoundingBox getBBox(const PointGeometry<DataTypes>* geometry, unsigned pid) {
+        const helper::ReadAccessor<DataVecCoord>& x = *geometry->l_state->read(core::VecCoordId::position());
+        defaulttype::BoundingBox bbox;
+        bbox.include(x[pid]);
+        return bbox;
+    }
+
 protected:
     const unsigned m_pid;
 

@@ -10,10 +10,12 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-class TriangleProximity;
+class PhongTriangleProximity;
 
 template<class DataTypes>
 class PhongTriangleGeometry : public TriangleGeometry<DataTypes> {
+    friend class PhongTriangleProximity<DataTypes>;
+
 public:
     typedef TriangleGeometry<DataTypes> Inherit;
     SOFA_CLASS(SOFA_TEMPLATE(PhongTriangleGeometry,DataTypes),Inherit);
@@ -25,9 +27,7 @@ public:
 
     virtual ~PhongTriangleGeometry() override {}
 
-    virtual BaseProximity::SPtr project(unsigned tid, const defaulttype::Vector3 & P) const;
-
-    virtual BaseProximity::SPtr center(unsigned tid) const;
+    virtual BaseElementIterator::UPtr begin(unsigned eid) const;
 
     virtual void init() override;
 

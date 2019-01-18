@@ -48,6 +48,39 @@ public :
         it.addCol(m_pid[1], N * m_fact[1]);
     }
 
+    static BaseProximity::SPtr project(const EdgeGeometry<DataTypes>* geometry, unsigned eid, const defaulttype::Vector3 & P) {
+        const core::topology::BaseMeshTopology::Edge edge = geometry->d_edges.getValue()[eid];
+
+        const helper::ReadAccessor<Data <VecCoord> >& x = *geometry->l_state->read(core::VecCoordId::position());
+
+        double fact_u;
+        double fact_v;
+
+        Coord v = x[edge[1]] - x[edge[0]];
+        fact_v = dot (P - x[edge[0]],v) / dot (v,v);
+
+        if (fact_v<0.0) fact_v = 0.0;
+        else if (fact_v>1.0) fact_v = 1.0;
+
+        fact_u = 1.0-fact_v;
+
+        return BaseProximity::create<EdgeProximity<DataTypes>>(edge[0],edge[1],fact_u,fact_v,geometry->l_state.get());
+    }
+
+    static BaseProximity::SPtr center(const EdgeGeometry<DataTypes>* geometry, unsigned eid) {
+        const core::topology::BaseMeshTopology::Edge edge = geometry->d_edges.getValue()[eid];
+        return BaseProximity::create<EdgeProximity<DataTypes>>(edge[0],edge[1],0.5,0.5,geometry->l_state.get());
+    }
+
+    static defaulttype::BoundingBox getBBox(const EdgeGeometry<DataTypes>* geometry, unsigned eid) {
+        const core::topology::BaseMeshTopology::Edge edge = geometry->d_edges.getValue()[eid];
+        const helper::ReadAccessor<DataVecCoord >& x = *geometry->l_state->read(core::VecCoordId::position());
+        defaulttype::BoundingBox bbox;
+        bbox.include(x[edge[0]]);
+        bbox.include(x[edge[1]]);
+        return bbox;
+    }
+
 protected:
     double m_pid[2];
     double m_fact[2];
