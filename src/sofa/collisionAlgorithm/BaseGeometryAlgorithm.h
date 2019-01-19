@@ -51,6 +51,7 @@ class BaseFilter;
 class BaseGeometryAlgorithm : public core::collision::Pipeline
 {
 public :
+
     SOFA_ABSTRACT_CLASS(BaseGeometryAlgorithm, core::collision::Pipeline);
 
     virtual ~BaseGeometryAlgorithm() override {}
@@ -59,7 +60,7 @@ public :
 
     virtual void computeCollisionDetection() = 0;
 
-    void registerFilter(BaseFilter * filter) {        
+    void registerFilter(BaseFilter * filter) {
         m_filters.insert(filter);
     }
 
@@ -67,9 +68,7 @@ public :
         m_filters.erase(filter);
     }
 
-    const std::set<BaseFilter*> & getFilters() {
-        return m_filters;
-    }
+    bool acceptFilter(const BaseProximity::SPtr & pfrom,const BaseProximity::SPtr & pdest) const;
 
 private:
     void reset() {}

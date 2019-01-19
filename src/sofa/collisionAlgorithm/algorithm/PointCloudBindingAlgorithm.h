@@ -16,6 +16,8 @@ public:
 
     Data<double> d_maxDist;
     Data<DetectionOutput> d_output;
+    Data<DataElementIterator> d_from;
+    Data<DataElementIterator> d_dest;
 
     PointCloudBindingAlgorithm();
 
@@ -23,9 +25,9 @@ public:
 
     void computeCollisionDetection() override;
 
-private:
-    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
-    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
+//private:
+//    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,DataIterator,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_from;
+//    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,DataIterator,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_dest;
 };
 
 }

@@ -41,7 +41,10 @@ bool AABBBroadPhase::selectElement(const defaulttype::Vector3 & P,std::set<unsig
 }
 
 void AABBBroadPhase::prepareDetection() {
-    sofa::core::behavior::BaseMechanicalState * mstate = l_geometry->getState();
+    const BaseGeometry * geo = d_elements.getValue().end();
+    if (geo == NULL) return;
+
+    sofa::core::behavior::BaseMechanicalState * mstate = geo->getState();
 
     m_Bmin = defaulttype::Vector3(mstate->getPX(0),mstate->getPY(0),mstate->getPZ(0));
     m_Bmax = m_Bmin;
@@ -92,7 +95,7 @@ void AABBBroadPhase::prepareDetection() {
     m_Bmin -= m_cellSize * 0.5;
     m_Bmax -= m_cellSize * 0.5;
 
-    for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
+    for (auto it = d_elements.getValue().begin(); it != d_elements.getValue().end(); it++)
     {
         defaulttype::BoundingBox bbox = it->getBBox();
 

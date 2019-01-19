@@ -19,10 +19,9 @@ BezierTriangleGeometry<DataTypes>::BezierTriangleGeometry()
 {}
 
 template<class DataTypes>
-BaseElementIterator::UPtr BezierTriangleGeometry<DataTypes>::begin(unsigned eid) const {
+BaseElementIterator::UPtr BezierTriangleGeometry<DataTypes>::getElementIterator(unsigned eid) const {
     return DefaultElementIterator<GEOMETRY, TriangleProximity<GEOMETRY> >::create(this, this->d_triangles.getValue(), eid);
 }
-
 
 ////Bezier triangle are computed according to :
 ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1

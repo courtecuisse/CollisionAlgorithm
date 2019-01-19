@@ -31,20 +31,15 @@ public:
     Data<defaulttype::Vector4> d_color;
 
     BaseGeometry()
-    : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , m_broadPhase(NULL) {}
-
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const = 0;
-
-    virtual const BaseGeometry * end() const {
-        return this;
-    }
+    : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model")){}
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
     void bwdInit( ) override {
         computeCollisionReset();
     }
+
+    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const = 0;
 
     virtual void reset() override {}
 
@@ -54,17 +49,6 @@ public:
 
     void computeCollisionDetection() override {}
 
-    BroadPhase * getBroadPhase() const {
-        return m_broadPhase;
-    }
-
-    void setBroadPhase(BroadPhase * d) {
-        m_broadPhase = d;
-    }
-
-    void unsetBroadPhase(BroadPhase * d) {
-        if (m_broadPhase == d) m_broadPhase = NULL;
-    }
 
 protected:
     virtual void doCollisionReset() override {}
@@ -80,7 +64,6 @@ protected:
 
     virtual void prepareDetection() {}
 
-    BroadPhase * m_broadPhase;
 };
 
 
@@ -106,6 +89,46 @@ public:
     }
 
     core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
+};
+
+class DataElementIterator {
+public:
+
+    DataElementIterator(const BaseGeometry * geo = NULL)
+        : m_geometry(geo)
+        , m_broadPhase(NULL) {}
+
+    friend std::ostream& operator<<(std::ostream& i, const DataElementIterator& /*t*/)  {
+        return i;
+    }
+
+    friend std::istream& operator>>(std::istream& i, DataElementIterator& /*t*/) {
+        return i;
+    }
+
+    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
+        return m_geometry->getElementIterator(eid);
+    }
+
+    virtual const BaseGeometry * end() const {
+        return m_geometry;
+    }
+
+    void setBroadPhase(BroadPhase * d) const {
+        m_broadPhase = d;
+    }
+
+    void unsetBroadPhase(BroadPhase * d) const {
+        if (m_broadPhase == d) m_broadPhase = NULL;
+    }
+
+    const BroadPhase * getBroadPhase() const {
+        return m_broadPhase;
+    }
+
+private:
+    const BaseGeometry * m_geometry;
+    mutable const BroadPhase * m_broadPhase;
 };
 
 }

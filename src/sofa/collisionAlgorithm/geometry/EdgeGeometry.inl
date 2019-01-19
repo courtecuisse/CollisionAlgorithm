@@ -11,7 +11,7 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-BaseElementIterator::UPtr EdgeGeometry<DataTypes>::begin(unsigned eid) const {
+BaseElementIterator::UPtr EdgeGeometry<DataTypes>::getElementIterator(unsigned eid) const {
     return DefaultElementIterator<GEOMETRY, EdgeProximity<GEOMETRY> >::create(this, d_edges.getValue(), eid);
 }
 

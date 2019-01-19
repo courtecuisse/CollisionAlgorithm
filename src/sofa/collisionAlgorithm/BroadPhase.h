@@ -26,15 +26,14 @@ public:
     SOFA_ABSTRACT_CLASS(BroadPhase,core::objectmodel::BaseObject);
 
     Data<defaulttype::Vector4> d_color;
+    Data<DataElementIterator> d_elements;
 
     BroadPhase()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , l_geometry(initLink("geometry", "link to state")) {
-        l_geometry.setPath("@.");
-    }
+    , d_elements(initData(&d_elements, "geometry", "link to state")) {}
 
     virtual ~BroadPhase() {
-        l_geometry->unsetBroadPhase(this);
+        d_elements.getValue().unsetBroadPhase(this);
     }
 
     virtual defaulttype::BoundingBox getBBox() const = 0;
@@ -42,14 +41,14 @@ public:
     virtual bool selectElement(const defaulttype::Vector3 & P,std::set<unsigned> & eid, unsigned d = 0) const = 0;
 
     void init( ) override {
-        if (l_geometry != NULL) {
-            l_geometry->setBroadPhase(this);
+        if (d_elements.getValue().end() != NULL) {
+            d_elements.getValue().unsetBroadPhase(this);
         }
     }
 
     virtual void prepareDetection() = 0;
 
-    core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DOUBLELINK> l_geometry;
+//    core::objectmodel::SingleLink<BroadPhase,DataIterator,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_geometry;
 };
 
 

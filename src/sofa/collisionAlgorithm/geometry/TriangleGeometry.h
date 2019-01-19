@@ -29,8 +29,11 @@ public:
 
     Data<VecTriangles> d_triangles;
 
+    Data <DataElementIterator> d_elements;
+
     TriangleGeometry()
-    : d_triangles(initData(&d_triangles, VecTriangles(), "triangles", "Vector of Triangles")) {}
+    : d_triangles(initData(&d_triangles, VecTriangles(), "triangles", "Vector of Triangles"))
+    , d_elements(initData(&d_elements, DataElementIterator(this), "elements", "Elements iterator")){}
 
     virtual ~TriangleGeometry() override {}
 
@@ -40,7 +43,7 @@ public:
 
     virtual void draw(const core::visual::VisualParams * vparams) override;
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const;
+    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const;
 
     typedef struct
     {

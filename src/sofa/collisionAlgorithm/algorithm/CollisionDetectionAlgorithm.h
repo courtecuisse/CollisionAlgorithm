@@ -15,25 +15,29 @@ public:
     SOFA_CLASS(CollisionDetectionAlgorithm, BaseGeometryAlgorithm);
 
     Data<DetectionOutput> d_output;
+    Data<DataElementIterator> d_from;
+    Data<DataElementIterator> d_dest;
 
     CollisionDetectionAlgorithm()
     : d_output(initData(&d_output, "output" , "this"))
-    , l_from(initLink("from", "Link to from geometry"))
-    , l_dest(initLink("dest", "Link to dest geometry"))
+    , d_from(initData(&d_from, "from" , "this"))
+    , d_dest(initData(&d_dest, "dest" , "this"))
     {}
 
     virtual void computeCollisionReset() override;
 
     virtual void computeCollisionDetection() override;
 
-    static DetectionOutput::PairDetection findClosestPoint(const BaseElementIterator::UPtr & itfrom, const BaseGeometry * dst,const std::set<BaseFilter*> & filters = std::set<BaseFilter*>());
 
 private:
 //    template<class ElementIterator>
 
-    core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
-    core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
+//    core::objectmodel::SingleLink<CollisionDetectionAlgorithm,DataIterator,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_from;
+//    core::objectmodel::SingleLink<CollisionDetectionAlgorithm,DataIterator,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_dest;
 
+    BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P);
+
+    DetectionOutput::PairDetection findClosestPoint(const BaseElementIterator::UPtr & itfrom);
 };
 
 }

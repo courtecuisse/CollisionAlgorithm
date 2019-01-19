@@ -28,7 +28,7 @@ public:
     EdgeGeometry()
     : d_edges(initData(&d_edges, VecEdges(), "edges", "Vector of Edges")) {}
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const;
+    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const;
 
     //default implementation
     template<class DERIVED_GEOMETRY>

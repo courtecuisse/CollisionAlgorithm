@@ -31,13 +31,15 @@ public:
     Data <double> d_nonlin_threshold;
     Data <unsigned> d_draw_tesselation;
 
+    Data <DataElementIterator> d_elements;
+
     BezierTriangleGeometry();
 
     virtual void prepareDetection() override;
 
     virtual void draw(const core::visual::VisualParams * vparams) override;
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid) const;
+    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid) const;
 
     typedef struct
     {

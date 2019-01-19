@@ -11,7 +11,7 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-BaseElementIterator::UPtr PhongTriangleGeometry<DataTypes>::begin(unsigned eid) const {
+BaseElementIterator::UPtr PhongTriangleGeometry<DataTypes>::getElementIterator(unsigned eid) const {
     return DefaultElementIterator<GEOMETRY, TriangleProximity<GEOMETRY> >::create(this, this->d_triangles.getValue(), eid);
 }
 

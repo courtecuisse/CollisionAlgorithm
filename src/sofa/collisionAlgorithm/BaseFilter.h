@@ -25,7 +25,7 @@ public:
         l_algo->registerFilter(this);
     }
 
-    virtual bool accept(BaseProximity::SPtr,BaseProximity::SPtr) const = 0;
+    virtual bool accept(const BaseProximity::SPtr & p1,const BaseProximity::SPtr & p2) const = 0;
 
 
     core::objectmodel::SingleLink<BaseFilter,BaseGeometryAlgorithm,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DOUBLELINK> l_algo;

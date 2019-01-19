@@ -11,7 +11,7 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-BaseElementIterator::UPtr TriangleGeometry<DataTypes>::begin(unsigned eid) const {
+BaseElementIterator::UPtr TriangleGeometry<DataTypes>::getElementIterator(unsigned eid) const {
     return DefaultElementIterator<GEOMETRY, TriangleProximity<GEOMETRY> >::create(this, d_triangles.getValue(), eid);
 }
 

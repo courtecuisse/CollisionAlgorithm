@@ -24,7 +24,7 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const;
+    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const;
 
     virtual void draw(const core::visual::VisualParams *vparams) override;
 

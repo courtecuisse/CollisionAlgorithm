@@ -28,7 +28,7 @@ public:
 
     virtual ~PhongTriangleGeometry() override {}
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid) const;
+    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid) const;
 
     virtual void init() override;
 
