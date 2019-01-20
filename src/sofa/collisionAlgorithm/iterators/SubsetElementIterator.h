@@ -3,6 +3,7 @@
 #include <sofa/collisionAlgorithm/BaseElementIterator.h>
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
+#include <sofa/collisionAlgorithm/BaseElement.h>
 
 namespace sofa
 {
@@ -13,20 +14,20 @@ namespace collisionAlgorithm
 //Internal iterator of elements
 class SubsetElementIterator : public BaseElementIterator {
 public:
-    SubsetElementIterator(const BaseGeometry * geometry, const std::set<unsigned> & subsetElements) : m_geometry(geometry), m_subsetElements(subsetElements) {
+    SubsetElementIterator(const BaseDataElmt * elmt, const std::set<unsigned> & subsetElements) : m_elements(elmt), m_subsetElements(subsetElements) {
         m_iterator = m_subsetElements.cbegin();
     }
 
     BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
-//        return m_geometry->getElementIterator(id())->project(P);
+        return m_elements->begin(id())->project(P);
     }
 
     BaseProximity::SPtr center() const {
-//        return m_geometry->getElementIterator(id())->center();
+        return m_elements->begin(id())->center();
     }
 
     defaulttype::BoundingBox getBBox() const {
-//        return m_geometry->getElementIterator(id())->getBBox();
+        return m_elements->begin(id())->getBBox();
     }
 
     void next() {
@@ -41,7 +42,7 @@ public:
         return m_iterator==m_subsetElements.cend();
     }
 
-    const BaseGeometry * m_geometry;
+    const BaseDataElmt * m_elements;
     const std::set<unsigned> m_subsetElements;
     std::set<unsigned>::iterator m_iterator;
 };

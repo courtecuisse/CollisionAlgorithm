@@ -36,7 +36,7 @@ BaseElementIterator::UPtr CollisionDetectionAlgorithm::getDestIterator(const def
 
         if (selectedElements.empty()) return l_dest->begin();
 
-        return BaseElementIterator::UPtr(new SubsetElementIterator(l_dest->end(),selectedElements));
+        return BaseElementIterator::UPtr(new SubsetElementIterator(l_dest.get(),selectedElements));
     }
 }
 

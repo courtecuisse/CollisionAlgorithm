@@ -69,11 +69,11 @@ public:
 
     virtual sofa::core::objectmodel::BaseData* getData() const = 0;
 
-    void setBroadPhase(BroadPhase * d) const {
+    void setBroadPhase(BroadPhase * d) {
         m_broadPhase = d;
     }
 
-    void unsetBroadPhase(BroadPhase * d) const {
+    void unsetBroadPhase(BroadPhase * d) {
         if (m_broadPhase == d) m_broadPhase = NULL;
     }
 
@@ -86,7 +86,7 @@ public:
     virtual const BaseGeometry * end() const = 0;
 
 protected:
-    mutable const BroadPhase * m_broadPhase;
+    BroadPhase * m_broadPhase;
 };
 
 template<class ELMT>
@@ -154,9 +154,13 @@ public:
         return this->getValue().size();
     }
 
-    virtual void init() {}
+    virtual void init() {
+        if (this->m_broadPhase) this->m_broadPhase->init();
+    }
 
-    virtual void prepareDetection() {}
+    virtual void prepareDetection() {
+        if (this->m_broadPhase) this->m_broadPhase->prepareDetection();
+    }
 
 };
 
