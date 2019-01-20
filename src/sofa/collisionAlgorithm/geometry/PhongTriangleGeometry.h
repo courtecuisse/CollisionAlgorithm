@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sofa/core/topology/BaseMeshTopology.h>
-#include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
+#include <sofa/collisionAlgorithm/elements/DataPhongTriangleElement.h>
 
 namespace sofa
 {
@@ -10,13 +10,10 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-class PhongTriangleProximity;
-
-template<class DataTypes>
-class PhongTriangleGeometry : public TriangleGeometry<DataTypes> {
+class PhongTriangleGeometry : public TBaseGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
-    typedef TriangleGeometry<DataTypes> Inherit;
+    typedef TBaseGeometry<DataTypes> Inherit;
     typedef PhongTriangleGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::Coord Coord;
     typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
@@ -26,23 +23,16 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    virtual ~PhongTriangleGeometry() override {}
+    DataPhongTriangleElement<GEOMETRY> d_triangles;
 
-    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid) const;
+    PhongTriangleGeometry()
+    : d_triangles(initData(&d_triangles, "triangles", "Vector of Triangles")){}
+
+    virtual ~PhongTriangleGeometry() override {}
 
     virtual void init() override;
 
     virtual void prepareDetection() override;
-
-    inline defaulttype::Vector3 getNormal(const TriangleProximity<GEOMETRY> * prox) const {
-        return m_point_normals[prox->m_pid[0]] * prox->m_fact[0] +
-               m_point_normals[prox->m_pid[1]] * prox->m_fact[1] +
-               m_point_normals[prox->m_pid[2]] * prox->m_fact[2];
-    }
-
-protected:
-    std::vector<defaulttype::Vector3> m_point_normals;
-    std::vector< std::vector<TriangleID> > m_trianglesAroundVertex;
 
 };
 

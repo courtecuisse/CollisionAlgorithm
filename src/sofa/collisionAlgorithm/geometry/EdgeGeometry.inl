@@ -11,29 +11,29 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-BaseElementIterator::UPtr EdgeGeometry<DataTypes>::getElementIterator(unsigned eid) const {
-    return DefaultElementIterator<GEOMETRY, EdgeProximity<GEOMETRY> >::create(this, d_edges.getValue(), eid);
+void EdgeGeometry<DataTypes>::prepareDetection()
+{
+    d_edges.prepareDetection();
+}
+
+
+template<class DataTypes>
+void EdgeGeometry<DataTypes>::init()
+{
+
 }
 
 template<class DataTypes>
-void EdgeGeometry<DataTypes>::project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Edge & edge, defaulttype::Vector2 & factor) const {
-    edge = d_edges.getValue()[eid];
+void EdgeGeometry<DataTypes>::draw(const core::visual::VisualParams * vparams) {
+    if (! vparams->displayFlags().getShowCollisionModels())
+        return;
 
-    const helper::ReadAccessor<Data <VecCoord> >& x = *this->l_state->read(core::VecCoordId::position());
+    if (this->d_color.getValue()[3] == 0.0)
+        return;
 
-    double fact_u;
-    double fact_v;
+    glDisable(GL_LIGHTING);
 
-    Coord v = x[edge[1]] - x[edge[0]];
-    fact_v = dot (P - x[edge[0]],v) / dot (v,v);
 
-    if (fact_v<0.0) fact_v = 0.0;
-    else if (fact_v>1.0) fact_v = 1.0;
-
-    fact_u = 1.0-fact_v;
-
-    factor[0] = fact_u;
-    factor[1] = fact_v;
 }
 
 }
