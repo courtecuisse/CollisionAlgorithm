@@ -15,25 +15,22 @@ public:
     SOFA_CLASS(CollisionDetectionAlgorithm, BaseGeometryAlgorithm);
 
     Data<DetectionOutput> d_output;
-    Data<DataElementIterator> d_from;
-    Data<DataElementIterator> d_dest;
 
     CollisionDetectionAlgorithm()
     : d_output(initData(&d_output, "output" , "this"))
-    , d_from(initData(&d_from, "from" , "this"))
-    , d_dest(initData(&d_dest, "dest" , "this"))
+    , l_from(initLink("from", "link to from geometry elments"))
+    , l_dest(initLink("dest", "link to dest geometry elments"))
     {}
 
     virtual void computeCollisionReset() override;
 
     virtual void computeCollisionDetection() override;
 
-
 private:
 //    template<class ElementIterator>
 
-//    core::objectmodel::SingleLink<CollisionDetectionAlgorithm,DataIterator,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_from;
-//    core::objectmodel::SingleLink<CollisionDetectionAlgorithm,DataIterator,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_dest;
+    core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseDataElmt,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_from;
+    core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseDataElmt,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_dest;
 
     BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P);
 

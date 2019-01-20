@@ -27,13 +27,10 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    Data<VecTriangles> d_triangles;
-
-    Data <DataElementIterator> d_elements;
+    DataElemnt<sofa::core::topology::BaseMeshTopology::Triangle> d_triangles;
 
     TriangleGeometry()
-    : d_triangles(initData(&d_triangles, VecTriangles(), "triangles", "Vector of Triangles"))
-    , d_elements(initData(&d_elements, DataElementIterator(this), "elements", "Elements iterator")){}
+    : d_triangles(initData(&d_triangles, "triangles", "Vector of Triangles")){}
 
     virtual ~TriangleGeometry() override {}
 

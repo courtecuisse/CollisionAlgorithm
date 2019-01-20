@@ -16,9 +16,9 @@ void CollisionDetectionAlgorithm::computeCollisionReset() {
 }
 
 BaseElementIterator::UPtr CollisionDetectionAlgorithm::getDestIterator(const defaulttype::Vector3 & P) {
-    const BroadPhase * decorator = d_dest.getValue().getBroadPhase();
+    const BroadPhase * decorator = l_dest->getBroadPhase();
 
-    if (decorator == NULL) return d_dest.getValue().begin();
+    if (decorator == NULL) return l_dest->begin();
     else {
         defaulttype::BoundingBox bbox = decorator->getBBox();
 
@@ -34,9 +34,9 @@ BaseElementIterator::UPtr CollisionDetectionAlgorithm::getDestIterator(const def
             d++;// we look for boxed located at d+1
         }
 
-        if (selectedElements.empty()) return d_dest.getValue().begin();
+        if (selectedElements.empty()) return l_dest->begin();
 
-        return BaseElementIterator::UPtr(new SubsetElementIterator(d_dest.getValue().end(),selectedElements));
+        return BaseElementIterator::UPtr(new SubsetElementIterator(l_dest->end(),selectedElements));
     }
 }
 
@@ -49,7 +49,7 @@ DetectionOutput::PairDetection CollisionDetectionAlgorithm::findClosestPoint(con
 
     BaseElementIterator::UPtr itdest=getDestIterator(P);
 
-    while (itdest != d_dest.getValue().end())
+    while (itdest != l_dest->end())
     {
         BaseProximity::SPtr pdest = itdest->project(P);
         BaseProximity::SPtr pfrom  = itfrom->project(pdest->getPosition()); // reproject one on the initial proximity
@@ -81,9 +81,12 @@ DetectionOutput::PairDetection CollisionDetectionAlgorithm::findClosestPoint(con
 
 void CollisionDetectionAlgorithm::computeCollisionDetection()
 {
+    if (l_from == NULL) return;
+    if (l_dest == NULL) return;
+
     DetectionOutput * output = d_output.beginEdit();
 
-    for (auto itfrom=d_from.getValue().begin();itfrom!=d_from.getValue().end();itfrom++) {
+    for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
         DetectionOutput::PairDetection min_pair = findClosestPoint(itfrom);
 
         if (min_pair.first == nullptr || min_pair.second == nullptr) continue;

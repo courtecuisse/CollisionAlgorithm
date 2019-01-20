@@ -91,28 +91,49 @@ public:
     core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
 };
 
-class DataElementIterator {
+class BaseDataElmt {
 public:
 
-    DataElementIterator(const BaseGeometry * geo = NULL)
-        : m_geometry(geo)
-        , m_broadPhase(NULL) {}
+    typedef sofa::core::objectmodel::TClass<BaseDataElmt,sofa::core::objectmodel::BaseData> MyClass;
+    static const MyClass* GetClass() { return MyClass::get(); }
+    virtual const sofa::core::objectmodel::BaseClass* getClass() const
+    { return GetClass(); }
 
-    friend std::ostream& operator<<(std::ostream& i, const DataElementIterator& /*t*/)  {
-        return i;
+    template<class T>
+    static void dynamicCast(T*& ptr, sofa::core::objectmodel::Base* b) {
+        ptr = dynamic_cast<T*>(b);
     }
 
-    friend std::istream& operator>>(std::istream& i, DataElementIterator& /*t*/) {
-        return i;
+    template<class T>
+    static std::string className(const T* ptr= NULL) {
+        return sofa::core::objectmodel::BaseClass::defaultClassName(ptr);
     }
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
-        return m_geometry->getElementIterator(eid);
+    template<class T>
+    static std::string namespaceName(const T* ptr= NULL) {
+        return sofa::core::objectmodel::BaseClass::defaultNamespaceName(ptr);
     }
 
-    virtual const BaseGeometry * end() const {
-        return m_geometry;
+    template<class T>
+    static std::string templateName(const T* ptr= NULL) {
+        return sofa::core::objectmodel::BaseClass::BaseClass::defaultTemplateName(ptr);
     }
+
+    template< class T>
+    static std::string shortName( const T* ptr = NULL, sofa::core::objectmodel::BaseObjectDescription* = NULL ) {
+        std::string shortname = T::className(ptr);
+        if( !shortname.empty() )
+        {
+            *shortname.begin() = ::tolower(*shortname.begin());
+        }
+        return shortname;
+    }
+
+    virtual unsigned size() const = 0;
+
+    virtual sofa::core::objectmodel::Base* getOwner() const = 0;
+
+    virtual sofa::core::objectmodel::BaseData* getData() const = 0;
 
     void setBroadPhase(BroadPhase * d) const {
         m_broadPhase = d;
@@ -126,11 +147,109 @@ public:
         return m_broadPhase;
     }
 
-private:
+    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
+        return m_geometry->getElementIterator(eid);
+    }
+
+    virtual const BaseGeometry * end() const {
+        return m_geometry;
+    }
+
     const BaseGeometry * m_geometry;
     mutable const BroadPhase * m_broadPhase;
+};
+
+template<class ELMT>
+class DataElemnt : public core::objectmodel::Data<helper::vector<ELMT> >, public BaseDataElmt {
+public:
+    explicit DataElemnt(const typename core::objectmodel::Data<helper::vector<ELMT> >::InitData& init)
+    : Data<helper::vector<ELMT>>(init) {
+        m_geometry = dynamic_cast<const BaseGeometry *>(init.owner);
+        m_broadPhase = NULL;
+    }
+
+    virtual bool read(const std::string& value) {
+        return core::objectmodel::Data<helper::vector<ELMT> >::read(value);
+    }
+
+    virtual void copyAspect(int destAspect, int srcAspect) {
+        core::objectmodel::Data<helper::vector<ELMT> >::copyAspect(destAspect,srcAspect);
+    }
+
+    virtual void printValue(std::ostream& os) const {
+        core::objectmodel::Data<helper::vector<ELMT> >::printValue(os);
+    }
+
+    virtual std::string getValueString() const {
+        return core::objectmodel::Data<helper::vector<ELMT> >::getValueString();
+    }
+
+    virtual std::string getValueTypeString() const {
+        return core::objectmodel::Data<helper::vector<ELMT> >::getValueTypeString();
+    }
+
+    virtual const sofa::defaulttype::AbstractTypeInfo* getValueTypeInfo() const {
+        return core::objectmodel::Data<helper::vector<ELMT> >::getValueTypeInfo();
+    }
+
+    virtual const void* getValueVoidPtr() const {
+        return core::objectmodel::Data<helper::vector<ELMT> >::getValueVoidPtr();
+    }
+
+    virtual void* beginEditVoidPtr() {
+        return core::objectmodel::Data<helper::vector<ELMT> >::beginEditVoidPtr();
+    }
+
+    virtual void endEditVoidPtr() {
+        core::objectmodel::Data<helper::vector<ELMT> >::endEditVoidPtr();
+    }
+
+    virtual void releaseAspect(int aspect) {
+        core::objectmodel::Data<helper::vector<ELMT> >::releaseAspect(aspect);
+    }
+
+    virtual bool isCounterValid() const {
+        return core::objectmodel::Data<helper::vector<ELMT> >::isCounterValid();
+    }
+
+    virtual sofa::core::objectmodel::Base* getOwner() const {
+        return core::objectmodel::Data<helper::vector<ELMT> >::getOwner();
+    }
+
+    virtual sofa::core::objectmodel::BaseData* getData() const {
+        return core::objectmodel::Data<helper::vector<ELMT> >::getData();
+    }
+
+    unsigned size() const {
+        return this->getValue().size();
+    }
+
+};
+
+}
+
+namespace core {
+
+namespace objectmodel {
+
+template<>
+class LinkTraitsPtrCasts<collisionAlgorithm::BaseDataElmt>
+{
+public:
+    static sofa::core::objectmodel::Base* getBase(collisionAlgorithm::BaseDataElmt* n) {
+        if (!n) return NULL;
+        return n->getOwner();
+    }
+
+    static sofa::core::objectmodel::BaseData* getData(collisionAlgorithm::BaseDataElmt* n) {
+        if (!n) return NULL;
+        return n->getData();
+    }
 };
 
 }
 
 }
+
+}
+

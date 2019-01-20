@@ -70,6 +70,15 @@ public :
 
     bool acceptFilter(const BaseProximity::SPtr & pfrom,const BaseProximity::SPtr & pdest) const;
 
+
+    bool findDataLinkDest(BaseDataElmt *& ptr, const std::string& path, const core::objectmodel::BaseLink* link)
+    {
+        core::objectmodel::BaseData* base = NULL;
+        if (!this->getContext()->findDataLinkDest(base, path, link)) return false;
+        ptr = dynamic_cast<BaseDataElmt*>(base);
+        return (ptr != NULL);
+    }
+
 private:
     void reset() {}
 

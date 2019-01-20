@@ -31,8 +31,6 @@ public:
     Data <double> d_nonlin_threshold;
     Data <unsigned> d_draw_tesselation;
 
-    Data <DataElementIterator> d_elements;
-
     BezierTriangleGeometry();
 
     virtual void prepareDetection() override;
