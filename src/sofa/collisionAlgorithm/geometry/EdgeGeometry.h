@@ -24,7 +24,7 @@ public:
     DataEdgeContainer<GEOMETRY> d_edges;
 
     EdgeGeometry()
-    : d_edges(initData(&d_edges, "edges", "Vector of Edges")) {}
+    : d_edges(initData(&d_edges, "edges", "Vector of Edges")){}
 
     void draw(const core::visual::VisualParams * vparams) {
         if (! vparams->displayFlags().getShowCollisionModels())

@@ -1,13 +1,14 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/BaseElementIterator.h>
-#include <sofa/collisionAlgorithm/BaseGeometry.h>
 
 namespace sofa
 {
 
 namespace collisionAlgorithm
 {
+
+class BaseGeometry;
 
 template<class ELMT_CONTAINER>
 class DefaultElement : public BaseElement {

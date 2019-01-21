@@ -58,45 +58,22 @@ public :
     public:
         SOFA_ABSTRACT_CLASS(BaseFilter, sofa::core::objectmodel::BaseObject);
 
-        BaseFilter()
-        : l_algo(initLink("algo", "link to algorithm")) {}
-
-        ~BaseFilter() {
-            l_algo->unregisterFilter(this);
-        }
-
-        void init() {
-            l_algo->sout << "Register filter " << this->getName() << l_algo->sendl;
-            l_algo->registerFilter(this);
-        }
-
         virtual bool accept(const BaseProximity::SPtr & p1,const BaseProximity::SPtr & p2) const = 0;
-
-
-        core::objectmodel::SingleLink<BaseFilter,BaseGeometryAlgorithm,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DOUBLELINK> l_algo;
     };
+
+    BaseGeometryAlgorithm()
+    : l_filters(initLink("filters","list of filters")) {}
 
     virtual ~BaseGeometryAlgorithm() override {}
 
-    virtual void computeCollisionReset() = 0;
+    virtual void computeCollisionReset() override {}
 
-    virtual void computeCollisionDetection() = 0;
+    virtual void computeCollisionDetection() override {}
 
-    virtual void computeCollisionResponse() override {
-        computeCollisionReset();
-        computeCollisionDetection();
-    }
-
-    void registerFilter(BaseFilter * filter) {
-        m_filters.insert(filter);
-    }
-
-    void unregisterFilter(BaseFilter * filter) {
-        m_filters.erase(filter);
-    }
+    virtual void computeCollisionResponse() override {}
 
     bool acceptFilter(const BaseProximity::SPtr & pfrom,const BaseProximity::SPtr & pdest) const {
-        for (auto itfilter=m_filters.cbegin();itfilter != m_filters.cend();itfilter++) {
+        for (auto itfilter = l_filters.begin();itfilter != l_filters.end();itfilter++) {
             if (! (*itfilter)->accept(pdest,pfrom)) return false;
         }
         return true;
@@ -126,8 +103,7 @@ private:
     virtual void doCollisionResponse() override {}
 
 protected:
-    std::set<BaseFilter*> m_filters;
-
+    core::objectmodel::MultiLink<BaseGeometryAlgorithm,BaseFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DOUBLELINK> l_filters;
 };
 
 }
