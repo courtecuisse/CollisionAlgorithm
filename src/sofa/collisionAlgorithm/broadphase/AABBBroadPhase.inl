@@ -11,7 +11,7 @@ namespace collisionAlgorithm
 
 AABBBroadPhase::AABBBroadPhase()
 : d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox", "number of bbox"))
-, d_refineBBox(initData(&d_refineBBox, true,"refine", "number of bbox")){
+, d_refineBBox(initData(&d_refineBBox, true,"refine", "Optimization to project center of box in order to find the minimal set of intersecting boxes")){
 }
 
 defaulttype::BoundingBox AABBBroadPhase::getBBox() const {
@@ -40,7 +40,7 @@ bool AABBBroadPhase::selectElement(const defaulttype::Vector3 & P,std::set<unsig
     return true;
 }
 
-void AABBBroadPhase::prepareDetection() {
+void AABBBroadPhase::computeCollisionReset() {
     const BaseGeometry * geo = l_elements->end();
     if (geo == NULL) return;
 
@@ -97,7 +97,7 @@ void AABBBroadPhase::prepareDetection() {
 
     for (auto it = l_elements->begin(); it != l_elements->end(); it++)
     {
-        defaulttype::BoundingBox bbox = it->getBBox();
+        defaulttype::BoundingBox bbox = (*it)->getBBox();
 
         const defaulttype::Vector3 & minbox = bbox.minBBox();
         const defaulttype::Vector3 & maxbox = bbox.maxBBox();
@@ -128,7 +128,7 @@ void AABBBroadPhase::prepareDetection() {
                         P[1] += j*m_cellSize[1];
                         P[2] += k*m_cellSize[2];
 
-                        defaulttype::Vector3 D = P - it->project(P)->getPosition();
+                        defaulttype::Vector3 D = P - (*it)->project(P)->getPosition();
 
                         if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
                             (fabs(D[1])<=m_cellSize[1]*0.5) &&

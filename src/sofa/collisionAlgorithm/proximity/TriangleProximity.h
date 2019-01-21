@@ -23,9 +23,10 @@ public :
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    TriangleProximity(State * state,unsigned p1,unsigned p2,unsigned p3,double f1,double f2,double f3, const defaulttype::Vector3 & N)
+    TriangleProximity(State * state,unsigned tid, unsigned p1,unsigned p2,unsigned p3,double f1,double f2,double f3, const helper::vector<defaulttype::Vector3> & N)
     : TBaseProximity<DataTypes>(state)
-    , m_normal(N) {
+    , m_tid(tid)
+    , m_normalVector(N) {
         m_pid[0] = p1;
         m_pid[1] = p2;
         m_pid[2] = p3;
@@ -44,7 +45,7 @@ public :
     }
 
     inline defaulttype::Vector3 getNormal() const {
-        return m_normal;
+        return m_normalVector[m_tid];
     }
 
     void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
@@ -54,9 +55,10 @@ public :
     }
 
 protected:
-    const defaulttype::Vector3 & m_normal;
+    unsigned m_tid;
     unsigned m_pid[3];
     double m_fact[3];
+    const helper::vector<defaulttype::Vector3> & m_normalVector;
 
 };
 

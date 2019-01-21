@@ -1,10 +1,10 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseElementContainer.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/PhongTriangleProximity.h>
-#include <sofa/collisionAlgorithm/elements/DataTriangleElement.h>
+#include <sofa/collisionAlgorithm/container/DataTriangleContainer.h>
 
 namespace sofa
 {
@@ -13,7 +13,7 @@ namespace collisionAlgorithm
 {
 
 template<class GEOMETRY>
-class DataPhongTriangleElement : public DataTriangleElement<GEOMETRY> {
+class DataPhongTriangleContainer : public DataTriangleContainer<GEOMETRY> {
 public:
 
     typedef typename GEOMETRY::TDataTypes DataTypes;
@@ -31,32 +31,31 @@ public:
     typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
     typedef helper::vector<Triangle> VecTriangles;
 
-    explicit DataPhongTriangleElement(const typename DataTriangleElement<GEOMETRY>::InitData& init)
-    : DataTriangleElement<GEOMETRY>(init) {}
+    explicit DataPhongTriangleContainer(const typename DataTriangleContainer<GEOMETRY>::InitData& init)
+    : DataTriangleContainer<GEOMETRY>(init) {}
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
-        return DefaultElementIterator<DataPhongTriangleElement<GEOMETRY> >::create(this, this->getValue().size(), eid);
+        return DefaultElementIterator<DataPhongTriangleContainer<GEOMETRY> >::create(this, this->getValue().size(), eid);
     }
 
     inline BaseProximity::SPtr project(unsigned tid, const defaulttype::Vector3 & P) const {
         core::topology::BaseMeshTopology::Triangle triangle;
         defaulttype::Vector3 factor;
-        DataTriangleElement<GEOMETRY>::project(tid, P, triangle, factor);
+        DataTriangleContainer<GEOMETRY>::project(tid, P, triangle, factor);
 
-        return BaseProximity::create<PhongTriangleProximity<DataTypes> >(this->m_geometry->getState(),
+        return BaseProximity::create<PhongTriangleProximity<DataTypes> >(this->m_geometry->getState(),tid,
                                                                          triangle[0],triangle[1],triangle[2],
                                                                          factor[0],factor[1],factor[2],
-                                                                         m_point_normals[triangle[0]],m_point_normals[triangle[1]],m_point_normals[triangle[2]]);
+                                                                         m_point_normals);
     }
 
     inline BaseProximity::SPtr center(unsigned tid) const {
         const core::topology::BaseMeshTopology::Triangle & triangle = this->getValue()[tid];
-        return BaseProximity::create<PhongTriangleProximity<DataTypes> >(this->m_geometry->getState(),
+        return BaseProximity::create<PhongTriangleProximity<DataTypes> >(this->m_geometry->getState(),tid,
                                                                          triangle[0],triangle[1],triangle[2],
                                                                          0.3333,0.3333,0.3333,
-                                                                         m_point_normals[triangle[0]],m_point_normals[triangle[1]],m_point_normals[triangle[2]]);
+                                                                         m_point_normals);
     }
-
 
     virtual void init() {
         //store triangles around vertex information
@@ -72,7 +71,7 @@ public:
     }
 
     virtual void prepareDetection() {
-        DataTriangleElement<GEOMETRY>::prepareDetection();
+        DataTriangleContainer<GEOMETRY>::prepareDetection();
 
         m_point_normals.resize(m_trianglesAroundVertex.size());
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseElementContainer.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 #include <sofa/collisionAlgorithm/BroadPhase.h>
@@ -13,7 +13,7 @@ namespace collisionAlgorithm
 {
 
 template<class GEOMETRY>
-class DataTriangleElement : public DataElemnt<sofa::core::topology::BaseMeshTopology::Triangle> {
+class DataTriangleContainer : public DataElemntContainer<sofa::core::topology::BaseMeshTopology::Triangle> {
 public:
 
     typedef typename GEOMETRY::TDataTypes DataTypes;
@@ -31,17 +31,22 @@ public:
     typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
     typedef helper::vector<Triangle> VecTriangles;
 
-    explicit DataTriangleElement(const typename DataElemnt<sofa::core::topology::BaseMeshTopology::Triangle>::InitData& init)
-    : DataElemnt<sofa::core::topology::BaseMeshTopology::Triangle>(init) {
+    explicit DataTriangleContainer(const typename DataElemntContainer<sofa::core::topology::BaseMeshTopology::Triangle>::InitData& init)
+    : DataElemntContainer<sofa::core::topology::BaseMeshTopology::Triangle>(init) {
         m_geometry = dynamic_cast<const GEOMETRY*>(init.owner);
     }
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
-        return DefaultElementIterator<DataTriangleElement<GEOMETRY> >::create(this, this->getValue().size(), eid);
+        return DefaultElementIterator<DataTriangleContainer<GEOMETRY> >::create(this, this->getValue().size(), eid);
     }
 
     virtual const BaseGeometry * end() const {
         return m_geometry;
+    }
+
+
+    virtual void init() {
+        if (this->m_broadPhase) this->m_broadPhase->init();
     }
 
     inline BaseProximity::SPtr project(unsigned tid, const defaulttype::Vector3 & P) const {
@@ -49,12 +54,12 @@ public:
         defaulttype::Vector3 factor;
         project(tid, P, triangle, factor);
 
-        return BaseProximity::create<TriangleProximity<DataTypes> >(m_geometry->getState(),triangle[0],triangle[1],triangle[2],factor[0],factor[1],factor[2],m_triangle_normals[tid]);
+        return BaseProximity::create<TriangleProximity<DataTypes> >(m_geometry->getState(),tid,triangle[0],triangle[1],triangle[2],factor[0],factor[1],factor[2],m_triangle_normals);
     }
 
     inline BaseProximity::SPtr center(unsigned tid) const {
         const core::topology::BaseMeshTopology::Triangle & triangle = this->getValue()[tid];
-        return BaseProximity::create<TriangleProximity<DataTypes> >(m_geometry->getState(),triangle[0],triangle[1],triangle[2],0.3333,0.3333,0.3333,m_triangle_normals[tid]);
+        return BaseProximity::create<TriangleProximity<DataTypes> >(m_geometry->getState(),tid,triangle[0],triangle[1],triangle[2],0.3333,0.3333,0.3333,m_triangle_normals);
     }
 
     inline defaulttype::BoundingBox getBBox(unsigned tid) const {

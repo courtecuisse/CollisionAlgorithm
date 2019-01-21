@@ -1,8 +1,8 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/algorithm/CollisionDetectionAlgorithm.h>
-#include <sofa/collisionAlgorithm/BaseFilter.h>
+#include <sofa/collisionAlgorithm/algorithm/FindClosestPointAlgorithm.h>
 #include <sofa/collisionAlgorithm/iterators/SubsetElementIterator.h>
+#include <sofa/collisionAlgorithm/BaseGeometryAlgorithm.h>
 
 namespace sofa
 {
@@ -10,12 +10,12 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-void CollisionDetectionAlgorithm::computeCollisionReset() {
+void FindClosestPointAlgorithm::computeCollisionReset() {
     d_output.beginEdit()->clear();
     d_output.endEdit();
 }
 
-BaseElementIterator::UPtr CollisionDetectionAlgorithm::getDestIterator(const defaulttype::Vector3 & P) {
+BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defaulttype::Vector3 & P) {
     const BroadPhase * decorator = l_dest->getBroadPhase();
 
     if (decorator == NULL) return l_dest->begin();
@@ -40,19 +40,19 @@ BaseElementIterator::UPtr CollisionDetectionAlgorithm::getDestIterator(const def
     }
 }
 
-DetectionOutput::PairDetection CollisionDetectionAlgorithm::findClosestPoint(const BaseElementIterator::UPtr & itfrom)
+DetectionOutput::PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElement::UPtr & elfrom)
 {
     double min_dist = std::numeric_limits<double>::max();
     DetectionOutput::PairDetection min_pair(nullptr,nullptr);
 
-    defaulttype::Vector3 P = itfrom->center()->getPosition();
+    defaulttype::Vector3 P = elfrom->center()->getPosition();
 
     BaseElementIterator::UPtr itdest=getDestIterator(P);
 
     while (itdest != l_dest->end())
     {
-        BaseProximity::SPtr pdest = itdest->project(P);
-        BaseProximity::SPtr pfrom  = itfrom->project(pdest->getPosition()); // reproject one on the initial proximity
+        BaseProximity::SPtr pdest = (*itdest)->project(P);
+        BaseProximity::SPtr pfrom  = elfrom->project(pdest->getPosition()); // reproject one on the initial proximity
 
 //        //iterate until to find the correct location on pfrom
 //        for (int itearation = 0;itearation<10 && pfrom->distance(P)>0.0001;itearation++) {
@@ -79,7 +79,7 @@ DetectionOutput::PairDetection CollisionDetectionAlgorithm::findClosestPoint(con
     return min_pair;
 }
 
-void CollisionDetectionAlgorithm::computeCollisionDetection()
+void FindClosestPointAlgorithm::computeCollisionDetection()
 {
     if (l_from == NULL) return;
     if (l_dest == NULL) return;
@@ -87,7 +87,7 @@ void CollisionDetectionAlgorithm::computeCollisionDetection()
     DetectionOutput * output = d_output.beginEdit();
 
     for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
-        DetectionOutput::PairDetection min_pair = findClosestPoint(itfrom);
+        DetectionOutput::PairDetection min_pair = findClosestPoint(*itfrom);
 
         if (min_pair.first == nullptr || min_pair.second == nullptr) continue;
 

@@ -1,4 +1,4 @@
-#include <sofa/collisionAlgorithm/geometry/PhongTriangleGeometry.inl>
+#include <sofa/collisionAlgorithm/geometry/PhongTriangleGeometry.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa {

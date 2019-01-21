@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseElementContainer.h>
 #include <sofa/collisionAlgorithm/proximity/FixedProximity.h>
 #include <sofa/core/collision/Pipeline.h>
 
@@ -48,19 +48,44 @@ protected:
     helper::vector< PairDetection > m_output;
 };
 
-class BaseFilter;
-
 class BaseGeometryAlgorithm : public core::collision::Pipeline
 {
 public :
 
     SOFA_ABSTRACT_CLASS(BaseGeometryAlgorithm, core::collision::Pipeline);
 
+    class BaseFilter : public sofa::core::objectmodel::BaseObject {
+    public:
+        SOFA_ABSTRACT_CLASS(BaseFilter, sofa::core::objectmodel::BaseObject);
+
+        BaseFilter()
+        : l_algo(initLink("algo", "link to algorithm")) {}
+
+        ~BaseFilter() {
+            l_algo->unregisterFilter(this);
+        }
+
+        void init() {
+            l_algo->sout << "Register filter " << this->getName() << l_algo->sendl;
+            l_algo->registerFilter(this);
+        }
+
+        virtual bool accept(const BaseProximity::SPtr & p1,const BaseProximity::SPtr & p2) const = 0;
+
+
+        core::objectmodel::SingleLink<BaseFilter,BaseGeometryAlgorithm,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DOUBLELINK> l_algo;
+    };
+
     virtual ~BaseGeometryAlgorithm() override {}
 
     virtual void computeCollisionReset() = 0;
 
     virtual void computeCollisionDetection() = 0;
+
+    virtual void computeCollisionResponse() override {
+        computeCollisionReset();
+        computeCollisionDetection();
+    }
 
     void registerFilter(BaseFilter * filter) {
         m_filters.insert(filter);
@@ -70,24 +95,23 @@ public :
         m_filters.erase(filter);
     }
 
-    bool acceptFilter(const BaseProximity::SPtr & pfrom,const BaseProximity::SPtr & pdest) const;
+    bool acceptFilter(const BaseProximity::SPtr & pfrom,const BaseProximity::SPtr & pdest) const {
+        for (auto itfilter=m_filters.cbegin();itfilter != m_filters.cend();itfilter++) {
+            if (! (*itfilter)->accept(pdest,pfrom)) return false;
+        }
+        return true;
+    }
 
-
-    bool findDataLinkDest(BaseDataElmt *& ptr, const std::string& path, const core::objectmodel::BaseLink* link)
+    bool findDataLinkDest(BaseDataElmtContainer *& ptr, const std::string& path, const core::objectmodel::BaseLink* link)
     {
         core::objectmodel::BaseData* base = NULL;
         if (!this->getContext()->findDataLinkDest(base, path, link)) return false;
-        ptr = dynamic_cast<BaseDataElmt*>(base);
+        ptr = dynamic_cast<BaseDataElmtContainer*>(base);
         return (ptr != NULL);
     }
 
 private:
     void reset() {}
-
-    virtual void computeCollisionResponse() override {
-        computeCollisionReset();
-        computeCollisionDetection();
-    }
 
     virtual std::set< std::string > getResponseList() const override
     {

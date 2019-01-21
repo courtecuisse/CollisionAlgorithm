@@ -1,4 +1,4 @@
-#include <sofa/collisionAlgorithm/geometry/EdgeGeometry.inl>
+#include <sofa/collisionAlgorithm/geometry/EdgeGeometry.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa {

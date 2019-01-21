@@ -7,9 +7,9 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-void BaseGeometry::computeCollisionReset() {
-    prepareDetection();
-}
+//void BaseGeometry::computeCollisionReset() {
+//    prepareDetection();
+//}
 
 
 //BaseElement::BaseProximity::BaseProximity(BaseElement * elmt)

@@ -29,12 +29,12 @@ void PointCloudBindingAlgorithm::computeCollisionDetection()
 
     for (auto it = l_from->begin(); it != l_from->end();it++)
     {
-        p1.push_back(it->center());
+        p1.push_back((*it)->center());
     }
 
     for (auto it = l_dest->begin(); it != l_dest->end();it++)
     {
-        p2.push_back(it->center());
+        p2.push_back((*it)->center());
     }
 
     helper::vector<int> bindId;

@@ -9,14 +9,14 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class CollisionDetectionAlgorithm : public BaseGeometryAlgorithm
+class FindClosestPointAlgorithm : public BaseGeometryAlgorithm
 {
 public:
-    SOFA_CLASS(CollisionDetectionAlgorithm, BaseGeometryAlgorithm);
+    SOFA_CLASS(FindClosestPointAlgorithm, BaseGeometryAlgorithm);
 
     Data<DetectionOutput> d_output;
 
-    CollisionDetectionAlgorithm()
+    FindClosestPointAlgorithm()
     : d_output(initData(&d_output, "output" , "this"))
     , l_from(initLink("from", "link to from geometry elments"))
     , l_dest(initLink("dest", "link to dest geometry elments"))
@@ -29,12 +29,12 @@ public:
 private:
 //    template<class ElementIterator>
 
-    core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseDataElmt,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_from;
-    core::objectmodel::SingleLink<CollisionDetectionAlgorithm,BaseDataElmt,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_dest;
+    core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseDataElmtContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_from;
+    core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseDataElmtContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_dest;
 
     BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P);
 
-    DetectionOutput::PairDetection findClosestPoint(const BaseElementIterator::UPtr & itfrom);
+    DetectionOutput::PairDetection findClosestPoint(const BaseElement::UPtr & itfrom);
 };
 
 }

@@ -1,4 +1,4 @@
-#include <sofa/collisionAlgorithm/geometry/TriangleGeometry.inl>
+#include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa {

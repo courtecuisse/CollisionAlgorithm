@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
-#include <sofa/collisionAlgorithm/elements/DataEdgeElement.h>
+#include <sofa/collisionAlgorithm/container/DataEdgeContainer.h>
 
 namespace sofa {
 
@@ -21,16 +21,22 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    DataEdgeElement<GEOMETRY> d_edges;
+    DataEdgeContainer<GEOMETRY> d_edges;
 
     EdgeGeometry()
     : d_edges(initData(&d_edges, "edges", "Vector of Edges")) {}
 
-    virtual void prepareDetection() override;
+    void draw(const core::visual::VisualParams * vparams) {
+        if (! vparams->displayFlags().getShowCollisionModels())
+            return;
 
-    virtual void init() override;
+        if (this->d_color.getValue()[3] == 0.0)
+            return;
 
-    virtual void draw(const core::visual::VisualParams * vparams) override;
+        glDisable(GL_LIGHTING);
+
+
+    }
 
 };
 

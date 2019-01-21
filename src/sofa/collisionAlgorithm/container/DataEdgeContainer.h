@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseElementContainer.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
 
@@ -12,7 +12,7 @@ namespace collisionAlgorithm
 {
 
 template<class GEOMETRY>
-class DataEdgeElement : public DataElemnt<sofa::core::topology::BaseMeshTopology::Edge> {
+class DataEdgeContainer : public DataElemntContainer<sofa::core::topology::BaseMeshTopology::Edge> {
 public:
 
     typedef typename GEOMETRY::TDataTypes DataTypes;
@@ -27,13 +27,13 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    explicit DataEdgeElement(const typename DataElemnt<sofa::core::topology::BaseMeshTopology::Edge>::InitData& init)
-    : DataElemnt<sofa::core::topology::BaseMeshTopology::Edge>(init) {
+    explicit DataEdgeContainer(const typename DataElemntContainer<sofa::core::topology::BaseMeshTopology::Edge>::InitData& init)
+    : DataElemntContainer<sofa::core::topology::BaseMeshTopology::Edge>(init) {
         m_geometry = dynamic_cast<const GEOMETRY*>(init.owner);
     }
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
-        return DefaultElementIterator<DataEdgeElement<GEOMETRY> >::create(this, this->getValue().size(), eid);
+        return DefaultElementIterator<DataEdgeContainer<GEOMETRY> >::create(this, this->getValue().size(), eid);
     }
 
     virtual const BaseGeometry * end() const {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseElementContainer.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/BezierTriangleProximity.h>
 #include <sofa/collisionAlgorithm/container/DataPhongTriangleContainer.h>

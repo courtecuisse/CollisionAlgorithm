@@ -24,8 +24,8 @@ public:
     void computeCollisionDetection() override;
 
 private:
-    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseDataElmt,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_from;
-    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseDataElmt,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_dest;
+    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseDataElmtContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_from;
+    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseDataElmtContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_dest;
 };
 
 }

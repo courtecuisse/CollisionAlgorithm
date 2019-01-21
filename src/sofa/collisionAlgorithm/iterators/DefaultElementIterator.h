@@ -2,7 +2,6 @@
 
 #include <sofa/collisionAlgorithm/BaseElementIterator.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 
 namespace sofa
 {
@@ -10,16 +9,11 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class ELMT>
-class DefaultElementIterator : public BaseElementIterator {
-    friend class Iterator;
-
+template<class ELMT_CONTAINER>
+class DefaultElement : public BaseElement {
 public:
-    DefaultElementIterator(const ELMT * geo, unsigned start, unsigned end) {
-        m_id = start;
-        m_end = end;
-        m_elements = geo;
-    }
+
+    DefaultElement(unsigned id,const ELMT_CONTAINER * elmt) : m_id(id), m_elements(elmt) {}
 
     inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
         return m_elements->project(m_id, P);
@@ -31,6 +25,22 @@ public:
 
     inline defaulttype::BoundingBox getBBox() const {
         return m_elements->getBBox(m_id);
+    }
+
+protected:
+    unsigned m_id;
+    const ELMT_CONTAINER * m_elements;
+};
+
+template<class ELMT_CONTAINER>
+class DefaultElementIterator : public BaseElementIterator {
+    friend class Iterator;
+
+public:
+    DefaultElementIterator(const ELMT_CONTAINER * elmt, unsigned start, unsigned end) {
+        m_id = start;
+        m_end = end;
+        m_elements = elmt;
     }
 
     virtual void next() {
@@ -45,14 +55,18 @@ public:
         return m_id;
     }
 
-    static BaseElementIterator::UPtr create(const ELMT * elmt, unsigned end, unsigned start = 0) {
+    BaseElement::UPtr element() {
+        return BaseElement::UPtr(new DefaultElement<ELMT_CONTAINER>(m_id,m_elements));
+    }
+
+    static BaseElementIterator::UPtr create(const ELMT_CONTAINER * elmt, unsigned end, unsigned start = 0) {
         return BaseElementIterator::UPtr(new DefaultElementIterator(elmt,start,end));
     }
 
 private:
     unsigned m_id;
     unsigned m_end;
-    const ELMT * m_elements;
+    const ELMT_CONTAINER * m_elements;
 };
 
 }

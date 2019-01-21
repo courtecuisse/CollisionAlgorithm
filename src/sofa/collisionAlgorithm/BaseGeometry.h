@@ -1,7 +1,9 @@
 #pragma once
 
+#include <sofa/collisionAlgorithm/BaseElementContainer.h>
 #include <sofa/collisionAlgorithm/BaseElementIterator.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
+#include <sofa/collisionAlgorithm/BroadPhase.h>
 
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
@@ -21,9 +23,7 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class BroadPhase;
-
-class BaseGeometry : public core::collision::Pipeline
+class BaseGeometry : public core::collision::Pipeline, public BaseDataElmtContainer::ElementOwner
 {
 public:
     SOFA_ABSTRACT_CLASS(BaseGeometry,core::collision::Pipeline);
@@ -36,21 +36,20 @@ public:
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
     void bwdInit( ) override {
-        computeCollisionReset();
+        BaseDataElmtContainer::ElementOwner::init();
     }
 
-//    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const = 0;
-
-    virtual void reset() override {}
-
-    virtual void computeCollisionReset() override;
+    virtual void computeCollisionReset() override {
+        BaseDataElmtContainer::ElementOwner::prepareDetection();
+    }
 
     virtual void computeCollisionResponse() override {}
 
-    void computeCollisionDetection() override {}
+    virtual void computeCollisionDetection() override {}
 
+private:
+    virtual void reset() override {}
 
-protected:
     virtual void doCollisionReset() override {}
 
     virtual void doCollisionDetection(const sofa::helper::vector<core::CollisionModel*>& /*collisionModels*/) override {}
@@ -61,9 +60,6 @@ protected:
         std::set< std::string > res;
         return res;
     }
-
-    virtual void prepareDetection() {}
-
 };
 
 

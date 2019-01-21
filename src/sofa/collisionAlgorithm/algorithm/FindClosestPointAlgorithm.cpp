@@ -1,14 +1,14 @@
-#include <sofa/collisionAlgorithm/algorithm/CollisionDetectionAlgorithm.inl>
+#include <sofa/collisionAlgorithm/algorithm/FindClosestPointAlgorithm.inl>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
-SOFA_DECL_CLASS(CollisionDetectionAlgorithm)
+SOFA_DECL_CLASS(FindClosestPointAlgorithm)
 
-int CollisionDetectionAlgorithmClass = core::RegisterObject("CollisionDetectionAlgorithm")
-.add< CollisionDetectionAlgorithm >();
+int FindClosestPointAlgorithmClass = core::RegisterObject("FindClosestPointAlgorithm")
+.add< FindClosestPointAlgorithm >();
 
 }
 

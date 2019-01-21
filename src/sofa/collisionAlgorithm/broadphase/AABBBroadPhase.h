@@ -24,7 +24,7 @@ public:
 
     virtual ~AABBBroadPhase() override {}
 
-    virtual void prepareDetection() override;
+    virtual void computeCollisionReset() override;
 
     virtual defaulttype::BoundingBox getBBox() const;
 
