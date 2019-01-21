@@ -9,7 +9,6 @@ namespace collisionAlgorithm
 
 void BaseGeometry::computeCollisionReset() {
     prepareDetection();
-    if (m_broadPhase) m_broadPhase->prepareDetection();
 }
 
 

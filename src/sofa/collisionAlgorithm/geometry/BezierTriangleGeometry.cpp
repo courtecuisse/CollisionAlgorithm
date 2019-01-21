@@ -1,17 +1,17 @@
-#include <sofa/collisionAlgorithm/geometry/BezierTriangleGeometry.inl>
-#include <sofa/core/ObjectFactory.h>
+//#include <sofa/collisionAlgorithm/geometry/BezierTriangleGeometry.inl>
+//#include <sofa/core/ObjectFactory.h>
 
-namespace sofa
-{
+//namespace sofa
+//{
 
-namespace collisionAlgorithm
-{
+//namespace collisionAlgorithm
+//{
 
-SOFA_DECL_CLASS(BezierTriangleGeometry)
+//SOFA_DECL_CLASS(BezierTriangleGeometry)
 
-int BezierTriangleGeometryClass = core::RegisterObject("BezierTriangleGeometry")
-.add< BezierTriangleGeometry<sofa::defaulttype::Vec3dTypes> >();
+//int BezierTriangleGeometryClass = core::RegisterObject("BezierTriangleGeometry")
+//.add< BezierTriangleGeometry<sofa::defaulttype::Vec3dTypes> >();
 
-}
+//}
 
-}
+//}

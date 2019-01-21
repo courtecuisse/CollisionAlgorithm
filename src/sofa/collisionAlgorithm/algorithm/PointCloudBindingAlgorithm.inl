@@ -11,17 +11,15 @@ namespace collisionAlgorithm
 PointCloudBindingAlgorithm::PointCloudBindingAlgorithm()
 : d_maxDist(initData(&d_maxDist, std::numeric_limits<double>::min(), "maxDist", "Maximum distance"))
 , d_output(initData(&d_output, "output" , "this"))
-, l_from(initLink("from", "Link to from geometry"))
-, l_dest(initLink("dest", "Link to dest geometry")) {}
+, l_from(initLink("from" , "this"))
+, l_dest(initLink("dest" , "this")) {}
 
 void PointCloudBindingAlgorithm::computeCollisionDetection()
 {
     std::pair<BaseProximity::SPtr,BaseProximity::SPtr> res;
 
-    if (l_from.get() == nullptr)
-        return ;
-    if (l_dest.get() == nullptr)
-        return ;
+    if (l_from == nullptr) return ;
+    if (l_dest == nullptr) return ;
 
     if (l_from->begin() != l_dest->end()) return ;
     if (l_dest->begin() != l_dest->end()) return ;

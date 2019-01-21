@@ -1,8 +1,10 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/proximity/FixedProximity.h>
 #include <sofa/core/collision/Pipeline.h>
+
 namespace sofa
 {
 
@@ -51,6 +53,7 @@ class BaseFilter;
 class BaseGeometryAlgorithm : public core::collision::Pipeline
 {
 public :
+
     SOFA_ABSTRACT_CLASS(BaseGeometryAlgorithm, core::collision::Pipeline);
 
     virtual ~BaseGeometryAlgorithm() override {}
@@ -59,7 +62,7 @@ public :
 
     virtual void computeCollisionDetection() = 0;
 
-    void registerFilter(BaseFilter * filter) {        
+    void registerFilter(BaseFilter * filter) {
         m_filters.insert(filter);
     }
 
@@ -67,8 +70,15 @@ public :
         m_filters.erase(filter);
     }
 
-    const std::set<BaseFilter*> & getFilters() {
-        return m_filters;
+    bool acceptFilter(const BaseProximity::SPtr & pfrom,const BaseProximity::SPtr & pdest) const;
+
+
+    bool findDataLinkDest(BaseDataElmt *& ptr, const std::string& path, const core::objectmodel::BaseLink* link)
+    {
+        core::objectmodel::BaseData* base = NULL;
+        if (!this->getContext()->findDataLinkDest(base, path, link)) return false;
+        ptr = dynamic_cast<BaseDataElmt*>(base);
+        return (ptr != NULL);
     }
 
 private:

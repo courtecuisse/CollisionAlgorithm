@@ -10,27 +10,27 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class GEOMETRY, class PROXIMITY>
+template<class ELMT>
 class DefaultElementIterator : public BaseElementIterator {
     friend class Iterator;
 
 public:
-    DefaultElementIterator(const GEOMETRY * geo, unsigned start, unsigned end) {
+    DefaultElementIterator(const ELMT * geo, unsigned start, unsigned end) {
         m_id = start;
         m_end = end;
-        m_geometry = geo;
+        m_elements = geo;
     }
 
     inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
-        return PROXIMITY::project(m_geometry, m_id, P);
+        return m_elements->project(m_id, P);
     }
 
     inline BaseProximity::SPtr center() const {
-        return PROXIMITY::center(m_geometry, m_id);
+        return m_elements->center(m_id);
     }
 
     inline defaulttype::BoundingBox getBBox() const {
-        return PROXIMITY::getBBox(m_geometry, m_id);
+        return m_elements->getBBox(m_id);
     }
 
     virtual void next() {
@@ -45,15 +45,14 @@ public:
         return m_id;
     }
 
-    template<class CONTAINER>
-    static BaseElementIterator::UPtr create(const GEOMETRY * geo, const CONTAINER & container, unsigned start = 0) {
-        return BaseElementIterator::UPtr(new DefaultElementIterator(geo,start,container.size()));
+    static BaseElementIterator::UPtr create(const ELMT * elmt, unsigned end, unsigned start = 0) {
+        return BaseElementIterator::UPtr(new DefaultElementIterator(elmt,start,end));
     }
 
 private:
     unsigned m_id;
     unsigned m_end;
-    const GEOMETRY * m_geometry;
+    const ELMT * m_elements;
 };
 
 }

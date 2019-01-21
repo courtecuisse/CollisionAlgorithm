@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
 #include <sofa/core/objectmodel/BaseObject.h>
@@ -29,12 +30,10 @@ public:
 
     BroadPhase()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , l_geometry(initLink("geometry", "link to state")) {
-        l_geometry.setPath("@.");
-    }
+    , l_elements(initLink("elements", "link to state")) {}
 
     virtual ~BroadPhase() {
-        l_geometry->unsetBroadPhase(this);
+        if (l_elements) l_elements->unsetBroadPhase(this);
     }
 
     virtual defaulttype::BoundingBox getBBox() const = 0;
@@ -42,14 +41,20 @@ public:
     virtual bool selectElement(const defaulttype::Vector3 & P,std::set<unsigned> & eid, unsigned d = 0) const = 0;
 
     void init( ) override {
-        if (l_geometry != NULL) {
-            l_geometry->setBroadPhase(this);
-        }
+        if (l_elements) l_elements->setBroadPhase(this);
     }
 
     virtual void prepareDetection() = 0;
 
-    core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DOUBLELINK> l_geometry;
+    bool findDataLinkDest(BaseDataElmt *& ptr, const std::string& path, const core::objectmodel::BaseLink* link)
+    {
+        core::objectmodel::BaseData* base = NULL;
+        if (!this->getContext()->findDataLinkDest(base, path, link)) return false;
+        ptr = dynamic_cast<BaseDataElmt*>(base);
+        return (ptr != NULL);
+    }
+
+    core::objectmodel::SingleLink<BroadPhase,BaseDataElmt,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_elements;
 };
 
 

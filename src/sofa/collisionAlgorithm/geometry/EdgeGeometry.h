@@ -1,13 +1,11 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
+#include <sofa/collisionAlgorithm/elements/DataEdgeElement.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
-
-template<class GEOMETRY>
-class EdgeProximity;
 
 template<class DataTypes>
 class EdgeGeometry : public TBaseGeometry<DataTypes> {
@@ -23,25 +21,16 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    Data<VecEdges> d_edges;
+    DataEdgeElement<GEOMETRY> d_edges;
 
     EdgeGeometry()
-    : d_edges(initData(&d_edges, VecEdges(), "edges", "Vector of Edges")) {}
+    : d_edges(initData(&d_edges, "edges", "Vector of Edges")) {}
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const;
+    virtual void prepareDetection() override;
 
-    //default implementation
-    template<class DERIVED_GEOMETRY>
-    inline Coord getPosition(const EdgeProximity<DERIVED_GEOMETRY> * prox, core::VecCoordId v = core::VecCoordId::position()) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(v);
-        return pos[prox->m_pid[0]] * prox->m_fact[0] + pos[prox->m_pid[1]] * prox->m_fact[1];
-    }
+    virtual void init() override;
 
-    inline defaulttype::Vector3 getNormal(const EdgeProximity<GEOMETRY> * /*prox*/) const {
-        return defaulttype::Vector3(1,0,0);
-    }
-
-    virtual void project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Edge & edge, defaulttype::Vector2 & factor) const;
+    virtual void draw(const core::visual::VisualParams * vparams) override;
 
 };
 

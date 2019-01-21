@@ -31,20 +31,15 @@ public:
     Data<defaulttype::Vector4> d_color;
 
     BaseGeometry()
-    : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , m_broadPhase(NULL) {}
-
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const = 0;
-
-    virtual const BaseGeometry * end() const {
-        return this;
-    }
+    : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model")){}
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
     void bwdInit( ) override {
         computeCollisionReset();
     }
+
+//    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const = 0;
 
     virtual void reset() override {}
 
@@ -54,17 +49,6 @@ public:
 
     void computeCollisionDetection() override {}
 
-    BroadPhase * getBroadPhase() const {
-        return m_broadPhase;
-    }
-
-    void setBroadPhase(BroadPhase * d) {
-        m_broadPhase = d;
-    }
-
-    void unsetBroadPhase(BroadPhase * d) {
-        if (m_broadPhase == d) m_broadPhase = NULL;
-    }
 
 protected:
     virtual void doCollisionReset() override {}
@@ -80,7 +64,6 @@ protected:
 
     virtual void prepareDetection() {}
 
-    BroadPhase * m_broadPhase;
 };
 
 
@@ -111,3 +94,4 @@ public:
 }
 
 }
+
