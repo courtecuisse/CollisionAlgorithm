@@ -1,7 +1,6 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/BaseElementContainer.h>
 #include <sofa/collisionAlgorithm/proximity/FixedProximity.h>
 #include <sofa/core/collision/Pipeline.h>
 
@@ -79,14 +78,6 @@ public :
         return true;
     }
 
-    bool findDataLinkDest(BaseDataElmtContainer *& ptr, const std::string& path, const core::objectmodel::BaseLink* link)
-    {
-        core::objectmodel::BaseData* base = NULL;
-        if (!this->getContext()->findDataLinkDest(base, path, link)) return false;
-        ptr = dynamic_cast<BaseDataElmtContainer*>(base);
-        return (ptr != NULL);
-    }
-
 private:
     void reset() {}
 
@@ -103,7 +94,7 @@ private:
     virtual void doCollisionResponse() override {}
 
 protected:
-    core::objectmodel::MultiLink<BaseGeometryAlgorithm,BaseFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DOUBLELINK> l_filters;
+    core::objectmodel::MultiLink<BaseGeometryAlgorithm,BaseFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filters;
 };
 
 }

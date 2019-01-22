@@ -10,10 +10,11 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class DataTypes>
-class BezierTriangleProximity : public PhongTriangleProximity<DataTypes> {
+template<class GEOMETRY>
+class BezierTriangleProximity : public PhongTriangleProximity<GEOMETRY> {
 public :
 
+    typedef typename GEOMETRY::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
@@ -31,18 +32,17 @@ public :
         defaulttype::Vector3 n110,n011,n101;
     } BezierTriangleInfo;
 
-    BezierTriangleProximity(State * state,unsigned tid, unsigned p1,unsigned p2,unsigned p3,double f1,double f2,double f3, const helper::vector<defaulttype::Vector3> & N, const BezierTriangleInfo & info)
-    : PhongTriangleProximity<DataTypes>(state,tid, p1,p2,p3,f1,f2,f3,N)
-    , m_bezierTriangleInfo(info) {}
+    BezierTriangleProximity(const GEOMETRY * geo,unsigned tid, unsigned p1,unsigned p2,unsigned p3,double f1,double f2,double f3)
+    : PhongTriangleProximity<GEOMETRY>(geo,tid, p1,p2,p3,f1,f2,f3) {}
 
     ////Bezier triangle are computed according to :
     ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
     typename defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
-        const BezierTriangleInfo & tbinfo = m_bezierTriangleInfo;
+        const BezierTriangleInfo & tbinfo = this->m_geometry->bezierInfo()[this->m_tid];
 
         if(v == core::VecCoordId::position())
         {
-            const helper::ReadAccessor<DataVecCoord> & x = this->m_state->read(v);
+            const helper::ReadAccessor<DataVecCoord> & x = this->m_geometry->getState()->read(v);
 
             const defaulttype::Vector3 & p300 = x[m_pid[2]];
             const defaulttype::Vector3 & p030 = x[m_pid[1]];
@@ -69,15 +69,15 @@ public :
             double fact_u = m_fact[1];
             double fact_v = m_fact[0];
 
-            const helper::ReadAccessor<DataVecCoord> & x = this->m_state->read(core::VecCoordId::freePosition());
+            const helper::ReadAccessor<DataVecCoord> & x = this->m_geometry->getState()->read(core::VecCoordId::freePosition());
 
             const defaulttype::Vector3 & p300_Free = x[m_pid[2]];
             const defaulttype::Vector3 & p030_Free = x[m_pid[1]];
             const defaulttype::Vector3 & p003_Free = x[m_pid[0]];
 
-            const defaulttype::Vector3 & n200_Free = this->m_normalVector[m_pid[2]];
-            const defaulttype::Vector3 & n020_Free = this->m_normalVector[m_pid[1]];
-            const defaulttype::Vector3 & n002_Free = this->m_normalVector[m_pid[0]];
+            const defaulttype::Vector3 & n200_Free = this->m_geometry->pointNormals()[m_pid[2]];
+            const defaulttype::Vector3 & n020_Free = this->m_geometry->pointNormals()[m_pid[1]];
+            const defaulttype::Vector3 & n002_Free = this->m_geometry->pointNormals()[m_pid[0]];
 
             double w12_free = dot(p030_Free - p300_Free,n200_Free);
             double w21_free = dot(p300_Free - p030_Free,n020_Free);
@@ -118,11 +118,11 @@ public :
     }
 
     defaulttype::Vector3 getNormal() const {
-        const BezierTriangleInfo & tbinfo = m_bezierTriangleInfo;
+        const BezierTriangleInfo & tbinfo = this->m_geometry->bezierInfo()[this->m_tid];
 
-        const defaulttype::Vector3 &n200 = this->m_normalVector[m_pid[2]];
-        const defaulttype::Vector3 &n020 = this->m_normalVector[m_pid[1]];
-        const defaulttype::Vector3 &n002 = this->m_normalVector[m_pid[0]];
+        const defaulttype::Vector3 &n200 = this->m_geometry->pointNormals()[m_pid[2]];
+        const defaulttype::Vector3 &n020 = this->m_geometry->pointNormals()[m_pid[1]];
+        const defaulttype::Vector3 &n002 = this->m_geometry->pointNormals()[m_pid[0]];
 
         double fact_w = m_fact[2];
         double fact_u = m_fact[1];
@@ -148,7 +148,6 @@ public :
     }
 
 protected:
-    const BezierTriangleInfo & m_bezierTriangleInfo;
     unsigned m_pid[3];
     double m_fact[3];
 

@@ -2,6 +2,7 @@
 
 #include <sofa/collisionAlgorithm/BaseGeometryAlgorithm.h>
 #include <sofa/collisionAlgorithm/BroadPhase.h>
+#include <sofa/collisionAlgorithm/BaseGeometry.h>
 
 namespace sofa
 {
@@ -29,8 +30,8 @@ public:
 private:
 //    template<class ElementIterator>
 
-    core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseDataElmtContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_from;
-    core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseDataElmtContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_dest;
+    core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
+    core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
 
     BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P);
 

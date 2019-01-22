@@ -6,10 +6,11 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-template<class DataTypes>
-class GenericProximity : public TBaseProximity<DataTypes> {
+template<class GEOMETRY>
+class GenericProximity : public TBaseProximity<GEOMETRY> {
 public :
 
+    typedef typename GEOMETRY::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;

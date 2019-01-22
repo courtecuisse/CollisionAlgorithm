@@ -1,12 +1,11 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseElementContainer.h>
+#include <sofa/core/collision/Pipeline.h>
+#include <sofa/collisionAlgorithm/BaseGeometry.h>
 
-namespace sofa
-{
+namespace sofa {
 
-namespace collisionAlgorithm
-{
+namespace collisionAlgorithm {
 
 class BroadPhase : public core::collision::Pipeline
 {
@@ -17,14 +16,14 @@ public:
 
     BroadPhase()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , l_elements(initLink("elements", "link to state")) {}
+    , l_geometry(initLink("geometry", "link to state")) {}
 
     virtual ~BroadPhase() {
-        if (l_elements) l_elements->unsetBroadPhase(this);
+        if (l_geometry) l_geometry->unsetBroadPhase(this);
     }
 
     void init( ) override {
-        if (l_elements) l_elements->setBroadPhase(this);
+        if (l_geometry) l_geometry->setBroadPhase(this);
     }
 
 
@@ -38,15 +37,7 @@ public:
 
     virtual void computeCollisionResponse() override {}
 
-    bool findDataLinkDest(BaseDataElmtContainer *& ptr, const std::string& path, const core::objectmodel::BaseLink* link)
-    {
-        core::objectmodel::BaseData* base = NULL;
-        if (!this->getContext()->findDataLinkDest(base, path, link)) return false;
-        ptr = dynamic_cast<BaseDataElmtContainer*>(base);
-        return (ptr != NULL);
-    }
-
-    core::objectmodel::SingleLink<BroadPhase,BaseDataElmtContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_elements;
+    core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
 private:
     virtual void reset() override {}

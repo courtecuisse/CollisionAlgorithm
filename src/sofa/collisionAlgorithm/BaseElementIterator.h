@@ -1,8 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <map>
-#include <vector>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 
 namespace sofa

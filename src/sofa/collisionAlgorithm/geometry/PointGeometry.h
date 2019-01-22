@@ -1,7 +1,9 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/container/DataPointContainer.h>
+#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
+#include <sofa/collisionAlgorithm/proximity/PointProximity.h>
+
 namespace sofa
 {
 
@@ -21,10 +23,24 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    DataPointContainer<GEOMETRY> d_points;
+    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
+        return DefaultElementIterator<GEOMETRY >::create(this, this->getState()->getSize(), eid);
+    }
 
-    PointGeometry()
-    : d_points(initData(&d_points, "points", "Vector of Positions")){}
+    inline BaseProximity::SPtr project(unsigned pid, const defaulttype::Vector3 & ) const {
+        return BaseProximity::create<PointProximity<GEOMETRY> >(this,pid);
+    }
+
+    inline BaseProximity::SPtr center(unsigned pid) const {
+        return BaseProximity::create<PointProximity<GEOMETRY> >(this,pid);
+    }
+
+    inline defaulttype::BoundingBox getBBox(unsigned pid) const {
+        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
+        defaulttype::BoundingBox bbox;
+        bbox.include(x[pid]);
+        return bbox;
+    }
 
     void draw(const core::visual::VisualParams *vparams) {
         if (! vparams->displayFlags().getShowCollisionModels())

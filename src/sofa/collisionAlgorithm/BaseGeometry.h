@@ -1,29 +1,19 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseElementContainer.h>
 #include <sofa/collisionAlgorithm/BaseElementIterator.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
-#include <sofa/collisionAlgorithm/BroadPhase.h>
-
-#include <sofa/core/visual/VisualParams.h>
-#include <sofa/simulation/AnimateBeginEvent.h>
-#include <sofa/core/objectmodel/BaseObject.h>
-#include <sofa/core/behavior/MechanicalState.h>
-#include <sofa/core/BehaviorModel.h>
 #include <sofa/core/collision/Pipeline.h>
 #include <sofa/core/topology/BaseMeshTopology.h>
-#include <memory>
-#include <map>
-#include <vector>
+#include <sofa/core/visual/VisualParams.h>
 #include <qopengl.h>
 
-namespace sofa
-{
+namespace sofa {
 
-namespace collisionAlgorithm
-{
+namespace collisionAlgorithm {
 
-class BaseGeometry : public core::collision::Pipeline, public BaseDataElmtContainer::ElementOwner
+class BroadPhase;
+
+class BaseGeometry : public core::collision::Pipeline
 {
 public:
     SOFA_ABSTRACT_CLASS(BaseGeometry,core::collision::Pipeline);
@@ -35,17 +25,29 @@ public:
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
-    void bwdInit( ) override {
-        BaseDataElmtContainer::ElementOwner::init();
-    }
-
-    virtual void computeCollisionReset() override {
-        BaseDataElmtContainer::ElementOwner::prepareDetection();
-    }
+    virtual void computeCollisionReset() override {}
 
     virtual void computeCollisionResponse() override {}
 
     virtual void computeCollisionDetection() override {}
+
+    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const = 0;
+
+    virtual const BaseGeometry * end() const {
+        return this;
+    }
+
+    void setBroadPhase(BroadPhase * d) {
+        m_broadPhase = d;
+    }
+
+    void unsetBroadPhase(BroadPhase * d) {
+        if (m_broadPhase == d) m_broadPhase = NULL;
+    }
+
+    BroadPhase * getBroadPhase() const {
+        return m_broadPhase;
+    }
 
 private:
     virtual void reset() override {}
@@ -60,6 +62,8 @@ private:
         std::set< std::string > res;
         return res;
     }
+
+    BroadPhase * m_broadPhase;
 };
 
 

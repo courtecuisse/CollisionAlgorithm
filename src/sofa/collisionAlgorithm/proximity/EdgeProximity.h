@@ -6,10 +6,11 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-template<class DataTypes>
-class EdgeProximity : public TBaseProximity<DataTypes> {
+template<class GEOMETRY>
+class EdgeProximity : public TBaseProximity<GEOMETRY> {
 public :
 
+    typedef typename GEOMETRY::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
@@ -21,8 +22,8 @@ public :
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    EdgeProximity(State * state,unsigned p1,unsigned p2,double f1,double f2)
-    : TBaseProximity<DataTypes>(state) {
+    EdgeProximity(const GEOMETRY * geo,unsigned p1,unsigned p2,double f1,double f2)
+    : TBaseProximity<GEOMETRY>(geo) {
         m_pid[0] = p1;
         m_pid[1] = p2;
 
@@ -31,7 +32,7 @@ public :
     }
 
     inline defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->m_state->read(v);
+        const helper::ReadAccessor<DataVecCoord> & pos = this->m_geometry->getState()->read(v);
 
         return pos[m_pid[0]] * m_fact[0] +
                pos[m_pid[1]] * m_fact[1];

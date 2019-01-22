@@ -1,12 +1,11 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometryAlgorithm.h>
+#include <sofa/collisionAlgorithm/BaseGeometry.h>
 
-namespace sofa
-{
+namespace sofa {
 
-namespace collisionAlgorithm
-{
+namespace collisionAlgorithm {
 
 class PointCloudBindingAlgorithm : public BaseGeometryAlgorithm
 {
@@ -24,8 +23,8 @@ public:
     void computeCollisionDetection() override;
 
 private:
-    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseDataElmtContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_from;
-    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseDataElmtContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_dest;
+    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
+    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
 };
 
 }

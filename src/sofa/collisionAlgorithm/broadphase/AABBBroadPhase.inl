@@ -41,10 +41,9 @@ bool AABBBroadPhase::selectElement(const defaulttype::Vector3 & P,std::set<unsig
 }
 
 void AABBBroadPhase::computeCollisionReset() {
-    const BaseGeometry * geo = l_elements->end();
-    if (geo == NULL) return;
+    if (l_geometry == NULL) return;
 
-    sofa::core::behavior::BaseMechanicalState * mstate = geo->getState();
+    sofa::core::behavior::BaseMechanicalState * mstate = l_geometry->getState();
 
     m_Bmin = defaulttype::Vector3(mstate->getPX(0),mstate->getPY(0),mstate->getPZ(0));
     m_Bmax = m_Bmin;
@@ -95,7 +94,7 @@ void AABBBroadPhase::computeCollisionReset() {
     m_Bmin -= m_cellSize * 0.5;
     m_Bmax -= m_cellSize * 0.5;
 
-    for (auto it = l_elements->begin(); it != l_elements->end(); it++)
+    for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
     {
         defaulttype::BoundingBox bbox = (*it)->getBBox();
 

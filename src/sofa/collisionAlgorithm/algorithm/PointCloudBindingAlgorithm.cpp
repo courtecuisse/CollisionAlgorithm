@@ -3,11 +3,9 @@
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/core/visual/VisualParams.h>
 
-namespace sofa
-{
+namespace sofa {
 
-namespace collisionAlgorithm
-{
+namespace collisionAlgorithm {
 
 
 SOFA_DECL_CLASS(PointCloudBindingAlgorithm)

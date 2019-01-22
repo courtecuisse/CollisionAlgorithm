@@ -8,10 +8,11 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class DataTypes>
-class TriangleProximity : public TBaseProximity<DataTypes> {
+template<class GEOMETRY>
+class TriangleProximity : public TBaseProximity<GEOMETRY> {
 public :
 
+    typedef typename GEOMETRY::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
@@ -23,10 +24,9 @@ public :
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    TriangleProximity(State * state,unsigned tid, unsigned p1,unsigned p2,unsigned p3,double f1,double f2,double f3, const helper::vector<defaulttype::Vector3> & N)
-    : TBaseProximity<DataTypes>(state)
-    , m_tid(tid)
-    , m_normalVector(N) {
+    TriangleProximity(const GEOMETRY * geo,unsigned tid, unsigned p1,unsigned p2,unsigned p3,double f1,double f2,double f3)
+    : TBaseProximity<GEOMETRY>(geo)
+    , m_tid(tid) {
         m_pid[0] = p1;
         m_pid[1] = p2;
         m_pid[2] = p3;
@@ -37,7 +37,7 @@ public :
     }
 
     inline defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->m_state->read(v);
+        const helper::ReadAccessor<DataVecCoord> & pos = this->m_geometry->getState()->read(v);
 
         return pos[m_pid[0]] * m_fact[0] +
                pos[m_pid[1]] * m_fact[1] +
@@ -45,7 +45,7 @@ public :
     }
 
     inline defaulttype::Vector3 getNormal() const {
-        return m_normalVector[m_tid];
+        return this->m_geometry->triangleNormals()[m_tid];
     }
 
     void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
@@ -58,7 +58,6 @@ protected:
     unsigned m_tid;
     unsigned m_pid[3];
     double m_fact[3];
-    const helper::vector<defaulttype::Vector3> & m_normalVector;
 
 };
 
