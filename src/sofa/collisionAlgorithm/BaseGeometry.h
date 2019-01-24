@@ -71,7 +71,8 @@ template<class DataTypes>
 class TBaseGeometry : public BaseGeometry
 {
 public:
-    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(TBaseGeometry,DataTypes),BaseGeometry);
+    typedef TBaseGeometry<DataTypes> GEOMETRY;
+    SOFA_ABSTRACT_CLASS(GEOMETRY,BaseGeometry);
 
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;

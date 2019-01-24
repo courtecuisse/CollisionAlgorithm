@@ -19,11 +19,11 @@ public:
     , l_geometry(initLink("geometry", "link to state")) {}
 
     virtual ~BroadPhase() {
-        if (l_geometry) l_geometry->unsetBroadPhase(this);
+        if (l_geometry != NULL) l_geometry->unsetBroadPhase(this);
     }
 
     void init( ) override {
-        if (l_geometry) l_geometry->setBroadPhase(this);
+        if (l_geometry != NULL) l_geometry->setBroadPhase(this);
     }
 
 

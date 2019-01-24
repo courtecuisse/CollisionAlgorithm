@@ -39,17 +39,17 @@ public:
 
 
     inline BaseProximity::SPtr project(unsigned pid, const defaulttype::Vector3 & P) const {
-
+        return NULL;
     }
 
     inline BaseProximity::SPtr center(unsigned pid) const {
-
+        return NULL;
     }
 
     inline defaulttype::BoundingBox getBBox(unsigned pid) const {
 //        const ELMT & elmt = this->getValue()[pid];
 
-//        defaulttype::BoundingBox bbox;
+        defaulttype::BoundingBox bbox;
 //        for (unsigned i=0;i<ELMT::size();i++) {
 //            defaulttype::Vector3 pi(m_owner->getState()->getPX(elmt[i]),
 //                                    m_owner->getState()->getPY(elmt[i]),
@@ -57,7 +57,7 @@ public:
 //            bbox.include(pi);
 //        }
 
-//        return bbox;
+        return bbox;
     }
 
 protected:

@@ -69,7 +69,7 @@ protected:
     void project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Edge & edge, defaulttype::Vector2 & factor) const {
         edge = d_edges.getValue()[eid];
 
-        const helper::ReadAccessor<Data <VecCoord> >& x = *this->getState()->read(core::VecCoordId::position());
+        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
 
         double fact_u;
         double fact_v;

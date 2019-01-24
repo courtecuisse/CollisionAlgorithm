@@ -81,8 +81,8 @@ public:
     }
 
 protected:
-    std::vector<defaulttype::Vector3> m_point_normals;
-    std::vector< std::vector<TriangleID> > m_trianglesAroundVertex;
+    helper::vector<defaulttype::Vector3> m_point_normals;
+    helper::vector< std::vector<TriangleID> > m_trianglesAroundVertex;
 };
 
 
