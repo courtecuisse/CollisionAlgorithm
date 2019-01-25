@@ -47,6 +47,8 @@ public:
     }
 
     virtual void init() {
+        TriangleGeometry<DataTypes>::init();
+
         //store triangles around vertex information
         const VecTriangles& triangles = this->d_triangles.getValue();
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
@@ -59,8 +61,8 @@ public:
         }
     }
 
-    virtual void computeCollisionReset() {
-        TriangleGeometry<DataTypes>::computeCollisionReset();
+    virtual void prepareDetection() {
+        TriangleGeometry<DataTypes>::prepareDetection();
 
         m_point_normals.resize(m_trianglesAroundVertex.size());
 

@@ -58,8 +58,8 @@ public:
                                                                          0.3333,0.3333,0.3333);
     }
 
-    void computeCollisionReset() {
-        PhongTriangleGeometry<DataTypes>::computeCollisionReset();
+    virtual void prepareDetection() {
+        PhongTriangleGeometry<DataTypes>::prepareDetection();
 
         const VecTriangles& triangles = this->d_triangles.getValue();
         const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(core::VecCoordId::position());

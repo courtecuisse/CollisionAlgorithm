@@ -18,9 +18,7 @@ public:
 
     PointCloudBindingAlgorithm();
 
-    void computeCollisionReset() override;
-
-    void computeCollisionDetection() override;
+    void doDetection() override;
 
 private:
     core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;

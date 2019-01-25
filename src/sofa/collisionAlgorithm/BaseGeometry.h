@@ -25,12 +25,6 @@ public:
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
-    virtual void computeCollisionReset() override {}
-
-    virtual void computeCollisionResponse() override {}
-
-    virtual void computeCollisionDetection() override {}
-
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const = 0;
 
     virtual const BaseGeometry * end() const {
@@ -49,6 +43,8 @@ public:
         return m_broadPhase;
     }
 
+    virtual void prepareDetection() {}
+
 private:
     virtual void reset() override {}
 
@@ -61,6 +57,18 @@ private:
     virtual std::set< std::string > getResponseList() const override {
         std::set< std::string > res;
         return res;
+    }
+
+    void computeCollisionDetection() {}
+
+    void computeCollisionReset() {
+        prepareDetection();
+    }
+
+    void computeCollisionResponse()  {}
+
+    void bwdInit() {
+        prepareDetection();
     }
 
     BroadPhase * m_broadPhase;
@@ -79,6 +87,8 @@ public:
     typedef Data<VecCoord> DataVecCoord;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
+    core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
+
     TBaseGeometry()
     : BaseGeometry()
     , l_state(initLink("mstate", "link to state")) {
@@ -88,8 +98,6 @@ public:
     sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
     }
-
-    core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
 };
 
 }

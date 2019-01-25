@@ -65,21 +65,27 @@ public :
 
     virtual ~BaseGeometryAlgorithm() override {}
 
-    virtual void computeCollisionReset() override {}
-
-    virtual void computeCollisionDetection() override {}
-
-    virtual void computeCollisionResponse() override {}
-
     bool acceptFilter(const BaseProximity::SPtr & pfrom,const BaseProximity::SPtr & pdest) const {
         for (auto itfilter = l_filters.begin();itfilter != l_filters.end();itfilter++) {
-            if (! (*itfilter)->accept(pdest,pfrom)) return false;
+            const BaseFilter * filter = (*itfilter);
+            if (filter == NULL) continue;
+            if (! filter->accept(pdest,pfrom)) return false;
         }
         return true;
     }
 
+    virtual void doDetection() = 0;
+
 private:
     void reset() {}
+
+    virtual void computeCollisionReset() override {}
+
+    virtual void computeCollisionDetection() override {
+        doDetection();
+    }
+
+    virtual void computeCollisionResponse() override {}
 
     virtual std::set< std::string > getResponseList() const override
     {

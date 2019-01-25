@@ -14,8 +14,11 @@ PointCloudBindingAlgorithm::PointCloudBindingAlgorithm()
 , l_from(initLink("from" , "this"))
 , l_dest(initLink("dest" , "this")) {}
 
-void PointCloudBindingAlgorithm::computeCollisionDetection()
+void PointCloudBindingAlgorithm::doDetection()
 {
+    d_output.beginEdit()->clear();
+    d_output.endEdit();
+
     std::pair<BaseProximity::SPtr,BaseProximity::SPtr> res;
 
     if (l_from == nullptr) return ;
@@ -136,11 +139,6 @@ void PointCloudBindingAlgorithm::computeCollisionDetection()
 
     d_output.endEdit();
 
-}
-
-void PointCloudBindingAlgorithm::computeCollisionReset() {
-    d_output.beginEdit()->clear();
-    d_output.endEdit();
 }
 
 } // namespace collisionAlgorithm

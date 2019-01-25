@@ -93,25 +93,32 @@ public:
 
         glDisable(GL_LIGHTING);
 
-        double delta = 0.1;
+        double delta = 0.2;
         defaulttype::Vector4 color = this->d_color.getValue();
         const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
 
-        glBegin(GL_TRIANGLES);
+        if (! vparams->displayFlags().getShowWireFrame()) glBegin(GL_TRIANGLES);
+        else glBegin(GL_LINES);
+
         for (unsigned i=0;i<d_triangles.getValue().size();i++) {
             const Triangle& tri = this->d_triangles.getValue()[i];
 
             glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
             glVertex3dv(pos[tri[0]].data());
+            if (vparams->displayFlags().getShowWireFrame()) glVertex3dv(pos[tri[1]].data());
+
             glColor4f(color[0],fabs(color[1]-delta),color[2],color[3]);
             glVertex3dv(pos[tri[1]].data());
+            if (vparams->displayFlags().getShowWireFrame()) glVertex3dv(pos[tri[2]].data());
+
             glColor4f(color[0],color[1],fabs(color[2]-delta),color[3]);
-            glVertex3dv(pos[tri[2]].data());
+            glVertex3dv(pos[tri[2]].data());            
+            if (vparams->displayFlags().getShowWireFrame()) glVertex3dv(pos[tri[0]].data());
         }
         glEnd();
     }
 
-    virtual void computeCollisionReset() {
+    virtual void prepareDetection() override {
         const VecTriangles& triangles = d_triangles.getValue();
 
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());

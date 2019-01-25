@@ -23,9 +23,9 @@ public:
     , l_dest(initLink("dest", "link to dest geometry elments"))
     {}
 
-    virtual void computeCollisionReset() override;
+    virtual void doDetection() override;
 
-    virtual void computeCollisionDetection() override;
+    void draw(const core::visual::VisualParams * vparams);
 
 private:
 //    template<class ElementIterator>

@@ -10,11 +10,6 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-void FindClosestPointAlgorithm::computeCollisionReset() {
-    d_output.beginEdit()->clear();
-    d_output.endEdit();
-}
-
 BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defaulttype::Vector3 & P) {
     const BroadPhase * decorator = l_dest->getBroadPhase();
 
@@ -79,12 +74,13 @@ DetectionOutput::PairDetection FindClosestPointAlgorithm::findClosestPoint(const
     return min_pair;
 }
 
-void FindClosestPointAlgorithm::computeCollisionDetection()
+void FindClosestPointAlgorithm::doDetection()
 {
     if (l_from == NULL) return;
     if (l_dest == NULL) return;
 
     DetectionOutput * output = d_output.beginEdit();
+    output->clear();
 
     for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
         DetectionOutput::PairDetection min_pair = findClosestPoint(*itfrom);
@@ -95,6 +91,25 @@ void FindClosestPointAlgorithm::computeCollisionDetection()
     }
 
     d_output.endEdit();
+}
+
+void FindClosestPointAlgorithm::draw(const core::visual::VisualParams * vparams) {
+    if (! vparams->displayFlags().getShowCollisionModels())
+        return;
+
+    glDisable(GL_LIGHTING);
+
+    const DetectionOutput & output = d_output.getValue();
+
+    glColor4f(0,1,0,1);
+
+    glBegin(GL_LINES);
+    for (unsigned i=0;i<output.size();i++) {
+        glVertex3dv(output[i].first->getPosition().data());
+        glVertex3dv(output[i].second->getPosition().data());
+    }
+    glEnd();
+
 }
 
 }
