@@ -30,6 +30,10 @@ public:
             return ! this->get()->end(geo);
         }
 
+        bool operator == (const BaseGeometry * geo) {
+            return this->get()->end(geo);
+        }
+
         void operator++() {
             this->get()->next();
         }

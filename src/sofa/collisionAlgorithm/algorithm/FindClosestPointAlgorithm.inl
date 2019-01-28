@@ -10,10 +10,10 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defaulttype::Vector3 & P) {
-    const BroadPhase * decorator = l_dest->getBroadPhase();
+BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defaulttype::Vector3 & P, const BaseGeometry * geo) {
+    const BroadPhase * decorator = geo->getBroadPhase();
 
-    if (decorator == NULL) return l_dest->begin();
+    if (decorator == NULL) return geo->begin();
     else {
         defaulttype::BoundingBox bbox = decorator->getBBox();
 
@@ -29,22 +29,20 @@ BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defau
             d++;// we look for boxed located at d+1
         }
 
-        if (selectedElements.empty()) return l_dest->begin();
-
-        return BaseElementIterator::UPtr(new SubsetElementIterator(l_dest.get(),selectedElements));
+        return BaseElementIterator::UPtr(new SubsetElementIterator(geo, selectedElements));
     }
 }
 
-DetectionOutput::PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElement::UPtr & elfrom)
+DetectionOutput::PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElement::UPtr & elfrom, const BaseGeometry * geo)
 {
     double min_dist = std::numeric_limits<double>::max();
     DetectionOutput::PairDetection min_pair(nullptr,nullptr);
 
     defaulttype::Vector3 P = elfrom->center()->getPosition();
 
-    BaseElementIterator::UPtr itdest=getDestIterator(P);
+    BaseElementIterator::UPtr itdest=getDestIterator(P,geo);
 
-    while (itdest != l_dest->end())
+    while (itdest != geo->end())
     {
         BaseProximity::SPtr pdest = (*itdest)->project(P);
         BaseProximity::SPtr pfrom  = elfrom->project(pdest->getPosition()); // reproject one on the initial proximity
@@ -74,42 +72,42 @@ DetectionOutput::PairDetection FindClosestPointAlgorithm::findClosestPoint(const
     return min_pair;
 }
 
-void FindClosestPointAlgorithm::doDetection()
-{
-    if (l_from == NULL) return;
-    if (l_dest == NULL) return;
+BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::SPtr pfrom, const BaseGeometry * geo) {
+    double min_dist = std::numeric_limits<double>::max();
+    BaseProximity::SPtr minprox = nullptr;
 
-    DetectionOutput * output = d_output.beginEdit();
-    output->clear();
+    defaulttype::Vector3 P = pfrom->getPosition();
 
-    for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
-        DetectionOutput::PairDetection min_pair = findClosestPoint(*itfrom);
+    BaseElementIterator::UPtr itdest=getDestIterator(P,geo);
+
+    while (itdest != geo->end())
+    {
+        BaseProximity::SPtr pdest = (*itdest)->project(P);
+
+        if (acceptFilter(pfrom,pdest)) {
+            defaulttype::Vector3 N = P - pdest->getPosition();
+            double dist = N.norm();
+
+            if (dist<min_dist) {
+                min_dist = dist;
+                minprox = pdest;
+            }
+        }
+
+        itdest++;
+    }
+
+    return minprox;
+}
+
+void FindClosestPointAlgorithm::doDetection(const BaseGeometry * from, const BaseGeometry * dst, DetectionOutput & output) {
+    for (auto itfrom=from->begin();itfrom!=from->end();itfrom++) {
+        DetectionOutput::PairDetection min_pair = findClosestPoint(*itfrom,dst);
 
         if (min_pair.first == nullptr || min_pair.second == nullptr) continue;
 
-        output->add(min_pair.first,min_pair.second);
+        output.add(min_pair.first,min_pair.second);
     }
-
-    d_output.endEdit();
-}
-
-void FindClosestPointAlgorithm::draw(const core::visual::VisualParams * vparams) {
-    if (! vparams->displayFlags().getShowCollisionModels())
-        return;
-
-    glDisable(GL_LIGHTING);
-
-    const DetectionOutput & output = d_output.getValue();
-
-    glColor4f(0,1,0,1);
-
-    glBegin(GL_LINES);
-    for (unsigned i=0;i<output.size();i++) {
-        glVertex3dv(output[i].first->getPosition().data());
-        glVertex3dv(output[i].second->getPosition().data());
-    }
-    glEnd();
-
 }
 
 }

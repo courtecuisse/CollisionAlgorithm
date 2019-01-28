@@ -9,33 +9,24 @@ namespace collisionAlgorithm
 {
 
 PointCloudBindingAlgorithm::PointCloudBindingAlgorithm()
-: d_maxDist(initData(&d_maxDist, std::numeric_limits<double>::min(), "maxDist", "Maximum distance"))
-, d_output(initData(&d_output, "output" , "this"))
-, l_from(initLink("from" , "this"))
-, l_dest(initLink("dest" , "this")) {}
+: d_maxDist(initData(&d_maxDist, std::numeric_limits<double>::min(), "maxDist", "Maximum distance")) {}
 
-void PointCloudBindingAlgorithm::doDetection()
+void PointCloudBindingAlgorithm::doDetection(const BaseGeometry * from, const BaseGeometry * dest, DetectionOutput & output)
 {
-    d_output.beginEdit()->clear();
-    d_output.endEdit();
-
     std::pair<BaseProximity::SPtr,BaseProximity::SPtr> res;
 
-    if (l_from == nullptr) return ;
-    if (l_dest == nullptr) return ;
-
-    if (l_from->begin() != l_dest->end()) return ;
-    if (l_dest->begin() != l_dest->end()) return ;
+    if (from->begin() == from->end()) return ;
+    if (dest->begin() == dest->end()) return ;
 
     helper::vector<BaseProximity::SPtr> p1;
     helper::vector<BaseProximity::SPtr> p2;
 
-    for (auto it = l_from->begin(); it != l_from->end();it++)
+    for (auto it = from->begin(); it != from->end();it++)
     {
         p1.push_back((*it)->center());
     }
 
-    for (auto it = l_dest->begin(); it != l_dest->end();it++)
+    for (auto it = dest->begin(); it != dest->end();it++)
     {
         p2.push_back((*it)->center());
     }
@@ -122,9 +113,6 @@ void PointCloudBindingAlgorithm::doDetection()
         }
     }
 
-
-    DetectionOutput * output = d_output.beginEdit();
-
     for (unsigned i=0;i<bindId.size();i++)
     {
         if (bindId[i] == -1 || invBind[i] == -1)
@@ -134,11 +122,8 @@ void PointCloudBindingAlgorithm::doDetection()
         pair.first = p1[bindId[i]];
         pair.second = p2[invBind[i]];
 
-        output->add(pair.first,pair.second);
+        output.add(pair.first,pair.second);
     }
-
-    d_output.endEdit();
-
 }
 
 } // namespace collisionAlgorithm

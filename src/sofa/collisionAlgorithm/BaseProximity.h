@@ -27,6 +27,9 @@ public :
 
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const = 0;
 
+    //for debug
+    virtual void printDebug() {}
+
     template<class PROXIMITY, class ... Args>
     static BaseProximity::SPtr create(Args&& ... args) {
         return SPtr(new PROXIMITY(std::forward<Args>(args)...));
