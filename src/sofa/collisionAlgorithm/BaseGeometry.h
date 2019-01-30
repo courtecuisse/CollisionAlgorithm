@@ -19,9 +19,11 @@ public:
     SOFA_ABSTRACT_CLASS(BaseGeometry,core::collision::Pipeline);
 
     Data<defaulttype::Vector4> d_color;
+    Data<double> d_drawScaleNormal;
 
     BaseGeometry()
-    : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model")){}
+    : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
+    , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model")){}
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
@@ -44,6 +46,21 @@ public:
     }
 
     virtual void prepareDetection() {}
+
+    virtual void draw(const core::visual::VisualParams * vparams) {
+        if (! vparams->displayFlags().getShowNormals())
+            return;
+
+        if (this->d_color.getValue()[3] == 0.0)
+            return;
+
+        if (d_drawScaleNormal.getValue() == 0) return;
+
+        for (auto it=begin();it!=end();it++) {
+            BaseProximity::SPtr center = (*it)->center();
+            vparams->drawTool()->drawArrow(center->getPosition(), center->getPosition() + center->getNormal() * d_drawScaleNormal.getValue(), d_drawScaleNormal.getValue() * 0.1, d_color.getValue());
+        }
+    }
 
 private:
     virtual void reset() override {}

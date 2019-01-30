@@ -10,6 +10,37 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+template<class GEOMETRY>
+class PointElement : public BaseElement {
+public:
+    typedef GEOMETRY TGeometry;
+    typedef typename GEOMETRY::TDataTypes DataTypes;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef Data<VecCoord> DataVecCoord;
+
+    PointElement(unsigned id,const GEOMETRY * geo) : m_id(id), m_geo(geo) {}
+
+    inline BaseProximity::SPtr project(const defaulttype::Vector3 & /*P*/) const {
+        return BaseProximity::create<PointProximity<GEOMETRY> >(m_geo,m_id);
+    }
+
+    inline BaseProximity::SPtr center() const {
+        return BaseProximity::create<PointProximity<GEOMETRY> >(m_geo,m_id);
+    }
+
+    inline defaulttype::BoundingBox getBBox() const {
+        const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getState()->read(core::VecCoordId::position());
+        defaulttype::BoundingBox bbox;
+        bbox.include(x[m_id]);
+        return bbox;
+    }
+
+protected:
+    unsigned m_id;
+    const GEOMETRY * m_geo;
+};
+
+
 template<class DataTypes>
 class PointGeometry : public TBaseGeometry<DataTypes> {
 public:
@@ -24,25 +55,12 @@ public:
     SOFA_CLASS(GEOMETRY,Inherit);
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
-        return DefaultElementIterator<GEOMETRY >::create(this, this->getState()->getSize(), eid);
+        return DefaultElementIterator<PointElement<GEOMETRY> >::create(this, this->getState()->getSize(), eid);
     }
 
-    inline BaseProximity::SPtr project(unsigned pid, const defaulttype::Vector3 & ) const {
-        return BaseProximity::create<PointProximity<GEOMETRY> >(this,pid);
-    }
+    virtual void draw(const core::visual::VisualParams *vparams) {
+        Inherit::draw(vparams);
 
-    inline BaseProximity::SPtr center(unsigned pid) const {
-        return BaseProximity::create<PointProximity<GEOMETRY> >(this,pid);
-    }
-
-    inline defaulttype::BoundingBox getBBox(unsigned pid) const {
-        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
-        defaulttype::BoundingBox bbox;
-        bbox.include(x[pid]);
-        return bbox;
-    }
-
-    void draw(const core::visual::VisualParams *vparams) {
         if (! vparams->displayFlags().getShowCollisionModels())
             return;
 

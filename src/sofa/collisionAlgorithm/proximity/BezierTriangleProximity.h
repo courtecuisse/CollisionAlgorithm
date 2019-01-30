@@ -26,6 +26,8 @@ public :
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
+    friend class GEOMETRY::GEOMETRY;
+
     typedef struct
     {
         defaulttype::Vector3 p210,p120,p021,p012,p102,p201,p111;

@@ -22,8 +22,10 @@ public :
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    EdgeProximity(const GEOMETRY * geo,unsigned p1,unsigned p2,double f1,double f2)
+    EdgeProximity(const GEOMETRY * geo,unsigned eid, unsigned p1,unsigned p2,double f1,double f2)
     : TBaseProximity<GEOMETRY>(geo) {
+        m_eid = eid;
+
         m_pid[0] = p1;
         m_pid[1] = p2;
 
@@ -39,7 +41,11 @@ public :
     }
 
     inline defaulttype::Vector3 getNormal() const {
-        return  defaulttype::Vector3();
+        const helper::ReadAccessor<DataVecCoord> & pos = this->m_geometry->getState()->read(core::VecCoordId::position());
+
+        sofa::core::topology::BaseMeshTopology::Edge edge = this->m_geometry->getEdges()[m_eid];
+
+        return (pos[edge[1]] - pos[edge[0]]).normalized();
     }
 
     void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
@@ -48,6 +54,7 @@ public :
     }
 
 protected:
+    unsigned m_eid;
     unsigned m_pid[2];
     double m_fact[2];
 

@@ -8,37 +8,14 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class BaseGeometry;
-
-template<class ELMT_CONTAINER>
-class DefaultElement : public BaseElement {
-public:
-
-    DefaultElement(unsigned id,const ELMT_CONTAINER * elmt) : m_id(id), m_elements(elmt) {}
-
-    inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
-        return m_elements->project(m_id, P);
-    }
-
-    inline BaseProximity::SPtr center() const {
-        return m_elements->center(m_id);
-    }
-
-    inline defaulttype::BoundingBox getBBox() const {
-        return m_elements->getBBox(m_id);
-    }
-
-protected:
-    unsigned m_id;
-    const ELMT_CONTAINER * m_elements;
-};
-
-template<class ELMT_CONTAINER>
+template<class ELMT>
 class DefaultElementIterator : public BaseElementIterator {
     friend class Iterator;
 
 public:
-    DefaultElementIterator(const ELMT_CONTAINER * elmt, unsigned start, unsigned end) {
+    typedef typename ELMT::TGeometry GEOMETRY;
+
+    DefaultElementIterator(const GEOMETRY * elmt, unsigned start, unsigned end) {
         m_id = start;
         m_end = end;
         m_elements = elmt;
@@ -57,17 +34,17 @@ public:
     }
 
     BaseElement::UPtr element() {
-        return BaseElement::UPtr(new DefaultElement<ELMT_CONTAINER>(m_id,m_elements));
+        return BaseElement::UPtr(new ELMT(m_id,m_elements));
     }
 
-    static BaseElementIterator::UPtr create(const ELMT_CONTAINER * elmt, unsigned end, unsigned start = 0) {
+    static BaseElementIterator::UPtr create(const GEOMETRY * elmt, unsigned end, unsigned start = 0) {
         return BaseElementIterator::UPtr(new DefaultElementIterator(elmt,start,end));
     }
 
 private:
     unsigned m_id;
     unsigned m_end;
-    const ELMT_CONTAINER * m_elements;
+    const GEOMETRY * m_elements;
 };
 
 }

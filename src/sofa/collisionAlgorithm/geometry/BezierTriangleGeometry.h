@@ -9,6 +9,48 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+template<class GEOMETRY>
+class BezierTriangleElement : public BaseElement {
+public:
+    typedef GEOMETRY TGeometry;
+    typedef typename GEOMETRY::TDataTypes DataTypes;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef Data<VecCoord> DataVecCoord;
+
+    BezierTriangleElement(unsigned id,const GEOMETRY * geo) : m_tid(id), m_geo(geo) {}
+
+    inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
+        core::topology::BaseMeshTopology::Triangle triangle;
+        defaulttype::Vector3 factor;
+        m_geo->project(m_tid, P, triangle, factor);
+
+        return BaseProximity::create<BezierTriangleProximity<GEOMETRY> >(m_geo,m_tid,
+                                                                         triangle[0],triangle[1],triangle[2],
+                                                                         factor[0],factor[1],factor[2]);
+    }
+
+    inline BaseProximity::SPtr center() const {
+        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->getTriangles()[m_tid];
+        return BaseProximity::create<BezierTriangleProximity<GEOMETRY> >(m_geo,m_tid,
+                                                                         triangle[0],triangle[1],triangle[2],
+                                                                         0.3333,0.3333,0.3333);
+    }
+
+    inline defaulttype::BoundingBox getBBox() const {
+        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->getTriangles()[m_tid];
+        const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getState()->read(core::VecCoordId::position());
+        defaulttype::BoundingBox bbox;
+        bbox.include(x[triangle[0]]);
+        bbox.include(x[triangle[1]]);
+        bbox.include(x[triangle[2]]);
+        return bbox;
+    }
+
+protected:
+    unsigned m_tid;
+    const GEOMETRY * m_geo;
+};
+
 template<class DataTypes>
 class BezierTriangleGeometry : public PhongTriangleGeometry<DataTypes> {
 public:
@@ -38,24 +80,7 @@ public:
     {}
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
-        return DefaultElementIterator<GEOMETRY >::create(this, this->d_triangles.getValue().size(), eid);
-    }
-
-    inline BaseProximity::SPtr project(unsigned tid, const defaulttype::Vector3 & P) const {
-        core::topology::BaseMeshTopology::Triangle triangle;
-        defaulttype::Vector3 factor;
-        TriangleGeometry<DataTypes>::project(tid, P, triangle, factor);
-
-        return BaseProximity::create<BezierTriangleProximity<GEOMETRY> >(this,tid,
-                                                                         triangle[0],triangle[1],triangle[2],
-                                                                         factor[0],factor[1],factor[2]);
-    }
-
-    inline BaseProximity::SPtr center(unsigned tid) const {
-        const core::topology::BaseMeshTopology::Triangle & triangle = this->d_triangles.getValue()[tid];
-        return BaseProximity::create<BezierTriangleProximity<GEOMETRY> >(this,tid,
-                                                                         triangle[0],triangle[1],triangle[2],
-                                                                         0.3333,0.3333,0.3333);
+        return DefaultElementIterator<BezierTriangleElement<GEOMETRY> >::create(this, this->d_triangles.getValue().size(), eid);
     }
 
     virtual void prepareDetection() {
@@ -154,7 +179,9 @@ public:
         tesselate(level+1,tid,bary_A,bary_G,bary_E);
     }
 
-    void draw(const core::visual::VisualParams * vparams) {
+    virtual void draw(const core::visual::VisualParams * vparams) {
+        Inherit::draw(vparams);
+
         if (! vparams->displayFlags().getShowCollisionModels())
             return;
 
@@ -174,8 +201,6 @@ public:
         return m_beziertriangle_info;
     }
 
-protected:
-
     void project(unsigned elmt, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & fact) const {
         //initialize the algorithm xith the projection on a linear triangle
         PhongTriangleGeometry<DataTypes>::project(elmt, P, triangle, fact);
@@ -187,7 +212,7 @@ protected:
         unsigned int it=0;
         double delta = 0.00001;
 
-        TriangleProximity<GEOMETRY> pinfo(this, elmt,triangle[0],triangle[1],triangle[2], fact[0],fact[1],fact[2]);
+        BezierTriangleProximity<GEOMETRY> pinfo(this, elmt,triangle[0],triangle[1],triangle[2], fact[0],fact[1],fact[2]);
 
         while(it< max_it)
         {
@@ -219,7 +244,9 @@ protected:
             double P_v_fact0 = pinfo.m_fact[0] + delta * fact_v;
             double P_v_fact1 = pinfo.m_fact[1];
             double P_v_fact2 = pinfo.m_fact[2] - delta * fact_v;
-            TriangleProximity<GEOMETRY> P_v(this, elmt,triangle[0],triangle[1],triangle[2], P_v_fact0,P_v_fact1,P_v_fact2);
+            if (P_v_fact0 < 0 || P_v_fact1 < 0 || P_v_fact2 < 0) break;
+
+            BezierTriangleProximity<GEOMETRY> P_v(this, elmt,triangle[0],triangle[1],triangle[2], P_v_fact0,P_v_fact1,P_v_fact2);
             defaulttype::Vector3 p_v = (P - P_v.getPosition(core::VecCoordId::position())).normalized();
             defaulttype::Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
 
@@ -227,12 +254,12 @@ protected:
             double P_u_fact0 = pinfo.m_fact[0];
             double P_u_fact1 = pinfo.m_fact[1] + delta * fact_u;
             double P_u_fact2 = pinfo.m_fact[2] - delta * fact_u;
-            TriangleProximity<GEOMETRY> P_u(this, elmt,triangle[0],triangle[1],triangle[2], P_u_fact0,P_u_fact1,P_u_fact2);
+            if (P_u_fact0 < 0 || P_u_fact1 < 0 || P_u_fact2 < 0) break;
+
+            BezierTriangleProximity<GEOMETRY> P_u(this, elmt,triangle[0],triangle[1],triangle[2], P_u_fact0,P_u_fact1,P_u_fact2);
             defaulttype::Vector3 p_u = (P - P_u.getPosition(core::VecCoordId::position())).normalized();
             defaulttype::Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
 
-            if (P_v.m_fact[0] < 0 || P_v.m_fact[1] < 0 || P_v.m_fact[2] < 0) break;
-            if (P_u.m_fact[0] < 0 || P_u.m_fact[1] < 0 || P_u.m_fact[2] < 0) break;
 
             defaulttype::Mat2x2d J, invJ;
             J[0][0] = (e_v[0] - e_0[0])/delta;
@@ -265,10 +292,10 @@ protected:
             double P_a_fact0 = pinfo.m_fact[0] + dir2d[0] * delta * fact_a;
             double P_a_fact1 = pinfo.m_fact[1] + dir2d[1] * delta * fact_a;
             double P_a_fact2 = pinfo.m_fact[2] + dir2d[2] * delta * fact_a;
-            TriangleProximity<GEOMETRY> P_a(this, elmt,triangle[0],triangle[1],triangle[2], P_a_fact0,P_a_fact1,P_a_fact2);
 
-            if (P_a.m_fact[0] < 0 || P_a.m_fact[1] < 0 || P_a.m_fact[2] < 0) break;
+            if (P_a_fact0 < 0 ||P_a_fact1 < 0 || P_a_fact2 < 0) break;
 
+            BezierTriangleProximity<GEOMETRY> P_a(this, elmt,triangle[0],triangle[1],triangle[2], P_a_fact0,P_a_fact1,P_a_fact2);
             defaulttype::Vector3 QA = P_a.getPosition(core::VecCoordId::position());
 
             double fact;
@@ -305,6 +332,7 @@ protected:
         }
     }
 
+protected:
     std::vector<BezierTriangleInfo> m_beziertriangle_info;
 };
 

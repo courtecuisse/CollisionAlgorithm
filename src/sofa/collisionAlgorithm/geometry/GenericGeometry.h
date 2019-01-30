@@ -9,6 +9,44 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+template<class GEOMETRY, class ELMT>
+class GenericElement : public BaseElement {
+public:
+    typedef GEOMETRY TGeometry;
+    typedef typename GEOMETRY::TDataTypes DataTypes;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef Data<VecCoord> DataVecCoord;
+
+    GenericElement(unsigned id,const GEOMETRY * geo) : m_tid(id), m_geo(geo) {}
+
+    inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
+        return NULL;
+    }
+
+    inline BaseProximity::SPtr center() const {
+        return NULL;
+    }
+
+    inline defaulttype::BoundingBox getBBox() const {
+//        const ELMT & elmt = this->getValue()[pid];
+
+        defaulttype::BoundingBox bbox;
+//        for (unsigned i=0;i<ELMT::size();i++) {
+//            defaulttype::Vector3 pi(m_owner->getState()->getPX(elmt[i]),
+//                                    m_owner->getState()->getPY(elmt[i]),
+//                                    m_owner->getState()->getPZ(elmt[i]));
+//            bbox.include(pi);
+//        }
+
+        return bbox;
+    }
+protected:
+    unsigned m_tid;
+    const GEOMETRY * m_geo;
+};
+
+
+
 template<class DataTypes>
 class GenericGeometry : public TBaseGeometry<DataTypes> {
 public:
@@ -34,30 +72,13 @@ public:
     , d_quads(initData(&d_quads, "quads", "Vector of Quads")){}
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
-        return DefaultElementIterator<GEOMETRY >::create(this, this->getState()->getSize(), eid);
-    }
+        if (eid < d_edges.getValue().size())
+            return DefaultElementIterator<GenericElement<GEOMETRY,sofa::core::topology::BaseMeshTopology::Edge> >::create(this, d_edges.getValue().size(), eid);
 
+        eid -= d_edges.getValue().size();
+        if (eid < d_triangles.getValue().size())
+            return DefaultElementIterator<GenericElement<GEOMETRY,sofa::core::topology::BaseMeshTopology::Triangle> >::create(this, d_triangles.getValue().size(), eid);
 
-    inline BaseProximity::SPtr project(unsigned pid, const defaulttype::Vector3 & P) const {
-        return NULL;
-    }
-
-    inline BaseProximity::SPtr center(unsigned pid) const {
-        return NULL;
-    }
-
-    inline defaulttype::BoundingBox getBBox(unsigned pid) const {
-//        const ELMT & elmt = this->getValue()[pid];
-
-        defaulttype::BoundingBox bbox;
-//        for (unsigned i=0;i<ELMT::size();i++) {
-//            defaulttype::Vector3 pi(m_owner->getState()->getPX(elmt[i]),
-//                                    m_owner->getState()->getPY(elmt[i]),
-//                                    m_owner->getState()->getPZ(elmt[i]));
-//            bbox.include(pi);
-//        }
-
-        return bbox;
     }
 
 protected:

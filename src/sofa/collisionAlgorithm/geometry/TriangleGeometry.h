@@ -10,6 +10,45 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+template<class GEOMETRY>
+class TriangleElement : public BaseElement {
+public:
+    typedef GEOMETRY TGeometry;
+    typedef typename GEOMETRY::TDataTypes DataTypes;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef Data<VecCoord> DataVecCoord;
+
+    TriangleElement(unsigned id,const GEOMETRY * geo) : m_tid(id), m_geo(geo) {}
+
+    inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
+        core::topology::BaseMeshTopology::Triangle triangle;
+        defaulttype::Vector3 factor;
+        m_geo->project(m_tid, P, triangle, factor);
+
+        return BaseProximity::create<TriangleProximity<GEOMETRY> >(m_geo, m_tid,triangle[0],triangle[1],triangle[2],factor[0],factor[1],factor[2]);
+    }
+
+    inline BaseProximity::SPtr center() const {
+        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->getTriangles()[m_tid];
+        return BaseProximity::create<TriangleProximity<GEOMETRY> >(m_geo, m_tid,triangle[0],triangle[1],triangle[2],0.3333,0.3333,0.3333);
+    }
+
+    inline defaulttype::BoundingBox getBBox() const {
+        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->getTriangles()[m_tid];
+        const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getState()->read(core::VecCoordId::position());
+        defaulttype::BoundingBox bbox;
+        bbox.include(x[triangle[0]]);
+        bbox.include(x[triangle[1]]);
+        bbox.include(x[triangle[2]]);
+        return bbox;
+    }
+
+protected:
+    unsigned m_tid;
+    const GEOMETRY * m_geo;
+};
+
+
 template<class DataTypes>
 class TriangleGeometry : public TBaseGeometry<DataTypes> {
 public:
@@ -33,30 +72,7 @@ public:
     virtual ~TriangleGeometry() override {}
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
-        return DefaultElementIterator<GEOMETRY >::create(this, this->d_triangles.getValue().size(), eid);
-    }
-
-    inline BaseProximity::SPtr project(unsigned tid, const defaulttype::Vector3 & P) const {
-        core::topology::BaseMeshTopology::Triangle triangle;
-        defaulttype::Vector3 factor;
-        project(tid, P, triangle, factor);
-
-        return BaseProximity::create<TriangleProximity<GEOMETRY> >(this, tid,triangle[0],triangle[1],triangle[2],factor[0],factor[1],factor[2]);
-    }
-
-    inline BaseProximity::SPtr center(unsigned tid) const {
-        const core::topology::BaseMeshTopology::Triangle & triangle = d_triangles.getValue()[tid];
-        return BaseProximity::create<TriangleProximity<GEOMETRY> >(this, tid,triangle[0],triangle[1],triangle[2],0.3333,0.3333,0.3333);
-    }
-
-    inline defaulttype::BoundingBox getBBox(unsigned tid) const {
-        const core::topology::BaseMeshTopology::Triangle & triangle = d_triangles.getValue()[tid];
-        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
-        defaulttype::BoundingBox bbox;
-        bbox.include(x[triangle[0]]);
-        bbox.include(x[triangle[1]]);
-        bbox.include(x[triangle[2]]);
-        return bbox;
+        return DefaultElementIterator<TriangleElement<GEOMETRY> >::create(this, this->d_triangles.getValue().size(), eid);
     }
 
     void init() {
@@ -84,7 +100,9 @@ public:
         }
     }
 
-    void draw(const core::visual::VisualParams * vparams) {
+    virtual void draw(const core::visual::VisualParams * vparams) {
+        Inherit::draw(vparams);
+
         if (! vparams->displayFlags().getShowCollisionModels())
             return;
 
@@ -155,33 +173,12 @@ public:
         }
     }
 
-    inline const helper::vector<defaulttype::Vector3> & triangleNormals() const {
-        return m_triangle_normals;
+    inline const VecTriangles & getTriangles() const {
+        return d_triangles.getValue();
     }
 
-protected:
-    typedef struct
-    {
-        defaulttype::Vector3 v0,v1;
-        double d00;
-        double d01;
-        double d11;
-        double invDenom;
-
-        defaulttype::Vector3 ax1,ax2;
-    } TriangleInfo;
-
-    //proj_P must be on the plane
-    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const
-    {
-        defaulttype::Vector3 v2 = proj_P - p0;
-
-        double d20 = dot(v2,tinfo.v0);
-        double d21 = dot(v2,tinfo.v1);
-
-        fact_v = (tinfo.d11 * d20 - tinfo.d01 * d21) * tinfo.invDenom;
-        fact_w = (tinfo.d00 * d21 - tinfo.d01 * d20) * tinfo.invDenom;
-        fact_u = 1.0 - fact_v  - fact_w;
+    inline const helper::vector<defaulttype::Vector3> & triangleNormals() const {
+        return m_triangle_normals;
     }
 
     //Barycentric coordinates are computed according to
@@ -250,6 +247,31 @@ protected:
         factor[0] = fact_u;
         factor[1] = fact_v;
         factor[2] = fact_w;
+    }
+
+protected:
+    typedef struct
+    {
+        defaulttype::Vector3 v0,v1;
+        double d00;
+        double d01;
+        double d11;
+        double invDenom;
+
+        defaulttype::Vector3 ax1,ax2;
+    } TriangleInfo;
+
+    //proj_P must be on the plane
+    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const
+    {
+        defaulttype::Vector3 v2 = proj_P - p0;
+
+        double d20 = dot(v2,tinfo.v0);
+        double d21 = dot(v2,tinfo.v1);
+
+        fact_v = (tinfo.d11 * d20 - tinfo.d01 * d21) * tinfo.invDenom;
+        fact_w = (tinfo.d00 * d21 - tinfo.d01 * d20) * tinfo.invDenom;
+        fact_u = 1.0 - fact_v  - fact_w;
     }
 
     std::vector<TriangleInfo> m_triangle_info;
