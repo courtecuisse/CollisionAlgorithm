@@ -18,20 +18,22 @@ public:
     EdgeElement(unsigned id,const GEOMETRY * geo) : m_eid(id), m_geo(geo) {}
 
     inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
-        core::topology::BaseMeshTopology::Edge edge;
+        sofa::core::topology::BaseMeshTopology::Edge edge = m_geo->getEdge(m_eid);
         defaulttype::Vector2 factor;
-        m_geo->project(m_eid, P, edge, factor);
+        m_geo->project(P, edge[0], edge[1], factor);
 
         return BaseProximity::create<EdgeProximity<GEOMETRY> >(m_geo,m_eid, edge[0],edge[1],factor[0],factor[1]);
     }
 
     inline BaseProximity::SPtr center() const {
-        const core::topology::BaseMeshTopology::Edge & edge = m_geo->getEdges()[m_eid];
+        sofa::core::topology::BaseMeshTopology::Edge edge = m_geo->getEdge(m_eid);
+
         return BaseProximity::create<EdgeProximity<GEOMETRY> >(m_geo,m_eid, edge[0],edge[1],0.5,0.5);
     }
 
     inline defaulttype::BoundingBox getBBox() const {
-        const core::topology::BaseMeshTopology::Edge & edge = m_geo->getEdges()[m_eid];
+        sofa::core::topology::BaseMeshTopology::Edge edge = m_geo->getEdge(m_eid);
+
         const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getState()->read(core::VecCoordId::position());
         defaulttype::BoundingBox bbox;
         bbox.include(x[edge[0]]);
@@ -67,8 +69,8 @@ public:
         return DefaultElementIterator<EdgeElement<GEOMETRY> >::create(this, d_edges.getValue().size(), eid);
     }
 
-    inline const VecEdges & getEdges() const {
-        return d_edges.getValue();
+    inline const Edge & getEdge(unsigned eid) const {
+        return d_edges.getValue()[eid];
     }
 
     virtual void draw(const core::visual::VisualParams * vparams) {
@@ -95,16 +97,14 @@ public:
         glEnd();
     }
 
-    void project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Edge & edge, defaulttype::Vector2 & factor) const {
-        edge = d_edges.getValue()[eid];
-
+    void project(const defaulttype::Vector3 & P, unsigned p0, unsigned p1, defaulttype::Vector2 & factor) const {
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
 
         double fact_u;
         double fact_v;
 
-        Coord v = x[edge[1]] - x[edge[0]];
-        fact_v = dot (P - x[edge[0]],v) / dot (v,v);
+        Coord v = x[p1] - x[p0];
+        fact_v = dot (P - x[p0],v) / dot (v,v);
 
         if (fact_v<0.0) fact_v = 0.0;
         else if (fact_v>1.0) fact_v = 1.0;

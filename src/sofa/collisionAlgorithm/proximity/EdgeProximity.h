@@ -43,7 +43,7 @@ public :
     inline defaulttype::Vector3 getNormal() const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->m_geometry->getState()->read(core::VecCoordId::position());
 
-        sofa::core::topology::BaseMeshTopology::Edge edge = this->m_geometry->getEdges()[m_eid];
+        sofa::core::topology::BaseMeshTopology::Edge edge = this->m_geometry->getEdge(m_eid);
 
         return (pos[edge[1]] - pos[edge[0]]).normalized();
     }
