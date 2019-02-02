@@ -27,6 +27,14 @@ public:
         m_output.clear();
     }
 
+    helper::vector<PairDetection>::const_iterator begin() const {
+        return m_output.begin();
+    }
+
+    helper::vector<PairDetection>::const_iterator end() const {
+        return m_output.begin();
+    }
+
     const PairDetection & operator[](int i) const {
         return m_output[i];
     }
