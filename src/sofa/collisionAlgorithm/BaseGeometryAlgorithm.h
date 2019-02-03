@@ -44,10 +44,13 @@ public:
     }
 
     inline void add(BaseProximity::SPtr p1,defaulttype::Vector3 & P) {
+        if (p1 == NULL) return;
         m_output.push_back(PairDetection(p1,std::shared_ptr<FixedProximity>(new FixedProximity(P))));
     }
 
     inline void add(BaseProximity::SPtr p1, BaseProximity::SPtr p2) {
+        if (p1 == NULL) return;
+        if (p2 == NULL) return;
         m_output.push_back(PairDetection(p1,p2));
     }
 
