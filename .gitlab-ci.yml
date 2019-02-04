@@ -41,7 +41,6 @@
       - echo " INSTALLING CONFIGURING PLUGIN DEPENDENCIES "
 
       - AddProjectPlugin CollisionAlgorithm
-      - AddSofaOption SOFA_BUILD_TESTS OFF
 
       - echo " BUILDING SOFA "
       - BuildSofa mimesis
