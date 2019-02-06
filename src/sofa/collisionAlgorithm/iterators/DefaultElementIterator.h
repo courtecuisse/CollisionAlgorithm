@@ -15,17 +15,17 @@ class DefaultElementIterator : public BaseElementIterator {
 public:
     typedef typename ELMT::TGeometry GEOMETRY;
 
-    DefaultElementIterator(const GEOMETRY * elmt, unsigned start, unsigned end) {
+    DefaultElementIterator(const GEOMETRY * geo, unsigned start, unsigned end) {
         m_id = start;
         m_end = end;
-        m_elements = elmt;
+        m_geo = geo;
     }
 
     virtual void next() {
         this->m_id++;
     }
 
-    virtual bool end(const BaseGeometry * /*geo*/) const {
+    virtual bool end() const {
         return m_id>=m_end;
     }
 
@@ -34,17 +34,17 @@ public:
     }
 
     BaseElement::UPtr element() {
-        return BaseElement::UPtr(new ELMT(m_id,m_elements));
+        return BaseElement::UPtr(new ELMT(m_id,m_geo));
     }
 
-    static BaseElementIterator::UPtr create(const GEOMETRY * elmt, unsigned end, unsigned start = 0) {
-        return BaseElementIterator::UPtr(new DefaultElementIterator(elmt,start,end));
+    static BaseElementIterator::UPtr create(const GEOMETRY * geo, unsigned end, unsigned start = 0) {
+        return BaseElementIterator::UPtr(new DefaultElementIterator(geo,start,end));
     }
 
 private:
     unsigned m_id;
     unsigned m_end;
-    const GEOMETRY * m_elements;
+    const GEOMETRY * m_geo;
 };
 
 }

@@ -26,12 +26,13 @@ public:
     public:
         UPtr(BaseElementIterator * ptr) : std::unique_ptr<BaseElementIterator>(ptr) {}
 
-        bool operator != (const BaseGeometry * geo) {
-            return ! this->get()->end(geo);
+        //we take the geometry as parameter for std::iterator compatibility i.e. it != m_geo->end();
+        bool operator != (const BaseGeometry * /*geo*/) {
+            return ! this->get()->end();
         }
 
-        bool operator == (const BaseGeometry * geo) {
-            return this->get()->end(geo);
+        bool operator == (const BaseGeometry * /*geo*/) {
+            return this->get()->end();
         }
 
         void operator++() {
@@ -47,7 +48,23 @@ public:
         }
     };
 
-    virtual bool end(const BaseGeometry * geo) const = 0;
+
+    static BaseElementIterator::UPtr empty() {
+        class EmptyIterator : public BaseElementIterator {
+        public:
+            virtual bool end() const { return true; }
+
+            virtual void next() {}
+
+            virtual BaseElement::UPtr element() { return NULL; }
+
+            virtual unsigned id() const { return 0; }
+        };
+
+        return UPtr(new EmptyIterator());
+    }
+
+    virtual bool end() const = 0;
 
     virtual void next() = 0;
 

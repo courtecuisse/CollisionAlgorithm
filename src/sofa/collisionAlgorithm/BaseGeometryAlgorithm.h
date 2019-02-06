@@ -58,11 +58,11 @@ protected:
     helper::vector< PairDetection > m_output;
 };
 
-class BaseGeometryAlgorithm : public core::objectmodel::BaseObject
+class BaseGeometryAlgorithm : public core::collision::Pipeline
 {
 public :
 
-    SOFA_ABSTRACT_CLASS(BaseGeometryAlgorithm, core::objectmodel::BaseObject);
+    SOFA_ABSTRACT_CLASS(BaseGeometryAlgorithm, core::collision::Pipeline);
 
     class BaseFilter : public sofa::core::objectmodel::BaseObject {
     public:
@@ -85,10 +85,33 @@ public :
         return true;
     }
 
-    virtual void doDetection(const BaseGeometry * from, const BaseGeometry * dst, DetectionOutput & output) = 0;
+    virtual void doDetection() = 0;
 
 protected:
     core::objectmodel::MultiLink<BaseGeometryAlgorithm,BaseFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filters;
+
+
+
+    virtual void reset() override {}
+
+    virtual void doCollisionReset() override {}
+
+    virtual void doCollisionDetection(const sofa::helper::vector<core::CollisionModel*>& /*collisionModels*/) override {}
+
+    virtual void doCollisionResponse() override {}
+
+    virtual std::set< std::string > getResponseList() const override {
+        std::set< std::string > res;
+        return res;
+    }
+
+    void computeCollisionDetection() {
+        doDetection();
+    }
+
+    void computeCollisionReset() {}
+
+    void computeCollisionResponse()  {}
 };
 
 }

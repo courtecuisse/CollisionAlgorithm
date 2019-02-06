@@ -14,10 +14,13 @@ public:
     SOFA_CLASS(PointCloudBindingAlgorithm, BaseGeometryAlgorithm);
 
     Data<double> d_maxDist;
+    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
+    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
+    Data<DetectionOutput> d_output;
 
     PointCloudBindingAlgorithm();
 
-    void doDetection(const BaseGeometry * from, const BaseGeometry * dst, DetectionOutput & output) override;
+    void doDetection() override;
 };
 
 }
