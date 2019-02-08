@@ -14,35 +14,13 @@ PointCloudBindingAlgorithm::PointCloudBindingAlgorithm()
 , l_dest(initLink("dest", "link to dest geometry"))
 , d_output(initData(&d_output,"output", "output of the collision detection")){}
 
-void PointCloudBindingAlgorithm::doDetection()
-{
-    std::pair<BaseProximity::SPtr,BaseProximity::SPtr> res;
-
-    if (l_from->begin() == l_from->end()) return ;
-    if (l_dest->begin() == l_dest->end()) return ;
-
-    helper::vector<BaseProximity::SPtr> p1;
-    helper::vector<BaseProximity::SPtr> p2;
-
-    for (auto it = l_from->begin(); it != l_from->end();it++)
-    {
-        p1.push_back((*it)->center());
-    }
-
-    for (auto it = l_dest->begin(); it != l_dest->end();it++)
-    {
-        p2.push_back((*it)->center());
-    }
-
-    helper::vector<int> bindId;
+void PointCloudBindingAlgorithm::bind(const std::vector<defaulttype::Vector3> & p1, const std::vector<defaulttype::Vector3> & p2, helper::vector<int> & bindId, helper::vector<int> & invBind, double maxDist) {
     bindId.resize(p1.size(),-1);
+    invBind.resize(p2.size(),-1);
 
     bool change = true;
 
-    helper::vector<int> invBind;
-    invBind.resize(p2.size(),-1);
 
-    const double& maxDist = d_maxDist.getValue();
 
     while (change)
     {
@@ -54,14 +32,14 @@ void PointCloudBindingAlgorithm::doDetection()
         for (unsigned p=0;p<p1.size();p++) {
             if (bindId[p] != -1) continue;
 
-            Vector3 P = p1[p]->getPosition();
+            Vector3 P = p1[p];
             int closestId = -1;
             double closestDist = std::numeric_limits<double>::max();
 
             //Find minimal distance
             for (unsigned i=0;i<p2.size();i++)
             {
-                Vector3 Q = p2[i]->getPosition();
+                Vector3 Q = p2[i];
                 double dist = (Q-P).norm();
 
                 if (dist < closestDist && invBind[i] == -1)
@@ -100,8 +78,8 @@ void PointCloudBindingAlgorithm::doDetection()
 
                 change = true; // we retry the binding because two points are associated with the same point
 
-                double d1 = (p1[A]->getPosition() - p2[C]->getPosition()).norm();
-                double d2 = (p1[B]->getPosition() - p2[C]->getPosition()).norm();
+                double d1 = (p1[A] - p2[C]).norm();
+                double d2 = (p1[B] - p2[C]).norm();
 
                 if (d2<d1)
                 {
@@ -115,6 +93,31 @@ void PointCloudBindingAlgorithm::doDetection()
             }
         }
     }
+}
+
+void PointCloudBindingAlgorithm::doDetection()
+{
+    std::pair<BaseProximity::SPtr,BaseProximity::SPtr> res;
+
+    if (l_from->begin() == l_from->end()) return ;
+    if (l_dest->begin() == l_dest->end()) return ;
+
+    helper::vector<defaulttype::Vector3> p1;
+    helper::vector<defaulttype::Vector3> p2;
+
+    for (auto it = l_from->begin(); it != l_from->end();it++)
+    {
+        p1.push_back((*it)->center()->getPosition());
+    }
+
+    for (auto it = l_dest->begin(); it != l_dest->end();it++)
+    {
+        p2.push_back((*it)->center()->getPosition());
+    }
+
+    helper::vector<int> bindId;
+    helper::vector<int> invBind;
+    bind(p1,p2,bindId,invBind,d_maxDist.getValue());
 
     DetectionOutput & output = *d_output.beginEdit();
     output.clear();
@@ -125,8 +128,8 @@ void PointCloudBindingAlgorithm::doDetection()
             continue;
 
         std::pair<BaseProximity::SPtr,BaseProximity::SPtr> pair;
-        pair.first = p1[bindId[i]];
-        pair.second = p2[invBind[i]];
+        pair.first = (*l_from->begin(bindId[i]))->center();
+        pair.second = (*l_dest->begin(invBind[i]))->center();
 
         output.add(pair.first,pair.second);
     }

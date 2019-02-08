@@ -21,6 +21,8 @@ public:
     PointCloudBindingAlgorithm();
 
     void doDetection() override;
+
+    static void bind(const std::vector<defaulttype::Vector3> & p1, const std::vector<defaulttype::Vector3> & p2, helper::vector<int> & bindId, helper::vector<int> & invBind, double maxDist);
 };
 
 }
