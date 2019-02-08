@@ -7,10 +7,13 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 file(GLOB_RECURSE HEADER_FILES
     "src/*.h"
     "src/*.inl"
+    "deprecated/*.h"
+    "deprecated/*.inl"
 )
 
 file(GLOB_RECURSE SOURCE_FILES
     "src/*.cpp"
+    "deprecated/*.cpp"
 
 )
 
@@ -19,10 +22,10 @@ file(GLOB_RECURSE SCENES_FILES
     "scenes/*.xml"
 )
 
-file(GLOB_RECURSE SANDBOX_FILES
-    "sandbox/*.h"
-    "sandbox/*.inl"
-    "sandbox/*.cpp"
+file(GLOB_RECURSE IGNORED_FILES
+    "ignored/*.h"
+    "ignored/*.inl"
+    "ignored/*.cpp"
 )
 
 set (CMAKE_CXX_STANDARD 11)
@@ -35,8 +38,8 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-set_source_files_properties(${SANDBOX_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${SANDBOX_FILES}  ${README_FILES} )
+set_source_files_properties(${IGNORED_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${IGNORED_FILES}  ${README_FILES} )
 set(CollisionAlgorithm_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${CollisionAlgorithm_INCLUDE_DIRS}>")
