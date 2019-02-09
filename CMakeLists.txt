@@ -24,8 +24,6 @@ file(GLOB_RECURSE IGNORED_FILES
     "src/ignored/*.cpp"
 )
 
-set (CMAKE_CXX_STANDARD 11)
-
 find_package( OpenGL REQUIRED )
 find_package( Qt5 COMPONENTS OpenGL REQUIRED)
 find_package( Eigen3 REQUIRED )
