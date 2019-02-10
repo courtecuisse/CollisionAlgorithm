@@ -3,43 +3,11 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
+#include <sofa/collisionAlgorithm/elements/PointElement.h>
 
-namespace sofa
-{
+namespace sofa {
 
-namespace collisionAlgorithm
-{
-
-template<class GEOMETRY>
-class PointElement : public BaseElement {
-public:
-    typedef GEOMETRY TGeometry;
-    typedef typename GEOMETRY::TDataTypes DataTypes;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef Data<VecCoord> DataVecCoord;
-
-    PointElement(unsigned id,const GEOMETRY * geo) : m_id(id), m_geo(geo) {}
-
-    inline BaseProximity::SPtr project(const defaulttype::Vector3 & /*P*/) const {
-        return BaseProximity::create<PointProximity<GEOMETRY> >(m_geo,m_id);
-    }
-
-    inline BaseProximity::SPtr center() const {
-        return BaseProximity::create<PointProximity<GEOMETRY> >(m_geo,m_id);
-    }
-
-    inline defaulttype::BoundingBox getBBox() const {
-        const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getState()->read(core::VecCoordId::position());
-        defaulttype::BoundingBox bbox;
-        bbox.include(x[m_id]);
-        return bbox;
-    }
-
-protected:
-    unsigned m_id;
-    const GEOMETRY * m_geo;
-};
-
+namespace collisionAlgorithm {
 
 template<class DataTypes>
 class PointGeometry : public TBaseGeometry<DataTypes> {
@@ -69,9 +37,13 @@ public:
 
         glDisable(GL_LIGHTING);
 
-    //    for(ElementIterator it=elementIterator();!it.end();it.next()) {
-    //        m_elements[i]->draw(vparams);
-    //    }
+        const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
+
+        glBegin(GL_POINTS);
+        for(auto it=begin();it!=this->end();it++) {
+            glVertex3dv(pos[it->id()].data());
+        }
+        glEnd();
     }
 
 };

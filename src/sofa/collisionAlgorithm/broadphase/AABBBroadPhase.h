@@ -32,17 +32,38 @@ public:
 
     void draw(const core::visual::VisualParams * /*vparams*/) override;
 
+    inline unsigned getKey(size_t i,size_t j,size_t k) const {
+        return i*m_offset[0] + j * m_offset[1] + k;
+    }
+
+    inline const std::set<unsigned> & getIndexedElements(unsigned i,unsigned j, unsigned k) const {
+        auto it = m_indexedElement.find(getKey(i,j,k));
+        if (it == m_indexedElement.end()) return m_empty;
+        else return it->second;
+    }
+
+    inline defaulttype::Vec3i getCoord(const defaulttype::Vector3 & P) const {
+        defaulttype::Vec3i cbox;
+        cbox[0] = floor(P[0]/m_cellSize[0]);
+        cbox[1] = floor(P[1]/m_cellSize[1]);
+        cbox[2] = floor(P[2]/m_cellSize[2]);
+        return cbox;
+    }
+
+    inline const defaulttype::Vector3 & getMin() const {
+        return m_Bmin;
+    }
+
+    inline const defaulttype::Vector3 & getMax() const {
+        return m_Bmax;
+    }
 
 protected:
     defaulttype::Vector3 m_Bmin,m_Bmax,m_cellSize;
     defaulttype::Vec3i m_nbox;
     defaulttype::Vec<2, size_t> m_offset;
     std::map<unsigned, std::set<unsigned> > m_indexedElement;
-
-    unsigned getKey(size_t i,size_t j,size_t k) const
-    {
-        return i*m_offset[0] + j * m_offset[1] + k;
-    }
+    std::set<unsigned> m_empty;
 
     void fillElementSet(defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int b) const;
 };
