@@ -1,7 +1,8 @@
-#include <sofa/core/ObjectFactory.h>
 #include <string>
-#include <sofa/helper/system/FileRepository.h>
 #include <stdio.h>
+#include <sofa/helper/system/FileRepository.h>
+#include <sofa/helper/system/SetDirectory.h>
+#include <sofa/core/ObjectFactory.h>
 
 #define Q(x) #x
 #define QUOTE(x) Q(x)
@@ -35,12 +36,13 @@ namespace collisionAlgorithm {
             first = false;
             sofa::helper::system::DataRepository.addLastPath(std::string(PLUGIN_DATA_DIR_));
             sofa::helper::system::DataRepository.addLastPath(std::string(PLUGIN_DATA_DIR_) + "/data");
+            sofa::helper::system::DataRepository.addLastPath(sofa::helper::system::SetDirectory::GetCurrentDir());
 		}
 	}
 
 	const char* getModuleName()
 	{
-        return "CollisionAlgorithmPlugin";
+        return "CollisionAlgorithm";
 	}
 
 	const char* getModuleVersion()
@@ -53,7 +55,6 @@ namespace collisionAlgorithm {
 		return "LGPL";
 	}
 
-
 	const char* getModuleDescription()
 	{
 		return "a simple example of a plugin component module";
@@ -64,6 +65,6 @@ namespace collisionAlgorithm {
         return "";
 	}
 
-}
+} 
 
 } 
