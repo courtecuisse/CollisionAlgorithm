@@ -74,7 +74,7 @@ public:
         auto res = sofa::helper::write(*resId[m_geometry->getState()].write(), cParams);
         const typename DataTypes::MatrixDeriv& j = cParams->readJ(m_geometry->getState())->getValue();
         auto rowIt = j.readLine(cid);
-        const SReal f = lambda->element(cid);
+        const double f = lambda->element(cid);
         for (auto colIt = rowIt.begin(), colItEnd = rowIt.end(); colIt != colItEnd; ++colIt)
         {
             res[colIt.index()] += colIt.val() * f;

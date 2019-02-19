@@ -79,6 +79,7 @@ public:
         if (eid < d_triangles.getValue().size())
             return DefaultElementIterator<GenericElement<GEOMETRY,sofa::core::topology::BaseMeshTopology::Triangle> >::create(this, d_triangles.getValue().size(), eid);
 
+        return NULL;
     }
 
 protected:
