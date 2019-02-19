@@ -78,7 +78,7 @@ public :
 
     bool acceptFilter(const BaseProximity::SPtr & pfrom,const BaseProximity::SPtr & pdest) const {
         for (auto itfilter = l_filters.begin();itfilter != l_filters.end();itfilter++) {
-            const BaseFilter * filter = (*itfilter);
+            BaseFilter::SPtr filter = (*itfilter);
             if (filter == NULL) continue;
             if (! filter->accept(pdest,pfrom)) return false;
         }

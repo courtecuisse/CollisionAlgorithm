@@ -46,6 +46,10 @@ public:
         BaseElement::UPtr operator* () {
             return this->get()->element();
         }
+
+        const BaseElement::UPtr operator* () const {
+            return this->get()->element();
+        }
     };
 
 
