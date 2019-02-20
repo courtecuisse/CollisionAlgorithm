@@ -11,7 +11,7 @@ void treeBranch(const helper::vector<defaulttype::Vector3> & pointCloud, helper:
     helper::vector<int> branchinf(branch.size()/2-1,0);
     helper::vector<int> branchsup(branch.size()-branchinf.size()-1,0);
     helper::vector<double> coordAxis1(branch.size(),0);
-    int medianIndex;
+    int medianIndex = 0;
 
     if (axis==0) { //trie selon x
         for (unsigned i=0;i<branch.size();i++) {

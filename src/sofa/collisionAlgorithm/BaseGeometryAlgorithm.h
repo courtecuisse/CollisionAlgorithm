@@ -78,7 +78,7 @@ public :
 
     bool acceptFilter(const BaseProximity::SPtr & pfrom,const BaseProximity::SPtr & pdest) const {
         for (auto itfilter = l_filters.begin();itfilter != l_filters.end();itfilter++) {
-            BaseFilter::SPtr filter = (*itfilter);
+            const BaseFilter * filter = (*itfilter);
             if (filter == NULL) continue;
             if (! filter->accept(pdest,pfrom)) return false;
         }
@@ -89,8 +89,6 @@ public :
 
 protected:
     core::objectmodel::MultiLink<BaseGeometryAlgorithm,BaseFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filters;
-
-
 
     virtual void reset() override {}
 
