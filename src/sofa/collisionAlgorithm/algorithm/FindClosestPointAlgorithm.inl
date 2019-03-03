@@ -104,6 +104,9 @@ BaseProximity::SPtr BaseClosestPointAlgorithm::findClosestPoint(BaseProximity::S
 }
 
 void FindClosestPointAlgorithm::doDetection() {
+    if (l_from == NULL) return;
+    if (l_dest == NULL) return;
+
     DetectionOutput & output = *d_output.beginEdit();
     output.clear();
     for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {

@@ -2,7 +2,7 @@
 
 #include <sofa/collisionAlgorithm/BaseElementIterator.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
-#include <sofa/core/collision/Pipeline.h>
+#include <sofa/core/BehaviorModel.h>
 #include <sofa/core/topology/BaseMeshTopology.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <qopengl.h>
@@ -13,10 +13,10 @@ namespace collisionAlgorithm {
 
 class BroadPhase;
 
-class BaseGeometry : public core::collision::Pipeline
+class BaseGeometry : public core::BehaviorModel
 {
 public:
-    SOFA_ABSTRACT_CLASS(BaseGeometry,core::collision::Pipeline);
+    SOFA_ABSTRACT_CLASS(BaseGeometry,core::BehaviorModel);
 
     Data<defaulttype::Vector4> d_color;
     Data<double> d_drawScaleNormal;
@@ -48,12 +48,8 @@ public:
     virtual void prepareDetection() {}
 
     virtual void draw(const core::visual::VisualParams * vparams) {
-        if (! vparams->displayFlags().getShowNormals())
-            return;
-
-        if (this->d_color.getValue()[3] == 0.0)
-            return;
-
+        if (! vparams->displayFlags().getShowNormals()) return;
+        if (this->d_color.getValue()[3] == 0.0) return;
         if (d_drawScaleNormal.getValue() == 0) return;
 
         for (auto it=begin();it!=end();it++) {
@@ -63,26 +59,9 @@ public:
     }
 
 private:
-    virtual void reset() override {}
-
-    virtual void doCollisionReset() override {}
-
-    virtual void doCollisionDetection(const sofa::helper::vector<core::CollisionModel*>& /*collisionModels*/) override {}
-
-    virtual void doCollisionResponse() override {}
-
-    virtual std::set< std::string > getResponseList() const override {
-        std::set< std::string > res;
-        return res;
-    }
-
-    void computeCollisionDetection() {}
-
-    void computeCollisionReset() {
+    virtual void updatePosition(SReal /*dt*/) {
         prepareDetection();
     }
-
-    void computeCollisionResponse()  {}
 
     void bwdInit() {
         prepareDetection();
