@@ -144,9 +144,9 @@ public:
 
             const Triangle& triangle = this->l_geometry->d_triangles.getValue()[tid];
 
-            TriangleProximity<GEOMETRY> proxA(this, tid, triangle[0],triangle[1],triangle[2], bary_A[0],bary_A[1],bary_A[2]);
-            TriangleProximity<GEOMETRY> proxB(this, tid, triangle[0],triangle[1],triangle[2], bary_B[0],bary_B[1],bary_B[2]);
-            TriangleProximity<GEOMETRY> proxC(this, tid, triangle[0],triangle[1],triangle[2], bary_C[0],bary_C[1],bary_C[2]);
+            BezierTriangleProximity<GEOMETRY> proxA(this, tid, triangle[0],triangle[1],triangle[2], bary_A[0],bary_A[1],bary_A[2]);
+            BezierTriangleProximity<GEOMETRY> proxB(this, tid, triangle[0],triangle[1],triangle[2], bary_B[0],bary_B[1],bary_B[2]);
+            BezierTriangleProximity<GEOMETRY> proxC(this, tid, triangle[0],triangle[1],triangle[2], bary_C[0],bary_C[1],bary_C[2]);
 
             // draw Triangle
 
