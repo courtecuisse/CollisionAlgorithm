@@ -202,8 +202,6 @@ public:
     }
 
     void project(unsigned elmt, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & fact) const {
-        //initialize the algorithm xith the projection on a linear triangle
-        this->l_geometry->project(elmt, P, triangle, fact);
 
         unsigned max_it = d_nonlin_max_it.getValue();
         double tolerance = d_nonlin_tolerance.getValue();
@@ -212,11 +210,13 @@ public:
         unsigned int it=0;
         double delta = 0.00001;
 
+        //initialize the algorithm xith the projection on a linear triangle
+        this->l_geometry->project(elmt, P, triangle, fact);
         BezierTriangleProximity<GEOMETRY> pinfo(this, elmt,triangle[0],triangle[1],triangle[2], fact[0],fact[1],fact[2]);
 
         while(it< max_it)
         {
-            defaulttype::Vector3 Q = pinfo.getPosition(core::VecCoordId::position());
+            defaulttype::Vector3 Q = pinfo.getPosition();
 
             defaulttype::Vector3 nQP = P - Q;
             if (nQP.norm() < tolerance) break;
@@ -247,7 +247,7 @@ public:
             if (P_v_fact0 < 0 || P_v_fact1 < 0 || P_v_fact2 < 0) break;
 
             BezierTriangleProximity<GEOMETRY> P_v(this, elmt,triangle[0],triangle[1],triangle[2], P_v_fact0,P_v_fact1,P_v_fact2);
-            defaulttype::Vector3 p_v = (P - P_v.getPosition(core::VecCoordId::position())).normalized();
+            defaulttype::Vector3 p_v = (P - P_v.getPosition()).normalized();
             defaulttype::Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
 
             //variation point along u
@@ -257,7 +257,7 @@ public:
             if (P_u_fact0 < 0 || P_u_fact1 < 0 || P_u_fact2 < 0) break;
 
             BezierTriangleProximity<GEOMETRY> P_u(this, elmt,triangle[0],triangle[1],triangle[2], P_u_fact0,P_u_fact1,P_u_fact2);
-            defaulttype::Vector3 p_u = (P - P_u.getPosition(core::VecCoordId::position())).normalized();
+            defaulttype::Vector3 p_u = (P - P_u.getPosition()).normalized();
             defaulttype::Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
 
 

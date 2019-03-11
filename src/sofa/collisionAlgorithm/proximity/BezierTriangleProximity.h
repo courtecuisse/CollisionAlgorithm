@@ -46,13 +46,13 @@ public :
         {
             const helper::ReadAccessor<DataVecCoord> & x = this->m_geometry->getState()->read(v);
 
-            const defaulttype::Vector3 & p300 = x[m_pid[2]];
-            const defaulttype::Vector3 & p030 = x[m_pid[1]];
-            const defaulttype::Vector3 & p003 = x[m_pid[0]];
+            const defaulttype::Vector3 & p300 = x[this->m_pid[2]];
+            const defaulttype::Vector3 & p030 = x[this->m_pid[1]];
+            const defaulttype::Vector3 & p003 = x[this->m_pid[0]];
 
-            double fact_w = m_fact[2];
-            double fact_u = m_fact[1];
-            double fact_v = m_fact[0];
+            double fact_w = this->m_fact[2];
+            double fact_u = this->m_fact[1];
+            double fact_v = this->m_fact[0];
 
             return p300 *   fact_w*fact_w*fact_w +
                    p030 *   fact_u*fact_u*fact_u +
@@ -67,19 +67,19 @@ public :
         }
         else if (v == core::VecCoordId::freePosition())
         {
-            double fact_w = m_fact[2];
-            double fact_u = m_fact[1];
-            double fact_v = m_fact[0];
+            double fact_w = this->m_fact[2];
+            double fact_u = this->m_fact[1];
+            double fact_v = this->m_fact[0];
 
             const helper::ReadAccessor<DataVecCoord> & x = this->m_geometry->getState()->read(core::VecCoordId::freePosition());
 
-            const defaulttype::Vector3 & p300_Free = x[m_pid[2]];
-            const defaulttype::Vector3 & p030_Free = x[m_pid[1]];
-            const defaulttype::Vector3 & p003_Free = x[m_pid[0]];
+            const defaulttype::Vector3 & p300_Free = x[this->m_pid[2]];
+            const defaulttype::Vector3 & p030_Free = x[this->m_pid[1]];
+            const defaulttype::Vector3 & p003_Free = x[this->m_pid[0]];
 
-            const defaulttype::Vector3 & n200_Free = this->m_geometry->pointNormals()[m_pid[2]];
-            const defaulttype::Vector3 & n020_Free = this->m_geometry->pointNormals()[m_pid[1]];
-            const defaulttype::Vector3 & n002_Free = this->m_geometry->pointNormals()[m_pid[0]];
+            const defaulttype::Vector3 & n200_Free = this->m_geometry->pointNormals()[this->m_pid[2]];
+            const defaulttype::Vector3 & n020_Free = this->m_geometry->pointNormals()[this->m_pid[1]];
+            const defaulttype::Vector3 & n002_Free = this->m_geometry->pointNormals()[this->m_pid[0]];
 
             double w12_free = dot(p030_Free - p300_Free,n200_Free);
             double w21_free = dot(p300_Free - p030_Free,n020_Free);
@@ -122,13 +122,13 @@ public :
     defaulttype::Vector3 getNormal() const {
         const BezierTriangleInfo & tbinfo = this->m_geometry->bezierInfo()[this->m_tid];
 
-        const defaulttype::Vector3 &n200 = this->m_geometry->pointNormals()[m_pid[2]];
-        const defaulttype::Vector3 &n020 = this->m_geometry->pointNormals()[m_pid[1]];
-        const defaulttype::Vector3 &n002 = this->m_geometry->pointNormals()[m_pid[0]];
+        const defaulttype::Vector3 &n200 = this->m_geometry->pointNormals()[this->m_pid[2]];
+        const defaulttype::Vector3 &n020 = this->m_geometry->pointNormals()[this->m_pid[1]];
+        const defaulttype::Vector3 &n002 = this->m_geometry->pointNormals()[this->m_pid[0]];
 
-        double fact_w = m_fact[2];
-        double fact_u = m_fact[1];
-        double fact_v = m_fact[0];
+        double fact_w = this->m_fact[2];
+        double fact_u = this->m_fact[1];
+        double fact_v = this->m_fact[0];
 
         defaulttype::Vector3 normal = n200 * fact_w*fact_w +
                                       n020 * fact_u*fact_u +
@@ -144,14 +144,10 @@ public :
     }
 
     void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
-        it.addCol(m_pid[0], N * m_fact[0]);
-        it.addCol(m_pid[1], N * m_fact[1]);
-        it.addCol(m_pid[2], N * m_fact[2]);
+        it.addCol(this->m_pid[0], N * this->m_fact[0]);
+        it.addCol(this->m_pid[1], N * this->m_fact[1]);
+        it.addCol(this->m_pid[2], N * this->m_fact[2]);
     }
-
-protected:
-    unsigned m_pid[3];
-    double m_fact[3];
 
 };
 
