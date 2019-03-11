@@ -24,7 +24,7 @@ public:
     inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
         core::topology::BaseMeshTopology::Triangle triangle;
         defaulttype::Vector3 factor;
-        m_geo->project(m_tid, P, triangle, factor);
+        m_geo->l_geometry->project(m_tid, P, triangle, factor);
 
         return BaseProximity::create<PhongTriangleProximity<GEOMETRY> >(m_geo,m_tid,
                                                                          triangle[0],triangle[1],triangle[2],
@@ -32,14 +32,14 @@ public:
     }
 
     inline BaseProximity::SPtr center() const {
-        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->getTriangles()[m_tid];
+        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->l_geometry->getTriangles()[m_tid];
         return BaseProximity::create<PhongTriangleProximity<GEOMETRY> >(m_geo,m_tid,
                                                                          triangle[0],triangle[1],triangle[2],
                                                                          0.3333,0.3333,0.3333);
     }
 
     inline defaulttype::BoundingBox getBBox() const {
-        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->getTriangles()[m_tid];
+        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->l_geometry->getTriangles()[m_tid];
         const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getState()->read(core::VecCoordId::position());
         defaulttype::BoundingBox bbox;
         bbox.include(x[triangle[0]]);
@@ -54,10 +54,10 @@ protected:
 };
 
 template<class DataTypes>
-class PhongTriangleGeometry : public TriangleGeometry<DataTypes> {
+class PhongTriangleGeometry : public TLinkGeometry<TriangleGeometry<DataTypes> > {
 public:
     typedef DataTypes TDataTypes;
-    typedef TriangleGeometry<DataTypes> Inherit;
+    typedef TLinkGeometry<TriangleGeometry<DataTypes>> Inherit;
     typedef PhongTriangleGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::Coord Coord;
     typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
@@ -68,14 +68,12 @@ public:
     SOFA_CLASS(GEOMETRY,Inherit);
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
-        return DefaultElementIterator<PhongTriangleElement<GEOMETRY> >::create(this, this->d_triangles.getValue().size(), eid);
+        return DefaultElementIterator<PhongTriangleElement<GEOMETRY> >::create(this, this->l_geometry->d_triangles.getValue().size(), eid);
     }
 
     virtual void init() {
-        TriangleGeometry<DataTypes>::init();
-
         //store triangles around vertex information
-        const VecTriangles& triangles = this->d_triangles.getValue();
+        const VecTriangles& triangles = this->l_geometry->d_triangles.getValue();
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
         m_trianglesAroundVertex.resize(pos.size());
         for (size_t i = 0; i < triangles.size(); ++i)
@@ -87,17 +85,14 @@ public:
     }
 
     virtual void prepareDetection() {
-        TriangleGeometry<DataTypes>::prepareDetection();
-
         m_point_normals.resize(m_trianglesAroundVertex.size());
 
         for (size_t p=0;p<m_trianglesAroundVertex.size();p++)
         {
             const std::vector<TriangleID> & tav = m_trianglesAroundVertex[p];
             m_point_normals[p] = defaulttype::Vector3(0,0,0);
-            for (size_t t=0;t<tav.size();t++)
-            {
-                m_point_normals[p] += this->m_triangle_normals[tav[t]];
+            for (size_t t=0;t<tav.size();t++) {
+                m_point_normals[p] += this->l_geometry->triangleNormals()[tav[t]];
             }
             m_point_normals[p].normalize();
         }
@@ -105,6 +100,10 @@ public:
 
     inline const helper::vector<defaulttype::Vector3> & pointNormals() const {
         return m_point_normals;
+    }
+
+    inline const helper::vector<defaulttype::Vector3> & triangleNormals() const {
+        return this->l_geometry->triangleNormals();
     }
 
 protected:

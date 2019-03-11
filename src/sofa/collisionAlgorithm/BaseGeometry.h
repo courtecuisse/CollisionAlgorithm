@@ -63,10 +63,6 @@ private:
         prepareDetection();
     }
 
-    void bwdInit() {
-        prepareDetection();
-    }
-
     BroadPhase * m_broadPhase;
 };
 
@@ -78,6 +74,7 @@ public:
     typedef TBaseGeometry<DataTypes> GEOMETRY;
     SOFA_ABSTRACT_CLASS(GEOMETRY,BaseGeometry);
 
+    typedef DataTypes TDataTypes;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef Data<VecCoord> DataVecCoord;
@@ -86,8 +83,7 @@ public:
     core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
 
     TBaseGeometry()
-    : BaseGeometry()
-    , l_state(initLink("mstate", "link to state")) {
+    : l_state(initLink("mstate", "link to state")) {
         l_state.setPath("@.");
     }
 
@@ -95,6 +91,33 @@ public:
         return l_state.get();
     }
 };
+
+
+template<class LINK>
+class TLinkGeometry : public BaseGeometry
+{
+public:
+    typedef TLinkGeometry<LINK> GEOMETRY;
+    SOFA_ABSTRACT_CLASS(GEOMETRY,BaseGeometry);
+
+    typedef typename LINK::TDataTypes DataTypes;
+    typedef typename DataTypes::Coord Coord;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef Data<VecCoord> DataVecCoord;
+    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+
+    core::objectmodel::SingleLink<TLinkGeometry<LINK>,LINK,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+
+    TLinkGeometry()
+    : l_geometry(initLink("geometry", "link to state")) {
+        l_geometry.setPath("@.");
+    }
+
+    sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
+        return l_geometry->getState();
+    }
+};
+
 
 }
 
