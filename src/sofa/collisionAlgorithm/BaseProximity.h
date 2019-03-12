@@ -36,11 +36,10 @@ public :
     }
 };
 
-template<class GEOMETRY>
+template<class DataTypes>
 class TBaseProximity : public BaseProximity {
 public:
 
-    typedef typename GEOMETRY::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
@@ -51,15 +50,14 @@ public:
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    TBaseProximity(const GEOMETRY * geo)
-    : m_geometry(geo) {}
+    TBaseProximity(sofa::core::behavior::MechanicalState<DataTypes> * state)
+    : m_state(state) {}
 
     virtual void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const = 0;
 
     void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
-        DataMatrixDeriv & c1_d = *cId[m_geometry->getState()].write();
+        DataMatrixDeriv & c1_d = *cId[m_state].write();
         MatrixDeriv & c1 = *c1_d.beginEdit();
 
         for (unsigned j=0;j<normals.size();j++) {
@@ -71,8 +69,8 @@ public:
     }
 
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const {
-        auto res = sofa::helper::write(*resId[m_geometry->getState()].write(), cParams);
-        const typename DataTypes::MatrixDeriv& j = cParams->readJ(m_geometry->getState())->getValue();
+        auto res = sofa::helper::write(*resId[m_state].write(), cParams);
+        const typename DataTypes::MatrixDeriv& j = cParams->readJ(m_state)->getValue();
         auto rowIt = j.readLine(cid);
         const double f = lambda->element(cid);
         for (auto colIt = rowIt.begin(), colItEnd = rowIt.end(); colIt != colItEnd; ++colIt)
@@ -83,7 +81,7 @@ public:
 
 
 protected:
-    const GEOMETRY * m_geometry;
+    sofa::core::behavior::MechanicalState<DataTypes> * m_state;
 
 };
 

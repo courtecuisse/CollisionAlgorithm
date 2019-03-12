@@ -1,7 +1,6 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
-#include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
 #include <sofa/collisionAlgorithm/elements/EdgeElement.h>
 
 namespace sofa {

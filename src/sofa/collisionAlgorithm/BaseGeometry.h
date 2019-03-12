@@ -5,6 +5,7 @@
 #include <sofa/core/BehaviorModel.h>
 #include <sofa/core/topology/BaseMeshTopology.h>
 #include <sofa/core/visual/VisualParams.h>
+#include <sofa/core/objectmodel/DataCallback.h>
 #include <qopengl.h>
 
 namespace sofa {
@@ -13,17 +14,25 @@ namespace collisionAlgorithm {
 
 class BroadPhase;
 
-class BaseGeometry : public core::BehaviorModel
+class BaseGeometry : public core::objectmodel::BaseObject
 {
 public:
-    SOFA_ABSTRACT_CLASS(BaseGeometry,core::BehaviorModel);
+    SOFA_ABSTRACT_CLASS(BaseGeometry,core::objectmodel::BaseObject);
 
     Data<defaulttype::Vector4> d_color;
     Data<double> d_drawScaleNormal;
+    sofa::core::objectmodel::_datacallback_::DataCallback c_update;
 
     BaseGeometry()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model")){}
+    , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model")){
+        c_update.addCallback(std::bind(&BaseGeometry::prepareDetection,this));
+    }
+
+    void init() {
+        core::objectmodel::BaseData * data = this->getState()->findData("position");
+        if (data) c_update.addInput(data);
+    }
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
@@ -48,11 +57,6 @@ public:
             BaseProximity::SPtr center = (*it)->center();
             vparams->drawTool()->drawArrow(center->getPosition(), center->getPosition() + center->getNormal() * d_drawScaleNormal.getValue(), d_drawScaleNormal.getValue() * 0.1, d_color.getValue());
         }
-    }
-
-private:
-    virtual void updatePosition(SReal /*dt*/) {
-        prepareDetection();
     }
 };
 

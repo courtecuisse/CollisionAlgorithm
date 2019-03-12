@@ -13,9 +13,9 @@ class DefaultElementIterator : public BaseElementIterator {
     friend class Iterator;
 
 public:
-    typedef typename ELMT::TGeometry GEOMETRY;
+    typedef typename ELMT::TContainer CONTAINER;
 
-    DefaultElementIterator(const GEOMETRY * geo, unsigned start, unsigned end) {
+    DefaultElementIterator(const CONTAINER * geo, unsigned start, unsigned end) {
         m_id = start;
         m_end = end;
         m_geo = geo;
@@ -37,14 +37,14 @@ public:
         return BaseElement::UPtr(new ELMT(m_id,m_geo));
     }
 
-    static BaseElementIterator::UPtr create(const GEOMETRY * geo, unsigned end, unsigned start = 0) {
+    static BaseElementIterator::UPtr create(const CONTAINER * geo, unsigned end, unsigned start = 0) {
         return BaseElementIterator::UPtr(new DefaultElementIterator(geo,start,end));
     }
 
 private:
     unsigned m_id;
     unsigned m_end;
-    const GEOMETRY * m_geo;
+    const CONTAINER * m_geo;
 };
 
 }

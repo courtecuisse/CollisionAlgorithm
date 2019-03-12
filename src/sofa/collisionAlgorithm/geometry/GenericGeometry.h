@@ -9,15 +9,15 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class GEOMETRY, class ELMT>
+template<class CONTAINER, class ELMT>
 class GenericElement : public BaseElement {
 public:
-    typedef GEOMETRY TGeometry;
-    typedef typename GEOMETRY::TDataTypes DataTypes;
+    typedef CONTAINER TContainer;
+    typedef typename CONTAINER::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef Data<VecCoord> DataVecCoord;
 
-    GenericElement(unsigned id,const GEOMETRY * geo) : m_tid(id), m_geo(geo) {}
+    GenericElement(unsigned id,const CONTAINER * geo) : m_tid(id), m_geo(geo) {}
 
     inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
         return NULL;
@@ -42,7 +42,7 @@ public:
     }
 protected:
     unsigned m_tid;
-    const GEOMETRY * m_geo;
+    const CONTAINER * m_geo;
 };
 
 
@@ -51,7 +51,7 @@ template<class DataTypes>
 class GenericGeometry : public TBaseGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
-        typedef TBaseGeometry<DataTypes> Inherit;
+    typedef TBaseGeometry<DataTypes> Inherit;
     typedef GenericGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;

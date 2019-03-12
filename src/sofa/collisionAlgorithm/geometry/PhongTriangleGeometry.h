@@ -11,31 +11,37 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class GEOMETRY>
+template<class CONTAINER>
 class PhongTriangleElement : public BaseElement {
 public:
-    typedef GEOMETRY TGeometry;
-    typedef typename GEOMETRY::TDataTypes DataTypes;
+    typedef CONTAINER TContainer;
+    typedef typename CONTAINER::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef Data<VecCoord> DataVecCoord;
 
-    PhongTriangleElement(unsigned id,const GEOMETRY * geo) : m_tid(id), m_geo(geo) {}
+    PhongTriangleElement(unsigned id,const CONTAINER * geo) : m_tid(id), m_geo(geo) {}
 
     inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
         core::topology::BaseMeshTopology::Triangle triangle;
         defaulttype::Vector3 factor;
         m_geo->l_geometry->project(m_tid, P, triangle, factor);
 
-        return BaseProximity::create<PhongTriangleProximity<GEOMETRY> >(m_geo,m_tid,
+        return BaseProximity::create<PhongTriangleProximity<DataTypes> >(m_geo->getState(),
                                                                          triangle[0],triangle[1],triangle[2],
-                                                                         factor[0],factor[1],factor[2]);
+                                                                         factor[0],factor[1],factor[2],
+                                                                         m_geo->pointNormals()[triangle[0]],
+                                                                         m_geo->pointNormals()[triangle[1]],
+                                                                         m_geo->pointNormals()[triangle[2]]);
     }
 
     inline BaseProximity::SPtr center() const {
         const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->l_geometry->getTriangles()[m_tid];
-        return BaseProximity::create<PhongTriangleProximity<GEOMETRY> >(m_geo,m_tid,
+        return BaseProximity::create<PhongTriangleProximity<DataTypes> >(m_geo->getState(),
                                                                          triangle[0],triangle[1],triangle[2],
-                                                                         0.3333,0.3333,0.3333);
+                                                                         0.3333,0.3333,0.3333,
+                                                                         m_geo->pointNormals()[triangle[0]],
+                                                                         m_geo->pointNormals()[triangle[1]],
+                                                                         m_geo->pointNormals()[triangle[2]]);
     }
 
     inline defaulttype::BoundingBox getBBox() const {
@@ -50,7 +56,7 @@ public:
 
 protected:
     unsigned m_tid;
-    const GEOMETRY * m_geo;
+    const CONTAINER * m_geo;
 };
 
 template<class DataTypes>
@@ -72,6 +78,8 @@ public:
     }
 
     virtual void init() {
+        Inherit::init();
+
         //store triangles around vertex information
         const VecTriangles& triangles = this->l_geometry->d_triangles.getValue();
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());

@@ -17,7 +17,7 @@ public:
     typedef typename DataTypes::VecCoord VecCoord;
     typedef Data<VecCoord> DataVecCoord;
 
-    GenericElement(unsigned id,const GEOMETRY * geo) : m_tid(id), m_geo(geo) {}
+    GenericElement(unsigned id,const GEOMETRY * geo) : m_tid(id), m_container(geo) {}
 
     inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
         return NULL;
@@ -42,7 +42,7 @@ public:
     }
 protected:
     unsigned m_tid;
-    const GEOMETRY * m_geo;
+    const GEOMETRY * m_container;
 };
 
 

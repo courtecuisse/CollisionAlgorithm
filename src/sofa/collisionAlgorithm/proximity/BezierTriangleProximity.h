@@ -1,8 +1,6 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/BaseProximity.h>
-#include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
-#include <sofa/collisionAlgorithm/proximity/PhongTriangleProximity.h>
 
 namespace sofa
 {
@@ -10,11 +8,10 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class GEOMETRY>
-class BezierTriangleProximity : public PhongTriangleProximity<GEOMETRY> {
+template<class DataTypes>
+class BezierTriangleProximity : public TBaseProximity<DataTypes> {
 public :
 
-    typedef typename GEOMETRY::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
@@ -24,9 +21,6 @@ public :
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
-
-    friend class GEOMETRY::GEOMETRY;
 
     typedef struct
     {
@@ -34,52 +28,58 @@ public :
         defaulttype::Vector3 n110,n011,n101;
     } BezierTriangleInfo;
 
-    BezierTriangleProximity(const GEOMETRY * geo,unsigned tid, unsigned p1,unsigned p2,unsigned p3,double f1,double f2,double f3)
-    : PhongTriangleProximity<GEOMETRY>(geo,tid, p1,p2,p3,f1,f2,f3) {}
+    BezierTriangleProximity(sofa::core::behavior::MechanicalState<DataTypes> * state, // state
+                            unsigned p0,unsigned p1,unsigned p2, // indices of the triangle
+                            double f0,double f1,double f2, // barycentric coordinates
+                            const defaulttype::Vector3&n0, const defaulttype::Vector3&n1, const defaulttype::Vector3&n2, // point normals
+                            const BezierTriangleInfo & tinfo) // triangle info
+    : TBaseProximity<DataTypes>(state)
+    , m_p0(p0) , m_p1(p1) , m_p2(p2)
+    , m_f0(f0) , m_f1(f1) , m_f2(f2)
+    , m_n0(n0) , m_n1(n1) , m_n2(n2)
+    , m_tbinfo(tinfo) {}
 
     ////Bezier triangle are computed according to :
     ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
     typename defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
-        const BezierTriangleInfo & tbinfo = this->m_geometry->bezierInfo()[this->m_tid];
-
         if(v == core::VecCoordId::position())
         {
-            const helper::ReadAccessor<DataVecCoord> & x = this->m_geometry->getState()->read(v);
+            const helper::ReadAccessor<DataVecCoord> & x = this->m_state->read(v);
 
-            const defaulttype::Vector3 & p300 = x[this->m_pid[2]];
-            const defaulttype::Vector3 & p030 = x[this->m_pid[1]];
-            const defaulttype::Vector3 & p003 = x[this->m_pid[0]];
+            const defaulttype::Vector3 & p300 = x[m_p2];
+            const defaulttype::Vector3 & p030 = x[m_p1];
+            const defaulttype::Vector3 & p003 = x[m_p0];
 
-            double fact_w = this->m_fact[2];
-            double fact_u = this->m_fact[1];
-            double fact_v = this->m_fact[0];
+            double fact_w = m_f2;
+            double fact_u = m_f1;
+            double fact_v = m_f0;
 
             return p300 *   fact_w*fact_w*fact_w +
                    p030 *   fact_u*fact_u*fact_u +
                    p003 *   fact_v*fact_v*fact_v +
-                   tbinfo.p210 * 3*fact_w*fact_w*fact_u +
-                   tbinfo.p120 * 3*fact_w*fact_u*fact_u +
-                   tbinfo.p201 * 3*fact_w*fact_w*fact_v +
-                   tbinfo.p021 * 3*fact_u*fact_u*fact_v +
-                   tbinfo.p102 * 3*fact_w*fact_v*fact_v +
-                   tbinfo.p012 * 3*fact_u*fact_v*fact_v +
-                   tbinfo.p111 * 6*fact_w*fact_u*fact_v;
+                   m_tbinfo.p210 * 3*fact_w*fact_w*fact_u +
+                   m_tbinfo.p120 * 3*fact_w*fact_u*fact_u +
+                   m_tbinfo.p201 * 3*fact_w*fact_w*fact_v +
+                   m_tbinfo.p021 * 3*fact_u*fact_u*fact_v +
+                   m_tbinfo.p102 * 3*fact_w*fact_v*fact_v +
+                   m_tbinfo.p012 * 3*fact_u*fact_v*fact_v +
+                   m_tbinfo.p111 * 6*fact_w*fact_u*fact_v;
         }
         else if (v == core::VecCoordId::freePosition())
         {
-            double fact_w = this->m_fact[2];
-            double fact_u = this->m_fact[1];
-            double fact_v = this->m_fact[0];
+            double fact_w = m_f2;
+            double fact_u = m_f1;
+            double fact_v = m_f0;
 
-            const helper::ReadAccessor<DataVecCoord> & x = this->m_geometry->getState()->read(core::VecCoordId::freePosition());
+            const helper::ReadAccessor<DataVecCoord> & x = this->m_state->read(core::VecCoordId::freePosition());
 
-            const defaulttype::Vector3 & p300_Free = x[this->m_pid[2]];
-            const defaulttype::Vector3 & p030_Free = x[this->m_pid[1]];
-            const defaulttype::Vector3 & p003_Free = x[this->m_pid[0]];
+            const defaulttype::Vector3 & p300_Free = x[m_p2];
+            const defaulttype::Vector3 & p030_Free = x[m_p1];
+            const defaulttype::Vector3 & p003_Free = x[m_p0];
 
-            const defaulttype::Vector3 & n200_Free = this->m_geometry->pointNormals()[this->m_pid[2]];
-            const defaulttype::Vector3 & n020_Free = this->m_geometry->pointNormals()[this->m_pid[1]];
-            const defaulttype::Vector3 & n002_Free = this->m_geometry->pointNormals()[this->m_pid[0]];
+            const defaulttype::Vector3 & n200_Free = m_n2;
+            const defaulttype::Vector3 & n020_Free = m_n1;
+            const defaulttype::Vector3 & n002_Free = m_n0;
 
             double w12_free = dot(p030_Free - p300_Free,n200_Free);
             double w21_free = dot(p300_Free - p030_Free,n020_Free);
@@ -120,22 +120,21 @@ public :
     }
 
     defaulttype::Vector3 getNormal() const {
-        const BezierTriangleInfo & tbinfo = this->m_geometry->bezierInfo()[this->m_tid];
 
-        const defaulttype::Vector3 &n200 = this->m_geometry->pointNormals()[this->m_pid[2]];
-        const defaulttype::Vector3 &n020 = this->m_geometry->pointNormals()[this->m_pid[1]];
-        const defaulttype::Vector3 &n002 = this->m_geometry->pointNormals()[this->m_pid[0]];
+        const defaulttype::Vector3 &n200 = m_n2;
+        const defaulttype::Vector3 &n020 = m_n1;
+        const defaulttype::Vector3 &n002 = m_n0;
 
-        double fact_w = this->m_fact[2];
-        double fact_u = this->m_fact[1];
-        double fact_v = this->m_fact[0];
+        double fact_w = m_f2;
+        double fact_u = m_f1;
+        double fact_v = m_f0;
 
         defaulttype::Vector3 normal = n200 * fact_w*fact_w +
                                       n020 * fact_u*fact_u +
                                       n002 * fact_v*fact_v +
-                                      tbinfo.n110 * fact_w*fact_u +
-                                      tbinfo.n011 * fact_u*fact_v +
-                                      tbinfo.n101 * fact_w*fact_v;
+                                      m_tbinfo.n110 * fact_w*fact_u +
+                                      m_tbinfo.n011 * fact_u*fact_v +
+                                      m_tbinfo.n101 * fact_w*fact_v;
 
         defaulttype::Vector3 N1 = normal;
         N1.normalize();
@@ -144,10 +143,15 @@ public :
     }
 
     void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
-        it.addCol(this->m_pid[0], N * this->m_fact[0]);
-        it.addCol(this->m_pid[1], N * this->m_fact[1]);
-        it.addCol(this->m_pid[2], N * this->m_fact[2]);
+        it.addCol(m_p0, N * m_f0);
+        it.addCol(m_p1, N * m_f1);
+        it.addCol(m_p2, N * m_f2);
     }
+
+    unsigned m_p0,m_p1,m_p2;
+    double m_f0,m_f1,m_f2;
+    const defaulttype::Vector3 & m_n0,m_n1,m_n2;
+    const BezierTriangleInfo & m_tbinfo;
 
 };
 

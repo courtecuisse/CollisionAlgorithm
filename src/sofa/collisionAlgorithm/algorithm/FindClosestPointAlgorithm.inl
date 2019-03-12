@@ -151,7 +151,7 @@ BaseElementIterator::UPtr BaseClosestPointAlgorithm::getDestIterator(const defau
         max = std::max(max,bsize[1]-bindex[1]);
         max = std::max(max,bsize[2]-bindex[2]);
 
-        unsigned d = 0;
+        int d = 0;
         std::set<unsigned> selectedElements;
         while (selectedElements.empty() && d<max) {
             fillElementSet(decorator,bindex,selectedElements,d);

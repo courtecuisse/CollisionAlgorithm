@@ -1,10 +1,10 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <sofa/collisionAlgorithm/BaseElementContainer.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
-#include <sofa/collisionAlgorithm/elements/TriangleElement.h>
-#include <sofa/collisionAlgorithm/container/DataTriangleContainer.h>
+#include <sofa/collisionAlgorithm/BroadPhase.h>
 
 namespace sofa
 {
@@ -13,99 +13,81 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-class TriangleGeometry : public TBaseGeometry<DataTypes> {
+class DataTriangleContainer : public DataElemntContainer<sofa::core::topology::BaseMeshTopology::Triangle> {
 public:
+
+    typedef DataTriangleContainer<DataTypes> TContainer;
     typedef DataTypes TDataTypes;
-    typedef TBaseGeometry<DataTypes> Inherit;
-    typedef TriangleGeometry<DataTypes> GEOMETRY;
-    typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
-    typedef Data<VecCoord> DataVecCoord;
+    typedef typename DataTypes::Coord Coord;
+    typedef typename DataTypes::Real Real;
+    typedef typename DataTypes::VecDeriv VecDeriv;
+    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
+    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
+    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
+    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
     typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
     typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
     typedef helper::vector<Triangle> VecTriangles;
 
-    SOFA_CLASS(GEOMETRY,Inherit);
-
-    Data<VecTriangles> d_triangles;
-//    DataTriangleContainer<DataTypes> d_triangles;
-
-    TriangleGeometry()
-    : d_triangles(initData(&d_triangles, "triangles", "Vector of Triangles")){}
-
-    virtual ~TriangleGeometry() override {}
+    explicit DataTriangleContainer(const typename DataElemntContainer<sofa::core::topology::BaseMeshTopology::Triangle>::InitData& init)
+    : DataElemntContainer<sofa::core::topology::BaseMeshTopology::Triangle>(init) {
+        m_geometry = dynamic_cast<const TBaseGeometry<DataTypes> *>(init.owner);
+    }
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
-        return DefaultElementIterator<TriangleElement<GEOMETRY> >::create(this, this->d_triangles.getValue().size(), eid);
+        return DefaultElementIterator<TriangleElement<DataTriangleContainer<DataTypes> > >::create(this, this->getValue().size(), eid);
     }
 
-    void init() {
-        Inherit::init();
-
-        ///To remove if we think every input has to be explicit
-        if(d_triangles.getValue().empty())
-        {
-            msg_warning(this) << "Triangles are not set (data is empty). Will set from topology if present in the same context";
-            sofa::core::topology::BaseMeshTopology* topology{nullptr};
-            this->getContext()->get(topology);
-            if(!topology)
-            {
-                msg_error(this) << "No topology to work with ; giving up.";
-            }
-            else
-            {
-                if(topology->getTriangles().empty())
-                {
-                    msg_error(this) << "No topology with triangles to work with ; giving up.";
-                }
-                else
-                {
-                    d_triangles.setParent(topology->findData("triangles"));
-                }
-            }
-        }
+    virtual const BaseGeometry * end() const {
+        return m_geometry;
     }
 
-    virtual void draw(const core::visual::VisualParams * vparams) {
-        Inherit::draw(vparams);
-
-        if (! vparams->displayFlags().getShowCollisionModels())
-            return;
-
-        if (this->d_color.getValue()[3] == 0.0)
-            return;
-
-        glDisable(GL_LIGHTING);
-
-        double delta = 0.2;
-        defaulttype::Vector4 color = this->d_color.getValue();
-        const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
-
-        if (! vparams->displayFlags().getShowWireFrame()) glBegin(GL_TRIANGLES);
-        else glBegin(GL_LINES);
-
-        for (unsigned i=0;i<d_triangles.getValue().size();i++) {
-            const Triangle& tri = this->d_triangles.getValue()[i];
-
-            glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
-            glVertex3dv(pos[tri[0]].data());
-            if (vparams->displayFlags().getShowWireFrame()) glVertex3dv(pos[tri[1]].data());
-
-            glColor4f(color[0],fabs(color[1]-delta),color[2],color[3]);
-            glVertex3dv(pos[tri[1]].data());
-            if (vparams->displayFlags().getShowWireFrame()) glVertex3dv(pos[tri[2]].data());
-
-            glColor4f(color[0],color[1],fabs(color[2]-delta),color[3]);
-            glVertex3dv(pos[tri[2]].data());            
-            if (vparams->displayFlags().getShowWireFrame()) glVertex3dv(pos[tri[0]].data());
-        }
-        glEnd();
+    virtual void init() {
+        if (this->m_broadPhase) this->m_broadPhase->init();
     }
 
-    virtual void prepareDetection() override {
-        const VecTriangles& triangles = d_triangles.getValue();
+    sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
+        return m_geometry->getState();
+    }
 
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+    inline const VecTriangles & getTriangles() const {
+        return this->getValue();
+    }
+
+    inline const helper::vector<defaulttype::Vector3> & triangleNormals() const {
+        return m_triangle_normals;
+    }
+
+    inline BaseProximity::SPtr project(unsigned tid, const defaulttype::Vector3 & P) const {
+        core::topology::BaseMeshTopology::Triangle triangle;
+        defaulttype::Vector3 factor;
+        project(tid, P, triangle, factor);
+
+        return BaseProximity::create<TriangleProximity<DataTypes> >(m_geometry->getState(),tid,triangle[0],triangle[1],triangle[2],factor[0],factor[1],factor[2],m_triangle_normals);
+    }
+
+    inline BaseProximity::SPtr center(unsigned tid) const {
+        const core::topology::BaseMeshTopology::Triangle & triangle = this->getValue()[tid];
+        return BaseProximity::create<TriangleProximity<DataTypes> >(m_geometry->getState(),tid,triangle[0],triangle[1],triangle[2],0.3333,0.3333,0.3333,m_triangle_normals);
+    }
+
+    inline defaulttype::BoundingBox getBBox(unsigned tid) const {
+        const core::topology::BaseMeshTopology::Triangle & triangle = this->getValue()[tid];
+        const helper::ReadAccessor<Data <VecCoord> >& x = m_geometry->getState()->read(core::VecCoordId::position());
+        defaulttype::BoundingBox bbox;
+        bbox.include(x[triangle[0]]);
+        bbox.include(x[triangle[1]]);
+        bbox.include(x[triangle[2]]);
+        return bbox;
+    }
+
+    virtual void prepareDetection() {
+        const VecTriangles& triangles = this->getValue();
+
+        const helper::ReadAccessor<DataVecCoord> & pos = m_geometry->getState()->read(core::VecCoordId::position());
 
         m_triangle_info.resize(triangles.size());
         m_triangle_normals.resize(triangles.size());
@@ -139,21 +121,13 @@ public:
         }
     }
 
-    inline const VecTriangles & getTriangles() const {
-        return d_triangles.getValue();
-    }
-
-    inline const helper::vector<defaulttype::Vector3> & triangleNormals() const {
-        return m_triangle_normals;
-    }
-
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
     void project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+        const helper::ReadAccessor<DataVecCoord> & pos = this->m_geometry->getState()->read(core::VecCoordId::position());
 
         const TriangleInfo & tinfo = m_triangle_info[eid];
-        triangle = d_triangles.getValue()[eid];
+        triangle = this->getValue()[eid];
 
         defaulttype::Vector3 P0 = pos[triangle[0]];
         defaulttype::Vector3 P1 = pos[triangle[1]];
@@ -242,6 +216,7 @@ protected:
 
     std::vector<TriangleInfo> m_triangle_info;
     helper::vector<defaulttype::Vector3> m_triangle_normals;
+    const TBaseGeometry<DataTypes> * m_geometry;
 };
 
 

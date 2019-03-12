@@ -8,11 +8,10 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class GEOMETRY>
-class TriangleProximity : public TBaseProximity<GEOMETRY> {
+template<class DataTypes>
+class TriangleProximity : public TBaseProximity<DataTypes> {
 public :
 
-    typedef typename GEOMETRY::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
@@ -24,40 +23,34 @@ public :
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    TriangleProximity(const GEOMETRY * geo,unsigned tid, unsigned p1,unsigned p2,unsigned p3,double f1,double f2,double f3)
-    : TBaseProximity<GEOMETRY>(geo)
-    , m_tid(tid) {
-        m_pid[0] = p1;
-        m_pid[1] = p2;
-        m_pid[2] = p3;
-
-        m_fact[0] = f1;
-        m_fact[1] = f2;
-        m_fact[2] = f3;
-    }
+    TriangleProximity(sofa::core::behavior::MechanicalState<DataTypes> * state,unsigned p0,unsigned p1,unsigned p2,double f0,double f1,double f2,const defaulttype::Vector3 & n)
+    : TBaseProximity<DataTypes>(state)
+    , m_p0(p0) , m_p1(p1) , m_p2(p2)
+    , m_f0(f0) , m_f1(f1) , m_f2(f2)
+    , m_normal(n) {}
 
     inline defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->m_geometry->getState()->read(v);
+        const helper::ReadAccessor<DataVecCoord> & pos = this->m_state->read(v);
 
-        return pos[m_pid[0]] * m_fact[0] +
-               pos[m_pid[1]] * m_fact[1] +
-               pos[m_pid[2]] * m_fact[2];
+        return pos[m_p0] * m_f0 +
+               pos[m_p1] * m_f1 +
+               pos[m_p2] * m_f2;
     }
 
     inline defaulttype::Vector3 getNormal() const {
-        return this->m_geometry->triangleNormals()[m_tid];
+        return m_normal;
     }
 
     void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
-        it.addCol(m_pid[0], N * m_fact[0]);
-        it.addCol(m_pid[1], N * m_fact[1]);
-        it.addCol(m_pid[2], N * m_fact[2]);
+        it.addCol(m_p0, N * m_f0);
+        it.addCol(m_p1, N * m_f1);
+        it.addCol(m_p2, N * m_f2);
     }
 
 protected:
-    unsigned m_tid;
-    unsigned m_pid[3];
-    double m_fact[3];
+    unsigned m_p0,m_p1,m_p2;
+    double m_f0,m_f1,m_f2;
+    const defaulttype::Vector3 & m_normal;
 
 };
 
