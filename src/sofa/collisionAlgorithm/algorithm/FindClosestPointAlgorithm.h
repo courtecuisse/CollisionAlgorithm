@@ -24,6 +24,9 @@ public:
 private:
     BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P, const BaseGeometry * geo);
 
+protected:
+    void fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const;
+
 };
 
 
@@ -42,6 +45,7 @@ public:
     : l_from(initLink("from", "link to from geometry"))
     , l_dest(initLink("dest", "link to dest geometry"))
     , d_output(initData(&d_output,"output", "output of the collision detection")){}
+
 
 };
 

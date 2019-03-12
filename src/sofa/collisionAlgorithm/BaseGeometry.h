@@ -33,17 +33,9 @@ public:
         return this;
     }
 
-    void setBroadPhase(BroadPhase * d) {
-        m_broadPhase = d;
-    }
+    virtual void setBroadPhase(BroadPhase * d) = 0;
 
-    void unsetBroadPhase(BroadPhase * d) {
-        if (m_broadPhase == d) m_broadPhase = NULL;
-    }
-
-    BroadPhase * getBroadPhase() const {
-        return m_broadPhase;
-    }
+    virtual BroadPhase * getBroadPhase() const = 0;
 
     virtual void prepareDetection() {}
 
@@ -62,8 +54,6 @@ private:
     virtual void updatePosition(SReal /*dt*/) {
         prepareDetection();
     }
-
-    BroadPhase * m_broadPhase;
 };
 
 
@@ -90,6 +80,17 @@ public:
     sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
     }
+
+    void setBroadPhase(BroadPhase * d) {
+        m_broadPhase = d;
+    }
+
+    BroadPhase * getBroadPhase() const {
+        return m_broadPhase;
+    }
+
+protected:
+    BroadPhase * m_broadPhase;
 };
 
 
@@ -115,6 +116,14 @@ public:
 
     sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_geometry->getState();
+    }
+
+    void setBroadPhase(BroadPhase * d) {
+        l_geometry->setBroadPhase(d);
+    }
+
+    BroadPhase * getBroadPhase() const {
+        return l_geometry->getBroadPhase();
     }
 };
 

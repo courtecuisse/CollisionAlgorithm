@@ -10,22 +10,151 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+void BaseClosestPointAlgorithm::fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
+{
+    defaulttype::Vec3i nbox = decorator->getBoxSize();
+
+    {
+        int i=-d;
+        if (cbox[0]+i >= 0 && cbox[0]+i < nbox[0])
+        {
+            for (int j=-d;j<=d;j++)
+            {
+                if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
+                    continue;
+                for (int k=-d;k<=d;k++)
+                {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
+                        continue;
+
+                    decorator->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k, selectElements);
+                }
+            }
+        }
+    }
+
+    {
+        int i=d;
+        if (cbox[0]+i >= 0 && cbox[0]+i < nbox[0])
+        {
+            for (int j=-d;j<=d;j++)
+            {
+                if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
+                    continue;
+
+                for (int k=-d;k<=d;k++)
+                {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
+                        continue;
+
+                    decorator->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k, selectElements);
+                }
+            }
+        }
+    }
+
+
+    {
+        int j=-d;
+        if (cbox[1]+j >= 0 && cbox[1]+j < nbox[1])
+        {
+            for (int i=-d+1;i<d;i++)
+            {
+                if (cbox[0]+i < 0 || cbox[0]+i >= nbox[0])
+                    continue;
+
+                for (int k=-d;k<=d;k++)
+                {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
+                        continue;
+
+                    decorator->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k, selectElements);
+                }
+            }
+        }
+    }
+
+    {
+        int j=d;
+        if (cbox[1]+j >= 0 && cbox[1]+j < nbox[1])
+        {
+            for (int i=-d+1;i<d;i++)
+            {
+                if (cbox[0]+i < 0 || cbox[0]+i >= nbox[0])
+                    continue;
+
+                for (int k=-d;k<=d;k++)
+                {
+                    if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
+                        continue;
+
+                    decorator->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k, selectElements);
+                }
+            }
+        }
+    }
+
+    {
+        int k=-d;
+        if (cbox[2]+k >= 0 && cbox[2]+k < nbox[2])
+        {
+            for (int i=-d+1;i<d;i++)
+            {
+                if (cbox[0]+i < 0 || cbox[0]+i >= nbox[0])
+                    continue;
+
+                for (int j=-d+1;j<d;j++)
+                {
+                    if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
+                        continue;
+
+                    decorator->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k, selectElements);
+                }
+            }
+        }
+    }
+
+    {
+        int k=d;
+        if (cbox[2]+k >= 0 && cbox[2]+k < nbox[2])
+        {
+            for (int i=-d+1;i<d;i++)
+            {
+                if (cbox[0]+i < 0 || cbox[0]+i >= nbox[0])
+                    continue;
+
+                for (int j=-d+1;j<d;j++)
+                {
+                    if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
+                        continue;
+
+                    decorator->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k, selectElements);
+                }
+            }
+        }
+    }
+}
+
 BaseElementIterator::UPtr BaseClosestPointAlgorithm::getDestIterator(const defaulttype::Vector3 & P, const BaseGeometry * geo) {
     const BroadPhase * decorator = geo->getBroadPhase();
 
     if (decorator == NULL) return geo->begin();
     else {
-        defaulttype::BoundingBox bbox = decorator->getBBox();
+        defaulttype::Vec3i bindex = decorator->getBoxCoord(P);
+        defaulttype::Vec3i bsize = decorator->getBoxSize();
 
-        //project P inside the bbox
-        defaulttype::Vector3 cbox;
-        cbox[0] = std::min(std::max(P[0],bbox.minBBox()[0]),bbox.maxBBox()[0]);
-        cbox[1] = std::min(std::max(P[1],bbox.minBBox()[1]),bbox.maxBBox()[1]);
-        cbox[2] = std::min(std::max(P[2],bbox.minBBox()[2]),bbox.maxBBox()[2]);
+        int max = 0;
+        max = std::max(max,bindex[0]);
+        max = std::max(max,bindex[1]);
+        max = std::max(max,bindex[2]);
+        max = std::max(max,bsize[0]-bindex[0]);
+        max = std::max(max,bsize[1]-bindex[1]);
+        max = std::max(max,bsize[2]-bindex[2]);
 
         unsigned d = 0;
         std::set<unsigned> selectedElements;
-        while (selectedElements.empty() && decorator->selectElement(P,selectedElements,d)) {
+        while (selectedElements.empty() && d<max) {
+            fillElementSet(decorator,bindex,selectedElements,d);
             d++;// we look for boxed located at d+1
         }
 
