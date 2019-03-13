@@ -14,25 +14,25 @@ namespace collisionAlgorithm {
 
 class BroadPhase;
 
-class BaseGeometry : public core::objectmodel::BaseObject
+class BaseGeometry : public core::BehaviorModel
 {
 public:
-    SOFA_ABSTRACT_CLASS(BaseGeometry,core::objectmodel::BaseObject);
+    SOFA_ABSTRACT_CLASS(BaseGeometry,core::BehaviorModel);
 
     Data<defaulttype::Vector4> d_color;
     Data<double> d_drawScaleNormal;
-    sofa::core::objectmodel::_datacallback_::DataCallback c_update;
+//    sofa::core::objectmodel::_datacallback_::DataCallback c_update;
 
     BaseGeometry()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
     , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model")){
-        c_update.addCallback(std::bind(&BaseGeometry::prepareDetection,this));
+//        c_update.addCallback(std::bind(&BaseGeometry::prepareDetection,this));
     }
 
-    void init() {
-        core::objectmodel::BaseData * data = this->getState()->findData("position");
-        if (data) c_update.addInput(data);
-    }
+//    void init() {
+//        core::objectmodel::BaseData * data = this->getState()->findData("position");
+//        if (data) c_update.addInput(data);
+//    }
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
@@ -57,6 +57,12 @@ public:
             BaseProximity::SPtr center = (*it)->center();
             vparams->drawTool()->drawArrow(center->getPosition(), center->getPosition() + center->getNormal() * d_drawScaleNormal.getValue(), d_drawScaleNormal.getValue() * 0.1, d_color.getValue());
         }
+    }
+
+protected:
+    /// Computation of a new simulation step.
+    virtual void updatePosition(SReal ) {
+        prepareDetection();
     }
 };
 
@@ -97,7 +103,7 @@ protected:
     BroadPhase * m_broadPhase;
 };
 
-
+/*
 template<class LINK>
 class TLinkGeometry : public BaseGeometry
 {
@@ -130,7 +136,7 @@ public:
         return l_geometry->getBroadPhase();
     }
 };
-
+*/
 
 }
 

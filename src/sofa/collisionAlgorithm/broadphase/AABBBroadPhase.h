@@ -2,7 +2,7 @@
 
 #include <sofa/helper/AdvancedTimer.h>
 #include <sofa/collisionAlgorithm/BroadPhase.h>
-#include <sofa/collisionAlgorithm/BaseGeometryAlgorithm.h>
+#include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 
 namespace sofa
 {

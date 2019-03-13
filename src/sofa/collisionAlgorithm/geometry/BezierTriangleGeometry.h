@@ -34,7 +34,7 @@ public:
     }
 
     inline BaseProximity::SPtr center() const {
-        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->l_geometry->getTriangles()[m_tid];
+        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->getTriangles()[m_tid];
         return BaseProximity::create<BezierTriangleProximity<DataTypes> >(m_geo->getState(),
                                                                          triangle[0],triangle[1],triangle[2],
                                                                          0.3333,0.3333,0.3333,
@@ -45,7 +45,7 @@ public:
     }
 
     inline defaulttype::BoundingBox getBBox() const {
-        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->l_geometry->getTriangles()[m_tid];
+        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->getTriangles()[m_tid];
         const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getState()->read(core::VecCoordId::position());
         defaulttype::BoundingBox bbox;
         bbox.include(x[triangle[0]]);
@@ -88,13 +88,13 @@ public:
     {}
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
-        return DefaultElementIterator<BezierTriangleElement<GEOMETRY> >::create(this, this->l_geometry->d_triangles.getValue().size(), eid);
+        return DefaultElementIterator<BezierTriangleElement<GEOMETRY> >::create(this, this->d_triangles.getValue().size(), eid);
     }
 
     virtual void prepareDetection() {
         PhongTriangleGeometry<DataTypes>::prepareDetection();
 
-        const VecTriangles& triangles = this->l_geometry->d_triangles.getValue();
+        const VecTriangles& triangles = this->d_triangles.getValue();
         const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(core::VecCoordId::position());
 
         size_t nbTriangles = triangles.size();
@@ -150,7 +150,7 @@ public:
     void tesselate(unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C) {
         if (level >= d_draw_tesselation.getValue()) {
 
-            const Triangle& triangle = this->l_geometry->d_triangles.getValue()[tid];
+            const Triangle& triangle = this->d_triangles.getValue()[tid];
 
             BezierTriangleProximity<DataTypes> proxA(this->getState(), triangle[0],triangle[1],triangle[2], bary_A[0],bary_A[1],bary_A[2], this->m_point_normals[triangle[0]], this->m_point_normals[triangle[1]], this->m_point_normals[triangle[2]], m_beziertriangle_info[tid]);
             BezierTriangleProximity<DataTypes> proxB(this->getState(), triangle[0],triangle[1],triangle[2], bary_B[0],bary_B[1],bary_B[2], this->m_point_normals[triangle[0]], this->m_point_normals[triangle[1]], this->m_point_normals[triangle[2]], m_beziertriangle_info[tid]);
@@ -199,7 +199,7 @@ public:
         glDisable(GL_LIGHTING);
 
         glBegin(GL_TRIANGLES);
-        for (unsigned i=0;i<this->l_geometry->d_triangles.getValue().size();i++) {
+        for (unsigned i=0;i<this->d_triangles.getValue().size();i++) {
             tesselate(0, i , defaulttype::Vector3(1,0,0),defaulttype::Vector3(0,1,0),defaulttype::Vector3(0,0,1));
         }
         glEnd();
@@ -219,7 +219,7 @@ public:
         double delta = 0.00001;
 
         //initialize the algorithm xith the projection on a linear triangle
-        this->l_geometry->project(elmt, P, triangle, fact);
+        this->project(elmt, P, triangle, fact);
         BezierTriangleProximity<DataTypes> pinfo(this->getState(), triangle[0],triangle[1],triangle[2], fact[0],fact[1],fact[2], this->m_point_normals[triangle[0]], this->m_point_normals[triangle[1]], this->m_point_normals[triangle[2]], m_beziertriangle_info[elmt]);
 
         while(it< max_it)

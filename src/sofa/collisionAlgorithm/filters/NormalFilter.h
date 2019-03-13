@@ -1,12 +1,12 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseGeometryAlgorithm.h>
+#include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
-class NormalFilter : public BaseGeometryAlgorithm::BaseFilter {
+class NormalFilter : public BaseFilter {
 public:
     SOFA_ABSTRACT_CLASS(BaseFilter, BaseFilter);
 
