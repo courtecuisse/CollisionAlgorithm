@@ -92,18 +92,17 @@ void PointCloudBindingAlgorithm::bind(const std::vector<defaulttype::Vector3> & 
     }
 }
 
-void PointCloudBindingAlgorithm::processAlgorithm(BaseElementIterator::UPtr itfrom, const BaseGeometry * g2, helper::vector< PairDetection > & output) {
+void PointCloudBindingAlgorithm::processAlgorithm(const BaseGeometry * g1, const BaseGeometry * g2, helper::vector< PairDetection > & output) {
     helper::vector<defaulttype::Vector3> p1;
     helper::vector<defaulttype::Vector3> p2;
 
     helper::vector<BaseProximity::SPtr> prox1;
     helper::vector<BaseProximity::SPtr> prox2;
 
-    while (! itfrom->end()) {
+    for (auto itfrom = g1->begin(); itfrom != g1->end();itfrom++) {
         BaseProximity::SPtr center = (*itfrom)->center();
         prox1.push_back(center);
         p1.push_back(center->getPosition());
-        itfrom++;
     }
 
     for (auto itdest = g2->begin(); itdest != g2->end();itdest++) {

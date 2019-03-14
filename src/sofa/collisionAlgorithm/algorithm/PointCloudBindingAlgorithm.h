@@ -17,7 +17,7 @@ public:
 
     PointCloudBindingAlgorithm();
 
-    void processAlgorithm(BaseElementIterator::UPtr it, const BaseGeometry * g2, helper::vector< PairDetection > & output);
+    void processAlgorithm(const BaseGeometry * geometry1, const BaseGeometry * g2, helper::vector< PairDetection > & output);
 
     static void bind(const std::vector<defaulttype::Vector3> & p1, const std::vector<defaulttype::Vector3> & p2, helper::vector<int> & bindId, helper::vector<int> & invBind, double maxDist);
 };

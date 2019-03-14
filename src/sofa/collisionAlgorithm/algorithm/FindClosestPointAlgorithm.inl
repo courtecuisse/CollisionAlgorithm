@@ -162,43 +162,12 @@ BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defau
     }
 }
 
-PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElement::UPtr & elfrom, const BaseGeometry * geo)
-{
-    double min_dist = std::numeric_limits<double>::max();
-    PairDetection min_pair(nullptr,nullptr);
+PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElement::UPtr & elfrom, const BaseGeometry * geo) {
+    BaseProximity::SPtr from = elfrom->center();
+    BaseProximity::SPtr dest = findClosestPoint(from,
+                                                getDestIterator(from->getPosition(),geo));
 
-    defaulttype::Vector3 P = elfrom->center()->getPosition();
-
-    BaseElementIterator::UPtr itdest=getDestIterator(P,geo);
-
-    while (itdest != geo->end())
-    {
-        BaseProximity::SPtr pdest = (*itdest)->project(P);
-        BaseProximity::SPtr pfrom  = elfrom->project(pdest->getPosition()); // reproject one on the initial proximity
-
-//        //iterate until to find the correct location on pfrom
-//        for (int itearation = 0;itearation<10 && pfrom->distance(P)>0.0001;itearation++) {
-//            P = pfrom->getPosition();
-//            pdest = edest->project(P);
-//            pfrom = it_element.efrom->projectsofasc   (pdest->getPosition());
-//        }
-
-        if (acceptFilter(pfrom,pdest)) {
-            defaulttype::Vector3 N = pfrom->getPosition() - pdest->getPosition();
-            double dist = N.norm();
-
-            if (dist<min_dist)
-            {
-                min_dist = dist;
-                min_pair.first = pfrom;
-                min_pair.second = pdest;
-            }
-        }
-
-        itdest++;
-    }
-
-    return min_pair;
+    return PairDetection (from,dest);
 }
 
 BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::SPtr pfrom, BaseElementIterator::UPtr itdest) {
@@ -232,15 +201,13 @@ BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::S
     return findClosestPoint(pfrom,std::move(getDestIterator(pfrom->getPosition(),geo)));
 }
 
-void FindClosestPointAlgorithm::processAlgorithm(BaseElementIterator::UPtr itfrom, const BaseGeometry * geometry2, helper::vector< PairDetection > & output) {
-    while (! itfrom->end()) {
-        PairDetection min_pair = findClosestPoint(*itfrom,geometry2);
+void FindClosestPointAlgorithm::processAlgorithm(const BaseGeometry * geometry1, const BaseGeometry * geometry2, helper::vector< PairDetection > & output) {
+    for (auto it = geometry1->begin();it != geometry1->end(); it++) {
+        PairDetection min_pair = findClosestPoint(*it,geometry2);
 
         if (min_pair.first == nullptr || min_pair.second == nullptr) continue;
 
         output.push_back(PairDetection(min_pair.first,min_pair.second));
-
-        itfrom++;
     }
 }
 

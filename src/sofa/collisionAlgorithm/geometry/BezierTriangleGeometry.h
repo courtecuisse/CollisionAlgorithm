@@ -92,7 +92,7 @@ public:
     }
 
     virtual void prepareDetection() {
-        PhongTriangleGeometry<DataTypes>::prepareDetection();
+        Inherit::prepareDetection();
 
         const VecTriangles& triangles = this->d_triangles.getValue();
         const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(core::VecCoordId::position());
@@ -219,7 +219,8 @@ public:
         double delta = 0.00001;
 
         //initialize the algorithm xith the projection on a linear triangle
-        this->project(elmt, P, triangle, fact);
+        Inherit::project(elmt, P, triangle, fact);
+
         BezierTriangleProximity<DataTypes> pinfo(this->getState(), triangle[0],triangle[1],triangle[2], fact[0],fact[1],fact[2], this->m_point_normals[triangle[0]], this->m_point_normals[triangle[1]], this->m_point_normals[triangle[2]], m_beziertriangle_info[elmt]);
 
         while(it< max_it)

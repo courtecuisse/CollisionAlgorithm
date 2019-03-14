@@ -37,7 +37,7 @@ public :
         return true;
     }
 
-    virtual void processAlgorithm(BaseElementIterator::UPtr it, const BaseGeometry * g2, helper::vector< PairDetection > & output) = 0;
+    virtual void processAlgorithm(const BaseGeometry * g1, const BaseGeometry * g2, helper::vector< PairDetection > & output) = 0;
 
 protected:
     core::objectmodel::MultiLink<BaseAlgorithm,BaseFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filters;

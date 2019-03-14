@@ -93,6 +93,8 @@ public:
     }
 
     virtual void prepareDetection() {
+        Inherit::prepareDetection();
+
         m_point_normals.resize(m_trianglesAroundVertex.size());
 
         for (size_t p=0;p<m_trianglesAroundVertex.size();p++)
