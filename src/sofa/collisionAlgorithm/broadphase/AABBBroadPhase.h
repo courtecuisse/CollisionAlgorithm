@@ -40,9 +40,12 @@ public:
 
     inline defaulttype::Vec3i getCoord(const defaulttype::Vector3 & P) const {
         defaulttype::Vec3i cbox;
-        cbox[0] = floor(P[0]/m_cellSize[0]);
-        cbox[1] = floor(P[1]/m_cellSize[1]);
-        cbox[2] = floor(P[2]/m_cellSize[2]);
+        for (int i = 0 ; i < 3 ; i++) {
+            cbox[i] = floor(P[i]/m_cellSize[i]);
+        }
+//        cbox[0] = floor(P[0]/m_cellSize[0]);
+//        cbox[1] = floor(P[1]/m_cellSize[1]);
+//        cbox[2] = floor(P[2]/m_cellSize[2]);
         return cbox;
     }
 
@@ -61,9 +64,12 @@ public:
     virtual defaulttype::Vec3i getBoxCoord(const defaulttype::Vector3 & P) const {
         //compute the box where is P
         defaulttype::Vec3i cbox;
-        cbox[0] = floor((P[0] - m_Bmin[0])/m_cellSize[0]);
-        cbox[1] = floor((P[1] - m_Bmin[1])/m_cellSize[1]);
-        cbox[2] = floor((P[2] - m_Bmin[2])/m_cellSize[2]);
+        for (int i = 0 ; i < 3 ; i++) {
+            cbox[i] = floor((P[0] - m_Bmin[0])/m_cellSize[0]);
+        }
+//        cbox[0] = floor((P[0] - m_Bmin[0])/m_cellSize[0]);
+//        cbox[1] = floor((P[1] - m_Bmin[1])/m_cellSize[1]);
+//        cbox[2] = floor((P[2] - m_Bmin[2])/m_cellSize[2]);
 
         //project the box in the bounding box of the object
         //search with the closest box in bbox

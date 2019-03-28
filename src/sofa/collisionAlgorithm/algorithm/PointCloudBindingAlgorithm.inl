@@ -11,13 +11,25 @@ namespace collisionAlgorithm
 PointCloudBindingAlgorithm::PointCloudBindingAlgorithm()
 : d_maxDist(initData(&d_maxDist, std::numeric_limits<double>::min(), "maxDist", "Maximum distance")) {}
 
-void PointCloudBindingAlgorithm::bind(const std::vector<defaulttype::Vector3> & p1, const std::vector<defaulttype::Vector3> & p2, helper::vector<int> & bindId, helper::vector<int> & invBind, double maxDist) {
+/*!
+ * \brief PointCloudBindingAlgorithm::bind : bins 2 point clouds p1 and 2 to each other
+ * \param p1
+ * \param p2
+ * \param bindId
+ * \param invBind
+ * \param maxDist
+ */
+void PointCloudBindingAlgorithm::bind(
+    const std::vector<defaulttype::Vector3> & p1,
+    const std::vector<defaulttype::Vector3> & p2,
+    helper::vector<int> & bindId,
+    helper::vector<int> & invBind,
+    double maxDist
+) {
     bindId.resize(p1.size(),-1);
     invBind.resize(p2.size(),-1);
 
     bool change = true;
-
-
 
     while (change)
     {
@@ -92,6 +104,13 @@ void PointCloudBindingAlgorithm::bind(const std::vector<defaulttype::Vector3> & 
     }
 }
 
+/*!
+ * \brief PointCloudBindingAlgorithm::processAlgorithm, implementation of pure virtual processAlgorithm
+ * is called by component when needed
+ * \param g1
+ * \param g2
+ * \param output
+ */
 void PointCloudBindingAlgorithm::processAlgorithm(const BaseGeometry * g1, const BaseGeometry * g2, helper::vector< PairDetection > & output) {
     helper::vector<defaulttype::Vector3> p1;
     helper::vector<defaulttype::Vector3> p2;

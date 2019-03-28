@@ -7,6 +7,11 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
+/*!
+ * \brief The PointCloudBindingAlgorithm class
+ * Component to bind points belonging to 2 different but similar Geometrie
+ * Implements BaseAlgorithm
+ */
 class PointCloudBindingAlgorithm : public BaseAlgorithm
 {
 public:

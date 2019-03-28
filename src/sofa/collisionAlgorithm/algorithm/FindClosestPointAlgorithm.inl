@@ -144,12 +144,17 @@ BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defau
         defaulttype::Vec3i bsize = decorator->getBoxSize();
 
         int max = 0;
-        max = std::max(max,bindex[0]);
-        max = std::max(max,bindex[1]);
-        max = std::max(max,bindex[2]);
-        max = std::max(max,bsize[0]-bindex[0]);
-        max = std::max(max,bsize[1]-bindex[1]);
-        max = std::max(max,bsize[2]-bindex[2]);
+
+        for (int i = 0 ; i < 3 ; i++) {
+            max = std::max (max, bindex[i]) ;
+            max = std::max (max, bsize[i]-bindex[i]) ;
+        }
+//        max = std::max(max,bindex[0]);
+//        max = std::max(max,bindex[1]);
+//        max = std::max(max,bindex[2]);
+//        max = std::max(max,bsize[0]-bindex[0]);
+//        max = std::max(max,bsize[1]-bindex[1]);
+//        max = std::max(max,bsize[2]-bindex[2]);
 
         int d = 0;
         std::set<unsigned> selectedElements;
