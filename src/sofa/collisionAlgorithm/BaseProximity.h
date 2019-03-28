@@ -14,13 +14,18 @@ namespace collisionAlgorithm
 
 class BaseGeometry;
 
+/*!
+ * \brief The BaseProximity class is the basic abstract proximity class
+ */
 class BaseProximity {
 public :
     typedef std::shared_ptr<BaseProximity> SPtr;
     typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
 
+    /// return proximiy position in a vector3
     virtual defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
 
+    /// return normal in a vector3
     virtual defaulttype::Vector3 getNormal() const = 0;
 
     virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & dir, double fact, unsigned constraintId) const = 0;
@@ -36,6 +41,9 @@ public :
     }
 };
 
+/*!
+ * Template implementation of BaseProximity
+ */
 template<class DataTypes>
 class TBaseProximity : public BaseProximity {
 public:

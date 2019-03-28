@@ -18,7 +18,7 @@ void FindClosestPointAlgorithm::fillElementSet(const BroadPhase * decorator, def
         int i=-d;
         if (cbox[0]+i >= 0 && cbox[0]+i < nbox[0])
         {
-            for (int j=-d;j<=d;j++)
+            for (int j=-d; j <= d; j++)
             {
                 if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
                     continue;
@@ -164,8 +164,10 @@ BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defau
 
 PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElement::UPtr & elfrom, const BaseGeometry * geo) {
     BaseProximity::SPtr from = elfrom->center();
-    BaseProximity::SPtr dest = findClosestPoint(from,
-                                                getDestIterator(from->getPosition(),geo));
+    BaseProximity::SPtr dest = findClosestPoint(
+        from,
+        getDestIterator(from->getPosition(),geo)
+    );
 
     return PairDetection (from,dest);
 }

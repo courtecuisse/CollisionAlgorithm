@@ -24,11 +24,22 @@ namespace collisionAlgorithm
 class BroadPhase;
 class BaseGeometry;
 
+/*!
+ * \brief The BaseDataElmtContainer class is an abstract data containing class
+ */
 class BaseDataElmtContainer {
 public:
 
+    /*!
+     * \brief The ElementOwner class is a visitor that processes
+     * an std::set of BaseDataElmtContainer for collision detection
+     */
     class  ElementOwner {
     public:
+        /*!
+         * \brief init iterates through the containers, initializing them
+         * and preparing for detection
+         */
         void init() {
             std::cout << "INIT" << std::endl;
             for (auto it=m_containers.cbegin();it!=m_containers.cend();it++) {
@@ -37,6 +48,9 @@ public:
             }
         }
 
+        /*!
+         * \brief prepareDetection updates detection preparation
+         */
         void prepareDetection() {
             std::cout << "UPDATE" << std::endl;
             for (auto it=m_containers.cbegin();it!=m_containers.cend();it++) {
@@ -44,6 +58,10 @@ public:
             }
         }
 
+        /*!
+         * \brief registerContainer adds a new container to process
+         * \param c : Container to add to std::set
+         */
         void registerContainer(BaseDataElmtContainer*c) {
             std::cout << "REGISTER" << std::endl;
             m_containers.insert(c);
@@ -92,30 +110,63 @@ public:
 
     virtual sofa::core::objectmodel::BaseData* getData() const = 0;
 
+    /*!
+     * \brief setBroadPhase sets broad phase to parameter
+     * \param d : broad phase to use
+     */
     void setBroadPhase(BroadPhase * d) {
         m_broadPhase = d;
     }
 
+    /*!
+     * \brief unsetBroadPhase sets broadphase member
+     * to NULL if it is equal to the passed parameter
+     * \param d : broad phase to compare to
+     */
     void unsetBroadPhase(BroadPhase * d) {
         if (m_broadPhase == d) m_broadPhase = NULL;
     }
 
+    /*!
+     * \brief getBroadPhase accessor
+     * \return const broadphase member
+     */
     BroadPhase * getBroadPhase() const {
         return m_broadPhase;
     }
 
+    /*!
+     * \brief begin should define the beginning of an iterator
+     * \param eid
+     * \return an iterator
+     */
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const  = 0;
 
+    /*!
+     * \brief end marks the end of an iterator
+     * \return
+     */
     virtual const BaseGeometry * end() const = 0;
 
+    /*!
+     * \brief init iniatializes the object before preparing it for detection
+     */
     virtual void init() {}
 
+    /*!
+     * \brief prepareDetection prepares for detection
+     */
     virtual void prepareDetection() {}
 
 protected:
     BroadPhase * m_broadPhase;
 };
 
+/*!
+ * \class DataElementContainer
+ * \brief Inherits Data<> and BaseDataElmtContainer.
+ * Is still abstract, doesn't implement all functionalities
+ */
 template<class ELMT>
 class DataElemntContainer : public core::objectmodel::Data<helper::vector<ELMT> >, public BaseDataElmtContainer {
 public:

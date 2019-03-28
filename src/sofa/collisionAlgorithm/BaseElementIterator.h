@@ -8,6 +8,9 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+/*!
+ * \brief The BaseElement class is a basic abstract element container
+ */
 class BaseElement {
 public:
     typedef std::unique_ptr<BaseElement> UPtr;
@@ -20,8 +23,13 @@ public:
 
 };
 
+/*!
+ * \brief The BaseElementIterator class defines an abstract iterator class for BaseElements
+ */
 class BaseElementIterator {
 public:
+
+    ///defines a unique pointer iterator of baseElements
     class UPtr : public std::unique_ptr<BaseElementIterator> {
     public:
         UPtr(BaseElementIterator * ptr) : std::unique_ptr<BaseElementIterator>(ptr) {}
@@ -53,6 +61,7 @@ public:
     };
 
 
+    ///returns a new EmptyIterator
     static BaseElementIterator::UPtr empty() {
         class EmptyIterator : public BaseElementIterator {
         public:

@@ -14,6 +14,10 @@ namespace collisionAlgorithm {
 
 class BroadPhase;
 
+/*!
+ * \brief The BaseGeometry class is an abstract class defining a basic geometry
+ * iterates through Proximity elements and draws them
+ */
 class BaseGeometry : public core::BehaviorModel
 {
 public:
@@ -42,8 +46,8 @@ public:
         return this;
     }
 
+    /// broadphase accessors
     virtual void setBroadPhase(BroadPhase * d) = 0;
-
     virtual BroadPhase * getBroadPhase() const = 0;
 
     virtual void prepareDetection() {}
@@ -55,7 +59,12 @@ public:
 
         for (auto it=begin();it!=end();it++) {
             BaseProximity::SPtr center = (*it)->center();
-            vparams->drawTool()->drawArrow(center->getPosition(), center->getPosition() + center->getNormal() * d_drawScaleNormal.getValue(), d_drawScaleNormal.getValue() * 0.1, d_color.getValue());
+            vparams->drawTool()->drawArrow(
+                center->getPosition(),
+                center->getPosition() + center->getNormal() * d_drawScaleNormal.getValue(),
+                d_drawScaleNormal.getValue() * 0.1,
+                d_color.getValue()
+            );
         }
     }
 
@@ -66,7 +75,10 @@ protected:
     }
 };
 
-
+/*!
+ * \class TBaseGeometry
+ * \brief Template implementation of BaseGeometry
+ */
 template<class DataTypes>
 class TBaseGeometry : public BaseGeometry
 {
