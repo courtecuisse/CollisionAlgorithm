@@ -10,6 +10,10 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+/*!
+ * \brief The AABBBroadPhase class
+ * Implementation of broad phase collision detection using bounding boxes
+ */
 class AABBBroadPhase : public BroadPhase {
     friend class AABBElement;
 

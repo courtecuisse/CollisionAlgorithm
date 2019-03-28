@@ -18,6 +18,10 @@ defaulttype::BoundingBox AABBBroadPhase::getBBox() const {
     return defaulttype::BoundingBox(m_Bmin,m_Bmax);
 }
 
+/*!
+ * \brief AABBBroadPhase::prepareDetection
+ * checks if bounding boxes collided
+ */
 void AABBBroadPhase::prepareDetection() {
     if (l_geometry == NULL) return;
 
@@ -25,44 +29,70 @@ void AABBBroadPhase::prepareDetection() {
 
     m_Bmin = defaulttype::Vector3(mstate->getPX(0),mstate->getPY(0),mstate->getPZ(0));
     m_Bmax = m_Bmin;
+
+    //updates bounding box area
     for (unsigned i=1;i<mstate->getSize();i++) {
         defaulttype::Vector3 pos(mstate->getPX(i),mstate->getPY(i),mstate->getPZ(i));
 
-        if (pos[0]<m_Bmin[0]) m_Bmin[0] = pos[0];
-        if (pos[1]<m_Bmin[1]) m_Bmin[1] = pos[1];
-        if (pos[2]<m_Bmin[2]) m_Bmin[2] = pos[2];
+        for (int i = 0 ; i < 3 ; i++) {
+            if (pos[i] > m_Bmax[i])
+                m_Bmax[i] = pos[i] ;
+            if (pos[i] < m_Bmin[i])
+                m_Bmin[i] = pos[i] ;
+        }
 
-        if (pos[0]>m_Bmax[0]) m_Bmax[0] = pos[0];
-        if (pos[1]>m_Bmax[1]) m_Bmax[1] = pos[1];
-        if (pos[2]>m_Bmax[2]) m_Bmax[2] = pos[2];
+//        if (pos[0]<m_Bmin[0]) m_Bmin[0] = pos[0];
+//        if (pos[1]<m_Bmin[1]) m_Bmin[1] = pos[1];
+//        if (pos[2]<m_Bmin[2]) m_Bmin[2] = pos[2];
+
+//        if (pos[0]>m_Bmax[0]) m_Bmax[0] = pos[0];
+//        if (pos[1]>m_Bmax[1]) m_Bmax[1] = pos[1];
+//        if (pos[2]>m_Bmax[2]) m_Bmax[2] = pos[2];
     }
 
-    m_cellSize[0] = (m_Bmax[0] - m_Bmin[0]) / d_nbox.getValue()[0];
-    m_cellSize[1] = (m_Bmax[1] - m_Bmin[1]) / d_nbox.getValue()[1];
-    m_cellSize[2] = (m_Bmax[2] - m_Bmin[2]) / d_nbox.getValue()[2];
-
-    if (m_cellSize[0] == 0) {
-        m_cellSize[0] = (m_cellSize[1]+m_cellSize[2])*0.5;
-        m_nbox[0] = 1;
+    //fixes cell size
+    for (int i = 0 ; i < 3 ; i++) {
+        m_cellSize[i] = (m_Bmax[i] - m_Bmin[i]) / d_nbox.getValue()[i];
     }
-    else
-        m_nbox[0] = d_nbox.getValue()[0] + 1;
+//    m_cellSize[0] = (m_Bmax[0] - m_Bmin[0]) / d_nbox.getValue()[0];
+//    m_cellSize[1] = (m_Bmax[1] - m_Bmin[1]) / d_nbox.getValue()[1];
+//    m_cellSize[2] = (m_Bmax[2] - m_Bmin[2]) / d_nbox.getValue()[2];
 
-    if (m_cellSize[1] == 0)
-    {
-        m_cellSize[1] = (m_cellSize[0]+m_cellSize[2])*0.5;
-        m_nbox[1] = 1;
-    }
-    else
-        m_nbox[1] = d_nbox.getValue()[1] + 1;
 
-    if (m_cellSize[2] == 0)
-    {
-        m_cellSize[2] = (m_cellSize[0]+m_cellSize[1])*0.5;
-        m_nbox[2] = 1;
+
+    for (int i = 0 ; i < 3 ; i++) {
+        if (m_cellSize[i] == 0) {
+            int a = (i == 0) ? 1 : 0 ;
+            int b = (i == 2) ? 1 : 2 ;
+            m_cellSize[i] = (m_cellSize[a]+m_cellSize[b])*0.5;
+            m_nbox[i] = 1;
+        } else {
+            m_nbox[i] = d_nbox.getValue()[i] + 1;
+        }
     }
-    else
-        m_nbox[2] = d_nbox.getValue()[2] + 1;
+
+//    if (m_cellSize[0] == 0) {
+//        m_cellSize[0] = (m_cellSize[1]+m_cellSize[2])*0.5;
+//        m_nbox[0] = 1;
+//    }
+//    else {
+//        m_nbox[0] = d_nbox.getValue()[0] + 1;
+//    }
+
+//    if (m_cellSize[1] == 0) {
+//        m_cellSize[1] = (m_cellSize[0]+m_cellSize[2])*0.5;
+//        m_nbox[1] = 1;
+//    }
+//    else
+//        m_nbox[1] = d_nbox.getValue()[1] + 1;
+
+//    if (m_cellSize[2] == 0)
+//    {
+//        m_cellSize[2] = (m_cellSize[0]+m_cellSize[1])*0.5;
+//        m_nbox[2] = 1;
+//    }
+//    else
+//        m_nbox[2] = d_nbox.getValue()[2] + 1;
 
     m_indexedElement.clear();
     m_offset[0] = m_nbox[1]*m_nbox[2];
@@ -82,13 +112,18 @@ void AABBBroadPhase::prepareDetection() {
         defaulttype::Vec3i cminbox(0,0,0);
         defaulttype::Vec3i cmaxbox(0,0,0);
 
-        cminbox[0] = floor((minbox[0] - m_Bmin[0])/m_cellSize[0]);
-        cminbox[1] = floor((minbox[1] - m_Bmin[1])/m_cellSize[1]);
-        cminbox[2] = floor((minbox[2] - m_Bmin[2])/m_cellSize[2]);
+        for (int i = 0 ; i < 3 ; i++) {
+            cmaxbox[i] = ceil((maxbox[i] - m_Bmin[i])/m_cellSize[i]);
+            cminbox[i] = floor((minbox[i] - m_Bmax[i])/m_cellSize[i]); //second m_Bmax was Bmin => bug ?
+        }
 
-        cmaxbox[0] = ceil((maxbox[0] - m_Bmin[0])/m_cellSize[0]);
-        cmaxbox[1] = ceil((maxbox[1] - m_Bmin[1])/m_cellSize[1]);
-        cmaxbox[2] = ceil((maxbox[2] - m_Bmin[2])/m_cellSize[2]);
+//        cminbox[0] = floor((minbox[0] - m_Bmin[0])/m_cellSize[0]);
+//        cminbox[1] = floor((minbox[1] - m_Bmin[1])/m_cellSize[1]);
+//        cminbox[2] = floor((minbox[2] - m_Bmin[2])/m_cellSize[2]);
+
+//        cmaxbox[0] = ceil((maxbox[0] - m_Bmin[0])/m_cellSize[0]);
+//        cmaxbox[1] = ceil((maxbox[1] - m_Bmin[1])/m_cellSize[1]);
+//        cmaxbox[2] = ceil((maxbox[2] - m_Bmin[2])/m_cellSize[2]);
 
         const bool refine = d_refineBBox.getValue();
 

@@ -6,6 +6,10 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
+/*!
+ * \brief The NormalFilter class
+ * accepts proximities which angle is superior to a specified value (angle parameter)
+ */
 class NormalFilter : public BaseFilter {
 public:
     SOFA_ABSTRACT_CLASS(BaseFilter, BaseFilter);

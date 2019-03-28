@@ -6,6 +6,10 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
+/*!
+ * \brief The DistanceFilter class
+ * accepts proximities which positions are within a limited distance from each other
+ */
 class DistanceFilter : public BaseFilter {
 public:
     SOFA_ABSTRACT_CLASS(BaseFilter, BaseFilter);
