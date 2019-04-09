@@ -10,6 +10,11 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+FindClosestPointAlgorithm::FindClosestPointAlgorithm ()
+    : l_from(initLink("from", "link to from geometry"))
+    , l_dest(initLink("dest", "link to dest geometry"))
+    , d_output(initData(&d_output,"output", "output of the collision detection")) {}
+
 void FindClosestPointAlgorithm::fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
 {
     defaulttype::Vec3i nbox = decorator->getBoxSize();
@@ -206,6 +211,23 @@ BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::S
 
 BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::SPtr pfrom, const BaseGeometry * geo) {
     return findClosestPoint(pfrom,std::move(getDestIterator(pfrom->getPosition(),geo)));
+}
+
+void FindClosestPointAlgorithm::doDetection() {
+    if (l_from == NULL) return;
+    if (l_dest == NULL) return;
+
+    DetectionOutput & output = *d_output.beginEdit();
+    output.clear();
+    for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
+        PairDetection min_pair = findClosestPoint(*itfrom,l_dest.get());
+
+        if (min_pair.first == nullptr || min_pair.second == nullptr) continue;
+
+        output.add(min_pair.first,min_pair.second);
+    }
+    d_output.endEdit();
+
 }
 
 void FindClosestPointAlgorithm::processAlgorithm(const BaseGeometry * geometry1, const BaseGeometry * geometry2, helper::vector< PairDetection > & output) {
