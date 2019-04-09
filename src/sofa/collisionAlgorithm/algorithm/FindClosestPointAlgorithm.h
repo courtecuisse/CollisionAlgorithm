@@ -16,15 +16,12 @@ public:
     SOFA_ABSTRACT_CLASS(FindClosestPointAlgorithm, BaseAlgorithm);
 
     FindClosestPointAlgorithm () ;
-    void processAlgorithm(const BaseGeometry * geometry1, const BaseGeometry * g2, helper::vector< PairDetection > & output);
-
-    BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr from, const BaseGeometry * geo);
-
 
     core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
     core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
 
     Data<DetectionOutput> d_output;
+
 protected:
 
     void doDetection();
@@ -36,6 +33,8 @@ protected:
     BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr pfrom, BaseElementIterator::UPtr itdest);
 
     PairDetection findClosestPoint(const BaseElement::UPtr & itfrom, const BaseGeometry * geo);
+
+    BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr from, const BaseGeometry * geo);
 
 };
 

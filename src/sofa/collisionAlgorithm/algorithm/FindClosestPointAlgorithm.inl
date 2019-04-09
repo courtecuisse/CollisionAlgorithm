@@ -230,16 +230,6 @@ void FindClosestPointAlgorithm::doDetection() {
 
 }
 
-void FindClosestPointAlgorithm::processAlgorithm(const BaseGeometry * geometry1, const BaseGeometry * geometry2, helper::vector< PairDetection > & output) {
-    for (auto it = geometry1->begin();it != geometry1->end(); it++) {
-        PairDetection min_pair = findClosestPoint(*it,geometry2);
-
-        if (min_pair.first == nullptr || min_pair.second == nullptr) continue;
-
-        output.push_back(PairDetection(min_pair.first,min_pair.second));
-    }
-}
-
 }
 
 }
