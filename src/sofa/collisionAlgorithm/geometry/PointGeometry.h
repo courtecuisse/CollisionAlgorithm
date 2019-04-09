@@ -42,6 +42,7 @@ public:
 
         defaulttype::Vector4 color = this->d_color.getValue();
         glColor4f(color[0],color[1],color[2],color[3]);
+
         for(auto it=begin();it!=this->end();it++) {
             vparams->drawTool()->drawSphere(pos[it->id()],d_drawRadius.getValue());
         }

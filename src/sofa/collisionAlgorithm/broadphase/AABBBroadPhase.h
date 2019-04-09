@@ -65,7 +65,7 @@ public:
         //compute the box where is P
         defaulttype::Vec3i cbox;
         for (int i = 0 ; i < 3 ; i++) {
-            cbox[i] = floor((P[0] - m_Bmin[0])/m_cellSize[0]);
+            cbox[i] = floor((P[i] - m_Bmin[i])/m_cellSize[i]);
         }
 //        cbox[0] = floor((P[0] - m_Bmin[0])/m_cellSize[0]);
 //        cbox[1] = floor((P[1] - m_Bmin[1])/m_cellSize[1]);
@@ -75,8 +75,11 @@ public:
         //search with the closest box in bbox
         for (unsigned int i=0;i<3;i++)
         {
-            if (cbox[i] < 0) cbox[i] = 0;
-            else if (cbox[i] >= m_nbox[i]) cbox[i]=m_nbox[i]-1;
+            if (cbox[i] < 0) {
+                cbox[i] = 0;
+            } else if (cbox[i] >= m_nbox[i]) {
+                cbox[i]=m_nbox[i]-1;
+            }
         }
 
         return cbox;
