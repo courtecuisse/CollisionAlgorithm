@@ -32,11 +32,11 @@ public:
  * \brief The BaseAlgorithm abstract class defines an interface of
  * algorithms to be wrapped in sofa components
  */
-class BaseAlgorithm : public core::collision::Pipeline
+class BaseAlgorithm : public core::BehaviorModel
 {
 public :
 
-    SOFA_ABSTRACT_CLASS(BaseAlgorithm, core::objectmodel::BaseObject);
+    SOFA_ABSTRACT_CLASS(BaseAlgorithm, core::BehaviorModel);
 
     /*!
      * \brief BaseAlgorithm Constructor
@@ -59,31 +59,15 @@ public :
         return true;
     }
 
-    virtual void doDetection() = 0;
-
     core::objectmodel::MultiLink<BaseAlgorithm,BaseFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filters;
 protected:
 
-    virtual void reset() override {}
+    virtual void doDetection() = 0;
 
-    virtual void doCollisionReset() override {}
-
-    virtual void doCollisionDetection(const sofa::helper::vector<core::CollisionModel*>& /*collisionModels*/) override {}
-
-    virtual void doCollisionResponse() override {}
-
-    virtual std::set< std::string > getResponseList() const override {
-        std::set< std::string > res;
-        return res;
-    }
-
-    void computeCollisionDetection() {
+    /// Computation of a new simulation step.
+    virtual void updatePosition(SReal ) {
         doDetection();
     }
-
-    void computeCollisionReset() {}
-
-    void computeCollisionResponse()  {}
 };
 
 }
