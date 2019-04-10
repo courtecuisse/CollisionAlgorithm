@@ -4,6 +4,9 @@
 #include <sofa/collisionAlgorithm/iterators/SubsetElementIterator.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 
+#define DEBUGIN(p) std::cout << "IN : " << p << std::endl ;
+#define DEBUGOUT(p) std::cout << "OUT : " << p << std::endl ;
+
 namespace sofa
 {
 
@@ -210,7 +213,15 @@ BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::S
 
 
 BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::SPtr pfrom, const BaseGeometry * geo) {
-    return findClosestPoint(pfrom,std::move(getDestIterator(pfrom->getPosition(),geo)));
+    return findClosestPoint(
+        pfrom,
+        std::move(
+            getDestIterator(
+                pfrom->getPosition(),
+                geo
+            )
+        )
+    );
 }
 
 void FindClosestPointAlgorithm::doDetection() {

@@ -97,6 +97,7 @@ public:
     TBaseGeometry()
     : l_state(initLink("mstate", "link to state")) {
         l_state.setPath("@.");
+        m_broadPhase = NULL ;
     }
 
     sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
