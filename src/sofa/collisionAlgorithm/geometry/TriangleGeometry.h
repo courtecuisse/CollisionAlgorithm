@@ -4,7 +4,6 @@
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
-#include <sofa/collisionAlgorithm/container/DataTriangleContainer.h>
 
 namespace sofa
 {
