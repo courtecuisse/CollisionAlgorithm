@@ -30,7 +30,7 @@ public:
     }
 
     BaseElement::UPtr element() {
-        return *(m_geometry->begin(id()));
+        return *(m_geometry->getElementIterator(id()));
     }
 
     const BaseGeometry * m_geometry;

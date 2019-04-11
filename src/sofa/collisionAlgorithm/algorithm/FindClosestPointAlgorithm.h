@@ -26,15 +26,15 @@ protected:
 
     void doDetection();
 
-    BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P, const BaseGeometry * geo);
+    BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P, BaseGeometry *geo);
 
     void fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const;
 
     BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr pfrom, BaseElementIterator::UPtr itdest);
 
-    PairDetection findClosestPoint(const BaseElement::UPtr & itfrom, const BaseGeometry * geo);
+    PairDetection findClosestPoint(const BaseElement::UPtr & itfrom, BaseGeometry *geo);
 
-    BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr from, const BaseGeometry * geo);
+    BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr from, BaseGeometry *geo);
 
 };
 

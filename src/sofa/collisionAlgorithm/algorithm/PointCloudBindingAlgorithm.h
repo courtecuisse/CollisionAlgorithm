@@ -22,18 +22,17 @@ public:
 
     PointCloudBindingAlgorithm();
 
-    void doDetection(){}
-
-    void processAlgorithm(const BaseGeometry * geometry1, const BaseGeometry * g2, helper::vector< PairDetection > & output);
+    void doDetection();
 
     static void bind(const std::vector<defaulttype::Vector3> & p1, const std::vector<defaulttype::Vector3> & p2, helper::vector<int> & bindId, helper::vector<int> & invBind, double maxDist);
-
 
     core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
     core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
 
     Data<DetectionOutput> d_output;
 
+private:
+    void processAlgorithm(BaseGeometry * g1, BaseGeometry * g2, DetectionOutput & output);
 };
 
 }

@@ -26,7 +26,7 @@ public:
     EdgeGeometry()
     : d_edges(initData(&d_edges, "edges", "Vector of Edges")){}
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
+    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const {
         return DefaultElementIterator<EdgeElement<GEOMETRY> >::create(this, d_edges.getValue().size(), eid);
     }
 

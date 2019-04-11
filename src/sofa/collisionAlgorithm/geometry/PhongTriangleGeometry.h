@@ -73,7 +73,7 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
+    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const {
         return DefaultElementIterator<PhongTriangleElement<GEOMETRY> >::create(this, this->d_triangles.getValue().size(), eid);
     }
 

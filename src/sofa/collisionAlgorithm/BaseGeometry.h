@@ -18,37 +18,44 @@ class BroadPhase;
  * \brief The BaseGeometry class is an abstract class defining a basic geometry
  * iterates through Proximity elements and draws them
  */
-class BaseGeometry : public core::BehaviorModel
+class BaseGeometry : public core::objectmodel::BaseObject
 {
 public:
-    SOFA_ABSTRACT_CLASS(BaseGeometry,core::BehaviorModel);
+    SOFA_ABSTRACT_CLASS(BaseGeometry,core::objectmodel::BaseObject);
 
     Data<defaulttype::Vector4> d_color;
     Data<double> d_drawScaleNormal;
-//    sofa::core::objectmodel::_datacallback_::DataCallback c_update;
 
     BaseGeometry()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
     , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model")){
-//        c_update.addCallback(std::bind(&BaseGeometry::prepareDetection,this));
+        m_updateTime = -1.0; // for update first time
     }
-
-//    void init() {
-//        core::objectmodel::BaseData * data = this->getState()->findData("position");
-//        if (data) c_update.addInput(data);
-//    }
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const = 0;
+    inline BaseElementIterator::UPtr begin(unsigned eid = 0) {
+        update(this->getContext()->getTime());
+        return getElementIterator(eid);
+    }
 
-    virtual const BaseGeometry * end() const {
+    void update(double time) {
+        if (m_updateTime < time) {
+            prepareDetection();
+            m_updateTime = time;
+        }
+    }
+
+    inline const BaseGeometry * end() {
         return this;
     }
 
     /// broadphase accessors
-    virtual void setBroadPhase(BroadPhase * d) = 0;
-    virtual BroadPhase * getBroadPhase() const = 0;
+    inline void setBroadPhase(BroadPhase * d) {
+        m_broadPhase = d;
+    }
+
+    BroadPhase * getBroadPhase() const;
 
     virtual void prepareDetection() {}
 
@@ -68,11 +75,12 @@ public:
         }
     }
 
+    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const = 0;
+
 protected:
-    /// Computation of a new simulation step.
-    virtual void updatePosition(SReal ) {
-        prepareDetection();
-    }
+
+    double m_updateTime;
+    BroadPhase * m_broadPhase;
 };
 
 /*!
@@ -103,53 +111,7 @@ public:
     sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
     }
-
-    void setBroadPhase(BroadPhase * d) {
-        m_broadPhase = d;
-    }
-
-    BroadPhase * getBroadPhase() const {
-        return m_broadPhase;
-    }
-
-protected:
-    BroadPhase * m_broadPhase;
 };
-
-/*
-template<class LINK>
-class TLinkGeometry : public BaseGeometry
-{
-public:
-    typedef TLinkGeometry<LINK> GEOMETRY;
-    SOFA_ABSTRACT_CLASS(GEOMETRY,BaseGeometry);
-
-    typedef typename LINK::TDataTypes DataTypes;
-    typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef Data<VecCoord> DataVecCoord;
-    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
-
-    core::objectmodel::SingleLink<TLinkGeometry<LINK>,LINK,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
-
-    TLinkGeometry()
-    : l_geometry(initLink("geometry", "link to state")) {
-        l_geometry.setPath("@.");
-    }
-
-    sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
-        return l_geometry->getState();
-    }
-
-    void setBroadPhase(BroadPhase * d) {
-        l_geometry->setBroadPhase(d);
-    }
-
-    BroadPhase * getBroadPhase() const {
-        return l_geometry->getBroadPhase();
-    }
-};
-*/
 
 }
 

@@ -10,23 +10,20 @@ namespace collisionAlgorithm {
 /*!
  * \brief The BroadPhase class defines an interface for the collision detection broad phase
  */
-class BroadPhase : public core::BehaviorModel
+class BroadPhase : public core::objectmodel::BaseObject
 {
 public:
-    SOFA_ABSTRACT_CLASS(BroadPhase,core::BehaviorModel);
+    SOFA_ABSTRACT_CLASS(BroadPhase,core::objectmodel::BaseObject);
 
     Data<defaulttype::Vector4> d_color;
     core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
-//    sofa::core::objectmodel::_datacallback_::DataCallback c_update;
 
     /*!
      * \brief BroadPhase Constructor
      */
     BroadPhase()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , l_geometry(initLink("geometry", "link to state")) {
-//        c_update.addCallback(std::bind(&BroadPhase::prepareDetection,this));
-    }
+    , l_geometry(initLink("geometry", "link to state")) {}
 
     /*!
      * \brief ~BroadPhase destructor
@@ -34,16 +31,6 @@ public:
     virtual ~BroadPhase() {
         if (l_geometry != NULL) l_geometry->setBroadPhase(NULL);
     }
-
-//    void init( ) override {
-//        if (l_geometry != NULL) {
-//            core::objectmodel::BaseData * data = l_geometry->getState()->findData("position");
-//            if (data) {
-//                l_geometry->setBroadPhase(this);
-//                c_update.addInput(data);
-//            }
-//        }
-//    }
 
     /*!
      * \brief prepareDetection virtual method to implement
@@ -66,11 +53,18 @@ public:
 
     virtual void getElementSet(unsigned cx,unsigned cy, unsigned cz, std::set<unsigned> & selectElements) const = 0;
 
-protected:
-    /// Computation of a new simulation step.
-    virtual void updatePosition(SReal ) {
-        prepareDetection();
+    void update(double time) {
+        if (m_updateTime < time) {
+            prepareDetection();
+            m_updateTime = time;
+        }
+        if (l_geometry) l_geometry->update(time); // make sure the geometry is updated on the same time
     }
+
+protected:
+
+    double m_updateTime;
+
 };
 
 

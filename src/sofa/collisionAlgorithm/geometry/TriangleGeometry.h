@@ -34,7 +34,7 @@ public:
 
     virtual ~TriangleGeometry() override {}
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
+    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const {
         return DefaultElementIterator<TriangleElement<GEOMETRY> >::create(this, this->d_triangles.getValue().size(), eid);
     }
 

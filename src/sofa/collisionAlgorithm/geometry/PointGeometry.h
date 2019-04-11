@@ -27,7 +27,7 @@ public:
     PointGeometry()
     : d_drawRadius(initData(&d_drawRadius, 1.0, "radius", "radius of drawing")) {}
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
+    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const {
         return DefaultElementIterator<PointElement<GEOMETRY> >::create(this, this->getState()->getSize(), eid);
     }
 
@@ -43,7 +43,7 @@ public:
         defaulttype::Vector4 color = this->d_color.getValue();
         glColor4f(color[0],color[1],color[2],color[3]);
 
-        for(auto it=begin();it!=this->end();it++) {
+        for(auto it=this->begin();it!=this->end();it++) {
             vparams->drawTool()->drawSphere(pos[it->id()],d_drawRadius.getValue());
         }
     }

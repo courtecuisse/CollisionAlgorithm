@@ -104,6 +104,14 @@ void PointCloudBindingAlgorithm::bind(
     }
 }
 
+
+void PointCloudBindingAlgorithm::doDetection() {
+    processAlgorithm(l_from.get(),
+                     l_dest.get(),
+                     *d_output.beginEdit());
+    d_output.endEdit();
+}
+
 /*!
  * \brief PointCloudBindingAlgorithm::processAlgorithm, implementation of pure virtual processAlgorithm
  * is called by component when needed
@@ -112,12 +120,14 @@ void PointCloudBindingAlgorithm::bind(
  * \param output
  */
 //////// DEPRECATED : recode in doDectection ASAP
-void PointCloudBindingAlgorithm::processAlgorithm(const BaseGeometry * g1, const BaseGeometry * g2, helper::vector< PairDetection > & output) {
+void PointCloudBindingAlgorithm::processAlgorithm(BaseGeometry * g1, BaseGeometry * g2, DetectionOutput & output) {
     helper::vector<defaulttype::Vector3> p1;
     helper::vector<defaulttype::Vector3> p2;
 
     helper::vector<BaseProximity::SPtr> prox1;
     helper::vector<BaseProximity::SPtr> prox2;
+
+    output.clear();
 
     for (auto itfrom = g1->begin(); itfrom != g1->end();itfrom++) {
         BaseProximity::SPtr center = (*itfrom)->center();
@@ -144,7 +154,7 @@ void PointCloudBindingAlgorithm::processAlgorithm(const BaseGeometry * g1, const
         pair.first = prox1[bindId[i]];
         pair.second = prox2[invBind[i]];
 
-        output.push_back(PairDetection(pair.first,pair.second));
+        output.add(pair.first,pair.second);
     }
 }
 

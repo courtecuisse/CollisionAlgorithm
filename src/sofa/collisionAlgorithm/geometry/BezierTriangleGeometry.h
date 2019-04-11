@@ -87,7 +87,7 @@ public:
     , d_draw_tesselation(initData(&d_draw_tesselation,(unsigned) 0.0, "tesselation", "Number of tesselation"))
     {}
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
+    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const {
         return DefaultElementIterator<BezierTriangleElement<GEOMETRY> >::create(this, this->d_triangles.getValue().size(), eid);
     }
 

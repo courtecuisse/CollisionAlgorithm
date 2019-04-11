@@ -71,7 +71,7 @@ public:
     , d_triangles(initData(&d_triangles, "triangles", "Vector of Triangles"))
     , d_quads(initData(&d_quads, "quads", "Vector of Quads")){}
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const {
+    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const {
         if (eid < d_edges.getValue().size())
             return DefaultElementIterator<GenericElement<GEOMETRY,sofa::core::topology::BaseMeshTopology::Edge> >::create(this, d_edges.getValue().size(), eid);
 
