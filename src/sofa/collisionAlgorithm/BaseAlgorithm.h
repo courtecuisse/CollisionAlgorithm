@@ -42,7 +42,9 @@ public :
      * \brief BaseAlgorithm Constructor
      */
     BaseAlgorithm()
-    : l_filters(initLink("filters","list of filters")) {}
+    : l_filters(initLink("filters","list of filters")) {
+//        m_time = -1.0 ;
+    }
 
     /*!
      * \brief acceptFilter loops through all filters linked to the component
@@ -65,9 +67,16 @@ protected:
     virtual void doDetection() = 0;
 
     /// Computation of a new simulation step.
-    virtual void updatePosition(SReal ) {
+    virtual void updatePosition(SReal /*dt*/) {
+//        have been used for delaying algo exec
+//        if (m_time < 0.0) {
+//            m_time += dt ;
+//            return ;
+//        }
         doDetection();
     }
+
+//    SReal m_time ;
 };
 
 }
