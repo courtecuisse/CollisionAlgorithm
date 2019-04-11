@@ -32,6 +32,14 @@ public:
         if (l_geometry != NULL) l_geometry->setBroadPhase(NULL);
     }
 
+    void init( ) override {
+        if (l_geometry != NULL) {
+            sout << "Register to geometry " << l_geometry->getName() << sendl;
+            l_geometry->setBroadPhase(this);
+        }
+        serr << "No geometry found" << sendl;
+    }
+
     /*!
      * \brief prepareDetection virtual method to implement
      * detection pre-processing
