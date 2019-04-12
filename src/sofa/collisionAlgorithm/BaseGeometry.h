@@ -41,8 +41,8 @@ public:
 
     void update(double time) {
         if (m_updateTime < time) {
-            prepareDetection();
             m_updateTime = time;
+            prepareDetection();
         }
     }
 

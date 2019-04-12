@@ -63,8 +63,8 @@ public:
 
     void update(double time) {
         if (m_updateTime < time) {
-            prepareDetection();
             m_updateTime = time;
+            prepareDetection();
         }
         if (l_geometry) l_geometry->update(time); // make sure the geometry is updated on the same time
     }
