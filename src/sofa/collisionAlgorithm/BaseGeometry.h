@@ -55,7 +55,7 @@ public:
         m_broadPhase = d;
     }
 
-    BroadPhase * getBroadPhase() const { return m_broadPhase; }
+    BroadPhase * getBroadPhase() const;
 
     virtual void prepareDetection() {}
 
