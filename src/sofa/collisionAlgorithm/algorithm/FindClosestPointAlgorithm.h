@@ -39,6 +39,8 @@ public:
 
 protected:
 
+    BaseDistanceMeasure* m_distance_measure ;
+
     void doDetection();
 
     BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P, BaseGeometry *geo);
@@ -51,8 +53,6 @@ public:
     PairDetection findClosestPoint(const BaseElement::UPtr & itfrom, BaseGeometry *geo);
 
     BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr from, BaseGeometry *geo);
-
-    BaseDistanceMeasure* m_distance_measure ;
 
 };
 
