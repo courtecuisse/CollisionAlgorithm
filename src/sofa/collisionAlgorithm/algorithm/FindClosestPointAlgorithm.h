@@ -30,6 +30,7 @@ protected:
 
     void fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const;
 
+public:
     BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr pfrom, BaseElementIterator::UPtr itdest);
 
     PairDetection findClosestPoint(const BaseElement::UPtr & itfrom, BaseGeometry *geo);

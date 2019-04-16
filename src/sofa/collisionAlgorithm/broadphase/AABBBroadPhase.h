@@ -23,6 +23,7 @@ public:
 
     Data<defaulttype::Vec3i> d_nbox;
     Data<bool> d_refineBBox;
+    Data<bool> d_static;
 
     AABBBroadPhase();
 
@@ -98,6 +99,7 @@ protected:
     defaulttype::Vec3i m_nbox;
     defaulttype::Vec<2, size_t> m_offset;
     std::map<unsigned, std::set<unsigned> > m_indexedElement;
+    bool m_staticInitDone;
 };
 
 

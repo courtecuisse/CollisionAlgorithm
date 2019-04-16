@@ -37,7 +37,7 @@ public:
             sout << "Register to geometry " << l_geometry->getName() << sendl;
             l_geometry->setBroadPhase(this);
         }
-        serr << "No geometry found" << sendl;
+        else serr << "No geometry found" << sendl;
     }
 
     /*!
