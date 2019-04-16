@@ -4,6 +4,9 @@
 #include <sofa/collisionAlgorithm/iterators/SubsetElementIterator.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 
+//default distance measurement behaviour
+#include <sofa/collisionAlgorithm/distanceMeasures/Norm3Measure.h>
+
 #define DEBUGIN(p) std::cout << "IN : " << p << std::endl ;
 #define DEBUGOUT(p) std::cout << "OUT : " << p << std::endl ;
 
@@ -16,7 +19,19 @@ namespace collisionAlgorithm
 FindClosestPointAlgorithm::FindClosestPointAlgorithm ()
     : l_from(initLink("from", "link to from geometry"))
     , l_dest(initLink("dest", "link to dest geometry"))
-    , d_output(initData(&d_output,"output", "output of the collision detection")) {}
+    , l_distance_measure(initLink("distance", "link to distance measure component"))
+    , d_output(initData(&d_output,"output", "output of the collision detection"))
+{
+    init () ;
+}
+
+void FindClosestPointAlgorithm::init () {
+    //Norm3Measure is the default measure used if the distance measure is unspecified
+    m_distance_measure = new Norm3Measure() ;
+    if (l_distance_measure != NULL) {
+        m_distance_measure = l_distance_measure.get() ;
+    }
+}
 
 void FindClosestPointAlgorithm::fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
 {
@@ -194,8 +209,9 @@ BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::S
         BaseProximity::SPtr pdest = (*itdest)->project(P);
 
         if (acceptFilter(pfrom,pdest)) {
-            defaulttype::Vector3 N = P - pdest->getPosition();
-            double dist = N.norm();
+            //defaulttype::Vector3 N = P - pdest->getPosition();
+            //double dist = N.norm();
+            double dist = m_distance_measure->computeDistance(P, pdest->getPosition()) ;
 
             if (dist<min_dist) {
                 min_dist = dist;
@@ -228,13 +244,18 @@ void FindClosestPointAlgorithm::doDetection() {
 
     DetectionOutput & output = *d_output.beginEdit();
     output.clear();
+//    size_t i = 0, _3fat = 0 ; //debug purposes
     for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
         PairDetection min_pair = findClosestPoint(*itfrom,l_dest.get());
-
-        if (min_pair.first == nullptr || min_pair.second == nullptr) continue;
+//        i++ ;
+        if (min_pair.first == nullptr || min_pair.second == nullptr) {
+//            _3fat++ ;
+            continue;
+        }
 
         output.add(min_pair.first,min_pair.second);
     }
+//    std::cout << i << ':' << _3fat << std::endl ;
     d_output.endEdit();
 
 }

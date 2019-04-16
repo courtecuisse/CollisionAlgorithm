@@ -4,6 +4,8 @@
 #include <sofa/collisionAlgorithm/BroadPhase.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 
+#include <sofa/collisionAlgorithm/BaseDistanceMeasure.h>
+
 namespace sofa
 {
 
@@ -16,11 +18,24 @@ public:
     SOFA_ABSTRACT_CLASS(FindClosestPointAlgorithm, BaseAlgorithm);
 
     FindClosestPointAlgorithm () ;
+    void init () ;
 
-    core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
-    core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
+    core::objectmodel::SingleLink<
+        FindClosestPointAlgorithm,
+        BaseGeometry,
+        BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
+    core::objectmodel::SingleLink<
+        FindClosestPointAlgorithm,
+        BaseGeometry,
+        BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
+
+    core::objectmodel::SingleLink<
+        FindClosestPointAlgorithm,
+        BaseDistanceMeasure,
+        BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_distance_measure;
 
     Data<DetectionOutput> d_output;
+
 
 protected:
 
@@ -35,6 +50,8 @@ protected:
     PairDetection findClosestPoint(const BaseElement::UPtr & itfrom, BaseGeometry *geo);
 
     BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr from, BaseGeometry *geo);
+
+    BaseDistanceMeasure* m_distance_measure ;
 
 };
 
