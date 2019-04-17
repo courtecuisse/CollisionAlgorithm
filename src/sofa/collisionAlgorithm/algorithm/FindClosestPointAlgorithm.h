@@ -18,7 +18,6 @@ public:
     SOFA_ABSTRACT_CLASS(FindClosestPointAlgorithm, BaseAlgorithm);
 
     FindClosestPointAlgorithm () ;
-    void init () ;
 
     core::objectmodel::SingleLink<
         FindClosestPointAlgorithm,
@@ -29,17 +28,19 @@ public:
         BaseGeometry,
         BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
 
-    core::objectmodel::SingleLink<
-        FindClosestPointAlgorithm,
-        BaseDistanceMeasure,
-        BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_distance_measure;
+
+//    core::objectmodel::SingleLink<
+//        FindClosestPointAlgorithm,
+//        BaseDistanceMeasure,
+//        BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH>
+    Data<BaseDistanceMeasure> d_distance_measure;
 
     Data<DetectionOutput> d_output;
 
 
 protected:
 
-    BaseDistanceMeasure* m_distance_measure ;
+//    BaseDistanceMeasure* m_distance_measure ;
 
     void doDetection();
 

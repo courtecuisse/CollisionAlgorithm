@@ -1,13 +1,13 @@
-#include <sofa/collisionAlgorithm/distanceMeasures/Norm3Measure.h>
-#include <sofa/core/ObjectFactory.h>
+//#include <sofa/collisionAlgorithm/distanceMeasures/Norm3Measure.h>
+//#include <sofa/core/ObjectFactory.h>
 
-namespace sofa {
+//namespace sofa {
 
-namespace collisionAlgorithm {
+//namespace collisionAlgorithm {
 
-int Norm3MeasureClass = core::RegisterObject("Norm3Measure")
-.add< Norm3Measure >();
+//int Norm3MeasureClass = core::RegisterObject("Norm3Measure")
+//.add< Norm3Measure >();
 
-}
+//}
 
-}
+//}

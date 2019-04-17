@@ -19,18 +19,11 @@ namespace collisionAlgorithm
 FindClosestPointAlgorithm::FindClosestPointAlgorithm ()
     : l_from(initLink("from", "link to from geometry"))
     , l_dest(initLink("dest", "link to dest geometry"))
-    , l_distance_measure(initLink("distance", "link to distance measure component"))
+    , d_distance_measure(initData(&d_distance_measure, "distance", "distance measure component"))
     , d_output(initData(&d_output,"output", "output of the collision detection"))
 {
-    init () ;
-}
-
-void FindClosestPointAlgorithm::init () {
-    //Norm3Measure is the default measure used if the distance measure is unspecified
-    m_distance_measure = new Norm3Measure() ;
-    if (l_distance_measure != NULL) {
-        m_distance_measure = l_distance_measure.get() ;
-    }
+//    if (d_distance_measure == NULL) {
+//    }
 }
 
 void FindClosestPointAlgorithm::fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
@@ -192,8 +185,10 @@ BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defau
 
 PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElement::UPtr & elfrom, BaseGeometry * geo) {
     BaseProximity::SPtr from = elfrom->center();
-    BaseProximity::SPtr dest = findClosestPoint(from,
-                                                getDestIterator(from->getPosition(),geo));
+    BaseProximity::SPtr dest = findClosestPoint(
+        from,
+        getDestIterator(from->getPosition(),geo)
+    );
 
     return PairDetection (from,dest);
 }
@@ -211,7 +206,8 @@ BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::S
         if (acceptFilter(pfrom,pdest)) {
             //defaulttype::Vector3 N = P - pdest->getPosition();
             //double dist = N.norm();
-            double dist = m_distance_measure->computeDistance(P, pdest->getPosition()) ;
+            defaulttype::Vector3 Q = pdest->getPosition() ;
+            double dist = d_distance_measure.getValue().getDistance(P, Q) ;
 
             if (dist<min_dist) {
                 min_dist = dist;

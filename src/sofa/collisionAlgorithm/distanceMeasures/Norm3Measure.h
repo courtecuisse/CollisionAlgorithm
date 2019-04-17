@@ -1,24 +1,24 @@
-#pragma once
+//#pragma once
 
-#include <sofa/collisionAlgorithm/BaseDistanceMeasure.h>
+//#include <sofa/collisionAlgorithm/BaseDistanceMeasure.h>
 
-namespace sofa {
+//namespace sofa {
 
-namespace collisionAlgorithm {
+//namespace collisionAlgorithm {
 
-class Norm3Measure : public BaseDistanceMeasure {
-public :
-    SOFA_CLASS(Norm3Measure, BaseDistanceMeasure) ;
+//class Norm3Measure : public BaseDistanceMeasure {
+//public :
+//    SOFA_CLASS(Norm3Measure, BaseDistanceMeasure) ;
 
-    Norm3Measure () {}
+//    Norm3Measure () {}
 
-    virtual double computeDistance (defaulttype::Vec3 P, defaulttype::Vec3 Q) {
-        return (P-Q).norm() ;
-    }
+//    virtual double computeDistance (defaulttype::Vec3 P, defaulttype::Vec3 Q) {
+//        return (P-Q).norm() ;
+//    }
 
-} ;
+//} ;
 
 
-}
+//}
 
-}
+//}
