@@ -21,10 +21,7 @@ FindClosestPointAlgorithm::FindClosestPointAlgorithm ()
     , l_dest(initLink("dest", "link to dest geometry"))
     , d_distance_measure(initData(&d_distance_measure, "distance", "distance measure component"))
     , d_output(initData(&d_output,"output", "output of the collision detection"))
-{
-//    if (d_distance_measure == NULL) {
-//    }
-}
+{}
 
 void FindClosestPointAlgorithm::fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
 {
