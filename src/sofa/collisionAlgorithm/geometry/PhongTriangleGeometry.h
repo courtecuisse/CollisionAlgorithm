@@ -26,22 +26,26 @@ public:
         defaulttype::Vector3 factor;
         m_geo->project(m_tid, P, triangle, factor);
 
-        return BaseProximity::create<PhongTriangleProximity<DataTypes> >(m_geo->getState(),
-                                                                         triangle[0],triangle[1],triangle[2],
-                                                                         factor[0],factor[1],factor[2],
-                                                                         m_geo->pointNormals()[triangle[0]],
-                                                                         m_geo->pointNormals()[triangle[1]],
-                                                                         m_geo->pointNormals()[triangle[2]]);
+        return BaseProximity::create<PhongTriangleProximity<DataTypes> >(
+            m_geo->getState(),
+            triangle[0],triangle[1],triangle[2],
+            factor[0],factor[1],factor[2],
+            m_geo->pointNormals()[triangle[0]],
+            m_geo->pointNormals()[triangle[1]],
+            m_geo->pointNormals()[triangle[2]]
+        );
     }
 
     inline BaseProximity::SPtr center() const {
         const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->getTriangles()[m_tid];
-        return BaseProximity::create<PhongTriangleProximity<DataTypes> >(m_geo->getState(),
-                                                                         triangle[0],triangle[1],triangle[2],
-                                                                         0.3333,0.3333,0.3333,
-                                                                         m_geo->pointNormals()[triangle[0]],
-                                                                         m_geo->pointNormals()[triangle[1]],
-                                                                         m_geo->pointNormals()[triangle[2]]);
+        return BaseProximity::create<PhongTriangleProximity<DataTypes> >(
+            m_geo->getState(),
+            triangle[0],triangle[1],triangle[2],
+            0.3333,0.3333,0.3333,
+            m_geo->pointNormals()[triangle[0]],
+            m_geo->pointNormals()[triangle[1]],
+            m_geo->pointNormals()[triangle[2]]
+        );
     }
 
     inline defaulttype::BoundingBox getBBox() const {
