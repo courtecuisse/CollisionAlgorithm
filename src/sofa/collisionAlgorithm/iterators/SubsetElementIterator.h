@@ -2,7 +2,6 @@
 
 #include <sofa/collisionAlgorithm/BaseElementIterator.h>
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
-#include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 
 namespace sofa
 {
@@ -13,7 +12,7 @@ namespace collisionAlgorithm
 //Internal iterator of elements
 class SubsetElementIterator : public BaseElementIterator {
 public:
-    SubsetElementIterator(const BaseGeometry * geo, const std::set<unsigned> & subsetElements) : m_geometry(geo), m_subsetElements(subsetElements) {
+    SubsetElementIterator(BaseElementContainer * geo, const std::set<unsigned> & subsetElements) : m_container(geo), m_subsetElements(subsetElements) {
         m_iterator = m_subsetElements.cbegin();
     }
 
@@ -25,15 +24,15 @@ public:
         return *m_iterator;
     }
 
-    bool end() const{
+    bool end(unsigned ) const{
         return m_iterator==m_subsetElements.cend();
     }
 
-    BaseElement::UPtr element() {
-        return *(m_geometry->getElementIterator(id()));
+    const BaseElement * element() const {
+        return *(m_container->begin(id()));
     }
 
-    const BaseGeometry * m_geometry;
+    BaseElementContainer * m_container;
     const std::set<unsigned> m_subsetElements;
     std::set<unsigned>::iterator m_iterator;
 };

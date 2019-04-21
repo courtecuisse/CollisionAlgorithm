@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/broadphase/AABBBroadPhase.h>
-#include <sofa/collisionAlgorithm/proximity/FixedProximity.h>
 
 namespace sofa
 {
@@ -11,7 +10,7 @@ namespace collisionAlgorithm
 
 AABBBroadPhase::AABBBroadPhase()
 : d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox", "number of bbox"))
-, d_refineBBox(initData(&d_refineBBox, true,"refine", "Optimization to project center of box in order to find the minimal set of intersecting boxes"))
+, d_refineBBox(initData(&d_refineBBox, false,"refine", "Optimization to project center of box in order to find the minimal set of intersecting boxes"))
 , d_static(initData(&d_static, false,"isStatic", "Optimization: object is not moving in the scene"))
 , m_staticInitDone(false)
 {
@@ -26,14 +25,14 @@ defaulttype::BoundingBox AABBBroadPhase::getBBox() const {
  * checks if bounding boxes collided
  */
 void AABBBroadPhase::prepareDetection() {
-    if (l_geometry == NULL) return;
+    if (l_elements == NULL) return;
 
     if(d_static.getValue() && m_staticInitDone)
         return;
-    std::cout << m_staticInitDone << std::endl;
+
     m_staticInitDone = true;
 
-    sofa::core::behavior::BaseMechanicalState * mstate = l_geometry->getState();
+    sofa::core::behavior::BaseMechanicalState * mstate = l_elements->getState();
 
     m_Bmin = defaulttype::Vector3(mstate->getPX(0),mstate->getPY(0),mstate->getPZ(0));
     m_Bmax = m_Bmin;
@@ -110,8 +109,7 @@ void AABBBroadPhase::prepareDetection() {
     m_Bmin -= m_cellSize * 0.5;
     m_Bmax -= m_cellSize * 0.5;
 
-    int i=0;
-    for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
+    for (auto it = l_elements->begin(); it != l_elements->end(); it++)
     {
         //std::cout << ++i << std::endl;
         defaulttype::BoundingBox bbox = (*it)->getBBox();

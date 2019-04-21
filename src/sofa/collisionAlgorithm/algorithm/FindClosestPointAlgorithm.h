@@ -19,14 +19,8 @@ public:
 
     FindClosestPointAlgorithm () ;
 
-    core::objectmodel::SingleLink<
-        FindClosestPointAlgorithm,
-        BaseGeometry,
-        BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_from;
-    core::objectmodel::SingleLink<
-        FindClosestPointAlgorithm,
-        BaseGeometry,
-        BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_dest;
+    core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseElementContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_from;
+    core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseElementContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_dest;
 
     Data<BaseDistanceMeasure> d_distance_measure;
 
@@ -37,16 +31,16 @@ protected:
 
     void doDetection();
 
-    BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P, BaseGeometry *geo);
+    BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P, BaseElementContainer *geo);
 
     void fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const;
 
 public:
-    BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr pfrom, BaseElementIterator::UPtr itdest);
+    BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr pfrom, BaseElementIterator::UPtr itdest, BaseElementContainer * geo);
 
-    PairDetection findClosestPoint(const BaseElement::UPtr & itfrom, BaseGeometry *geo);
+    PairDetection findClosestPoint(const BaseElement * itfrom, BaseElementContainer *geo);
 
-    BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr from, BaseGeometry *geo);
+    BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr from, BaseElementContainer *geo);
 
 };
 

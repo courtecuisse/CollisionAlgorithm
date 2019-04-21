@@ -1,9 +1,9 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/proximity/FixedProximity.h>
 #include <sofa/core/collision/Pipeline.h>
 #include <sofa/collisionAlgorithm/DataDetectionOutput.h>
+#include <sofa/collisionAlgorithm/BaseElement.h>
 
 namespace sofa
 {
@@ -59,6 +59,14 @@ public :
             if (! filter->accept(pdest,pfrom)) return false;
         }
         return true;
+    }
+
+    bool findDataLinkDest(BaseElementContainer *& ptr, const std::string& path, const core::objectmodel::BaseLink* link)
+    {
+        core::objectmodel::BaseData* base = NULL;
+        if (!this->getContext()->findDataLinkDest(base, path, link)) return false;
+        ptr = dynamic_cast<BaseElementContainer*>(base);
+        return (ptr != NULL);
     }
 
     core::objectmodel::MultiLink<BaseAlgorithm,BaseFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filters;

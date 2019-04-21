@@ -1,6 +1,10 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/BaseElementIterator.h>
+#include <memory>
+#include <functional>
+#include <iostream>
+#include <algorithm>
 
 namespace sofa
 {
@@ -8,43 +12,63 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class ELMT>
+/*!
+ * \brief The BaseElement class is a basic abstract element container
+ */
+template<class CONTAINER>
 class DefaultElementIterator : public BaseElementIterator {
-    friend class Iterator;
-
 public:
-    typedef typename ELMT::TContainer CONTAINER;
 
-    DefaultElementIterator(const CONTAINER * geo, unsigned start, unsigned end) {
-        m_id = start;
-        m_end = end;
-        m_geo = geo;
-    }
+    /*!
+     * \brief The BaseElement class is a basic abstract element container
+     */
+    class DefaultBaseElement : public BaseElement {
+    public:
+
+        DefaultBaseElement(const DefaultElementIterator * it) : m_iterator(it) {}
+
+        virtual BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
+            return m_iterator->m_container->project(m_iterator,P);
+        }
+
+        virtual BaseProximity::SPtr center() const {
+            return m_iterator->m_container->center(m_iterator);
+        }
+
+        virtual defaulttype::BoundingBox getBBox() const {
+            return m_iterator->m_container->getBBox(m_iterator);
+        }
+
+        const DefaultElementIterator * m_iterator;
+    };
+
+    DefaultElementIterator(const CONTAINER * container, unsigned start)
+    : m_container(container), m_id(start), m_accessor(this) {}
 
     virtual void next() {
         this->m_id++;
     }
 
-    virtual bool end() const {
-        return m_id>=m_end;
+    virtual bool end(unsigned sz) const {
+        return m_id>=sz;
     }
 
     virtual unsigned id() const {
         return m_id;
     }
 
-    BaseElement::UPtr element() {
-        return BaseElement::UPtr(new ELMT(m_id,m_geo));
+    virtual const BaseElement * element() const {
+        return &m_accessor;
     }
 
-    static BaseElementIterator::UPtr create(const CONTAINER * geo, unsigned end, unsigned start = 0) {
-        return BaseElementIterator::UPtr(new DefaultElementIterator(geo,start,end));
+    static BaseElementIterator::UPtr create(const CONTAINER * container, unsigned start = 0) {
+        return BaseElementIterator::UPtr(new DefaultElementIterator<CONTAINER>(container, start));
     }
 
 private:
+    const CONTAINER * m_container;
     unsigned m_id;
-    unsigned m_end;
-    const CONTAINER * m_geo;
+    DefaultBaseElement m_accessor;
 };
 
 }

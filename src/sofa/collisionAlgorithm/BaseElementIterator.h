@@ -13,7 +13,6 @@ namespace collisionAlgorithm
  */
 class BaseElement {
 public:
-    typedef std::unique_ptr<BaseElement> UPtr;
 
     virtual BaseProximity::SPtr project(const defaulttype::Vector3 & P) const = 0;
 
@@ -35,13 +34,13 @@ public:
         UPtr(BaseElementIterator * ptr) : std::unique_ptr<BaseElementIterator>(ptr) {}
 
         //we take the geometry as parameter for std::iterator compatibility i.e. it != m_geo->end();
-        bool operator != (const BaseGeometry * /*geo*/) {
-            return ! this->get()->end();
+        bool operator != (const unsigned sz) {
+            return ! this->get()->end(sz);
         }
 
-        bool operator == (const BaseGeometry * /*geo*/) {
-            return this->get()->end();
-        }
+//        bool operator == (const BaseGeometry * /*geo*/) {
+//            return this->get()->end();
+//        }
 
         void operator++() {
             this->get()->next();
@@ -51,11 +50,11 @@ public:
             this->get()->next();
         }
 
-        BaseElement::UPtr operator* () {
+        const BaseElement * operator* () {
             return this->get()->element();
         }
 
-        const BaseElement::UPtr operator* () const {
+        const BaseElement * operator* () const {
             return this->get()->element();
         }
     };
@@ -65,11 +64,11 @@ public:
     static BaseElementIterator::UPtr empty() {
         class EmptyIterator : public BaseElementIterator {
         public:
-            virtual bool end() const { return true; }
+            virtual bool end(unsigned ) const { return true; }
 
             virtual void next() {}
 
-            virtual BaseElement::UPtr element() { return NULL; }
+            virtual const BaseElement * element() const { return NULL; }
 
             virtual unsigned id() const { return 0; }
         };
@@ -77,11 +76,11 @@ public:
         return UPtr(new EmptyIterator());
     }
 
-    virtual bool end() const = 0;
+    virtual bool end(unsigned sz) const = 0;
 
     virtual void next() = 0;
 
-    virtual BaseElement::UPtr element() = 0;
+    virtual const BaseElement * element() const = 0;
 
     virtual unsigned id() const = 0;
 };

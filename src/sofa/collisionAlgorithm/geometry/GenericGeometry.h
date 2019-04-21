@@ -48,10 +48,10 @@ protected:
 
 
 template<class DataTypes>
-class GenericGeometry : public TBaseGeometry<DataTypes> {
+class GenericGeometry : public BaseGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
-    typedef TBaseGeometry<DataTypes> Inherit;
+    typedef BaseGeometry<DataTypes> Inherit;
     typedef GenericGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
@@ -72,15 +72,20 @@ public:
     , d_quads(initData(&d_quads, "quads", "Vector of Quads")){}
 
     virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const {
-        if (eid < d_edges.getValue().size())
-            return DefaultElementIterator<GenericElement<GEOMETRY,sofa::core::topology::BaseMeshTopology::Edge> >::create(this, d_edges.getValue().size(), eid);
+//        if (eid < d_edges.getValue().size())
+//            return DefaultElementIterator<GEOMETRY>::create(this, eid);
 
-        eid -= d_edges.getValue().size();
-        if (eid < d_triangles.getValue().size())
-            return DefaultElementIterator<GenericElement<GEOMETRY,sofa::core::topology::BaseMeshTopology::Triangle> >::create(this, d_triangles.getValue().size(), eid);
+//        eid -= d_edges.getValue().size();
+//        if (eid < d_triangles.getValue().size())
+//            return DefaultElementIterator<GEOMETRY>::create(this, eid);
 
         return NULL;
     }
+
+    virtual unsigned end() const {
+        return 0;
+    }
+
 
 protected:
 

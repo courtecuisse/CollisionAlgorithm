@@ -2,6 +2,7 @@
 
 #include <sofa/core/collision/Pipeline.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <sofa/collisionAlgorithm/BaseElement.h>
 
 namespace sofa {
 
@@ -16,26 +17,26 @@ public:
     SOFA_ABSTRACT_CLASS(BroadPhase,core::objectmodel::BaseObject);
 
     Data<defaulttype::Vector4> d_color;
-    core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+    core::objectmodel::SingleLink<BroadPhase,BaseElementContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_elements;
 
     /*!
      * \brief BroadPhase Constructor
      */
     BroadPhase()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , l_geometry(initLink("geometry", "link to state")) {}
+    , l_elements(initLink("elements", "link to state")) {}
 
     /*!
      * \brief ~BroadPhase destructor
      */
     virtual ~BroadPhase() {
-        if (l_geometry != NULL) l_geometry->setBroadPhase(NULL);
+        if (l_elements != NULL) l_elements->setBroadPhase(NULL);
     }
 
     void init( ) override {
-        if (l_geometry != NULL) {
-            sout << "Register to geometry " << l_geometry->getName() << sendl;
-            l_geometry->setBroadPhase(this);
+        if (l_elements != NULL) {
+            sout << "Register to geometry " << l_elements->getOwner()->getName() << sendl;
+            l_elements->setBroadPhase(this);
         }
         else serr << "No geometry found" << sendl;
     }
@@ -61,17 +62,13 @@ public:
 
     virtual void getElementSet(unsigned cx,unsigned cy, unsigned cz, std::set<unsigned> & selectElements) const = 0;
 
-    void update(double time) {
-        if (m_updateTime < time) {
-            m_updateTime = time;
-            prepareDetection();
-        }
-        if (l_geometry) l_geometry->update(time); // make sure the geometry is updated on the same time
+    bool findDataLinkDest(BaseElementContainer *& ptr, const std::string& path, const core::objectmodel::BaseLink* link)
+    {
+        core::objectmodel::BaseData* base = NULL;
+        if (!this->getContext()->findDataLinkDest(base, path, link)) return false;
+        ptr = dynamic_cast<BaseElementContainer*>(base);
+        return (ptr != NULL);
     }
-
-protected:
-
-    double m_updateTime;
 
 };
 

@@ -148,7 +148,7 @@ void FindClosestPointAlgorithm::fillElementSet(const BroadPhase * decorator, def
     }
 }
 
-BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defaulttype::Vector3 & P, BaseGeometry * geo) {
+BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defaulttype::Vector3 & P, BaseElementContainer * geo) {
     const BroadPhase * decorator = geo->getBroadPhase();
 
     if (decorator == NULL) return geo->begin();
@@ -180,23 +180,24 @@ BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defau
     }
 }
 
-PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElement::UPtr & elfrom, BaseGeometry * geo) {
+PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElement * elfrom, BaseElementContainer *geo) {
     BaseProximity::SPtr from = elfrom->center();
     BaseProximity::SPtr dest = findClosestPoint(
         from,
-        getDestIterator(from->getPosition(),geo)
+        getDestIterator(from->getPosition(),geo),
+        geo
     );
 
     return PairDetection (from,dest);
 }
 
-BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::SPtr pfrom, BaseElementIterator::UPtr itdest) {
+BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::SPtr pfrom, BaseElementIterator::UPtr itdest, BaseElementContainer * geo) {
     double min_dist = std::numeric_limits<double>::max();
     BaseProximity::SPtr minprox = nullptr;
 
     defaulttype::Vector3 P = pfrom->getPosition();
 
-    while (! itdest->end())
+    for(;itdest != geo->end();itdest++)
     {
         BaseProximity::SPtr pdest = (*itdest)->project(P);
 
@@ -211,23 +212,17 @@ BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::S
                 minprox = pdest;
             }
         }
-
-        itdest++;
     }
 
     return minprox;
 }
 
 
-BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::SPtr pfrom, BaseGeometry * geo) {
+BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::SPtr pfrom, BaseElementContainer *geo) {
     return findClosestPoint(
         pfrom,
-        std::move(
-            getDestIterator(
-                pfrom->getPosition(),
-                geo
-            )
-        )
+        getDestIterator(pfrom->getPosition(),geo),
+        geo
     );
 }
 

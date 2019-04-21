@@ -12,15 +12,12 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class BaseGeometry;
-
 /*!
  * \brief The BaseProximity class is the basic abstract proximity class
  */
 class BaseProximity {
 public :
     typedef std::shared_ptr<BaseProximity> SPtr;
-    typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
 
     /// return proximiy position in a vector3
     virtual defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
@@ -31,20 +28,12 @@ public :
     virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & dir, double fact, unsigned constraintId) const = 0;
 
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const = 0;
-
-    //for debug
-    virtual void printDebug() {}
-
-    template<class PROXIMITY, class ... Args>
-    static BaseProximity::SPtr create(Args&& ... args) {
-        return SPtr(new PROXIMITY(std::forward<Args>(args)...));
-    }
 };
 
 /*!
  * Template implementation of BaseProximity
  */
-template<class DataTypes>
+template<class DataTypes, class PROXIMITYDATA>
 class TBaseProximity : public BaseProximity {
 public:
 
@@ -58,19 +47,31 @@ public:
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
+    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+    typedef std::function<defaulttype::Vector3(const PROXIMITYDATA & ,core::VecCoordId )> PositionFunctor;
+    typedef std::function<defaulttype::Vector3(const PROXIMITYDATA & )> NormalFunctor;
 
-    TBaseProximity(sofa::core::behavior::MechanicalState<DataTypes> * state)
-    : m_state(state) {}
+    TBaseProximity(State * state, const PROXIMITYDATA & data, PositionFunctor fp, NormalFunctor fn)
+    : m_state(state)
+    , m_data(data)
+    , m_positionFunctor(fp)
+    , m_normalFunctor(fn) {}
 
-    virtual void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const = 0;
+    defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
+        return m_positionFunctor(m_data,v);
+    }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
+    defaulttype::Vector3 getNormal() const {
+        return m_normalFunctor(m_data);
+    }
+
+    virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
         DataMatrixDeriv & c1_d = *cId[m_state].write();
         MatrixDeriv & c1 = *c1_d.beginEdit();
 
         for (unsigned j=0;j<normals.size();j++) {
             MatrixDerivRowIterator c_it = c1.writeLine(constraintId+j);
-            addContributions(c_it, normals[j] * fact);
+            m_data.addContributions(c_it, normals[j] * fact);
         }
 
         c1_d.endEdit();
@@ -88,9 +89,12 @@ public:
     }
 
 
-protected:
-    sofa::core::behavior::MechanicalState<DataTypes> * m_state;
 
+protected:
+    State * m_state;
+    const PROXIMITYDATA m_data;
+    const PositionFunctor m_positionFunctor;
+    const NormalFunctor m_normalFunctor;
 };
 
 }
