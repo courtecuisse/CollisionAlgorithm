@@ -37,8 +37,8 @@ template<class CONTAINER>
 class TBaseProximity : public BaseProximity {
 public:
 
-    typedef typename CONTAINER::PROXIMITYDATA PROXIMITYDATA;
-    typedef typename CONTAINER::DataTypes DataTypes;
+    typedef typename CONTAINER::TPROXIMITYDATA PROXIMITYDATA;
+    typedef typename CONTAINER::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;

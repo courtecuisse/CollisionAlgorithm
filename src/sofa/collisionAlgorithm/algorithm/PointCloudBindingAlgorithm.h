@@ -26,13 +26,13 @@ public:
 
     static void bind(const std::vector<defaulttype::Vector3> & p1, const std::vector<defaulttype::Vector3> & p2, helper::vector<int> & bindId, helper::vector<int> & invBind, double maxDist);
 
-    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseElementContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_from;
-    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseElementContainer,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_DATALINK> l_dest;
+    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
+    core::objectmodel::SingleLink<PointCloudBindingAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
 
     Data<DetectionOutput> d_output;
 
 private:
-    void processAlgorithm(BaseElementContainer* g1, BaseElementContainer* g2, DetectionOutput & output);
+    void processAlgorithm(BaseGeometry* g1, BaseGeometry* g2, DetectionOutput & output);
 };
 
 }

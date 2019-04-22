@@ -7,8 +7,8 @@ namespace collisionAlgorithm {
 
 SOFA_DECL_CLASS(GenericGeometry)
 
-int GenericGeometryClass = core::RegisterObject("GenericGeometry")
-.add< GenericGeometry<sofa::defaulttype::Vec3dTypes> >();
+//int GenericGeometryClass = core::RegisterObject("GenericGeometry")
+//.add< GeometryCreator<GenericGeometry<sofa::defaulttype::Vec3dTypes>> >();
 
 }
 

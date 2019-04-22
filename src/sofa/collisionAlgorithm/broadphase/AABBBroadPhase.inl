@@ -25,14 +25,14 @@ defaulttype::BoundingBox AABBBroadPhase::getBBox() const {
  * checks if bounding boxes collided
  */
 void AABBBroadPhase::prepareDetection() {
-    if (l_elements == NULL) return;
+    if (l_geometry == NULL) return;
 
     if(d_static.getValue() && m_staticInitDone)
         return;
 
     m_staticInitDone = true;
 
-    sofa::core::behavior::BaseMechanicalState * mstate = l_elements->getState();
+    sofa::core::behavior::BaseMechanicalState * mstate = l_geometry->getState();
 
     m_Bmin = defaulttype::Vector3(mstate->getPX(0),mstate->getPY(0),mstate->getPZ(0));
     m_Bmax = m_Bmin;
@@ -109,7 +109,7 @@ void AABBBroadPhase::prepareDetection() {
     m_Bmin -= m_cellSize * 0.5;
     m_Bmax -= m_cellSize * 0.5;
 
-    for (auto it = l_elements->begin(); it != l_elements->end(); it++)
+    for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
     {
         //std::cout << ++i << std::endl;
         defaulttype::BoundingBox bbox = (*it)->getBBox();

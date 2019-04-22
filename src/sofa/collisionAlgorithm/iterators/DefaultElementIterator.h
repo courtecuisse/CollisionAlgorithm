@@ -19,7 +19,7 @@ template<class CONTAINER>
 class DefaultElementIterator : public BaseElementIterator {
 public:
 
-    typedef typename CONTAINER::PROXIMITYDATA PROXIMITYDATA;
+    typedef typename CONTAINER::TPROXIMITYDATA PROXIMITYDATA;
 
     DefaultElementIterator(const CONTAINER * container, unsigned start)
     : m_container(container), m_id(start) {}

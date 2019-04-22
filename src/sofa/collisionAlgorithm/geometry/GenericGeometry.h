@@ -48,10 +48,10 @@ namespace collisionAlgorithm
 
 
 template<class DataTypes>
-class GenericGeometry : public BaseGeometry<DataTypes> {
+class GenericGeometry : public TBaseGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
-    typedef BaseGeometry<DataTypes> Inherit;
+    typedef TBaseGeometry<DataTypes> Inherit;
     typedef GenericGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
