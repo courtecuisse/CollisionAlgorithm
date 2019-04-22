@@ -10,27 +10,20 @@ namespace collisionAlgorithm
 {
 
 template<class GEOMETRY>
-class DataBezierTriangleGeometry : public DataPhongTriangleElement<GEOMETRY> {
+class DataBezierTriangleContainer : public DataPhongTriangleContainer<GEOMETRY> {
 public:
 
+    typedef sofa::core::topology::BaseMeshTopology::Edge ELEMENT;
     typedef TriangleProximity PROXIMITYDATA;
-    typedef DataBezierTriangleGeometry<GEOMETRY> CONTAINER;
-    typedef DataPhongTriangleElement<GEOMETRY> Inherit;
-
     typedef typename GEOMETRY::TDataTypes DataTypes;
-    typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::Real Real;
-    typedef typename DataTypes::VecDeriv VecDeriv;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
-    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
     typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
-    typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
     typedef helper::vector<Triangle> VecTriangles;
+
+    typedef DataBezierTriangleContainer<GEOMETRY> CONTAINER;
+    typedef DataPhongTriangleContainer<GEOMETRY> Inherit;
 
     typedef struct
     {
@@ -43,7 +36,7 @@ public:
     Data <double> d_nonlin_threshold;
     Data <unsigned> d_draw_tesselation;
 
-    DataBezierTriangleGeometry(const typename Inherit::InitData& init)
+    DataBezierTriangleContainer(const typename CONTAINER::InitData& init)
     : Inherit(init)
     , d_nonlin_max_it(dynamic_cast<sofa::core::objectmodel::BaseObject*>(init.owner)->initData(&d_nonlin_max_it,(unsigned) 20,"nonlin_max_it", "number of iterations"))
     , d_nonlin_tolerance(dynamic_cast<sofa::core::objectmodel::BaseObject*>(init.owner)->initData(&d_nonlin_tolerance,(double) 0.001,"nonlin_tol", "Tolerance"))
@@ -57,7 +50,7 @@ public:
         const VecTriangles& triangles = this->elements();
         const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(core::VecCoordId::position());
 
-        size_t nbTriangles = triangles.size();
+        unsigned nbTriangles = triangles.size();
         m_beziertriangle_info.resize(nbTriangles);
         for (size_t t=0;t< nbTriangles;t++)
         {
@@ -107,7 +100,7 @@ public:
         }
     }
 
-    void tesselate(unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C, const defaulttype::Vector4 & color) {
+    void tesselate(unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C) {
         if (level >= d_draw_tesselation.getValue()) {
 
             const Triangle& triangle = this->element(tid);
@@ -119,12 +112,14 @@ public:
             // draw Triangle
             double delta = 0.2;
 
+            const defaulttype::Vector4 & color = this->m_geometry->d_color.getValue();
+
             glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
-            glVertex3dv(getBezierPosition(proxA).data());
+            glVertex3dv(getPosition(proxA).data());
             glColor4f(color[0],fabs(color[1]-delta),color[2],color[3]);
-            glVertex3dv(getBezierPosition(proxB).data());
+            glVertex3dv(getPosition(proxB).data());
             glColor4f(color[0],color[1],fabs(color[2]-delta),color[3]);
-            glVertex3dv(getBezierPosition(proxC).data());
+            glVertex3dv(getPosition(proxC).data());
 
             return;
         }
@@ -135,32 +130,31 @@ public:
 
         defaulttype::Vector3 bary_G = (bary_A + bary_B + bary_C)/3.0;
 
-        tesselate(level+1,tid,bary_A,bary_D,bary_G,color);
-        tesselate(level+1,tid,bary_D,bary_B,bary_G,color);
+        tesselate(level+1,tid,bary_A,bary_D,bary_G);
+        tesselate(level+1,tid,bary_D,bary_B,bary_G);
 
-        tesselate(level+1,tid,bary_G,bary_B,bary_F,color);
-        tesselate(level+1,tid,bary_G,bary_F,bary_C,color);
+        tesselate(level+1,tid,bary_G,bary_B,bary_F);
+        tesselate(level+1,tid,bary_G,bary_F,bary_C);
 
-        tesselate(level+1,tid,bary_G,bary_C,bary_E,color);
-        tesselate(level+1,tid,bary_A,bary_G,bary_E,color);
+        tesselate(level+1,tid,bary_G,bary_C,bary_E);
+        tesselate(level+1,tid,bary_A,bary_G,bary_E);
     }
 
-    virtual void draw(const core::visual::VisualParams * vparams,defaulttype::Vector4 & color) {
-        Inherit::draw(vparams,color);
-
+    void draw(const core::visual::VisualParams * vparams) {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
+        const defaulttype::Vector4 & color = this->m_geometry->d_color.getValue();
         if (color[3] == 0.0) return;
 
         glDisable(GL_LIGHTING);
 
         glBegin(GL_TRIANGLES);
         for (auto it = this->begin();it != this->end();it++) {
-            tesselate(0, it->id() , defaulttype::Vector3(1,0,0),defaulttype::Vector3(0,1,0),defaulttype::Vector3(0,0,1),color);
+            tesselate(0, it->id() , defaulttype::Vector3(1,0,0),defaulttype::Vector3(0,1,0),defaulttype::Vector3(0,0,1));
         }
         glEnd();
     }
 
-    inline TriangleProximity projectBezier(unsigned tid, const defaulttype::Vector3 & P) const {
+    inline TriangleProximity project(unsigned tid, const defaulttype::Vector3 & P) const {
         unsigned max_it = d_nonlin_max_it.getValue();
         double tolerance = d_nonlin_tolerance.getValue();
         double threshold = d_nonlin_threshold.getValue();
@@ -173,13 +167,13 @@ public:
 
         while(it< max_it)
         {
-            defaulttype::Vector3 Q = getBezierPosition(pinfo);
+            defaulttype::Vector3 Q = getPosition(pinfo);
 
             defaulttype::Vector3 nQP = P - Q;
             if (nQP.norm() < tolerance) break;
             nQP.normalize();
 
-            defaulttype::Vector3 N1 = getBezierNormal(pinfo);
+            defaulttype::Vector3 N1 = getNormal(pinfo);
             N1.normalize();
 
             if (pinfo.m_f0 < 0 || pinfo.m_f1 < 0 || pinfo.m_f2 < 0) break;
@@ -204,7 +198,7 @@ public:
             if (P_v_fact0 < 0 || P_v_fact1 < 0 || P_v_fact2 < 0) break;
 
             TriangleProximity P_v(tid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_v_fact0, P_v_fact1, P_v_fact2);
-            defaulttype::Vector3 p_v = (P - getBezierPosition(P_v)).normalized();
+            defaulttype::Vector3 p_v = (P - getPosition(P_v)).normalized();
             defaulttype::Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
 
             //variation point along u
@@ -214,7 +208,7 @@ public:
             if (P_u_fact0 < 0 || P_u_fact1 < 0 || P_u_fact2 < 0) break;
 
             TriangleProximity P_u(tid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_u_fact0,P_u_fact1,P_u_fact2);
-            defaulttype::Vector3 p_u = (P - getBezierPosition(P_u)).normalized();
+            defaulttype::Vector3 p_u = (P - getPosition(P_u)).normalized();
             defaulttype::Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
 
             defaulttype::Mat2x2d J, invJ;
@@ -252,12 +246,12 @@ public:
             if (P_a_fact0 < 0 ||P_a_fact1 < 0 || P_a_fact2 < 0) break;
 
             TriangleProximity P_a(tid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_a_fact0,P_a_fact1,P_a_fact2);
-            defaulttype::Vector3 QA = getBezierPosition(P_a);
+            defaulttype::Vector3 QA = getPosition(P_a);
 
             double fact;
             if (fabs(dot(nQP,N1))>0.8) {
                 double fx = acos(fabs(dot(nQP,N1)));
-                double fxdx = acos(fabs(dot((P - QA).normalized(),getBezierNormal(P_a))));
+                double fxdx = acos(fabs(dot((P - QA).normalized(),getNormal(P_a))));
                 double j = (fxdx - fx) / delta;
                 fact = -fx / j;
             } else {
@@ -290,7 +284,7 @@ public:
         return pinfo;
     }
 
-    inline defaulttype::Vector3 getBezierNormal(const TriangleProximity & data) const {
+    inline defaulttype::Vector3 getNormal(const TriangleProximity & data) const {
         const defaulttype::Vector3 &n200 = this->m_triangle_normals[data.m_p2];
         const defaulttype::Vector3 &n020 = this->m_triangle_normals[data.m_p1];
         const defaulttype::Vector3 &n002 = this->m_triangle_normals[data.m_p0];
@@ -312,7 +306,7 @@ public:
 
     ////Bezier triangle are computed according to :
     ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
-    inline defaulttype::Vector3 getBezierPosition(const TriangleProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
+    inline defaulttype::Vector3 getPosition(const TriangleProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
         const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[data.m_eid];
 
         if(v == core::VecCoordId::position())
@@ -383,6 +377,10 @@ public:
                    p012_Free * 3*fact_u*fact_v*fact_v +
                    p111_Free * 6*fact_w*fact_u*fact_v;
         }
+    }
+
+    inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
+        return DefaultElementIterator<CONTAINER>::create(this, eid);
     }
 
 protected:

@@ -19,7 +19,7 @@ public:
     DataEdgeContainer<GEOMETRY> d_edges;
 
     EdgeGeometry()
-    : d_edges(initData(&d_edges, "edges", "Vector of Edges")){}
+    : d_edges(initData(&d_edges,"edges", "Edges Container" )) {}
 
     void init() {
         Inherit::init();
@@ -27,7 +27,7 @@ public:
         ///To remove if we think every input has to be explicit
         if(d_edges.getValue().empty())
         {
-            msg_warning(this) << "Triangles are not set (data is empty). Will set from topology if present in the same context";
+            msg_warning(this) << "Edges are not set (data is empty). Will set from topology if present in the same context";
             sofa::core::topology::BaseMeshTopology* topology{nullptr};
             this->getContext()->get(topology);
             if(!topology)
@@ -38,7 +38,7 @@ public:
             {
                 if(topology->getEdges().empty())
                 {
-                    msg_error(this) << "No topology with triangles to work with ; giving up.";
+                    msg_error(this) << "No topology with edges to work with ; giving up.";
                 }
                 else
                 {

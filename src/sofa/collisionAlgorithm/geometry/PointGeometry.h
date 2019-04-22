@@ -18,10 +18,21 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    DataPointContainer<GEOMETRY> d_points = { this };
+    DataContainer<DataPointContainer<GEOMETRY> > d_points;
 
     PointGeometry()
-    : d_points(initData(&d_points, "points", "Points container")) {}
+    : d_points(initData(&d_points,"points", "Points Container" )) {}
+
+    void init() {
+        Inherit::init();
+
+        ///To remove if we think every input has to be explicit
+        if(d_points.getValue().empty())
+        {
+            msg_warning(this) << "Points are not set (data is empty). Will set from state if present in the same context";
+            d_points.setParent(this->l_state->findData("position"));
+        }
+    }
 
 };
 

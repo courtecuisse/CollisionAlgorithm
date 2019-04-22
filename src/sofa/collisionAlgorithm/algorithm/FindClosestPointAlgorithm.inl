@@ -180,7 +180,7 @@ BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defau
     }
 }
 
-PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElement * elfrom, BaseElementContainer *geo) {
+PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElementIterator *elfrom, BaseElementContainer *geo) {
     BaseProximity::SPtr from = elfrom->center();
     BaseProximity::SPtr dest = findClosestPoint(
         from,

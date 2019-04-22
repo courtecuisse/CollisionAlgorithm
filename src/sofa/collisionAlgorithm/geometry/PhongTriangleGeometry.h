@@ -18,10 +18,10 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    DataPhongTriangleElement<GEOMETRY> d_triangles;
+    DataPhongTriangleContainer<GEOMETRY> d_triangles;
 
     PhongTriangleGeometry()
-    : d_triangles(initData(&d_triangles, "triangles", "Vector of Triangles")) {}
+    : d_triangles(initData(&d_triangles,"triangles", "Triangles Container" )) {}
 
     void init() {
         Inherit::init();

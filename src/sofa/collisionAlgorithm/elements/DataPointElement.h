@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/elements/DataElement.h>
+#include <sofa/collisionAlgorithm/elements/DataBaseContainer.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 #include <sofa/core/objectmodel/BaseObject.h>
 
@@ -11,43 +11,27 @@ namespace collisionAlgorithm
 {
 
 template<class GEOMETRY>
-class DataPointContainer : public DataElementContainer<GEOMETRY, defaulttype::Vector3, PointProximity> {
+class DataPointContainer : public DataBaseContainer<GEOMETRY, defaulttype::Vector3, PointProximity> {
 public:
 
+    typedef defaulttype::Vector3 ELEMENT;
     typedef PointProximity PROXIMITYDATA;
-    typedef DataPointContainer<GEOMETRY> CONTAINER;
-    typedef DataElementContainer<GEOMETRY, defaulttype::Vector3, PROXIMITYDATA> Inherit;
-
     typedef typename GEOMETRY::TDataTypes DataTypes;
-    typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::Real Real;
-    typedef typename DataTypes::VecDeriv VecDeriv;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
-    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
-    typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
+    typedef DataPointContainer<GEOMETRY> CONTAINER;
+    typedef DataBaseContainer<GEOMETRY, ELEMENT, PROXIMITYDATA> Inherit;
 
     Data<double> d_drawRadius;
 
-    explicit DataPointContainer(const typename Inherit::InitData& init)
+    DataPointContainer(const typename CONTAINER::InitData& init)
     : Inherit(init)
     , d_drawRadius(dynamic_cast<sofa::core::objectmodel::BaseObject*>(init.owner)->initData(&d_drawRadius, (double) 1.0, "drawPointRadius", "radius of drawing")) {}
 
-    defaulttype::BoundingBox getBBox(unsigned eid) const override {
-        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
-        defaulttype::BoundingBox bbox;
-        bbox.include(x[eid]);
-        return bbox;
-    }
-
-    void draw(const core::visual::VisualParams *vparams, const defaulttype::Vector4 & color) override {
-        Inherit::draw(vparams,color);
-
-        if (! vparams->displayFlags().getShowCollisionModels()) return;
+    inline void draw(const core::visual::VisualParams *vparams) {
+        const defaulttype::Vector4 & color = this->m_geometry->d_color.getValue();
+        //if (! vparams->displayFlags().getShowCollisionModels()) return;
         if (color[3] == 0.0) return;
         if (this->d_drawRadius.getValue() == 0.0) return;
 
@@ -60,25 +44,31 @@ public:
         }
     }
 
-    inline PointProximity center(unsigned eid) const override {
+    virtual defaulttype::BoundingBox getBBox(unsigned eid) const {
+        const helper::ReadAccessor<DataVecCoord>& x = this->getState()->read(core::VecCoordId::position());
+        defaulttype::BoundingBox bbox;
+        bbox.include(x[eid]);
+        return bbox;
+    }
+
+    inline PointProximity center(unsigned eid) const {
         return PointProximity(eid);
     }
 
-    inline PointProximity project(unsigned eid,const defaulttype::Vector3 & /*P*/) const override {
+    inline PointProximity project(unsigned eid,const defaulttype::Vector3 & /*P*/) const {
         return PointProximity(eid);
     }
 
-    defaulttype::Vector3 getPosition(const PointProximity & data, core::VecCoordId v) const override {
+    inline defaulttype::Vector3 getPosition(const PointProximity & data, core::VecCoordId v) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
         return pos[data.m_eid];
     }
 
-    defaulttype::Vector3 getNormal(const PointProximity & /*data*/) const override {
+    inline defaulttype::Vector3 getNormal(const PointProximity & /*data*/) const {
         return defaulttype::Vector3();
     }
 
 };
-
 
 }
 

@@ -27,10 +27,18 @@ public:
     bool end(unsigned ) const{
         return m_iterator==m_subsetElements.cend();
     }
-
-    const BaseElement * element() const {
-        return *(m_container->begin(id()));
+    BaseProximity::SPtr project(const defaulttype::Vector3 & P) const override {
+        return m_container->begin(id())->project(P);
     }
+
+    BaseProximity::SPtr center() const override {
+        return m_container->begin(id())->center();
+    }
+
+    defaulttype::BoundingBox getBBox() const override {
+        return m_container->begin(id())->getBBox();
+    }
+
 
     BaseElementContainer * m_container;
     const std::set<unsigned> m_subsetElements;

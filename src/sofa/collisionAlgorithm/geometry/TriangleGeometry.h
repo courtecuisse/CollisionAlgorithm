@@ -8,20 +8,20 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class TriangleGeometry : public EdgeGeometry<DataTypes> {
+class TriangleGeometry : public BaseGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
-    typedef EdgeGeometry<DataTypes> Inherit;
+    typedef BaseGeometry<DataTypes> Inherit;
     typedef TriangleGeometry<DataTypes> GEOMETRY;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    DataTriangleElement<GEOMETRY> d_triangles;
+    DataTriangleContainer<GEOMETRY> d_triangles;
 
     TriangleGeometry()
-    : d_triangles(initData(&d_triangles, "triangles", "Vector of Triangles")) {}
+    : d_triangles(initData(&d_triangles, "triangles", "Triangles Container" )) {}
 
-    void init() {
+    void init() override {
         Inherit::init();
 
         ///To remove if we think every input has to be explicit

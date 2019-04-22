@@ -19,31 +19,10 @@ template<class CONTAINER>
 class DefaultElementIterator : public BaseElementIterator {
 public:
 
-    /*!
-     * \brief The BaseElement class is a basic abstract element container
-     */
-    class DefaultBaseElement : public BaseElement {
-    public:
-
-        DefaultBaseElement(const DefaultElementIterator * it) : m_iterator(it) {}
-
-        virtual BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
-            return m_iterator->m_container->project(m_iterator,P);
-        }
-
-        virtual BaseProximity::SPtr center() const {
-            return m_iterator->m_container->center(m_iterator);
-        }
-
-        virtual defaulttype::BoundingBox getBBox() const {
-            return m_iterator->m_container->getBBox(m_iterator);
-        }
-
-        const DefaultElementIterator * m_iterator;
-    };
+    typedef typename CONTAINER::PROXIMITYDATA PROXIMITYDATA;
 
     DefaultElementIterator(const CONTAINER * container, unsigned start)
-    : m_container(container), m_id(start), m_accessor(this) {}
+    : m_container(container), m_id(start) {}
 
     virtual void next() {
         this->m_id++;
@@ -57,18 +36,30 @@ public:
         return m_id;
     }
 
-    virtual const BaseElement * element() const {
-        return &m_accessor;
+    BaseProximity::SPtr project(const defaulttype::Vector3 & P) const override {
+        return createProximity(m_container->project(id(),P));
     }
 
-    static BaseElementIterator::UPtr create(const CONTAINER * container, unsigned start = 0) {
+    BaseProximity::SPtr center() const override {
+        return createProximity(m_container->center(id()));
+    }
+
+    defaulttype::BoundingBox getBBox() const override {
+        return m_container->getBBox(id());
+    }
+
+    static BaseElementIterator::UPtr create(CONTAINER * container, unsigned start = 0) {
+        container->updateContainer();
         return BaseElementIterator::UPtr(new DefaultElementIterator<CONTAINER>(container, start));
     }
 
 private:
     const CONTAINER * m_container;
     unsigned m_id;
-    DefaultBaseElement m_accessor;
+
+    inline BaseProximity::SPtr createProximity(const PROXIMITYDATA & data) const {
+        return BaseProximity::SPtr(new TBaseProximity<CONTAINER>(m_container, data));
+    }
 };
 
 }

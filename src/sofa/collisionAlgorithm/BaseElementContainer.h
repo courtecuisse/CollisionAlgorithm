@@ -17,8 +17,7 @@ class BaseElementContainer {
 public:
 
     BaseElementContainer()
-    : m_broadPhase(NULL)
-    , m_update_time(-1.0)  {}
+    : m_broadPhase(NULL) {}
 
     typedef sofa::core::objectmodel::TClass<BaseElementContainer,sofa::core::objectmodel::BaseData> MyClass;
 
@@ -65,7 +64,6 @@ public:
     }
 
     const BroadPhase * getBroadPhase() {
-        updateInternalData();
         return m_broadPhase;
     }
 
@@ -73,39 +71,15 @@ public:
 
     virtual sofa::core::objectmodel::Base* getOwner() const = 0;
 
-    virtual BaseProximity::SPtr project(const BaseElementIterator * it, const defaulttype::Vector3 & P) const = 0;
-
-    virtual BaseProximity::SPtr center(const BaseElementIterator * it) const = 0;
-
-    virtual defaulttype::BoundingBox getBBox(const BaseElementIterator * it) const = 0;
-
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) = 0;
 
     virtual unsigned end() const = 0;
-
-    virtual void init() {}
-
-    virtual void prepareDetection() {}
-
-    virtual double getTime() const = 0;
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
 protected:
     BroadPhase * m_broadPhase;
-    double m_update_time;
 
-    inline void updateInternalData() {
-        double time = getTime();
-
-        if (m_update_time < 0) init();
-
-        if (m_update_time < time) {
-            m_update_time = time;
-            prepareDetection();
-//            if (m_broadPhase != NULL) m_broadPhase->prepareDetection();
-        }
-    }
 };
 
 }

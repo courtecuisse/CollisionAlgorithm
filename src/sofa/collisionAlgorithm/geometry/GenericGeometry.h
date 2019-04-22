@@ -9,41 +9,41 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class CONTAINER, class ELMT>
-class GenericElement : public BaseElement {
-public:
-    typedef CONTAINER TContainer;
-    typedef typename CONTAINER::TDataTypes DataTypes;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef Data<VecCoord> DataVecCoord;
+//template<class CONTAINER, class ELMT>
+//class GenericElement : public BaseElement {
+//public:
+//    typedef CONTAINER TContainer;
+//    typedef typename CONTAINER::TDataTypes DataTypes;
+//    typedef typename DataTypes::VecCoord VecCoord;
+//    typedef Data<VecCoord> DataVecCoord;
 
-    GenericElement(unsigned id,const CONTAINER * geo) : m_tid(id), m_geo(geo) {}
+//    GenericElement(unsigned id,const CONTAINER * geo) : m_tid(id), m_geo(geo) {}
 
-    inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
-        return NULL;
-    }
+//    inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
+//        return NULL;
+//    }
 
-    inline BaseProximity::SPtr center() const {
-        return NULL;
-    }
+//    inline BaseProximity::SPtr center() const {
+//        return NULL;
+//    }
 
-    inline defaulttype::BoundingBox getBBox() const {
-//        const ELMT & elmt = this->getValue()[pid];
+//    inline defaulttype::BoundingBox getBBox() const {
+////        const ELMT & elmt = this->getValue()[pid];
 
-        defaulttype::BoundingBox bbox;
-//        for (unsigned i=0;i<ELMT::size();i++) {
-//            defaulttype::Vector3 pi(m_owner->getState()->getPX(elmt[i]),
-//                                    m_owner->getState()->getPY(elmt[i]),
-//                                    m_owner->getState()->getPZ(elmt[i]));
-//            bbox.include(pi);
-//        }
+//        defaulttype::BoundingBox bbox;
+////        for (unsigned i=0;i<ELMT::size();i++) {
+////            defaulttype::Vector3 pi(m_owner->getState()->getPX(elmt[i]),
+////                                    m_owner->getState()->getPY(elmt[i]),
+////                                    m_owner->getState()->getPZ(elmt[i]));
+////            bbox.include(pi);
+////        }
 
-        return bbox;
-    }
-protected:
-    unsigned m_tid;
-    const CONTAINER * m_geo;
-};
+//        return bbox;
+//    }
+//protected:
+//    unsigned m_tid;
+//    const CONTAINER * m_geo;
+//};
 
 
 

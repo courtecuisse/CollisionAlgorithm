@@ -39,7 +39,9 @@ public:
         l_state.setPath("@.");
     }
 
-
+    double getTime() const {
+        return this->getContext()->getTime();
+    }
 
     sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();

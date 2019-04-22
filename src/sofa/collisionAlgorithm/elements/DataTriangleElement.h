@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/elements/DataElement.h>
+#include <sofa/collisionAlgorithm/elements/DataBaseContainer.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 #include <sofa/collisionAlgorithm/BroadPhase.h>
@@ -12,35 +12,27 @@ namespace collisionAlgorithm
 {
 
 template<class GEOMETRY>
-class DataTriangleElement : public DataElementContainer<GEOMETRY, sofa::core::topology::BaseMeshTopology::Triangle, TriangleProximity> {
+class DataTriangleContainer : public DataBaseContainer<GEOMETRY, sofa::core::topology::BaseMeshTopology::Triangle, TriangleProximity> {
 public:
 
+    typedef sofa::core::topology::BaseMeshTopology::Triangle ELEMENT;
     typedef TriangleProximity PROXIMITYDATA;
-    typedef DataTriangleElement<GEOMETRY> CONTAINER;
-    typedef DataElementContainer<GEOMETRY, sofa::core::topology::BaseMeshTopology::Triangle, PROXIMITYDATA> Inherit;
-
     typedef typename GEOMETRY::TDataTypes DataTypes;
-    typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::Real Real;
-    typedef typename DataTypes::VecDeriv VecDeriv;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
-    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+    typedef DataTriangleContainer<GEOMETRY> CONTAINER;
+    typedef DataBaseContainer<GEOMETRY, ELEMENT, PROXIMITYDATA> Inherit;
+
     typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
-    typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
     typedef helper::vector<Triangle> VecTriangles;
 
-    explicit DataTriangleElement(const typename Inherit::InitData& init)
-    : Inherit(init){}
+    DataTriangleContainer(const typename CONTAINER::InitData& init)
+    : Inherit(init) {}
 
-    virtual void draw(const core::visual::VisualParams * vparams, const defaulttype::Vector4 & color) override {
-        Inherit::draw(vparams,color);
-
+    inline void draw(const core::visual::VisualParams * vparams) {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
+        const defaulttype::Vector4 & color = this->m_geometry->d_color.getValue();
         if (color[3] == 0.0) return;
 
         glDisable(GL_LIGHTING);
@@ -106,13 +98,13 @@ public:
         }
     }
 
-    inline defaulttype::Vector3 getNormal(const TriangleProximity & data) const override {
+    inline defaulttype::Vector3 getNormal(const TriangleProximity & data) const {
         return m_triangle_normals[data.m_eid];
     }
 
     ////Bezier triangle are computed according to :
     ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
-    inline defaulttype::Vector3 getPosition(const TriangleProximity & data, core::VecCoordId v = core::VecCoordId::position()) const override {
+    inline defaulttype::Vector3 getPosition(const TriangleProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
 
         return pos[data.m_p0] * data.m_f0 +
@@ -120,7 +112,7 @@ public:
                pos[data.m_p2] * data.m_f2;
     }
 
-    inline TriangleProximity center(unsigned eid) const override {
+    inline TriangleProximity center(unsigned eid) const {
         const core::topology::BaseMeshTopology::Triangle & triangle = this->element(eid);
 
         return TriangleProximity(eid,
@@ -128,7 +120,7 @@ public:
                                  0.3333,0.3333,0.3333);
     }
 
-    inline defaulttype::BoundingBox getBBox(unsigned eid) const override {
+    inline defaulttype::BoundingBox getBBox(unsigned eid) const {
         const core::topology::BaseMeshTopology::Triangle & triangle = this->element(eid);
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
         defaulttype::BoundingBox bbox;
@@ -140,7 +132,7 @@ public:
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    inline TriangleProximity project(unsigned eid, const defaulttype::Vector3 & P) const override {
+    inline TriangleProximity project(unsigned eid, const defaulttype::Vector3 & P) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
         const TriangleInfo & tinfo = m_triangle_info[eid];
@@ -202,6 +194,10 @@ public:
         }
 
         return TriangleProximity(eid, triangle[0], triangle[1], triangle[2], fact_u, fact_v, fact_w);
+    }
+
+    inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
+        return DefaultElementIterator<CONTAINER>::create(this, eid);
     }
 
 protected:

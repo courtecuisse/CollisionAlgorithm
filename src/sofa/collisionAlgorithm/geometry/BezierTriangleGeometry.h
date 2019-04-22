@@ -18,10 +18,10 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    DataBezierTriangleGeometry<GEOMETRY> d_triangles;
+    DataBezierTriangleContainer<GEOMETRY> d_triangles;
 
     BezierTriangleGeometry()
-    : d_triangles(initData(&d_triangles, "triangles", "Vector of Triangles")) {}
+    : d_triangles(initData(&d_triangles,"triangles", "Triangles Container" )) {}
 
     void init() {
         Inherit::init();

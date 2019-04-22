@@ -9,20 +9,6 @@ namespace collisionAlgorithm
 {
 
 /*!
- * \brief The BaseElement class is a basic abstract element container
- */
-class BaseElement {
-public:
-
-    virtual BaseProximity::SPtr project(const defaulttype::Vector3 & P) const = 0;
-
-    virtual BaseProximity::SPtr center() const = 0;
-
-    virtual defaulttype::BoundingBox getBBox() const = 0;
-
-};
-
-/*!
  * \brief The BaseElementIterator class defines an abstract iterator class for BaseElements
  */
 class BaseElementIterator {
@@ -38,10 +24,6 @@ public:
             return ! this->get()->end(sz);
         }
 
-//        bool operator == (const BaseGeometry * /*geo*/) {
-//            return this->get()->end();
-//        }
-
         void operator++() {
             this->get()->next();
         }
@@ -50,12 +32,12 @@ public:
             this->get()->next();
         }
 
-        const BaseElement * operator* () {
-            return this->get()->element();
+        const BaseElementIterator * operator* () {
+            return this->get();
         }
 
-        const BaseElement * operator* () const {
-            return this->get()->element();
+        const BaseElementIterator * operator* () const {
+            return this->get();
         }
     };
 
@@ -68,7 +50,11 @@ public:
 
             virtual void next() {}
 
-            virtual const BaseElement * element() const { return NULL; }
+            virtual BaseProximity::SPtr project(const defaulttype::Vector3 &) const { return NULL; }
+
+            virtual BaseProximity::SPtr center() const { return NULL; }
+
+            virtual defaulttype::BoundingBox getBBox() const { return defaulttype::BoundingBox(); }
 
             virtual unsigned id() const { return 0; }
         };
@@ -80,7 +66,11 @@ public:
 
     virtual void next() = 0;
 
-    virtual const BaseElement * element() const = 0;
+    virtual BaseProximity::SPtr project(const defaulttype::Vector3 & P) const = 0;
+
+    virtual BaseProximity::SPtr center() const = 0;
+
+    virtual defaulttype::BoundingBox getBBox() const = 0;
 
     virtual unsigned id() const = 0;
 };

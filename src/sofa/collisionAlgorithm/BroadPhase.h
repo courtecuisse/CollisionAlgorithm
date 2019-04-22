@@ -2,7 +2,7 @@
 
 #include <sofa/core/collision/Pipeline.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseElementContainer.h>
 
 namespace sofa {
 

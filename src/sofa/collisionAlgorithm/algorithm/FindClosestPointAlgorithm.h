@@ -38,7 +38,7 @@ protected:
 public:
     BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr pfrom, BaseElementIterator::UPtr itdest, BaseElementContainer * geo);
 
-    PairDetection findClosestPoint(const BaseElement * itfrom, BaseElementContainer *geo);
+    PairDetection findClosestPoint(const BaseElementIterator * itfrom, BaseElementContainer *geo);
 
     BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr from, BaseElementContainer *geo);
 

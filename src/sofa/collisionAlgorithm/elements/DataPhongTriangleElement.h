@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseElementContainer.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/elements/DataTriangleElement.h>
 
@@ -12,30 +12,23 @@ namespace collisionAlgorithm
 {
 
 template<class GEOMETRY>
-class DataPhongTriangleElement : public DataTriangleElement<GEOMETRY> {
+class DataPhongTriangleContainer : public DataTriangleContainer<GEOMETRY> {
 public:
 
     typedef TriangleProximity PROXIMITYDATA;
-    typedef DataPhongTriangleElement<GEOMETRY> CONTAINER;
-    typedef DataTriangleElement<GEOMETRY> Inherit;
+    typedef DataPhongTriangleContainer<GEOMETRY> CONTAINER;
+    typedef DataTriangleContainer<GEOMETRY> Inherit;
 
     typedef typename GEOMETRY::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::Real Real;
-    typedef typename DataTypes::VecDeriv VecDeriv;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
-    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
-    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
     typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
-    typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
     typedef helper::vector<Triangle> VecTriangles;
+    typedef size_t TriangleID;
 
-    explicit DataPhongTriangleElement(const typename Inherit::InitData& init)
-    : Inherit(init){}
+    DataPhongTriangleContainer(const typename CONTAINER::InitData& init)
+    : Inherit(init) {}
 
     virtual void init() override {
         Inherit::init();
@@ -52,7 +45,7 @@ public:
         }
     }
 
-    virtual defaulttype::Vector3 getNormal(const TriangleProximity & data) const override {
+    inline defaulttype::Vector3 getNormal(const TriangleProximity & data) const {
         return m_point_normals[data.m_p0] * data.m_f0 +
                m_point_normals[data.m_p1] * data.m_f1 +
                m_point_normals[data.m_p2] * data.m_f2;
@@ -72,6 +65,10 @@ public:
             }
             m_point_normals[p].normalize();
         }
+    }
+
+    inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
+        return DefaultElementIterator<CONTAINER>::create(this, eid);
     }
 
 protected:
