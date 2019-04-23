@@ -23,7 +23,8 @@ public:
      */
     BroadPhase()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , l_geometry(initLink("elements", "link to state")) {}
+    , l_geometry(initLink("elements", "link to state"))
+    , m_update_time(-1.0) {}
 
     /*!
      * \brief ~BroadPhase destructor
@@ -61,6 +62,15 @@ public:
 
     virtual void getElementSet(unsigned cx,unsigned cy, unsigned cz, std::set<unsigned> & selectElements) const = 0;
 
+    virtual void updateTime(double time) {
+        if (m_update_time < time) {
+            m_update_time = time;
+            prepareDetection();
+        }
+    }
+
+private :
+    double m_update_time;
 };
 
 

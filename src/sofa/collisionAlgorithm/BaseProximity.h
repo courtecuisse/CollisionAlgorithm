@@ -69,7 +69,7 @@ public:
 
         for (unsigned j=0;j<normals.size();j++) {
             MatrixDerivRowIterator c_it = c1.writeLine(constraintId+j);
-            m_data.addContributions(c_it, normals[j] * fact);
+            m_container->addContributions(m_data, c_it, normals[j] * fact);
         }
 
         c1_d.endEdit();
@@ -85,8 +85,6 @@ public:
             res[colIt.index()] += colIt.val() * f;
         }
     }
-
-
 
 protected:
     const CONTAINER * m_container;

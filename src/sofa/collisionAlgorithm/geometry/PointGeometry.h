@@ -17,6 +17,8 @@ public:
     typedef PointGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
+    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
@@ -72,6 +74,9 @@ public:
         return defaulttype::Vector3();
     }
 
+    inline void addContributions(const PointProximity & data, MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
+        it.addCol(data.m_eid, N);
+    }
 };
 
 }

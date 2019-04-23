@@ -49,7 +49,7 @@ public:
     }
 
     static BaseElementIterator::UPtr create(CONTAINER * container, unsigned start = 0) {
-        container->updateContainer();
+        container->updateTime();
         return BaseElementIterator::UPtr(new DefaultElementIterator<CONTAINER>(container, start));
     }
 

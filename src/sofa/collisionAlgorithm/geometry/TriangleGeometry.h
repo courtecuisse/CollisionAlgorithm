@@ -16,6 +16,9 @@ public:
     typedef TriangleGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
+    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+
     typedef size_t TriangleID;
     typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
     typedef helper::vector<Triangle> VecTriangles;
@@ -160,6 +163,12 @@ public:
         bbox.include(x[triangle[1]]);
         bbox.include(x[triangle[2]]);
         return bbox;
+    }
+
+    inline void addContributions(const TriangleProximity & data, MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
+        it.addCol(data.m_p0, N * data.m_f0);
+        it.addCol(data.m_p1, N * data.m_f1);
+        it.addCol(data.m_p2, N * data.m_f2);
     }
 
     //Barycentric coordinates are computed according to

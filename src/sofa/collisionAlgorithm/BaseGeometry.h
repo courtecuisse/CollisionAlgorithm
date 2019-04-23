@@ -31,7 +31,8 @@ public:
     BaseGeometry()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
     , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model"))
-    , m_broadPhase(NULL) {}
+    , m_broadPhase(NULL)
+    , m_update_time(-1.0) {}
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) = 0;
 
@@ -47,13 +48,26 @@ public:
         if (m_broadPhase == d) m_broadPhase = NULL;
     }
 
-    const BroadPhase * getBroadPhase() {
-        return m_broadPhase;
+    const BroadPhase * getBroadPhase();
+
+    virtual void prepareDetection() {}
+
+    inline void updateTime() {
+        double time = this->getContext()->getTime();
+
+        if (m_update_time < 0) init();
+
+        if (m_update_time < time) {
+            m_update_time = time;
+            prepareDetection();
+        }
     }
 
 protected:
     BroadPhase * m_broadPhase;
+    double m_update_time;
 };
+
 
 template<class DataTypes>
 class TBaseGeometry : public BaseGeometry {
@@ -76,8 +90,7 @@ public:
     core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
 
     TBaseGeometry()
-    : l_state(initLink("mstate", "link to state"))
-    , m_update_time(-1.0) {
+    : l_state(initLink("mstate", "link to state")) {
         l_state.setPath("@.");
     }
 
@@ -97,25 +110,6 @@ public:
         return l_state.get();
     }
 
-    virtual void prepareDetection() {}
-
-    inline void updateContainer() {
-        double time = this->getContext()->getTime();
-
-        if (m_update_time < 0) {
-            init();
-//            if (this->m_broadPhase) this->m_broadPhase->init();
-        }
-
-        if (m_update_time < time) {
-            m_update_time = time;
-            prepareDetection();
-//            if (this->m_broadPhase) this->m_broadPhase->prepareDetection();
-        }
-    }
-
-protected:
-    double m_update_time;
 
 };
 
