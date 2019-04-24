@@ -8,11 +8,11 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class EdgeGeometry : public TBaseGeometry<DataTypes> {
+class EdgeGeometry : public TBaseGeometry<DataTypes,EdgeProximity> {
 public:
     typedef DataTypes TDataTypes;
     typedef EdgeProximity TPROXIMITYDATA;
-    typedef TBaseGeometry<DataTypes> Inherit;
+    typedef TBaseGeometry<DataTypes,TPROXIMITYDATA> Inherit;
     typedef EdgeGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
@@ -68,11 +68,6 @@ public:
         bbox.include(x[edge[0]]);
         bbox.include(x[edge[1]]);
         return bbox;
-    }
-
-    inline void addContributions(const EdgeProximity & data, MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
-        it.addCol(data.m_p0, N * data.m_f0);
-        it.addCol(data.m_p1, N * data.m_f1);
     }
 
     inline EdgeProximity center(unsigned eid) const {
