@@ -119,8 +119,7 @@ void PointCloudBindingAlgorithm::doDetection() {
  * \param g2
  * \param output
  */
-//////// DEPRECATED : recode in doDectection ASAP
-void PointCloudBindingAlgorithm::processAlgorithm(BaseGeometry * g1, BaseGeometry * g2, DetectionOutput & output) {
+void PointCloudBindingAlgorithm::processAlgorithm(BaseGeometry *g1, BaseGeometry *g2, DetectionOutput & output) {
     helper::vector<defaulttype::Vector3> p1;
     helper::vector<defaulttype::Vector3> p2;
 

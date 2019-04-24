@@ -1,44 +1,44 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
-#include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 
-namespace sofa
-{
+namespace sofa {
 
-namespace collisionAlgorithm
-{
+namespace collisionAlgorithm {
 
 template<class DataTypes>
-class TriangleGeometry : public TBaseGeometry<DataTypes> {
+class TriangleGeometry : public TBaseGeometry<DataTypes,TriangleProximity> {
 public:
     typedef DataTypes TDataTypes;
-    typedef TBaseGeometry<DataTypes> Inherit;
+    typedef TriangleProximity TPROXIMITYDATA;
     typedef TriangleGeometry<DataTypes> GEOMETRY;
-    typedef typename DataTypes::Coord Coord;
+    typedef TBaseGeometry<DataTypes,TPROXIMITYDATA> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
-    typedef Data<VecCoord> DataVecCoord;
+    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
+    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+
+    typedef size_t TriangleID;
     typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
-    typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
     typedef helper::vector<Triangle> VecTriangles;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    Data<VecTriangles> d_triangles;
-//    DataTriangleContainer<DataTypes> d_triangles;
+    Data<helper::vector<Triangle> > d_triangles;
 
     TriangleGeometry()
-    : d_triangles(initData(&d_triangles, "triangles", "Vector of Triangles")){}
+    : d_triangles(initData(&d_triangles, "triangles", "Triangles Container" )) {}
 
-    virtual ~TriangleGeometry() override {}
-
-    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const {
-        return DefaultElementIterator<TriangleElement<GEOMETRY> >::create(this, this->d_triangles.getValue().size(), eid);
+    inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
+        return DefaultElementIterator<GEOMETRY>::create(this, eid);
     }
 
-    void init() {
+    unsigned end() const {
+        return d_triangles.getValue().size();
+    }
+
+    void init() override {
         Inherit::init();
 
         ///To remove if we think every input has to be explicit
@@ -65,26 +65,21 @@ public:
         }
     }
 
-    virtual void draw(const core::visual::VisualParams * vparams) {
-        Inherit::draw(vparams);
-
-        if (! vparams->displayFlags().getShowCollisionModels())
-            return;
-
-        if (this->d_color.getValue()[3] == 0.0)
-            return;
+    void draw(const core::visual::VisualParams * vparams) {
+        if (! vparams->displayFlags().getShowCollisionModels()) return;
+        const defaulttype::Vector4 & color = this->d_color.getValue();
+        if (color[3] == 0.0) return;
 
         glDisable(GL_LIGHTING);
 
         double delta = 0.2;
-        defaulttype::Vector4 color = this->d_color.getValue();
-        const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
         if (! vparams->displayFlags().getShowWireFrame()) glBegin(GL_TRIANGLES);
         else glBegin(GL_LINES);
 
-        for (unsigned i=0;i<d_triangles.getValue().size();i++) {
-            const Triangle& tri = this->d_triangles.getValue()[i];
+        for (auto it=this->begin();it!=this->end();it++) {
+            const Triangle& tri = this->d_triangles.getValue()[it->id()];
 
             glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
             glVertex3dv(pos[tri[0]].data());
@@ -95,14 +90,14 @@ public:
             if (vparams->displayFlags().getShowWireFrame()) glVertex3dv(pos[tri[2]].data());
 
             glColor4f(color[0],color[1],fabs(color[2]-delta),color[3]);
-            glVertex3dv(pos[tri[2]].data());            
+            glVertex3dv(pos[tri[2]].data());
             if (vparams->displayFlags().getShowWireFrame()) glVertex3dv(pos[tri[0]].data());
         }
         glEnd();
     }
 
     virtual void prepareDetection() override {
-        const VecTriangles& triangles = d_triangles.getValue();
+        const VecTriangles& triangles = this->d_triangles.getValue();
 
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
@@ -138,21 +133,45 @@ public:
         }
     }
 
-    inline const VecTriangles & getTriangles() const {
-        return d_triangles.getValue();
+    inline defaulttype::Vector3 getNormal(const TriangleProximity & data) const {
+        return m_triangle_normals[data.m_eid];
     }
 
-    inline const helper::vector<defaulttype::Vector3> & triangleNormals() const {
-        return m_triangle_normals;
+    ////Bezier triangle are computed according to :
+    ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
+    inline defaulttype::Vector3 getPosition(const TriangleProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
+
+        return pos[data.m_p0] * data.m_f0 +
+               pos[data.m_p1] * data.m_f1 +
+               pos[data.m_p2] * data.m_f2;
+    }
+
+    inline TriangleProximity center(unsigned eid) const {
+        const core::topology::BaseMeshTopology::Triangle & triangle = this->d_triangles.getValue()[eid];
+
+        return TriangleProximity(eid,
+                                 triangle[0],triangle[1],triangle[2],
+                                 0.3333,0.3333,0.3333);
+    }
+
+    inline defaulttype::BoundingBox getBBox(unsigned eid) const {
+        const core::topology::BaseMeshTopology::Triangle & triangle = this->d_triangles.getValue()[eid];
+        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
+        defaulttype::BoundingBox bbox;
+        bbox.include(x[triangle[0]]);
+        bbox.include(x[triangle[1]]);
+        bbox.include(x[triangle[2]]);
+        return bbox;
     }
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    void project(unsigned eid, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & factor) const {
+    inline TriangleProximity project(unsigned eid, const defaulttype::Vector3 & P) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
         const TriangleInfo & tinfo = m_triangle_info[eid];
-        triangle = d_triangles.getValue()[eid];
+        core::topology::BaseMeshTopology::Triangle triangle = this->d_triangles.getValue()[eid];
 
         defaulttype::Vector3 P0 = pos[triangle[0]];
         defaulttype::Vector3 P1 = pos[triangle[1]];
@@ -209,9 +228,7 @@ public:
             fact_w = 0;
         }
 
-        factor[0] = fact_u;
-        factor[1] = fact_v;
-        factor[2] = fact_w;
+        return TriangleProximity(eid, triangle[0], triangle[1], triangle[2], fact_u, fact_v, fact_w);
     }
 
 protected:
@@ -241,6 +258,7 @@ protected:
 
     std::vector<TriangleInfo> m_triangle_info;
     helper::vector<defaulttype::Vector3> m_triangle_normals;
+
 };
 
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/geometry/PhongTriangleGeometry.h>
-#include <sofa/collisionAlgorithm/proximity/BezierTriangleProximity.h>
 
 namespace sofa
 {
@@ -9,71 +8,26 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class CONTAINER>
-class BezierTriangleElement : public BaseElement {
-public:
-    typedef CONTAINER TContainer;
-    typedef typename CONTAINER::TDataTypes DataTypes;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef Data<VecCoord> DataVecCoord;
-
-    BezierTriangleElement(unsigned id,const CONTAINER * geo) : m_tid(id), m_geo(geo) {}
-
-    inline BaseProximity::SPtr project(const defaulttype::Vector3 & P) const {
-        core::topology::BaseMeshTopology::Triangle triangle;
-        defaulttype::Vector3 factor;
-        m_geo->project(m_tid, P, triangle, factor);
-
-        return BaseProximity::create<BezierTriangleProximity<DataTypes> >(m_geo->getState(),
-                                                                         triangle[0],triangle[1],triangle[2],
-                                                                         factor[0],factor[1],factor[2],
-                                                                         m_geo->pointNormals()[triangle[0]],
-                                                                         m_geo->pointNormals()[triangle[1]],
-                                                                         m_geo->pointNormals()[triangle[2]],
-                                                                         m_geo->bezierInfo()[m_tid]);
-    }
-
-    inline BaseProximity::SPtr center() const {
-        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->getTriangles()[m_tid];
-        return BaseProximity::create<BezierTriangleProximity<DataTypes> >(m_geo->getState(),
-                                                                         triangle[0],triangle[1],triangle[2],
-                                                                         0.3333,0.3333,0.3333,
-                                                                         m_geo->pointNormals()[triangle[0]],
-                                                                         m_geo->pointNormals()[triangle[1]],
-                                                                         m_geo->pointNormals()[triangle[2]],
-                                                                         m_geo->bezierInfo()[m_tid]);
-    }
-
-    inline defaulttype::BoundingBox getBBox() const {
-        const core::topology::BaseMeshTopology::Triangle & triangle = m_geo->getTriangles()[m_tid];
-        const helper::ReadAccessor<Data <VecCoord> >& x = m_geo->getState()->read(core::VecCoordId::position());
-        defaulttype::BoundingBox bbox;
-        bbox.include(x[triangle[0]]);
-        bbox.include(x[triangle[1]]);
-        bbox.include(x[triangle[2]]);
-        return bbox;
-    }
-
-protected:
-    unsigned m_tid;
-    const CONTAINER * m_geo;
-};
-
 template<class DataTypes>
 class BezierTriangleGeometry : public PhongTriangleGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
+    typedef TriangleProximity TPROXIMITYDATA;
     typedef PhongTriangleGeometry<DataTypes> Inherit;
     typedef BezierTriangleGeometry<DataTypes> GEOMETRY;
-    typedef typename DataTypes::Coord Coord;
-    typedef Data<helper::vector<defaulttype::Vector3> > DataVecCoord;
-    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef size_t TriangleID;
     typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
-    typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
     typedef helper::vector<Triangle> VecTriangles;
-    typedef typename BezierTriangleProximity<DataTypes>::BezierTriangleInfo BezierTriangleInfo;
 
     SOFA_CLASS(GEOMETRY,Inherit);
+
+    typedef struct
+    {
+        defaulttype::Vector3 p210,p120,p021,p012,p102,p201,p111;
+        defaulttype::Vector3 n110,n011,n101;
+    } BezierTriangleInfo;
 
     Data <unsigned> d_nonlin_max_it;
     Data <double> d_nonlin_tolerance;
@@ -84,11 +38,10 @@ public:
     : d_nonlin_max_it(initData(&d_nonlin_max_it,(unsigned) 20,"nonlin_max_it", "number of iterations"))
     , d_nonlin_tolerance(initData(&d_nonlin_tolerance,(double) 0.001,"nonlin_tol", "Tolerance"))
     , d_nonlin_threshold(initData(&d_nonlin_threshold,(double) 0.00001,"nonlin_th", "Threshold"))
-    , d_draw_tesselation(initData(&d_draw_tesselation,(unsigned) 0.0, "tesselation", "Number of tesselation"))
-    {}
+    , d_draw_tesselation(initData(&d_draw_tesselation,(unsigned) 0.0, "tesselation", "Number of tesselation")) {}
 
-    virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const {
-        return DefaultElementIterator<BezierTriangleElement<GEOMETRY> >::create(this, this->d_triangles.getValue().size(), eid);
+    inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
+        return DefaultElementIterator<GEOMETRY>::create(this, eid);
     }
 
     virtual void prepareDetection() {
@@ -97,7 +50,7 @@ public:
         const VecTriangles& triangles = this->d_triangles.getValue();
         const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(core::VecCoordId::position());
 
-        size_t nbTriangles = triangles.size();
+        unsigned nbTriangles = triangles.size();
         m_beziertriangle_info.resize(nbTriangles);
         for (size_t t=0;t< nbTriangles;t++)
         {
@@ -152,21 +105,21 @@ public:
 
             const Triangle& triangle = this->d_triangles.getValue()[tid];
 
-            BezierTriangleProximity<DataTypes> proxA(this->getState(), triangle[0],triangle[1],triangle[2], bary_A[0],bary_A[1],bary_A[2], this->m_point_normals[triangle[0]], this->m_point_normals[triangle[1]], this->m_point_normals[triangle[2]], m_beziertriangle_info[tid]);
-            BezierTriangleProximity<DataTypes> proxB(this->getState(), triangle[0],triangle[1],triangle[2], bary_B[0],bary_B[1],bary_B[2], this->m_point_normals[triangle[0]], this->m_point_normals[triangle[1]], this->m_point_normals[triangle[2]], m_beziertriangle_info[tid]);
-            BezierTriangleProximity<DataTypes> proxC(this->getState(), triangle[0],triangle[1],triangle[2], bary_C[0],bary_C[1],bary_C[2], this->m_point_normals[triangle[0]], this->m_point_normals[triangle[1]], this->m_point_normals[triangle[2]], m_beziertriangle_info[tid]);
+            TriangleProximity proxA(tid, triangle[0],triangle[1],triangle[2], bary_A[0],bary_A[1],bary_A[2]);
+            TriangleProximity proxB(tid, triangle[0],triangle[1],triangle[2], bary_B[0],bary_B[1],bary_B[2]);
+            TriangleProximity proxC(tid, triangle[0],triangle[1],triangle[2], bary_C[0],bary_C[1],bary_C[2]);
 
             // draw Triangle
-
             double delta = 0.2;
-            defaulttype::Vector4 color = this->d_color.getValue();
+
+            const defaulttype::Vector4 & color = this->d_color.getValue();
 
             glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
-            glVertex3dv(proxA.getPosition().data());
+            glVertex3dv(getPosition(proxA).data());
             glColor4f(color[0],fabs(color[1]-delta),color[2],color[3]);
-            glVertex3dv(proxB.getPosition().data());
+            glVertex3dv(getPosition(proxB).data());
             glColor4f(color[0],color[1],fabs(color[2]-delta),color[3]);
-            glVertex3dv(proxC.getPosition().data());
+            glVertex3dv(getPosition(proxC).data());
 
             return;
         }
@@ -187,30 +140,21 @@ public:
         tesselate(level+1,tid,bary_A,bary_G,bary_E);
     }
 
-    virtual void draw(const core::visual::VisualParams * vparams) {
-        Inherit::draw(vparams);
-
-        if (! vparams->displayFlags().getShowCollisionModels())
-            return;
-
-        if (this->d_color.getValue()[3] == 0.0)
-            return;
+    void draw(const core::visual::VisualParams * vparams) {
+        if (! vparams->displayFlags().getShowCollisionModels()) return;
+        const defaulttype::Vector4 & color = this->d_color.getValue();
+        if (color[3] == 0.0) return;
 
         glDisable(GL_LIGHTING);
 
         glBegin(GL_TRIANGLES);
-        for (unsigned i=0;i<this->d_triangles.getValue().size();i++) {
-            tesselate(0, i , defaulttype::Vector3(1,0,0),defaulttype::Vector3(0,1,0),defaulttype::Vector3(0,0,1));
+        for (auto it = this->begin();it != this->end();it++) {
+            tesselate(0, it->id() , defaulttype::Vector3(1,0,0),defaulttype::Vector3(0,1,0),defaulttype::Vector3(0,0,1));
         }
         glEnd();
     }
 
-    inline const std::vector<BezierTriangleInfo> & bezierInfo() const {
-        return m_beziertriangle_info;
-    }
-
-    void project(unsigned elmt, const defaulttype::Vector3 & P, core::topology::BaseMeshTopology::Triangle & triangle, defaulttype::Vector3 & fact) const {
-
+    inline TriangleProximity project(unsigned tid, const defaulttype::Vector3 & P) const {
         unsigned max_it = d_nonlin_max_it.getValue();
         double tolerance = d_nonlin_tolerance.getValue();
         double threshold = d_nonlin_threshold.getValue();
@@ -219,19 +163,17 @@ public:
         double delta = 0.00001;
 
         //initialize the algorithm xith the projection on a linear triangle
-        Inherit::project(elmt, P, triangle, fact);
-
-        BezierTriangleProximity<DataTypes> pinfo(this->getState(), triangle[0],triangle[1],triangle[2], fact[0],fact[1],fact[2], this->m_point_normals[triangle[0]], this->m_point_normals[triangle[1]], this->m_point_normals[triangle[2]], m_beziertriangle_info[elmt]);
+        TriangleProximity pinfo = Inherit::project(tid, P);
 
         while(it< max_it)
         {
-            defaulttype::Vector3 Q = pinfo.getPosition();
+            defaulttype::Vector3 Q = getPosition(pinfo);
 
             defaulttype::Vector3 nQP = P - Q;
             if (nQP.norm() < tolerance) break;
             nQP.normalize();
 
-            defaulttype::Vector3 N1 = pinfo.getNormal();
+            defaulttype::Vector3 N1 = getNormal(pinfo);
             N1.normalize();
 
             if (pinfo.m_f0 < 0 || pinfo.m_f1 < 0 || pinfo.m_f2 < 0) break;
@@ -255,9 +197,8 @@ public:
             double P_v_fact2 = pinfo.m_f2 - delta * fact_v;
             if (P_v_fact0 < 0 || P_v_fact1 < 0 || P_v_fact2 < 0) break;
 
-            BezierTriangleProximity<DataTypes> P_v(this->getState(), triangle[0],triangle[1],triangle[2], P_v_fact0,P_v_fact1,P_v_fact2,
-                                                   this->m_point_normals[triangle[0]], this->m_point_normals[triangle[1]], this->m_point_normals[triangle[2]], m_beziertriangle_info[elmt]);
-            defaulttype::Vector3 p_v = (P - P_v.getPosition()).normalized();
+            TriangleProximity P_v(tid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_v_fact0, P_v_fact1, P_v_fact2);
+            defaulttype::Vector3 p_v = (P - getPosition(P_v)).normalized();
             defaulttype::Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
 
             //variation point along u
@@ -266,11 +207,9 @@ public:
             double P_u_fact2 = pinfo.m_f2 - delta * fact_u;
             if (P_u_fact0 < 0 || P_u_fact1 < 0 || P_u_fact2 < 0) break;
 
-            BezierTriangleProximity<DataTypes> P_u(this->getState(), triangle[0],triangle[1],triangle[2], P_u_fact0,P_u_fact1,P_u_fact2,
-                                                   this->m_point_normals[triangle[0]], this->m_point_normals[triangle[1]], this->m_point_normals[triangle[2]], m_beziertriangle_info[elmt]);
-            defaulttype::Vector3 p_u = (P - P_u.getPosition()).normalized();
+            TriangleProximity P_u(tid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_u_fact0,P_u_fact1,P_u_fact2);
+            defaulttype::Vector3 p_u = (P - getPosition(P_u)).normalized();
             defaulttype::Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
-
 
             defaulttype::Mat2x2d J, invJ;
             J[0][0] = (e_v[0] - e_0[0])/delta;
@@ -306,14 +245,13 @@ public:
 
             if (P_a_fact0 < 0 ||P_a_fact1 < 0 || P_a_fact2 < 0) break;
 
-            BezierTriangleProximity<DataTypes> P_a(this->getState(), triangle[0],triangle[1],triangle[2], P_a_fact0,P_a_fact1,P_a_fact2,
-                                                   this->m_point_normals[triangle[0]], this->m_point_normals[triangle[1]], this->m_point_normals[triangle[2]], m_beziertriangle_info[elmt]);
-            defaulttype::Vector3 QA = P_a.getPosition(core::VecCoordId::position());
+            TriangleProximity P_a(tid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_a_fact0,P_a_fact1,P_a_fact2);
+            defaulttype::Vector3 QA = getPosition(P_a);
 
             double fact;
             if (fabs(dot(nQP,N1))>0.8) {
                 double fx = acos(fabs(dot(nQP,N1)));
-                double fxdx = acos(fabs(dot((P - QA).normalized(),P_a.getNormal())));
+                double fxdx = acos(fabs(dot((P - QA).normalized(),getNormal(P_a))));
                 double j = (fxdx - fx) / delta;
                 fact = -fx / j;
             } else {
@@ -341,6 +279,103 @@ public:
             pinfo.m_f2 += dir2d[2];
 
             it++;
+        }
+
+        return pinfo;
+    }
+
+    inline defaulttype::Vector3 getNormal(const TriangleProximity & data) const {
+        const defaulttype::Vector3 &n200 = this->m_triangle_normals[data.m_p2];
+        const defaulttype::Vector3 &n020 = this->m_triangle_normals[data.m_p1];
+        const defaulttype::Vector3 &n002 = this->m_triangle_normals[data.m_p0];
+        const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[data.m_eid];
+
+        double fact_w = data.m_f2;
+        double fact_u = data.m_f1;
+        double fact_v = data.m_f0;
+
+        defaulttype::Vector3 normal = n200 * fact_w*fact_w +
+                                      n020 * fact_u*fact_u +
+                                      n002 * fact_v*fact_v +
+                                      tbinfo.n110 * fact_w*fact_u +
+                                      tbinfo.n011 * fact_u*fact_v +
+                                      tbinfo.n101 * fact_w*fact_v;
+
+        return normal.normalized();
+    }
+
+    ////Bezier triangle are computed according to :
+    ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
+    inline defaulttype::Vector3 getPosition(const TriangleProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
+        const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[data.m_eid];
+
+        if(v == core::VecCoordId::position())
+        {
+            const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(v);
+
+            const defaulttype::Vector3 & p300 = x[data.m_p2];
+            const defaulttype::Vector3 & p030 = x[data.m_p1];
+            const defaulttype::Vector3 & p003 = x[data.m_p0];
+
+            double fact_w = data.m_f2;
+            double fact_u = data.m_f1;
+            double fact_v = data.m_f0;
+
+            return p300 *   fact_w*fact_w*fact_w +
+                   p030 *   fact_u*fact_u*fact_u +
+                   p003 *   fact_v*fact_v*fact_v +
+                   tbinfo.p210 * 3*fact_w*fact_w*fact_u +
+                   tbinfo.p120 * 3*fact_w*fact_u*fact_u +
+                   tbinfo.p201 * 3*fact_w*fact_w*fact_v +
+                   tbinfo.p021 * 3*fact_u*fact_u*fact_v +
+                   tbinfo.p102 * 3*fact_w*fact_v*fact_v +
+                   tbinfo.p012 * 3*fact_u*fact_v*fact_v +
+                   tbinfo.p111 * 6*fact_w*fact_u*fact_v;
+        } else {
+            double fact_w = data.m_f2;
+            double fact_u = data.m_f1;
+            double fact_v = data.m_f0;
+
+            const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(v);
+
+            const defaulttype::Vector3 & p300_Free = x[data.m_p2];
+            const defaulttype::Vector3 & p030_Free = x[data.m_p1];
+            const defaulttype::Vector3 & p003_Free = x[data.m_p0];
+
+            const defaulttype::Vector3 & n200_Free = this->m_triangle_normals[data.m_p2];
+            const defaulttype::Vector3 & n020_Free = this->m_triangle_normals[data.m_p1];
+            const defaulttype::Vector3 & n002_Free = this->m_triangle_normals[data.m_p0];
+
+            double w12_free = dot(p030_Free - p300_Free,n200_Free);
+            double w21_free = dot(p300_Free - p030_Free,n020_Free);
+            double w23_free = dot(p003_Free - p030_Free,n020_Free);
+            double w32_free = dot(p030_Free - p003_Free,n002_Free);
+            double w31_free = dot(p300_Free - p003_Free,n002_Free);
+            double w13_free = dot(p003_Free - p300_Free,n200_Free);
+
+            const defaulttype::Vector3 & p210_Free = (p300_Free*2.0 + p030_Free - n200_Free * w12_free) / 3.0;
+            const defaulttype::Vector3 & p120_Free = (p030_Free*2.0 + p300_Free - n020_Free * w21_free) / 3.0;
+
+            const defaulttype::Vector3 & p021_Free = (p030_Free*2.0 + p003_Free - n020_Free * w23_free) / 3.0;
+            const defaulttype::Vector3 & p012_Free = (p003_Free*2.0 + p030_Free - n002_Free * w32_free) / 3.0;
+
+            const defaulttype::Vector3 & p102_Free = (p003_Free*2.0 + p300_Free - n002_Free * w31_free) / 3.0;
+            const defaulttype::Vector3 & p201_Free = (p300_Free*2.0 + p003_Free - n200_Free * w13_free) / 3.0;
+
+            const defaulttype::Vector3 & E_Free = (p210_Free+p120_Free+p102_Free+p201_Free+p021_Free+p012_Free) / 6.0;
+            const defaulttype::Vector3 & V_Free = (p300_Free+p030_Free+p003_Free) / 3.0;
+            const defaulttype::Vector3 & p111_Free =  E_Free + (E_Free-V_Free) / 2.0;
+
+            return p300_Free *   fact_w*fact_w*fact_w +
+                   p030_Free *   fact_u*fact_u*fact_u +
+                   p003_Free *   fact_v*fact_v*fact_v +
+                   p210_Free * 3*fact_w*fact_w*fact_u +
+                   p120_Free * 3*fact_w*fact_u*fact_u +
+                   p201_Free * 3*fact_w*fact_w*fact_v +
+                   p021_Free * 3*fact_u*fact_u*fact_v +
+                   p102_Free * 3*fact_w*fact_v*fact_v +
+                   p012_Free * 3*fact_u*fact_v*fact_v +
+                   p111_Free * 6*fact_w*fact_u*fact_v;
         }
     }
 

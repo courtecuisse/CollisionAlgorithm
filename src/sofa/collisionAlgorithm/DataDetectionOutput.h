@@ -1,8 +1,8 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/proximity/FixedProximity.h>
 #include <sofa/core/collision/Pipeline.h>
+#include <sofa/collisionAlgorithm/proximity/FixedProximity.h>
 
 namespace sofa
 {

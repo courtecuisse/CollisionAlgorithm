@@ -16,14 +16,15 @@ public:
     SOFA_ABSTRACT_CLASS(BroadPhase,core::objectmodel::BaseObject);
 
     Data<defaulttype::Vector4> d_color;
-    core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+    core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_geometry;
 
     /*!
      * \brief BroadPhase Constructor
      */
     BroadPhase()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , l_geometry(initLink("geometry", "link to state")) {}
+    , l_geometry(initLink("elements", "link to state"))
+    , m_update_time(-1.0) {}
 
     /*!
      * \brief ~BroadPhase destructor
@@ -61,18 +62,15 @@ public:
 
     virtual void getElementSet(unsigned cx,unsigned cy, unsigned cz, std::set<unsigned> & selectElements) const = 0;
 
-    void update(double time) {
-        if (m_updateTime < time) {
-            m_updateTime = time;
+    virtual void updateTime(double time) {
+        if (m_update_time < time) {
+            m_update_time = time;
             prepareDetection();
         }
-        if (l_geometry) l_geometry->update(time); // make sure the geometry is updated on the same time
     }
 
-protected:
-
-    double m_updateTime;
-
+private :
+    double m_update_time;
 };
 
 

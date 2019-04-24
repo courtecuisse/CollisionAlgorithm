@@ -5,8 +5,9 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-BroadPhase * BaseGeometry::getBroadPhase() const {
-    if (m_broadPhase) m_broadPhase->update(this->getContext()->getTime());
+const BroadPhase * BaseGeometry::getBroadPhase() {
+    updateTime();
+    if (m_broadPhase) m_broadPhase->updateTime(m_update_time);
     return m_broadPhase;
 }
 
