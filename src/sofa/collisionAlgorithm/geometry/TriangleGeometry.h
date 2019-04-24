@@ -25,7 +25,7 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    Data<helper::vector<Triangle>> d_triangles;
+    Data<helper::vector<Triangle> > d_triangles;
 
     TriangleGeometry()
     : d_triangles(initData(&d_triangles, "triangles", "Triangles Container" )) {}
