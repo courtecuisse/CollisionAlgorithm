@@ -6,7 +6,13 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-void CollisionAlgorithm::BindPointCloudReinit(const helper::vector<defaulttype::Vector3> & p1, const helper::vector<defaulttype::Vector3> & p2 , helper::vector<int> & bindId, double minDist) {
+void CollisionAlgorithm::BindPointCloudReinit(
+    const helper::vector<defaulttype::Vector3> & p1,
+    const helper::vector<defaulttype::Vector3> & p2 ,
+    helper::vector<int> & bindId,
+
+    double minDist
+) {
     helper::vector<int> reinit(p1.size(),-1);
     bindId.swap(reinit);
 

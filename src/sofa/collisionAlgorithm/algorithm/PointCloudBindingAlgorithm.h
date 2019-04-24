@@ -18,8 +18,6 @@ public:
     typedef sofa::defaulttype::Vector3 Vector3;
     SOFA_CLASS(PointCloudBindingAlgorithm, BaseAlgorithm);
 
-    Data<double> d_maxDist;
-
     PointCloudBindingAlgorithm();
 
     void doDetection();
@@ -33,6 +31,7 @@ public:
 
 private:
     void processAlgorithm(BaseGeometry* g1, BaseGeometry* g2, DetectionOutput & output);
+    Data<double> d_maxDist;
 };
 
 }
