@@ -69,7 +69,7 @@ protected:
 };
 
 
-template<class DataTypes>
+template<class DataTypes, class PROXIMITYDATA>
 class TBaseGeometry : public BaseGeometry {
 public:
 
@@ -85,9 +85,9 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(TBaseGeometry,DataTypes),BaseGeometry);
+    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE2(TBaseGeometry,DataTypes,PROXIMITYDATA),BaseGeometry);
 
-    core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
+    core::objectmodel::SingleLink<TBaseGeometry<DataTypes,PROXIMITYDATA>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
 
     TBaseGeometry()
     : l_state(initLink("mstate", "link to state")) {
@@ -108,6 +108,42 @@ public:
 
     inline sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
+    }
+
+    /*
+    virtual defaulttype::BoundingBox getBBox(unsigned eid) const  = 0;
+
+    virtual PROXIMITYDATA center(unsigned eid) const = 0;
+
+    virtual PROXIMITYDATA project(unsigned eid,const defaulttype::Vector3 & P) const = 0;
+
+    virtual defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v) const = 0;
+
+    virtual defaulttype::Vector3 getNormal(const PROXIMITYDATA & data) const = 0;
+
+    virtual void addContributions(const PROXIMITYDATA & data, MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const = 0;*/
+
+    inline void buildJacobianConstraint(const PROXIMITYDATA & data, core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
+        DataMatrixDeriv & c1_d = *cId[this->getState()].write();
+        MatrixDeriv & c1 = *c1_d.beginEdit();
+
+        for (unsigned j=0;j<normals.size();j++) {
+            MatrixDerivRowIterator c_it = c1.writeLine(constraintId+j);
+            data.addContributions(c_it, normals[j] * fact);
+        }
+
+        c1_d.endEdit();
+    }
+
+    inline void storeLambda(const PROXIMITYDATA & /*data*/, const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const {
+        auto res = sofa::helper::write(*resId[this->getState()].write(), cParams);
+        const typename DataTypes::MatrixDeriv& j = cParams->readJ(this->getState())->getValue();
+        auto rowIt = j.readLine(cid);
+        const double f = lambda->element(cid);
+        for (auto colIt = rowIt.begin(), colItEnd = rowIt.end(); colIt != colItEnd; ++colIt)
+        {
+            res[colIt.index()] += colIt.val() * f;
+        }
     }
 
 

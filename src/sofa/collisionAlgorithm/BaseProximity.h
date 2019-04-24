@@ -63,27 +63,12 @@ public:
         return m_container->getNormal(m_data);
     }
 
-    virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
-        DataMatrixDeriv & c1_d = *cId[m_container->getState()].write();
-        MatrixDeriv & c1 = *c1_d.beginEdit();
-
-        for (unsigned j=0;j<normals.size();j++) {
-            MatrixDerivRowIterator c_it = c1.writeLine(constraintId+j);
-            m_container->addContributions(m_data, c_it, normals[j] * fact);
-        }
-
-        c1_d.endEdit();
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
+        m_container->buildJacobianConstraint(m_data,cId,normals,fact,constraintId);
     }
 
-    virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const {
-        auto res = sofa::helper::write(*resId[m_container->getState()].write(), cParams);
-        const typename DataTypes::MatrixDeriv& j = cParams->readJ(m_container->getState())->getValue();
-        auto rowIt = j.readLine(cid);
-        const double f = lambda->element(cid);
-        for (auto colIt = rowIt.begin(), colItEnd = rowIt.end(); colIt != colItEnd; ++colIt)
-        {
-            res[colIt.index()] += colIt.val() * f;
-        }
+    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const {
+        m_container->storeLambda(m_data,cParams,resId,cid,lambda);
     }
 
 protected:

@@ -9,12 +9,12 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class PointGeometry : public TBaseGeometry<DataTypes> {
+class PointGeometry : public TBaseGeometry<DataTypes, PointProximity> {
 public:
     typedef DataTypes TDataTypes;
     typedef PointProximity TPROXIMITYDATA;
-    typedef TBaseGeometry<DataTypes> Inherit;
     typedef PointGeometry<DataTypes> GEOMETRY;
+    typedef TBaseGeometry<DataTypes, TPROXIMITYDATA> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef typename DataTypes::MatrixDeriv MatrixDeriv;
@@ -74,9 +74,6 @@ public:
         return defaulttype::Vector3();
     }
 
-    inline void addContributions(const PointProximity & data, MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
-        it.addCol(data.m_eid, N);
-    }
 };
 
 }

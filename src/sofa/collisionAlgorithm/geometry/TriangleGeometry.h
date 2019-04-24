@@ -8,12 +8,12 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class TriangleGeometry : public TBaseGeometry<DataTypes> {
+class TriangleGeometry : public TBaseGeometry<DataTypes,TriangleProximity> {
 public:
     typedef DataTypes TDataTypes;
     typedef TriangleProximity TPROXIMITYDATA;
-    typedef TBaseGeometry<DataTypes> Inherit;
     typedef TriangleGeometry<DataTypes> GEOMETRY;
+    typedef TBaseGeometry<DataTypes,TPROXIMITYDATA> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef typename DataTypes::MatrixDeriv MatrixDeriv;
@@ -163,12 +163,6 @@ public:
         bbox.include(x[triangle[1]]);
         bbox.include(x[triangle[2]]);
         return bbox;
-    }
-
-    inline void addContributions(const TriangleProximity & data, MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
-        it.addCol(data.m_p0, N * data.m_f0);
-        it.addCol(data.m_p1, N * data.m_f1);
-        it.addCol(data.m_p2, N * data.m_f2);
     }
 
     //Barycentric coordinates are computed according to
