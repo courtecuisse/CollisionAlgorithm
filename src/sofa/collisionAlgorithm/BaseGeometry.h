@@ -84,14 +84,18 @@ public:
     typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+    typedef core::topology::BaseMeshTopology Topology;
 
     SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE2(TBaseGeometry,DataTypes,PROXIMITYDATA),BaseGeometry);
 
     core::objectmodel::SingleLink<TBaseGeometry<DataTypes,PROXIMITYDATA>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
+    core::objectmodel::SingleLink<TBaseGeometry<DataTypes,PROXIMITYDATA>,Topology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
 
     TBaseGeometry()
-    : l_state(initLink("mstate", "link to state")) {
+    : l_state(initLink("mstate", "link to state"))
+    , l_topology(initLink("topology", "link to topology")) {
         l_state.setPath("@.");
+        l_topology.setPath("@.");
     }
 
     inline void drawNormals(const core::visual::VisualParams *vparams) {
@@ -109,19 +113,6 @@ public:
     inline sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
     }
-
-    /*
-    virtual defaulttype::BoundingBox getBBox(unsigned eid) const  = 0;
-
-    virtual PROXIMITYDATA center(unsigned eid) const = 0;
-
-    virtual PROXIMITYDATA project(unsigned eid,const defaulttype::Vector3 & P) const = 0;
-
-    virtual defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v) const = 0;
-
-    virtual defaulttype::Vector3 getNormal(const PROXIMITYDATA & data) const = 0;
-
-    virtual void addContributions(const PROXIMITYDATA & data, MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const = 0;*/
 
     inline void buildJacobianConstraint(const PROXIMITYDATA & data, core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
         DataMatrixDeriv & c1_d = *cId[this->getState()].write();

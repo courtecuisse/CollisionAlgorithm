@@ -25,44 +25,12 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    Data<helper::vector<Triangle> > d_triangles;
-
-    TriangleGeometry()
-    : d_triangles(initData(&d_triangles, "triangles", "Triangles Container" )) {}
-
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
         return DefaultElementIterator<GEOMETRY>::create(this, eid);
     }
 
     unsigned end() const {
-        return d_triangles.getValue().size();
-    }
-
-    void init() override {
-        Inherit::init();
-
-        ///To remove if we think every input has to be explicit
-        if(d_triangles.getValue().empty())
-        {
-            msg_warning(this) << "Triangles are not set (data is empty). Will set from topology if present in the same context";
-            sofa::core::topology::BaseMeshTopology* topology{nullptr};
-            this->getContext()->get(topology);
-            if(!topology)
-            {
-                msg_error(this) << "No topology to work with ; giving up.";
-            }
-            else
-            {
-                if(topology->getTriangles().empty())
-                {
-                    msg_error(this) << "No topology with triangles to work with ; giving up.";
-                }
-                else
-                {
-                    d_triangles.setParent(topology->findData("triangles"));
-                }
-            }
-        }
+        return this->l_topology->getNbTriangles();
     }
 
     void draw(const core::visual::VisualParams * vparams) {
@@ -79,7 +47,7 @@ public:
         else glBegin(GL_LINES);
 
         for (auto it=this->begin();it!=this->end();it++) {
-            const Triangle& tri = this->d_triangles.getValue()[it->id()];
+            const Triangle& tri = this->l_topology->getTriangle(it->id());
 
             glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
             glVertex3dv(pos[tri[0]].data());
@@ -97,7 +65,7 @@ public:
     }
 
     virtual void prepareDetection() override {
-        const VecTriangles& triangles = this->d_triangles.getValue();
+        const VecTriangles& triangles = this->l_topology->getTriangles();
 
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
@@ -148,7 +116,7 @@ public:
     }
 
     inline TriangleProximity center(unsigned eid) const {
-        const core::topology::BaseMeshTopology::Triangle & triangle = this->d_triangles.getValue()[eid];
+        const core::topology::BaseMeshTopology::Triangle & triangle = this->l_topology->getTriangle(eid);
 
         return TriangleProximity(eid,
                                  triangle[0],triangle[1],triangle[2],
@@ -156,7 +124,7 @@ public:
     }
 
     inline defaulttype::BoundingBox getBBox(unsigned eid) const {
-        const core::topology::BaseMeshTopology::Triangle & triangle = this->d_triangles.getValue()[eid];
+        const core::topology::BaseMeshTopology::Triangle & triangle = this->l_topology->getTriangle(eid);
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
         defaulttype::BoundingBox bbox;
         bbox.include(x[triangle[0]]);
@@ -171,7 +139,7 @@ public:
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
         const TriangleInfo & tinfo = m_triangle_info[eid];
-        core::topology::BaseMeshTopology::Triangle triangle = this->d_triangles.getValue()[eid];
+        core::topology::BaseMeshTopology::Triangle triangle = this->l_topology->getTriangle(eid);
 
         defaulttype::Vector3 P0 = pos[triangle[0]];
         defaulttype::Vector3 P1 = pos[triangle[1]];

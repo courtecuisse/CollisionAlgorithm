@@ -19,7 +19,6 @@ public:
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef size_t TriangleID;
     typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
-    typedef helper::vector<Triangle> VecTriangles;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
@@ -47,7 +46,7 @@ public:
     virtual void prepareDetection() {
         Inherit::prepareDetection();
 
-        const VecTriangles& triangles = this->d_triangles.getValue();
+        const helper::vector<Triangle>& triangles = this->l_topology->getTriangles();
         const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(core::VecCoordId::position());
 
         unsigned nbTriangles = triangles.size();
@@ -103,7 +102,7 @@ public:
     void tesselate(unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C) {
         if (level >= d_draw_tesselation.getValue()) {
 
-            const Triangle& triangle = this->d_triangles.getValue()[tid];
+            const Triangle& triangle = this->l_topology->getTriangle(tid);
 
             TriangleProximity proxA(tid, triangle[0],triangle[1],triangle[2], bary_A[0],bary_A[1],bary_A[2]);
             TriangleProximity proxB(tid, triangle[0],triangle[1],triangle[2], bary_B[0],bary_B[1],bary_B[2]);

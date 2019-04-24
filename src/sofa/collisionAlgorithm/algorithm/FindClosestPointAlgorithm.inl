@@ -5,7 +5,6 @@
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 
 //default distance measurement behaviour
-#include <sofa/collisionAlgorithm/distanceMeasures/Norm3Measure.h>
 
 #define DEBUGIN(p) std::cout << "IN : " << p << std::endl ;
 #define DEBUGOUT(p) std::cout << "OUT : " << p << std::endl ;
@@ -204,8 +203,8 @@ BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::S
         if (acceptFilter(pfrom,pdest)) {
             //defaulttype::Vector3 N = P - pdest->getPosition();
             //double dist = N.norm();
-            defaulttype::Vector3 Q = pdest->getPosition() ;
-            double dist = d_distance_measure.getValue().getDistance(P, Q) ;
+            //defaulttype::Vector3 Q = pdest->getPosition() ;
+            double dist = d_distance_measure.getValue().compute(pfrom,pdest) ;
 
             if (dist<min_dist) {
                 min_dist = dist;

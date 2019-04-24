@@ -25,7 +25,7 @@ public:
     Data<double> d_drawRadius;
 
     PointGeometry()
-    : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawPointRadius", "radius of drawing")) {}
+    : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {}
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
         return DefaultElementIterator<GEOMETRY>::create(this, eid);

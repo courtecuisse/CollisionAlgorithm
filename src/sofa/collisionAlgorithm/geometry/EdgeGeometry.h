@@ -21,48 +21,16 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    Data<helper::vector<sofa::core::topology::BaseMeshTopology::Edge> > d_edges;
-
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
         return DefaultElementIterator<GEOMETRY>::create(this, eid);
     }
 
-    EdgeGeometry()
-    : d_edges(initData(&d_edges,"edges", "Edges Container" )) {}
-
     unsigned end() const {
-        return d_edges.getValue().size();
-    }
-
-    void init() {
-        Inherit::init();
-
-        ///To remove if we think every input has to be explicit
-        if(d_edges.getValue().empty())
-        {
-            msg_warning(this) << "Edges are not set (data is empty). Will set from topology if present in the same context";
-            sofa::core::topology::BaseMeshTopology* topology{nullptr};
-            this->getContext()->get(topology);
-            if(!topology)
-            {
-                msg_error(this) << "No topology to work with ; giving up.";
-            }
-            else
-            {
-                if(topology->getEdges().empty())
-                {
-                    msg_error(this) << "No topology with edges to work with ; giving up.";
-                }
-                else
-                {
-                    d_edges.setParent(topology->findData("edges"));
-                }
-            }
-        }
+        return this->l_topology->getNbEdges();
     }
 
     inline defaulttype::BoundingBox getBBox(unsigned eid) const {
-        const core::topology::BaseMeshTopology::Edge & edge = this->d_edges.getValue()[eid];
+        const core::topology::BaseMeshTopology::Edge & edge = this->l_topology->getEdge(eid);
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
         defaulttype::BoundingBox bbox;
         bbox.include(x[edge[0]]);
@@ -71,7 +39,7 @@ public:
     }
 
     inline EdgeProximity center(unsigned eid) const {
-        const core::topology::BaseMeshTopology::Edge & edge = this->d_edges.getValue()[eid];
+        const core::topology::BaseMeshTopology::Edge & edge = this->l_topology->getEdge(eid);
 
         return EdgeProximity(eid,edge[0],edge[1],0.5,0.5);
     }
@@ -89,7 +57,7 @@ public:
     }
 
     inline EdgeProximity project(unsigned eid, const defaulttype::Vector3 & P) const {
-        sofa::core::topology::BaseMeshTopology::Edge edge = this->d_edges.getValue()[eid];
+        sofa::core::topology::BaseMeshTopology::Edge edge = this->l_topology->getEdge(eid);
 
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
 
@@ -122,7 +90,7 @@ public:
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
         for (auto it=this->begin();it!=this->end();it++) {
-            const sofa::core::topology::BaseMeshTopology::Edge & edge = d_edges.getValue()[it->id()];
+            const sofa::core::topology::BaseMeshTopology::Edge & edge = this->l_topology->getEdge(it->id());
 
             glVertex3dv(pos[edge[0]].data());
             glVertex3dv(pos[edge[1]].data());

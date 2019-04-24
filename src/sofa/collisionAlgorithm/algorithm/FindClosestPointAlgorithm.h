@@ -4,7 +4,7 @@
 #include <sofa/collisionAlgorithm/BroadPhase.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 
-#include <sofa/collisionAlgorithm/BaseDistanceMeasure.h>
+#include <sofa/collisionAlgorithm/data/DataDistanceMeasure.h>
 
 namespace sofa
 {
@@ -22,7 +22,7 @@ public:
     core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
     core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
 
-    Data<BaseDistanceMeasure> d_distance_measure;
+    Data<DistanceMeasure> d_distance_measure;
 
     Data<DetectionOutput> d_output;
 
