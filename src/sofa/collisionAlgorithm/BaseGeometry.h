@@ -106,7 +106,7 @@ public:
         }
     }
 
-    sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
+    inline sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
     }
 
