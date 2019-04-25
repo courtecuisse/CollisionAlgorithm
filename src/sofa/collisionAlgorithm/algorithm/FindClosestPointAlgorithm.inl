@@ -15,11 +15,16 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+static double norme3(BaseProximity::SPtr p1, BaseProximity::SPtr p2) {
+    return (p1->getPosition()-p2->getPosition()).norm() ;
+}
+
 FindClosestPointAlgorithm::FindClosestPointAlgorithm ()
-    : l_from(initLink("from", "link to from geometry"))
-    , l_dest(initLink("dest", "link to dest geometry"))
-    , d_distance_measure(initData(&d_distance_measure, "distance", "distance measure component"))
-    , d_output(initData(&d_output,"output", "output of the collision detection"))
+: l_from(initLink("from", "link to from geometry"))
+, l_dest(initLink("dest", "link to dest geometry"))
+, d_distance_measure(initData(&d_distance_measure,
+                              DistanceMeasure(std::bind(&norme3, std::placeholders::_1, std::placeholders::_2)), "distance", "distance measure component"))
+, d_output(initData(&d_output,"output", "output of the collision detection"))
 {}
 
 void FindClosestPointAlgorithm::fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const

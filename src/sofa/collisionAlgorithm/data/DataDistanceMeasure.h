@@ -3,6 +3,7 @@
 #include <sofa/core/objectmodel/BaseObject.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/defaulttype/Vec.h>
+#include <sofa/core/objectmodel/Data.h>
 
 namespace sofa {
 
@@ -13,7 +14,11 @@ public :
 
     typedef std::function<double(BaseProximity::SPtr p1, BaseProximity::SPtr p2)> DistanceFunction;
 
-    DistanceMeasure(DistanceFunction fct = std::bind(&DistanceMeasure::normedDistance, std::placeholders::_1, std::placeholders::_2)) : compute(fct) {}
+    friend class sofa::core::objectmodel::DataValue<DistanceMeasure, true>;
+    friend class sofa::core::objectmodel::DataValue<DistanceMeasure, false>;
+    template<class T> friend class sofa::core::objectmodel::Data<T>::InitData;
+
+    DistanceMeasure(DistanceFunction fct) : compute(fct) {}
 
     DistanceFunction compute;
 
@@ -25,9 +30,8 @@ public :
     }
 
 protected:
-    static double normedDistance (BaseProximity::SPtr p1, BaseProximity::SPtr p2) {
-        return (p1->getPosition()-p2->getPosition()).norm() ;
-    }
+    // this is not allow to create this data without providing the functor
+    DistanceMeasure() {}
 } ;
 
 }
