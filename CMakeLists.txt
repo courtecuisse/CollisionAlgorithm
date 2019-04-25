@@ -24,7 +24,9 @@ file(GLOB_RECURSE IGNORED_FILES
     "src/ignored/*.cpp"
 )
 
-setupGitInfo()
+if(COMMAND setupGitInfo)
+    setupGitInfo()
+endif()
 
 find_package( OpenGL REQUIRED )
 find_package( Qt5 COMPONENTS OpenGL REQUIRED)
