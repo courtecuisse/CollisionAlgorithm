@@ -68,7 +68,7 @@ public:
     }
 
     void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const {
-        m_container->storeLambda(m_data,cParams,resId,cid,lambda);
+        m_container->storeLambda(cParams,resId,cid,lambda);
     }
 
 protected:

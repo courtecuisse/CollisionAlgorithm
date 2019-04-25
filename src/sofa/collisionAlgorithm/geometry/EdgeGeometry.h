@@ -8,11 +8,11 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class EdgeGeometry : public TBaseGeometry<DataTypes,EdgeProximity> {
+class EdgeGeometry : public TBaseGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
     typedef EdgeProximity TPROXIMITYDATA;
-    typedef TBaseGeometry<DataTypes,TPROXIMITYDATA> Inherit;
+    typedef TBaseGeometry<DataTypes> Inherit;
     typedef EdgeGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
@@ -20,6 +20,13 @@ public:
     typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
 
     SOFA_CLASS(GEOMETRY,Inherit);
+
+    core::objectmodel::SingleLink<GEOMETRY,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
+
+    EdgeGeometry()
+    : l_topology(initLink("topology", "link to topology")) {
+        l_topology.setPath("@.");
+    }
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
         return DefaultElementIterator<GEOMETRY>::create(this, eid);

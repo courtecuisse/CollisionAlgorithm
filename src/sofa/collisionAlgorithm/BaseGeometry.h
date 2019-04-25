@@ -69,7 +69,7 @@ protected:
 };
 
 
-template<class DataTypes, class PROXIMITYDATA>
+template<class DataTypes>
 class TBaseGeometry : public BaseGeometry {
 public:
 
@@ -84,18 +84,14 @@ public:
     typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
-    typedef core::topology::BaseMeshTopology Topology;
 
-    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE2(TBaseGeometry,DataTypes,PROXIMITYDATA),BaseGeometry);
+    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(TBaseGeometry,DataTypes),BaseGeometry);
 
-    core::objectmodel::SingleLink<TBaseGeometry<DataTypes,PROXIMITYDATA>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
-    core::objectmodel::SingleLink<TBaseGeometry<DataTypes,PROXIMITYDATA>,Topology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
+    core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
 
     TBaseGeometry()
-    : l_state(initLink("mstate", "link to state"))
-    , l_topology(initLink("topology", "link to topology")) {
+    : l_state(initLink("mstate", "link to state")) {
         l_state.setPath("@.");
-        l_topology.setPath("@.");
     }
 
     inline void drawNormals(const core::visual::VisualParams *vparams) {
@@ -114,6 +110,7 @@ public:
         return l_state.get();
     }
 
+    template<class PROXIMITYDATA>
     inline void buildJacobianConstraint(const PROXIMITYDATA & data, core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
         DataMatrixDeriv & c1_d = *cId[this->getState()].write();
         MatrixDeriv & c1 = *c1_d.beginEdit();
@@ -126,7 +123,7 @@ public:
         c1_d.endEdit();
     }
 
-    inline void storeLambda(const PROXIMITYDATA & /*data*/, const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const {
+    inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const {
         auto res = sofa::helper::write(*resId[this->getState()].write(), cParams);
         const typename DataTypes::MatrixDeriv& j = cParams->readJ(this->getState())->getValue();
         auto rowIt = j.readLine(cid);

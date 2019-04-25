@@ -9,12 +9,12 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class PointGeometry : public TBaseGeometry<DataTypes, PointProximity> {
+class PointGeometry : public TBaseGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
     typedef PointProximity TPROXIMITYDATA;
     typedef PointGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes, TPROXIMITYDATA> Inherit;
+    typedef TBaseGeometry<DataTypes> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef typename DataTypes::MatrixDeriv MatrixDeriv;

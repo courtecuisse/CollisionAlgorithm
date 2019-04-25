@@ -8,12 +8,12 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class TriangleGeometry : public TBaseGeometry<DataTypes,TriangleProximity> {
+class TriangleGeometry : public TBaseGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
     typedef TriangleProximity TPROXIMITYDATA;
     typedef TriangleGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes,TPROXIMITYDATA> Inherit;
+    typedef TBaseGeometry<DataTypes> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef typename DataTypes::MatrixDeriv MatrixDeriv;
@@ -24,6 +24,13 @@ public:
     typedef helper::vector<Triangle> VecTriangles;
 
     SOFA_CLASS(GEOMETRY,Inherit);
+
+    core::objectmodel::SingleLink<GEOMETRY,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
+
+    TriangleGeometry()
+    : l_topology(initLink("topology", "link to topology")) {
+        l_topology.setPath("@.");
+    }
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
         return DefaultElementIterator<GEOMETRY>::create(this, eid);
