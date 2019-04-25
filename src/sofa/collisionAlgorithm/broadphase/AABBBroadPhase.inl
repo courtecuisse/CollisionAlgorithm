@@ -122,7 +122,7 @@ void AABBBroadPhase::prepareDetection() {
 
         for (int i = 0 ; i < 3 ; i++) {
             cmaxbox[i] = ceil((maxbox[i] - m_Bmin[i])/m_cellSize[i]);
-            cminbox[i] = floor((minbox[i] - m_Bmax[i])/m_cellSize[i]); //second m_Bmax was Bmin => bug ?
+            cminbox[i] = floor((minbox[i] - m_Bmin[i])/m_cellSize[i]); //second m_Bmax was Bmin => bug ?
         }
 
 //        cminbox[0] = floor((minbox[0] - m_Bmin[0])/m_cellSize[0]);

@@ -23,7 +23,7 @@ public:
      */
     BroadPhase()
     : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , l_geometry(initLink("elements", "link to state"))
+    , l_geometry(initLink("geometry", "link to the geometry"))
     , m_update_time(-1.0) {}
 
     /*!
