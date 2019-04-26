@@ -15,15 +15,16 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-static double norme3(BaseProximity::SPtr p1, BaseProximity::SPtr p2) {
-    return (p1->getPosition()-p2->getPosition()).norm() ;
+static double norme3(const collisionAlgorithm::PairDetection & d) {
+    return (d.first->getPosition()-d.second->getPosition()).norm() ;
 }
 
 FindClosestPointAlgorithm::FindClosestPointAlgorithm ()
-: l_from(initLink("from", "link to from geometry"))
+: d_iterations(initData(&d_iterations,(unsigned) 0,"iterations", "numberof iterations"))
+, l_from(initLink("from", "link to from geometry"))
 , l_dest(initLink("dest", "link to dest geometry"))
 , d_distance_measure(initData(&d_distance_measure,
-                              DistanceMeasure(std::bind(&norme3, std::placeholders::_1, std::placeholders::_2)), "distance", "distance measure component"))
+                              DistanceMeasure(std::bind(&norme3, std::placeholders::_1)), "distance", "distance measure component"))
 , d_output(initData(&d_output,"output", "output of the collision detection"))
 {}
 
@@ -184,48 +185,41 @@ BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defau
     }
 }
 
-PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElementIterator *elfrom, BaseGeometry *geo) {
-    BaseProximity::SPtr from = elfrom->center();
-    BaseProximity::SPtr dest = findClosestPoint(
-        from,
-        getDestIterator(from->getPosition(),geo),
-        geo
-    );
 
-    return PairDetection (from,dest);
-}
 
-BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::SPtr pfrom, BaseElementIterator::UPtr itdest, BaseGeometry *geo) {
+PairDetection FindClosestPointAlgorithm::dofindClosestPoint(const BaseElementIterator *elfrom, BaseElementIterator::UPtr itdest, BaseGeometry *geo) {
     double min_dist = std::numeric_limits<double>::max();
-    BaseProximity::SPtr minprox = nullptr;
-
-    defaulttype::Vector3 P = pfrom->getPosition();
+    BaseProximity::SPtr minprox_from = nullptr;
+    BaseProximity::SPtr minprox_dest = nullptr;
 
     for(;itdest != geo->end();itdest++)
     {
-        BaseProximity::SPtr pdest = (*itdest)->project(P);
+        BaseProximity::SPtr pfrom = elfrom->center();
+        BaseProximity::SPtr pdest = itdest->project(pfrom->getPosition());
+
+        for (unsigned it=0;it<10;it++) {
+            pfrom = elfrom->project(pdest->getPosition());
+            pdest = itdest->project(pfrom->getPosition());
+        }
 
         if (acceptFilter(pfrom,pdest)) {
-            //defaulttype::Vector3 N = P - pdest->getPosition();
-            //double dist = N.norm();
-            //defaulttype::Vector3 Q = pdest->getPosition() ;
-            double dist = d_distance_measure.getValue().compute(pfrom,pdest) ;
+            double dist = d_distance_measure.getValue().compute(PairDetection(pfrom,pdest));
 
             if (dist<min_dist) {
                 min_dist = dist;
-                minprox = pdest;
+                minprox_dest = pdest;
+                minprox_from = pfrom;
             }
         }
     }
 
-    return minprox;
+    return PairDetection(minprox_from,minprox_dest);
 }
 
-
-BaseProximity::SPtr FindClosestPointAlgorithm::findClosestPoint(BaseProximity::SPtr pfrom, BaseGeometry *geo) {
-    return findClosestPoint(
-        pfrom,
-        getDestIterator(pfrom->getPosition(),geo),
+PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElementIterator *elfrom, BaseGeometry *geo) {
+    return dofindClosestPoint(
+        elfrom,
+        getDestIterator(elfrom->center()->getPosition(),geo),
         geo
     );
 }

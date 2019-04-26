@@ -95,13 +95,18 @@ public:
     }
 
     inline void drawNormals(const core::visual::VisualParams *vparams) {
+        if (! vparams->displayFlags().getShowNormals() || d_drawScaleNormal.getValue() == 0.0) return;
+
+        defaulttype::Vector4 color = d_color.getValue();
+        color[3] = 1.0;
+
         for (auto it=begin();it!=end();it++) {
             BaseProximity::SPtr center = (*it)->center();
             vparams->drawTool()->drawArrow(
                 center->getPosition(),
                 center->getPosition() + center->getNormal() * d_drawScaleNormal.getValue(),
                 d_drawScaleNormal.getValue() * 0.1,
-                d_color.getValue()
+                color
             );
         }
     }

@@ -4,6 +4,7 @@
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/defaulttype/Vec.h>
 #include <sofa/core/objectmodel/Data.h>
+#include <sofa/collisionAlgorithm/data/DataDetectionOutput.h>
 
 namespace sofa {
 
@@ -12,7 +13,7 @@ namespace collisionAlgorithm {
 class DistanceMeasure {
 public :
 
-    typedef std::function<double(BaseProximity::SPtr p1, BaseProximity::SPtr p2)> DistanceFunction;
+    typedef std::function<double(const collisionAlgorithm::PairDetection & p)> DistanceFunction;
 
     friend class sofa::core::objectmodel::DataValue<DistanceMeasure, true>;
     friend class sofa::core::objectmodel::DataValue<DistanceMeasure, false>;

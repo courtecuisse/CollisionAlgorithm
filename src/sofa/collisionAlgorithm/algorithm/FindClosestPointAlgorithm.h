@@ -17,7 +17,7 @@ class FindClosestPointAlgorithm : public BaseAlgorithm
 public:
     SOFA_CLASS(FindClosestPointAlgorithm, BaseAlgorithm);
 
-    FindClosestPointAlgorithm () ;
+    Data<unsigned> d_iterations;
 
     core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
     core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
@@ -26,6 +26,7 @@ public:
 
     Data<DetectionOutput> d_output;
 
+    FindClosestPointAlgorithm();
 
 protected:
 
@@ -36,11 +37,9 @@ protected:
     void fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const;
 
 public:
-    BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr pfrom, BaseElementIterator::UPtr itdest, BaseGeometry * geo);
+    PairDetection dofindClosestPoint(const BaseElementIterator *elfrom, BaseElementIterator::UPtr itdest, BaseGeometry * geo);
 
-    PairDetection findClosestPoint(const BaseElementIterator * itfrom, BaseGeometry *geo);
-
-    BaseProximity::SPtr findClosestPoint(BaseProximity::SPtr from, BaseGeometry *geo);
+    PairDetection findClosestPoint(const BaseElementIterator *elfrom, BaseGeometry *geo);
 
 };
 
