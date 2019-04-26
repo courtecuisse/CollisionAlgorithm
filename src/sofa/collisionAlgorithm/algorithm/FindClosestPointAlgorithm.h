@@ -15,7 +15,7 @@ namespace collisionAlgorithm
 class FindClosestPointAlgorithm : public BaseAlgorithm
 {
 public:
-    SOFA_ABSTRACT_CLASS(FindClosestPointAlgorithm, BaseAlgorithm);
+    SOFA_CLASS(FindClosestPointAlgorithm, BaseAlgorithm);
 
     FindClosestPointAlgorithm () ;
 
