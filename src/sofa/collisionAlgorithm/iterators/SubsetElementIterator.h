@@ -12,7 +12,10 @@ namespace collisionAlgorithm
 //Internal iterator of elements
 class SubsetElementIterator : public BaseElementIterator {
 public:
-    SubsetElementIterator(BaseGeometry * geo, const std::set<unsigned> & subsetElements) : m_container(geo), m_subsetElements(subsetElements) {
+    SubsetElementIterator(BaseGeometry * geo, const std::set<unsigned> & subsetElements)
+    : BaseElementIterator(geo)
+    , m_container(geo)
+    , m_subsetElements(subsetElements) {
         m_iterator = m_subsetElements.cbegin();
     }
 

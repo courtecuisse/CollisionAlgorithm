@@ -21,8 +21,10 @@ public:
 
     typedef typename CONTAINER::TPROXIMITYDATA PROXIMITYDATA;
 
-    DefaultElementIterator(const CONTAINER * container, unsigned start)
-    : m_container(container), m_id(start) {}
+    DefaultElementIterator(CONTAINER * container, unsigned start)
+    : BaseElementIterator(container)
+    , m_container(container)
+    , m_id(start) {}
 
     virtual void next() {
         this->m_id++;
@@ -48,8 +50,7 @@ public:
         return m_container->getBBox(id());
     }
 
-    static BaseElementIterator::UPtr create(CONTAINER * container, unsigned start = 0) {
-        container->updateTime();
+    static BaseElementIterator::UPtr create(CONTAINER * container, unsigned start = 0) {        
         return BaseElementIterator::UPtr(new DefaultElementIterator<CONTAINER>(container, start));
     }
 

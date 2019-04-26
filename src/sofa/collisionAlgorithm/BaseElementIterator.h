@@ -8,6 +8,8 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+class BaseGeometry;
+
 /*!
  * \brief The BaseElementIterator class defines an abstract iterator class for BaseElements
  */
@@ -57,10 +59,14 @@ public:
             virtual defaulttype::BoundingBox getBBox() const { return defaulttype::BoundingBox(); }
 
             virtual unsigned id() const { return 0; }
+
+            EmptyIterator() : BaseElementIterator(NULL) {}
         };
 
         return UPtr(new EmptyIterator());
     }
+
+    BaseElementIterator(BaseGeometry * geo);
 
     virtual bool end(unsigned sz) const = 0;
 
@@ -73,6 +79,7 @@ public:
     virtual defaulttype::BoundingBox getBBox() const = 0;
 
     virtual unsigned id() const = 0;
+
 };
 
 }
