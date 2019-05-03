@@ -41,7 +41,10 @@ public :
      * \brief BaseAlgorithm Constructor
      */
     BaseAlgorithm()
-    : l_filters(initLink("filters","list of filters")) {
+    : l_filters(initLink("filters","list of filters"))
+    , drawCollision (initData(&drawCollision, false, "drawcollision", "draw collision"))
+    , d_output(initData(&d_output,"output", "output of the collision detection"))
+    {
 //        m_time = -1.0 ;
     }
 
@@ -60,10 +63,29 @@ public :
         return true;
     }
 
+    Data<bool> drawCollision ;
     core::objectmodel::MultiLink<BaseAlgorithm,BaseFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filters;
+
+    Data<DetectionOutput> d_output;
 protected:
 
     virtual void doDetection() = 0;
+
+    void draw(const core::visual::VisualParams* vparams) {
+//        if (vparams->displayFlags().getShowCollisionModels()) {
+        if (drawCollision.getValue()) {
+            glDisable(GL_LIGHTING);
+            glColor4f(0,1,0,1);
+
+            glBegin(GL_LINES);
+            DetectionOutput output = d_output.getValue() ;
+            for (unsigned i=0;i<output.size();i++) {
+                glVertex3dv(output[i].first->getPosition().data());
+                glVertex3dv(output[i].second->getPosition().data());
+            }
+            glEnd();
+        }
+    }
 
     /// Computation of a new simulation step.
     virtual void updatePosition(SReal /*dt*/) {

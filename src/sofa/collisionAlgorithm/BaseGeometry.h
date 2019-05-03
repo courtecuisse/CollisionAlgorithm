@@ -88,9 +88,11 @@ public:
     SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(TBaseGeometry,DataTypes),BaseGeometry);
 
     core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
+    Data<bool> drawCollision ;
 
     TBaseGeometry()
-    : l_state(initLink("mstate", "link to state")) {
+    : l_state(initLink("mstate", "link to state"))
+    , drawCollision (initData(&drawCollision, false, "drawcollision", "draw collision")) {
         l_state.setPath("@.");
     }
 

@@ -24,7 +24,7 @@ public:
 
     Data<DistanceMeasure> d_distance_measure;
 
-    Data<DetectionOutput> d_output;
+//    Data<DetectionOutput> d_output;
 
     FindClosestPointAlgorithm();
 

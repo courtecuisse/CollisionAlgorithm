@@ -25,7 +25,7 @@ FindClosestPointAlgorithm::FindClosestPointAlgorithm ()
 , l_dest(initLink("dest", "link to dest geometry"))
 , d_distance_measure(initData(&d_distance_measure,
                               DistanceMeasure(std::bind(&norme3, std::placeholders::_1)), "distance", "distance measure component"))
-, d_output(initData(&d_output,"output", "output of the collision detection"))
+//, d_output(initData(&d_output,"output", "output of the collision detection"))
 {}
 
 void FindClosestPointAlgorithm::fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
@@ -230,18 +230,18 @@ void FindClosestPointAlgorithm::doDetection() {
 
     DetectionOutput & output = *d_output.beginEdit();
     output.clear();
-//    size_t i = 0, _3fat = 0 ; //debug purposes
+    size_t i = 0, fail = 0 ; //debug purposes
     for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
         PairDetection min_pair = findClosestPoint(*itfrom,l_dest.get());
-//        i++ ;
+        i++ ;
         if (min_pair.first == nullptr || min_pair.second == nullptr) {
-//            _3fat++ ;
+            fail++ ;
             continue;
         }
 
         output.add(min_pair.first,min_pair.second);
     }
-//    std::cout << i << ':' << _3fat << std::endl ;
+    std::cout << i << ':' << fail << std::endl ;
     d_output.endEdit();
 
 }

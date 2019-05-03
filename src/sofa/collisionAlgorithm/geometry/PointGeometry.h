@@ -25,7 +25,7 @@ public:
     Data<double> d_drawRadius;
 
     PointGeometry()
-    : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {}
+    : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "radius", "radius of drawing")) {}
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
         return DefaultElementIterator<GEOMETRY>::create(this, eid);
@@ -38,7 +38,8 @@ public:
     void draw(const core::visual::VisualParams *vparams) override {
         this->drawNormals(vparams);
 
-        if (! vparams->displayFlags().getShowCollisionModels()) return;
+//        if (! vparams->displayFlags().getShowCollisionModels()) return;
+        if (! this->drawCollision.getValue() && ! vparams->displayFlags().getShowCollisionModels()) return ;
         const defaulttype::Vector4 & color = this->d_color.getValue();
         if (color[3] == 0.0) return;
         if (d_drawRadius.getValue() == 0.0) return;
