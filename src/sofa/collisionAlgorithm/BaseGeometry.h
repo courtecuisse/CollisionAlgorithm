@@ -29,10 +29,11 @@ public:
     Data<double> d_drawScaleNormal;
 
     BaseGeometry()
-    : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
-    , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model"))
-    , m_broadPhase(NULL)
-    , m_update_time(-1.0) {}
+        : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
+        , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model"))
+        , m_broadPhase(NULL)
+        , m_update_time(-1.0)
+    {}
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) = 0;
 
