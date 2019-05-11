@@ -20,7 +20,7 @@ static double norme3(const collisionAlgorithm::PairDetection & d) {
 }
 
 FindClosestPointAlgorithm::FindClosestPointAlgorithm ()
-: d_iterations(initData(&d_iterations,(unsigned) 0,"iterations", "numberof iterations"))
+: d_iterations(initData(&d_iterations,(unsigned) 1,"iterations", "numberof iterations"))
 , l_from(initLink("from", "link to from geometry"))
 , l_dest(initLink("dest", "link to dest geometry"))
 , d_distance_measure(initData(&d_distance_measure,
@@ -187,18 +187,18 @@ BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defau
 
 
 
-PairDetection FindClosestPointAlgorithm::dofindClosestPoint(const BaseElementIterator *elfrom, BaseElementIterator::UPtr itdest, BaseGeometry *geo) {
+PairDetection FindClosestPointAlgorithm::dofindClosestPoint(const BaseElementIterator *itfrom, BaseElementIterator::UPtr itdest, BaseGeometry *geo) {
     double min_dist = std::numeric_limits<double>::max();
     BaseProximity::SPtr minprox_from = nullptr;
     BaseProximity::SPtr minprox_dest = nullptr;
 
     for(;itdest != geo->end();itdest++)
     {
-        BaseProximity::SPtr pfrom = elfrom->center();
+        BaseProximity::SPtr pfrom = itfrom->center();
         BaseProximity::SPtr pdest = itdest->project(pfrom->getPosition());
 
-        for (unsigned it=0;it<10;it++) {
-            pfrom = elfrom->project(pdest->getPosition());
+        for (unsigned it=0;it<d_iterations.getValue();it++) {
+            pfrom = itfrom->project(pdest->getPosition());
             pdest = itdest->project(pfrom->getPosition());
         }
 
