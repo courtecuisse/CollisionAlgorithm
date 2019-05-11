@@ -25,7 +25,7 @@ file(GLOB_RECURSE IGNORED_FILES
 )
 
 if(COMMAND setupGitInfo)
-    setupGitInfo()
+    setupGitInfo(PLUGIN_GIT_INFO)
 endif()
 
 find_package( OpenGL REQUIRED )
