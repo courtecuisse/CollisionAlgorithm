@@ -17,6 +17,28 @@ public:
         it.addCol(m_p1, N * m_f1);
     }
 
+    template<class CONTAINER>
+    static EdgeProximity center(const CONTAINER * container, unsigned eid) {
+        const core::topology::BaseMeshTopology::Edge & edge = container->getEdge(eid);
+
+        return EdgeProximity(eid, edge[0], edge[1], 0.5, 0.5);
+    }
+
+    template<class CONTAINER>
+    static defaulttype::BoundingBox getBBox(const CONTAINER * container, unsigned eid) {
+        const core::topology::BaseMeshTopology::Edge & edge = container->getEdge(eid);
+        const helper::ReadAccessor<Data <typename CONTAINER::VecCoord> >& x = container->getState()->read(core::VecCoordId::position());
+
+        defaulttype::BoundingBox bbox;
+        bbox.include(x[edge[0]]);
+        bbox.include(x[edge[1]]);
+        return bbox;
+    }
+
+    unsigned getElementId() const {
+        return m_eid;
+    }
+
     unsigned m_eid;
     unsigned m_p0,m_p1;
     double m_f0,m_f1;

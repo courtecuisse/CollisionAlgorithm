@@ -1,6 +1,5 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/BaseElementIterator.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/core/BehaviorModel.h>
@@ -37,7 +36,9 @@ public:
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) = 0;
 
-    virtual unsigned end() const = 0;
+    inline const BaseGeometry * end() const {
+        return this;
+    }
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
@@ -103,7 +104,7 @@ public:
         defaulttype::Vector4 color = d_color.getValue();
         color[3] = 1.0;
 
-        for (auto it=begin();it!=end();it++) {
+        for (auto it=this->begin();it!=this->end();it++) {
             BaseProximity::SPtr center = (*it)->center();
             vparams->drawTool()->drawArrow(
                 center->getPosition(),
@@ -141,8 +142,6 @@ public:
             res[colIt.index()] += colIt.val() * f;
         }
     }
-
-
 };
 
 }

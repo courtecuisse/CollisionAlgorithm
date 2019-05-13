@@ -19,8 +19,6 @@ class BaseProximity {
 public :
     typedef std::shared_ptr<BaseProximity> SPtr;
 
-    BaseProximity(unsigned id) : m_elementId(id) {}
-
     /// return proximiy position in a vector3
     virtual defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
 
@@ -31,22 +29,15 @@ public :
 
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const = 0;
 
-    inline unsigned getElementId() const {
-        return m_elementId;
-    }
-
-private:
-    unsigned m_elementId;
+    virtual unsigned getElementId() const = 0;
 };
 
 /*!
  * Template implementation of BaseProximity
  */
-template<class CONTAINER>
+template<class CONTAINER, class PROXIMITYDATA>
 class TBaseProximity : public BaseProximity {
 public:
-
-    typedef typename CONTAINER::TPROXIMITYDATA PROXIMITYDATA;
     typedef typename CONTAINER::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
@@ -60,9 +51,8 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    TBaseProximity(const CONTAINER * container, unsigned eid, const PROXIMITYDATA & data)
-    : BaseProximity(eid)
-    , m_container(container)
+    TBaseProximity(const CONTAINER * container, const PROXIMITYDATA & data)
+    : m_container(container)
     , m_data(data) {}
 
     defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
@@ -79,6 +69,14 @@ public:
 
     void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const {
         m_container->storeLambda(cParams,resId,cid,lambda);
+    }
+
+    inline unsigned getElementId() const override {
+        return m_data.getElementId();
+    }
+
+    inline BaseProximity::SPtr createProximity(const PROXIMITYDATA & data) const {
+        return BaseProximity::SPtr(new TBaseProximity<CONTAINER,PROXIMITYDATA>(m_container, data));
     }
 
 protected:

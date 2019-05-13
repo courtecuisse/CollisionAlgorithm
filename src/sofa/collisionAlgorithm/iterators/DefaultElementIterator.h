@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/BaseElementIterator.h>
+#include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <memory>
 #include <functional>
 #include <iostream>
@@ -15,52 +16,51 @@ namespace collisionAlgorithm
 /*!
  * \brief The BaseElement class is a basic abstract element container
  */
-template<class CONTAINER>
+template<class CONTAINER, class PROXIMITYDATA>
 class DefaultElementIterator : public BaseElementIterator {
 public:
 
-    typedef typename CONTAINER::TPROXIMITYDATA PROXIMITYDATA;
-
-    DefaultElementIterator(CONTAINER * container, unsigned start)
+    DefaultElementIterator(CONTAINER * container, unsigned size, unsigned start)
     : BaseElementIterator(container)
     , m_container(container)
+    , m_size(size)
     , m_id(start) {}
 
-    virtual void next() {
+    void next() override {
         this->m_id++;
     }
 
-    virtual bool end(unsigned sz) const {
-        return m_id>=sz;
+    bool end() const override {
+        return m_id >= m_size;
     }
 
-    virtual unsigned id() const {
+    unsigned id() const override {
         return m_id;
     }
 
     BaseProximity::SPtr project(const defaulttype::Vector3 & P) const override {
-        return createProximity(m_container->project(id(),P));
+        PROXIMITYDATA data = PROXIMITYDATA::center(m_container, id()); // initialized with the center of the element
+        m_container->project(data, P); // compute the projection
+        return BaseProximity::SPtr(new TBaseProximity<CONTAINER, PROXIMITYDATA>(m_container, data));
     }
 
     BaseProximity::SPtr center() const override {
-        return createProximity(m_container->center(id()));
+        PROXIMITYDATA data = PROXIMITYDATA::center(m_container, id()); // initialized with the center of the element
+        return BaseProximity::SPtr(new TBaseProximity<CONTAINER, PROXIMITYDATA>(m_container, data));
     }
 
     defaulttype::BoundingBox getBBox() const override {
-        return m_container->getBBox(id());
+        return PROXIMITYDATA::getBBox(m_container, id());
     }
 
-    static BaseElementIterator::UPtr create(CONTAINER * container, unsigned start = 0) {        
-        return BaseElementIterator::UPtr(new DefaultElementIterator<CONTAINER>(container, start));
+    static BaseElementIterator::UPtr create(CONTAINER * container, unsigned size, unsigned start) {
+        return BaseElementIterator::UPtr(new DefaultElementIterator<CONTAINER,PROXIMITYDATA>(container, size, start));
     }
 
 private:
     const CONTAINER * m_container;
+    unsigned m_size;
     unsigned m_id;
-
-    inline BaseProximity::SPtr createProximity(const PROXIMITYDATA & data) const {
-        return BaseProximity::SPtr(new TBaseProximity<CONTAINER>(m_container, m_id, data));
-    }
 };
 
 }

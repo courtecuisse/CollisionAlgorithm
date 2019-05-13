@@ -13,10 +13,14 @@ class FixedProximity : public BaseProximity {
 public:
 
     FixedProximity(const defaulttype::Vector3 & p)
-    : BaseProximity(0), m_position(p) {}
+    : m_position(p) {}
 
     defaulttype::Vector3 getPosition(core::VecCoordId ) const {
         return m_position;
+    }
+
+    virtual unsigned getElementId() const {
+        return 0;
     }
 
     virtual defaulttype::Vector3 getNormal() const {

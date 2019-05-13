@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
 
 namespace sofa {
@@ -11,7 +12,6 @@ template<class DataTypes>
 class EdgeGeometry : public TBaseGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
-    typedef EdgeProximity TPROXIMITYDATA;
     typedef TBaseGeometry<DataTypes> Inherit;
     typedef EdgeGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::VecCoord VecCoord;
@@ -29,26 +29,13 @@ public:
     }
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
-        return DefaultElementIterator<GEOMETRY>::create(this, eid);
+        return DefaultElementIterator<GEOMETRY, EdgeProximity>::create(this,
+                                                                       this->l_topology->getNbEdges(),
+                                                                       eid);
     }
 
-    unsigned end() const {
-        return this->l_topology->getNbEdges();
-    }
-
-    inline defaulttype::BoundingBox getBBox(unsigned eid) const {
-        const core::topology::BaseMeshTopology::Edge & edge = this->l_topology->getEdge(eid);
-        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
-        defaulttype::BoundingBox bbox;
-        bbox.include(x[edge[0]]);
-        bbox.include(x[edge[1]]);
-        return bbox;
-    }
-
-    inline EdgeProximity center(unsigned eid) const {
-        const core::topology::BaseMeshTopology::Edge & edge = this->l_topology->getEdge(eid);
-
-        return EdgeProximity(eid,edge[0],edge[1],0.5,0.5);
+    inline const sofa::core::topology::BaseMeshTopology::Edge getEdge(unsigned eid) const {
+        return this->l_topology->getEdge(eid);
     }
 
     inline defaulttype::Vector3 getPosition(const EdgeProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
@@ -63,8 +50,8 @@ public:
         return (pos[data.m_p1] - pos[data.m_p0]).normalized();
     }
 
-    inline EdgeProximity project(unsigned eid, const defaulttype::Vector3 & P) const {
-        sofa::core::topology::BaseMeshTopology::Edge edge = this->l_topology->getEdge(eid);
+    inline void project(EdgeProximity & data, const defaulttype::Vector3 & P) const {
+        sofa::core::topology::BaseMeshTopology::Edge edge = getEdge(data.m_eid);
 
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
 
@@ -82,7 +69,7 @@ public:
 
         fact_u = 1.0-fact_v;
 
-        return EdgeProximity(eid, edge[0],edge[1], fact_u,fact_v);
+        data = EdgeProximity(data.m_eid, edge[0], edge[1], fact_u,fact_v);
     }
 
     inline void draw(const core::visual::VisualParams * vparams) {

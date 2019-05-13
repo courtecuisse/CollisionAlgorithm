@@ -13,7 +13,6 @@ template<class DataTypes>
 class PhongTriangleGeometry : public TriangleGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
-    typedef TriangleProximity TPROXIMITYDATA;
     typedef TriangleGeometry<DataTypes> Inherit;
     typedef PhongTriangleGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::VecCoord VecCoord;
@@ -25,7 +24,9 @@ public:
     SOFA_CLASS(GEOMETRY,Inherit);
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
-        return DefaultElementIterator<GEOMETRY>::create(this, eid);
+        return DefaultElementIterator<GEOMETRY, TriangleProximity>::create(this,
+                                                                           this->l_topology->getNbTriangles(),
+                                                                           eid);
     }
 
     inline defaulttype::Vector3 getNormal(const TriangleProximity & data) const {

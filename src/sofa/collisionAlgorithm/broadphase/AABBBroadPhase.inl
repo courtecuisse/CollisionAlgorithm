@@ -148,7 +148,7 @@ void AABBBroadPhase::prepareDetection() {
                         P[1] += j*m_cellSize[1];
                         P[2] += k*m_cellSize[2];
 
-                        defaulttype::Vector3 D = P - (*it)->project(P)->getPosition();
+                        defaulttype::Vector3 D = P - it->project(P)->getPosition();
 
                         if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
                             (fabs(D[1])<=m_cellSize[1]*0.5) &&

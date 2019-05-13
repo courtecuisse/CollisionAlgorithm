@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 
 namespace sofa {
@@ -11,7 +12,6 @@ template<class DataTypes>
 class TriangleGeometry : public TBaseGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
-    typedef TriangleProximity TPROXIMITYDATA;
     typedef TriangleGeometry<DataTypes> GEOMETRY;
     typedef TBaseGeometry<DataTypes> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
@@ -33,11 +33,7 @@ public:
     }
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
-        return DefaultElementIterator<GEOMETRY>::create(this, eid);
-    }
-
-    unsigned end() const {
-        return this->l_topology->getNbTriangles();
+        return DefaultElementIterator<GEOMETRY, TriangleProximity>::create(this, this->l_topology->getNbTriangles(), eid);
     }
 
     void draw(const core::visual::VisualParams * vparams) {
@@ -56,7 +52,7 @@ public:
         if (! vparams->displayFlags().getShowWireFrame()) glBegin(GL_TRIANGLES);
         else glBegin(GL_LINES);
 
-        for (auto it=this->begin();it!=this->end();it++) {
+        for (auto it=this->begin();it != this->end(); it++) {
             const Triangle& tri = this->l_topology->getTriangle(it->id());
 
             glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
@@ -111,6 +107,10 @@ public:
         }
     }
 
+    inline const sofa::core::topology::BaseMeshTopology::Triangle getTriangle(unsigned eid) const {
+        return this->l_topology->getTriangle(eid);
+    }
+
     inline defaulttype::Vector3 getNormal(const TriangleProximity & data) const {
         return m_triangle_normals[data.m_eid];
     }
@@ -125,31 +125,13 @@ public:
                pos[data.m_p2] * data.m_f2;
     }
 
-    inline TriangleProximity center(unsigned eid) const {
-        const core::topology::BaseMeshTopology::Triangle & triangle = this->l_topology->getTriangle(eid);
-
-        return TriangleProximity(eid,
-                                 triangle[0],triangle[1],triangle[2],
-                                 0.3333,0.3333,0.3333);
-    }
-
-    inline defaulttype::BoundingBox getBBox(unsigned eid) const {
-        const core::topology::BaseMeshTopology::Triangle & triangle = this->l_topology->getTriangle(eid);
-        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
-        defaulttype::BoundingBox bbox;
-        bbox.include(x[triangle[0]]);
-        bbox.include(x[triangle[1]]);
-        bbox.include(x[triangle[2]]);
-        return bbox;
-    }
-
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    inline TriangleProximity project(unsigned eid, const defaulttype::Vector3 & P) const {
+    inline void project(TriangleProximity & data, const defaulttype::Vector3 & P) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
-        const TriangleInfo & tinfo = m_triangle_info[eid];
-        core::topology::BaseMeshTopology::Triangle triangle = this->l_topology->getTriangle(eid);
+        const TriangleInfo & tinfo = m_triangle_info[data.m_eid];
+        core::topology::BaseMeshTopology::Triangle triangle = getTriangle(data.m_eid);
 
         defaulttype::Vector3 P0 = pos[triangle[0]];
         defaulttype::Vector3 P1 = pos[triangle[1]];
@@ -206,7 +188,7 @@ public:
             fact_w = 0;
         }
 
-        return TriangleProximity(eid, triangle[0], triangle[1], triangle[2], fact_u, fact_v, fact_w);
+        data = TriangleProximity(data.m_eid, triangle[0], triangle[1], triangle[2], fact_u, fact_v, fact_w);
     }
 
 protected:

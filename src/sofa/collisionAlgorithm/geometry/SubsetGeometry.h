@@ -40,10 +40,6 @@ public:
         return BaseElementIterator::UPtr(new SubsetElementIterator(l_wholeGeometry.get(), d_indices.getValue()));
     }
 
-    unsigned end() const override {
-        return m_setIndices.size();
-    }
-
     sofa::core::behavior::BaseMechanicalState * getState() const override
     {
         return l_wholeGeometry->getState();

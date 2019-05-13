@@ -19,17 +19,18 @@ public:
         m_iterator = m_subsetElements.cbegin();
     }
 
-    void next() {
+    void next() override {
         m_iterator++;
     }
 
-    unsigned id() const {
+    unsigned id() const override {
         return *m_iterator;
     }
 
-    bool end(unsigned ) const{
+    bool end() const override {
         return m_iterator==m_subsetElements.cend();
     }
+
     BaseProximity::SPtr project(const defaulttype::Vector3 & P) const override {
         return m_container->begin(id())->project(P);
     }
@@ -42,7 +43,7 @@ public:
         return m_container->begin(id())->getBBox();
     }
 
-
+private:
     BaseGeometry * m_container;
     const std::set<unsigned> m_subsetElements;
     std::set<unsigned>::iterator m_iterator;
