@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/algorithm/FindClosestPointAlgorithm.h>
+#include <sofa/collisionAlgorithm/algorithm/FindClosestProximityAlgorithm.h>
 #include <sofa/collisionAlgorithm/iterators/SubsetElementIterator.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 
@@ -19,7 +19,7 @@ static double norme3(const collisionAlgorithm::PairDetection & d) {
     return (d.first->getPosition()-d.second->getPosition()).norm() ;
 }
 
-FindClosestPointAlgorithm::FindClosestPointAlgorithm ()
+FindClosestProximityAlgorithm::FindClosestProximityAlgorithm ()
 : d_iterations(initData(&d_iterations,(unsigned) 1,"iterations", "numberof iterations"))
 , l_from(initLink("from", "link to from geometry"))
 , l_dest(initLink("dest", "link to dest geometry"))
@@ -28,7 +28,7 @@ FindClosestPointAlgorithm::FindClosestPointAlgorithm ()
 //, d_output(initData(&d_output,"output", "output of the collision detection"))
 {}
 
-void FindClosestPointAlgorithm::fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
+void FindClosestProximityAlgorithm::fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
 {
     defaulttype::Vec3i nbox = decorator->getBoxSize();
 
@@ -153,7 +153,7 @@ void FindClosestPointAlgorithm::fillElementSet(const BroadPhase * decorator, def
     }
 }
 
-BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defaulttype::Vector3 & P, BaseGeometry *geo) {
+BaseElementIterator::UPtr FindClosestProximityAlgorithm::getDestIterator(const defaulttype::Vector3 & P, BaseGeometry *geo) {
     const BroadPhase * decorator = geo->getBroadPhase();
 
     if (decorator == NULL) return geo->begin();
@@ -187,7 +187,7 @@ BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defau
 
 
 
-PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElementIterator *itfrom,  BaseGeometry *geo) {
+PairDetection FindClosestProximityAlgorithm::findClosestPoint(const BaseElementIterator *itfrom,  BaseGeometry *geo) {
     double min_dist = std::numeric_limits<double>::max();
     BaseProximity::SPtr minprox_from = nullptr;
     BaseProximity::SPtr minprox_dest = nullptr;
@@ -217,7 +217,7 @@ PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElementItera
     return PairDetection(minprox_from,minprox_dest);
 }
 
-void FindClosestPointAlgorithm::doDetection() {
+void FindClosestProximityAlgorithm::doDetection() {
     if (l_from == NULL) return;
     if (l_dest == NULL) return;
 

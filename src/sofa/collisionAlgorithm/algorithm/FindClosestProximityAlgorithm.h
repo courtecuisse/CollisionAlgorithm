@@ -12,21 +12,21 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class FindClosestPointAlgorithm : public BaseAlgorithm
+class FindClosestProximityAlgorithm : public BaseAlgorithm
 {
 public:
-    SOFA_CLASS(FindClosestPointAlgorithm, BaseAlgorithm);
+    SOFA_CLASS(FindClosestProximityAlgorithm, BaseAlgorithm);
 
     Data<unsigned> d_iterations;
 
-    core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
-    core::objectmodel::SingleLink<FindClosestPointAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
+    core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
+    core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
 
     Data<DistanceMeasure> d_distance_measure;
 
 //    Data<DetectionOutput> d_output;
 
-    FindClosestPointAlgorithm();
+    FindClosestProximityAlgorithm();
 
 protected:
 
