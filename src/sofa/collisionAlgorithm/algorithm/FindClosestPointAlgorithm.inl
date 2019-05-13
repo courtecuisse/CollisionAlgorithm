@@ -187,12 +187,13 @@ BaseElementIterator::UPtr FindClosestPointAlgorithm::getDestIterator(const defau
 
 
 
-PairDetection FindClosestPointAlgorithm::dofindClosestPoint(const BaseElementIterator *itfrom, BaseElementIterator::UPtr itdest, BaseGeometry *geo) {
+PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElementIterator *itfrom,  BaseGeometry *geo) {
     double min_dist = std::numeric_limits<double>::max();
     BaseProximity::SPtr minprox_from = nullptr;
     BaseProximity::SPtr minprox_dest = nullptr;
 
-    for(;itdest != geo->end();itdest++)
+    for(BaseElementIterator::UPtr itdest = getDestIterator(itfrom->center()->getPosition(),geo); // this function may create an iterator on using the bradphase if defined in the geometry
+        itdest != geo->end(); itdest++)
     {
         BaseProximity::SPtr pfrom = itfrom->center();
         BaseProximity::SPtr pdest = itdest->project(pfrom->getPosition());
@@ -214,14 +215,6 @@ PairDetection FindClosestPointAlgorithm::dofindClosestPoint(const BaseElementIte
     }
 
     return PairDetection(minprox_from,minprox_dest);
-}
-
-PairDetection FindClosestPointAlgorithm::findClosestPoint(const BaseElementIterator *elfrom, BaseGeometry *geo) {
-    return dofindClosestPoint(
-        elfrom,
-        getDestIterator(elfrom->center()->getPosition(),geo),
-        geo
-    );
 }
 
 void FindClosestPointAlgorithm::doDetection() {

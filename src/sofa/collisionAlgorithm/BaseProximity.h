@@ -19,6 +19,8 @@ class BaseProximity {
 public :
     typedef std::shared_ptr<BaseProximity> SPtr;
 
+    BaseProximity(unsigned id) : m_elementId(id) {}
+
     /// return proximiy position in a vector3
     virtual defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
 
@@ -28,6 +30,13 @@ public :
     virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & dir, double fact, unsigned constraintId) const = 0;
 
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const = 0;
+
+    inline unsigned getElementId() const {
+        return m_elementId;
+    }
+
+private:
+    unsigned m_elementId;
 };
 
 /*!
@@ -51,8 +60,9 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    TBaseProximity(const CONTAINER * container, const PROXIMITYDATA & data)
-    : m_container(container)
+    TBaseProximity(const CONTAINER * container, unsigned eid, const PROXIMITYDATA & data)
+    : BaseProximity(eid)
+    , m_container(container)
     , m_data(data) {}
 
     defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {

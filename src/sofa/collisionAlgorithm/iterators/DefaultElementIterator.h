@@ -59,7 +59,7 @@ private:
     unsigned m_id;
 
     inline BaseProximity::SPtr createProximity(const PROXIMITYDATA & data) const {
-        return BaseProximity::SPtr(new TBaseProximity<CONTAINER>(m_container, data));
+        return BaseProximity::SPtr(new TBaseProximity<CONTAINER>(m_container, m_id, data));
     }
 };
 

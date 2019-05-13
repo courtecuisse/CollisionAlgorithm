@@ -37,6 +37,8 @@ public :
 
     SOFA_ABSTRACT_CLASS(BaseAlgorithm, core::BehaviorModel);
 
+    core::objectmodel::MultiLink<BaseAlgorithm,BaseFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filters;
+
     /*!
      * \brief BaseAlgorithm Constructor
      */
@@ -64,14 +66,13 @@ public :
     }
 
     Data<bool> drawCollision ;
-    core::objectmodel::MultiLink<BaseAlgorithm,BaseFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filters;
-
     Data<DetectionOutput> d_output;
+
 protected:
 
     virtual void doDetection() = 0;
 
-    void draw(const core::visual::VisualParams* vparams) {
+    void draw(const core::visual::VisualParams* /*vparams*/) {
 //        if (vparams->displayFlags().getShowCollisionModels()) {
         if (drawCollision.getValue()) {
             glDisable(GL_LIGHTING);

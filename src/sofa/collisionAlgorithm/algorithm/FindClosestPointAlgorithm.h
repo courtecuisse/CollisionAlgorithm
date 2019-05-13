@@ -30,15 +30,13 @@ public:
 
 protected:
 
-    void doDetection();
+    virtual void doDetection();
 
     BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P, BaseGeometry *geo);
 
     void fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const;
 
 public:
-    PairDetection dofindClosestPoint(const BaseElementIterator *elfrom, BaseElementIterator::UPtr itdest, BaseGeometry * geo);
-
     PairDetection findClosestPoint(const BaseElementIterator *elfrom, BaseGeometry *geo);
 
 };
