@@ -1,36 +1,17 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.1)
+cmake_policy(SET CMP0048 OLD)
+
 project(CollisionAlgorithmPlugin)
 
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-find_package(SofaFramework REQUIRED)
-find_package(SofaBase REQUIRED)
-find_package(SofaSimulation REQUIRED)
-find_package(SofaGeneral REQUIRED)
-
-#list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
-#find_package(TRI6FEM REQUIRED)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-
-set(HEADER_FILES      
-     src/initCollisionAlgorithmPlugin.h
-     src/AABBDecorator.h
-     src/AABBDecorator.inl
-     src/CollisionAlgorithm.h
+file(GLOB_RECURSE HEADER_FILES
+    "src/*.h"
+    "src/*.inl"
 )
 
-set(SOURCE_FILES
-     src/initCollisionAlgorithmPlugin.cpp
-     src/AABBDecorator.cpp
-     src/FindClosestPoint.cpp
-     src/BindPointCloud.cpp
-#     src/KdTreeClosestPoint.cpp
-     src/totalDistanceBind.cpp
-#     src/kdtreeBind.cpp
-     src/BindPointCloudReinit.cpp
-     src/HybridBind.cpp
-     src/PCAPointCloud.cpp
-     src/ManualBind.cpp
+file(GLOB_RECURSE SOURCE_FILES
+    "src/*.cpp"
 )
 
 file(GLOB_RECURSE SCENES_FILES
@@ -38,23 +19,23 @@ file(GLOB_RECURSE SCENES_FILES
     "scenes/*.xml"
 )
 
+file(GLOB_RECURSE IGNORED_FILES
+    "src/ignored/*.h"
+    "src/ignored/*.inl"
+    "src/ignored/*.cpp"
+)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${README_FILES} )
-#set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "_d")
+set (CMAKE_CXX_STANDARD 11)
 
-set(COLLISIONALGORITHMPLUGIN_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${COLLISIONALGORITHMPLUGIN_INCLUDE_DIRS}>")
+set_source_files_properties(${IGNORED_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${IGNORED_FILES}  ${README_FILES} )
+set(${PROJECT_NAME}_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
+target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${${PROJECT_NAME}_INCLUDE_DIRS}>")
 target_include_directories(${PROJECT_NAME} PUBLIC "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DPLUGIN_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\"")
-#target_link_libraries(${PROJECT_NAME} SofaCore SofaComponentBase SofaSimulationTree SofaUserInteraction SofaConstraint TRI6FEM)
 target_link_libraries(${PROJECT_NAME} SofaCore SofaComponentBase SofaSimulationTree SofaUserInteraction SofaConstraint ConstraintGeometryPlugin)
 
 ## Install rules for the library and headers; CMake package configurations files
-sofa_create_package(${PROJECT_NAME} 0.1 ${PROJECT_NAME} ${PROJECT_NAME})
-
-install(DIRECTORY sofa
-        DESTINATION include/${PROJECT_NAME}
-        FILES_MATCHING PATTERN "*.h" PATTERN "*hpp" PATTERN "*.inl"
-)
-
+sofa_generate_package(NAME ${PROJECT_NAME} VERSION 0.1 TARGETS ${PROJECT_NAME} INCLUDE_INSTALL_DIR ${${PROJECT_NAME}_INCLUDE_DIRS})

@@ -25,7 +25,7 @@
 #ifndef SOFA_COMPONENT_AABBDECORATOR_H
 #define SOFA_COMPONENT_AABBDECORATOR_H
 
-#include "ConstraintGeometry.h"
+#include <ConstraintGeometry.h>
 #include <sofa/core/behavior/ForceField.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/objectmodel/Data.h>
