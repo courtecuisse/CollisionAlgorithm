@@ -3,6 +3,8 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/collision/Pipeline.h>
 #include <sofa/collisionAlgorithm/data/DataDetectionOutput.h>
+#include <sofa/simulation/UpdateMappingEndEvent.h>
+#include <sofa/simulation/CollisionEndEvent.h>
 
 namespace sofa
 {
@@ -31,13 +33,15 @@ public:
  * \brief The BaseAlgorithm abstract class defines an interface of
  * algorithms to be wrapped in sofa components
  */
-class BaseAlgorithm : public core::BehaviorModel
+class BaseAlgorithm : public sofa::core::objectmodel::BaseObject
 {
 public :
 
-    SOFA_ABSTRACT_CLASS(BaseAlgorithm, core::BehaviorModel);
+    SOFA_ABSTRACT_CLASS(BaseAlgorithm, sofa::core::objectmodel::BaseObject);
 
     core::objectmodel::MultiLink<BaseAlgorithm,BaseFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filters;
+    Data<bool> drawCollision ;
+    Data<DetectionOutput> d_output;
 
     /*!
      * \brief BaseAlgorithm Constructor
@@ -45,9 +49,8 @@ public :
     BaseAlgorithm()
     : l_filters(initLink("filters","list of filters"))
     , drawCollision (initData(&drawCollision, false, "drawcollision", "draw collision"))
-    , d_output(initData(&d_output,"output", "output of the collision detection"))
-    {
-//        m_time = -1.0 ;
+    , d_output(initData(&d_output,"output", "output of the collision detection")) {
+        this->f_listening.setValue(true);
     }
 
     /*!
@@ -65,15 +68,12 @@ public :
         return true;
     }
 
-    Data<bool> drawCollision ;
-    Data<DetectionOutput> d_output;
 
 protected:
 
     virtual void doDetection() = 0;
 
     void draw(const core::visual::VisualParams* /*vparams*/) {
-//        if (vparams->displayFlags().getShowCollisionModels()) {
         if (drawCollision.getValue()) {
             glDisable(GL_LIGHTING);
             glColor4f(0,1,0,1);
@@ -88,17 +88,11 @@ protected:
         }
     }
 
-    /// Computation of a new simulation step.
-    virtual void updatePosition(SReal /*dt*/) {
-//        have been used for delaying algo exec
-//        if (m_time < 0.0) {
-//            m_time += dt ;
-//            return ;
-//        }
+    void handleEvent(sofa::core::objectmodel::Event *event) {
+        if (! dynamic_cast<sofa::simulation::CollisionBeginEvent*>(event)) return;
+
         doDetection();
     }
-
-//    SReal m_time ;
 };
 
 }

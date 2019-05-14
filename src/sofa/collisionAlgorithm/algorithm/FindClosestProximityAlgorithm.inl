@@ -28,7 +28,7 @@ FindClosestProximityAlgorithm::FindClosestProximityAlgorithm ()
 //, d_output(initData(&d_output,"output", "output of the collision detection"))
 {}
 
-void FindClosestProximityAlgorithm::fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
+void FindClosestProximityAlgorithm::fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
 {
     defaulttype::Vec3i nbox = decorator->getBoxSize();
 
@@ -154,10 +154,13 @@ void FindClosestProximityAlgorithm::fillElementSet(const BroadPhase * decorator,
 }
 
 BaseElementIterator::UPtr FindClosestProximityAlgorithm::getDestIterator(const defaulttype::Vector3 & P, BaseGeometry *geo) {
-    const BroadPhase * decorator = geo->getBroadPhase();
+    const std::vector<BaseGeometry::BroadPhase::SPtr> & decorators = geo->getBroadPhase();
 
-    if (decorator == NULL) return geo->begin();
+    if (decorators.empty()) return geo->begin();
     else {
+        //take the first broad phase...
+        const BaseGeometry::BroadPhase::SPtr & decorator = decorators[0];
+
         defaulttype::Vec3i bindex = decorator->getBoxCoord(P);
         defaulttype::Vec3i bsize = decorator->getBoxSize();
 

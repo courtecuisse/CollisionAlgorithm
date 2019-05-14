@@ -21,8 +21,7 @@ class DefaultElementIterator : public BaseElementIterator {
 public:
 
     DefaultElementIterator(CONTAINER * container, unsigned size, unsigned start)
-    : BaseElementIterator(container)
-    , m_container(container)
+    : m_container(container)
     , m_size(size)
     , m_id(start) {}
 

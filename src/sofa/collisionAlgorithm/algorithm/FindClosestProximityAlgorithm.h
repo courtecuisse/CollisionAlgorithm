@@ -34,7 +34,7 @@ protected:
 
     BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P, BaseGeometry *geo);
 
-    void fillElementSet(const BroadPhase * decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const;
+    void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const;
 
 public:
     PairDetection findClosestPoint(const BaseElementIterator *elfrom, BaseGeometry *geo);

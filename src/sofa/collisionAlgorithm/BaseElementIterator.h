@@ -45,7 +45,7 @@ public:
 
 
     ///returns a new EmptyIterator
-    static BaseElementIterator::UPtr empty(BaseGeometry * geo) {
+    static BaseElementIterator::UPtr empty() {
         class EmptyIterator : public BaseElementIterator {
         public:
             virtual bool end() const { return true; }
@@ -59,14 +59,10 @@ public:
             virtual defaulttype::BoundingBox getBBox() const { return defaulttype::BoundingBox(); }
 
             virtual unsigned id() const { return 0; }
-
-            EmptyIterator(BaseGeometry * geo) : BaseElementIterator(geo) {}
         };
 
-        return UPtr(new EmptyIterator(geo));
+        return UPtr(new EmptyIterator());
     }
-
-    BaseElementIterator(BaseGeometry * geo);
 
     virtual bool end() const = 0;
 

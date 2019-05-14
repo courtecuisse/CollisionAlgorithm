@@ -14,7 +14,7 @@ namespace collisionAlgorithm
  * \brief The AABBBroadPhase class
  * Implementation of broad phase collision detection using bounding boxes
  */
-class AABBBroadPhase : public BroadPhase {
+class AABBBroadPhase : public BaseBroadPhase {
     friend class AABBElement;
 
 public:
