@@ -60,7 +60,7 @@ public :
         for (auto itfilter = l_filters.begin();itfilter != l_filters.end();itfilter++) {
             const BaseFilter * filter = (*itfilter);
             if (filter == NULL) continue;
-            if (! filter->accept(pdest,pfrom)) return false;
+            if (! filter->accept(pfrom,pdest)) return false;
         }
         return true;
     }

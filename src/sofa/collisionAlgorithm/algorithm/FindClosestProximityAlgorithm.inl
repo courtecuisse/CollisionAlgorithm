@@ -198,6 +198,10 @@ PairDetection FindClosestProximityAlgorithm::findClosestPoint(const BaseElementI
         BaseProximity::SPtr pfrom = itfrom->center();
         BaseProximity::SPtr pdest = itdest->project(pfrom->getPosition());
 
+        // Internal iterations to reproject on the from element
+        // For linear elements (triangles, edges, ...) it = 1 should be sufficient
+        // For points (from) it can be set to 0 since the reprojection will not modify the proximity
+        // For non linear elements (bezier, ...) few iterations may be necessary
         for (unsigned it=0;it<d_iterations.getValue();it++) {
             pfrom = itfrom->project(pdest->getPosition());
             pdest = itdest->project(pfrom->getPosition());
