@@ -40,16 +40,12 @@ public :
     SOFA_ABSTRACT_CLASS(BaseAlgorithm, sofa::core::objectmodel::BaseObject);
 
     core::objectmodel::MultiLink<BaseAlgorithm,BaseFilter,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_filters;
-    Data<bool> drawCollision ;
-    Data<DetectionOutput> d_output;
 
     /*!
      * \brief BaseAlgorithm Constructor
      */
     BaseAlgorithm()
-    : l_filters(initLink("filters","list of filters"))
-    , drawCollision (initData(&drawCollision, false, "drawcollision", "draw collision"))
-    , d_output(initData(&d_output,"output", "output of the collision detection")) {
+    : l_filters(initLink("filters","list of filters")){
         this->f_listening.setValue(true);
     }
 
@@ -72,21 +68,6 @@ public :
 protected:
 
     virtual void doDetection() = 0;
-
-    void draw(const core::visual::VisualParams* /*vparams*/) {
-        if (drawCollision.getValue()) {
-            glDisable(GL_LIGHTING);
-            glColor4f(0,1,0,1);
-
-            glBegin(GL_LINES);
-            DetectionOutput output = d_output.getValue() ;
-            for (unsigned i=0;i<output.size();i++) {
-                glVertex3dv(output[i].first->getPosition().data());
-                glVertex3dv(output[i].second->getPosition().data());
-            }
-            glEnd();
-        }
-    }
 
     void handleEvent(sofa::core::objectmodel::Event *event) {
         if (! dynamic_cast<sofa::simulation::CollisionBeginEvent*>(event)) return;

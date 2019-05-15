@@ -1,4 +1,4 @@
-#include <sofa/collisionAlgorithm/algorithm/FindClosestProximityAlgorithm.inl>
+#include <sofa/collisionAlgorithm/algorithm/FindClosestProximityAlgorithm.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa {

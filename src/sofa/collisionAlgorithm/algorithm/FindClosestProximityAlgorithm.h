@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseAlgorithm.h>
+#include <sofa/collisionAlgorithm/algorithm/BaseClosestProximityAlgorithm.h>
 #include <sofa/collisionAlgorithm/BroadPhase.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 
@@ -12,32 +12,57 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class FindClosestProximityAlgorithm : public BaseAlgorithm
+class FindClosestProximityAlgorithm : public BaseClosestProximityAlgorithm
 {
 public:
-    SOFA_CLASS(FindClosestProximityAlgorithm, BaseAlgorithm);
-
-    Data<unsigned> d_iterations;
+    SOFA_CLASS(FindClosestProximityAlgorithm, BaseClosestProximityAlgorithm);
 
     core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
     core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
+    Data<bool> drawCollision ;
+    Data<DetectionOutput> d_output;
 
-    Data<DistanceMeasure> d_distance_measure;
+    FindClosestProximityAlgorithm()
+    : l_from(initLink("from", "link to from geometry"))
+    , l_dest(initLink("dest", "link to dest geometry"))
+    , drawCollision (initData(&drawCollision, false, "drawcollision", "draw collision"))
+    , d_output(initData(&d_output,"output", "output of the collision detection")) {}
 
-//    Data<DetectionOutput> d_output;
+    void draw(const core::visual::VisualParams* /*vparams*/) {
+        if (drawCollision.getValue()) {
+            glDisable(GL_LIGHTING);
+            glColor4f(0,1,0,1);
 
-    FindClosestProximityAlgorithm();
+            glBegin(GL_LINES);
+            DetectionOutput output = d_output.getValue() ;
+            for (unsigned i=0;i<output.size();i++) {
+                glVertex3dv(output[i].first->getPosition().data());
+                glVertex3dv(output[i].second->getPosition().data());
+            }
+            glEnd();
+        }
+    }
 
-protected:
+    void doDetection() {
+        if (l_from == NULL) return;
+        if (l_dest == NULL) return;
 
-    virtual void doDetection();
+        DetectionOutput & output = *d_output.beginEdit();
+        output.clear();
+    //    size_t i = 0, fail = 0 ; //debug purposes
+        for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
+            PairDetection min_pair = findClosestPoint(*itfrom,l_dest.get());
+    //        i++ ;
+            if (min_pair.first == nullptr || min_pair.second == nullptr) {
+    //            fail++ ;
+                continue;
+            }
 
-    BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P, BaseGeometry *geo);
-
-    void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const;
-
-public:
-    PairDetection findClosestPoint(const BaseElementIterator *elfrom, BaseGeometry *geo);
+            output.add(min_pair.first,min_pair.second);
+        }
+    //    std::cout << i << ':' << fail << this->getName() << std::endl ;
+        d_output.endEdit();
+    }
 
 };
 

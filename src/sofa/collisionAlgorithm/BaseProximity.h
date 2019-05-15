@@ -75,14 +75,19 @@ public:
         return m_data.getElementId();
     }
 
-    inline BaseProximity::SPtr createProximity(const CONTAINER* container, const PROXIMITYDATA & data) const {
-        return BaseProximity::SPtr(new TBaseProximity<CONTAINER,PROXIMITYDATA>(container, data));
+    inline BaseProximity::SPtr createProximity(const PROXIMITYDATA & data) const {
+        return BaseProximity::SPtr(new TBaseProximity<CONTAINER,PROXIMITYDATA>(m_container, data));
     }
 
 protected:
     const CONTAINER * m_container;
     const PROXIMITYDATA m_data;
 };
+
+template<class CONTAINER, class PROXIMITYDATA>
+static BaseProximity::SPtr createProximity(const CONTAINER * container, const PROXIMITYDATA & data) {
+    return BaseProximity::SPtr(new TBaseProximity<CONTAINER,PROXIMITYDATA>(container, data));
+}
 
 }
 
