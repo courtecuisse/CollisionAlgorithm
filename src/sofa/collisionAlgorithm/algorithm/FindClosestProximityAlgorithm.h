@@ -19,28 +19,27 @@ public:
 
     core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
     core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
-    Data<bool> drawCollision ;
+    Data<bool> d_drawCollision ;
     Data<DetectionOutput> d_output;
 
     FindClosestProximityAlgorithm()
     : l_from(initLink("from", "link to from geometry"))
     , l_dest(initLink("dest", "link to dest geometry"))
-    , drawCollision (initData(&drawCollision, false, "drawcollision", "draw collision"))
+    , d_drawCollision (initData(&d_drawCollision, false, "drawcollision", "draw collision"))
     , d_output(initData(&d_output,"output", "output of the collision detection")) {}
 
     void draw(const core::visual::VisualParams* /*vparams*/) {
-        if (drawCollision.getValue()) {
-            glDisable(GL_LIGHTING);
-            glColor4f(0,1,0,1);
+        if (! d_drawCollision.getValue()) return;
+        glDisable(GL_LIGHTING);
+        glColor4f(0,1,0,1);
 
-            glBegin(GL_LINES);
-            DetectionOutput output = d_output.getValue() ;
-            for (unsigned i=0;i<output.size();i++) {
-                glVertex3dv(output[i].first->getPosition().data());
-                glVertex3dv(output[i].second->getPosition().data());
-            }
-            glEnd();
+        glBegin(GL_LINES);
+        DetectionOutput output = d_output.getValue() ;
+        for (unsigned i=0;i<output.size();i++) {
+            glVertex3dv(output[i].first->getPosition().data());
+            glVertex3dv(output[i].second->getPosition().data());
         }
+        glEnd();
     }
 
     void doDetection() {
