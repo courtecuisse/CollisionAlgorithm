@@ -64,6 +64,12 @@ public :
         return true;
     }
 
+    void init() {
+        for (unsigned i=0;i<l_filters.size();i++) {
+            this->addSlave(l_filters[i]);
+        }
+    }
+
 
 protected:
 

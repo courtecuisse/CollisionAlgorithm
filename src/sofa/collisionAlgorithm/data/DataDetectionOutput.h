@@ -36,10 +36,6 @@ public:
         return m_output.begin();
     }
 
-    const PairDetection & operator[](int i) const {
-        return m_output[i];
-    }
-
     unsigned size() const {
         return m_output.size();
     }
@@ -53,6 +49,10 @@ public:
         if (p1 == NULL) return;
         if (p2 == NULL) return;
         m_output.push_back(PairDetection(p1,p2));
+    }
+
+    inline const PairDetection & operator[](int i) const {
+        return m_output[i];
     }
 
 protected:
