@@ -48,18 +48,15 @@ public:
 
         DetectionOutput & output = *d_output.beginEdit();
         output.clear();
-    //    size_t i = 0, fail = 0 ; //debug purposes
+
         for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
             PairDetection min_pair = findClosestPoint(*itfrom,l_dest.get());
-    //        i++ ;
             if (min_pair.first == nullptr || min_pair.second == nullptr) {
-    //            fail++ ;
                 continue;
             }
 
             output.add(min_pair.first,min_pair.second);
         }
-    //    std::cout << i << ':' << fail << this->getName() << std::endl ;
         d_output.endEdit();
     }
 
