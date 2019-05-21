@@ -26,6 +26,11 @@ public:
             return ! this->get()->end();
         }
 
+        //we take the geometry as parameter for std::iterator compatibility i.e. it != m_geo->end();
+        bool operator== (const BaseGeometry * ) {
+            return this->get()->end();
+        }
+
         void operator++() {
             this->get()->next();
         }
