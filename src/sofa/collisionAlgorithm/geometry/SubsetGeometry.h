@@ -1,8 +1,8 @@
 #pragma once
 
+#include <sofa/helper/set.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/iterators/SubsetElementIterator.h>
-#include <sofa/helper/set.h>
 
 namespace sofa {
 

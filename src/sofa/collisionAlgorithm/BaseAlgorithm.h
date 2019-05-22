@@ -3,8 +3,6 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/collision/Pipeline.h>
 #include <sofa/collisionAlgorithm/data/DataDetectionOutput.h>
-#include <sofa/simulation/UpdateMappingEndEvent.h>
-#include <sofa/simulation/CollisionEndEvent.h>
 
 namespace sofa
 {

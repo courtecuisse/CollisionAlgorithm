@@ -5,7 +5,7 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-SOFA_DECL_CLASS(ContactDistance);
+SOFA_DECL_CLASS(ContactDistance)
 
 int ContactDistanceClass = core::RegisterObject("ContactDistance")
 .add< ContactDistance >();
