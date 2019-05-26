@@ -7,7 +7,7 @@
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/core/objectmodel/DataCallback.h>
 #include <sofa/simulation/Visitor.h>
-#include <qopengl.h>
+#include <sofa/helper/system/gl.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
 
 namespace sofa {

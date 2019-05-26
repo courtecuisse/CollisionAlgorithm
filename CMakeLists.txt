@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.1)
-cmake_policy(SET CMP0048 OLD)
 project(CollisionAlgorithm)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -28,8 +27,6 @@ if(COMMAND setupGitInfo)
     setupGitInfo(PLUGIN_GIT_INFO)
 endif()
 
-find_package( OpenGL REQUIRED )
-find_package( Qt5 COMPONENTS OpenGL REQUIRED)
 find_package( Eigen3 REQUIRED )
 
 include_directories(${EIGEN3_INCLUDE_DIR})
@@ -44,7 +41,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${${PROJECT
 target_include_directories(${PROJECT_NAME} PUBLIC "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DPLUGIN_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\"")
-target_link_libraries(${PROJECT_NAME} SofaCore SofaSimulationCommon Qt5::OpenGL)
+target_link_libraries(${PROJECT_NAME} SofaSimulationCommon)
 
 ## Install rules for the library and headers; CMake package configurations files
 sofa_generate_package(NAME ${PROJECT_NAME} VERSION 0.1 TARGETS ${PROJECT_NAME} INCLUDE_INSTALL_DIR ${${PROJECT_NAME}_INCLUDE_DIRS})
