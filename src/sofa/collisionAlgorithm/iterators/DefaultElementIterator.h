@@ -16,13 +16,13 @@ namespace collisionAlgorithm
 /*!
  * \brief The BaseElement class is a basic abstract element container
  */
-template<class CONTAINER, class PROXIMITYDATA>
-class DefaultElementIterator : public BaseElementIterator {
+template<class CONTAINER, class PROXIMITYDATA, class ELEMENT>
+class TDefaultElementIterator : public BaseElementIterator {
 public:
 
-    DefaultElementIterator(CONTAINER * container, unsigned size, unsigned start)
+    TDefaultElementIterator(const CONTAINER * container, const helper::vector<ELEMENT> & elmts, unsigned start)
     : m_container(container)
-    , m_size(size)
+    , m_elements(elmts)
     , m_id(start) {}
 
     void next() override {
@@ -30,7 +30,7 @@ public:
     }
 
     bool end() const override {
-        return m_id >= m_size;
+        return m_id >= m_elements.size();
     }
 
     unsigned id() const override {
@@ -38,28 +38,32 @@ public:
     }
 
     BaseProximity::SPtr project(const defaulttype::Vector3 & P) const override {
-        PROXIMITYDATA data = PROXIMITYDATA::center(m_container, id()); // initialized with the center of the element
-        m_container->project(data, P); // compute the projection
+        PROXIMITYDATA data = m_container->project(m_id, m_elements[m_id], P); // compute the projection
         return BaseProximity::SPtr(new TBaseProximity<CONTAINER, PROXIMITYDATA>(m_container, data));
     }
 
     BaseProximity::SPtr center() const override {
-        PROXIMITYDATA data = PROXIMITYDATA::center(m_container, id()); // initialized with the center of the element
+        PROXIMITYDATA data = m_container->center(m_id, m_elements[m_id]); // initialized with the center of the element
         return BaseProximity::SPtr(new TBaseProximity<CONTAINER, PROXIMITYDATA>(m_container, data));
     }
 
     defaulttype::BoundingBox getBBox() const override {
-        return PROXIMITYDATA::getBBox(m_container, id());
-    }
-
-    static BaseElementIterator::UPtr create(CONTAINER * container, unsigned size, unsigned start) {
-        return BaseElementIterator::UPtr(new DefaultElementIterator<CONTAINER,PROXIMITYDATA>(container, size, start));
+        return m_container->getBBox(m_elements[m_id]);
     }
 
 private:
     const CONTAINER * m_container;
-    unsigned m_size;
+    const helper::vector<ELEMENT> & m_elements;
     unsigned m_id;
+};
+
+template<class PROXIMITYDATA>
+class DefaultElementIterator {
+public:
+    template<class CONTAINER, class ELEMENT>
+    static BaseElementIterator::UPtr create(const CONTAINER * c, const helper::vector<ELEMENT> & elmt, unsigned start = 0) {
+        return BaseElementIterator::UPtr(new TDefaultElementIterator<CONTAINER, PROXIMITYDATA, ELEMENT>(c, elmt, start));
+    }
 };
 
 }

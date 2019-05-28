@@ -61,7 +61,7 @@ public:
         this->f_listening.setValue(true);
     }
 
-    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) = 0;
+    virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const = 0;
 
     inline const BaseGeometry * end() const {
         return this;

@@ -18,6 +18,7 @@ public:
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef typename DataTypes::MatrixDeriv MatrixDeriv;
     typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    typedef sofa::core::topology::BaseMeshTopology::Edge Edge;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
@@ -28,10 +29,8 @@ public:
         l_topology.setPath("@.");
     }
 
-    inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
-        return DefaultElementIterator<GEOMETRY, EdgeProximity>::create(this,
-                                                                       this->l_topology->getNbEdges(),
-                                                                       eid);
+    inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
+        return DefaultElementIterator<EdgeProximity>::create(this,this->l_topology->getEdges(), eid);
     }
 
     inline const sofa::core::topology::BaseMeshTopology::Edge getEdge(unsigned eid) const {
@@ -50,9 +49,20 @@ public:
         return (pos[data.m_p1] - pos[data.m_p0]).normalized();
     }
 
-    inline void project(EdgeProximity & data, const defaulttype::Vector3 & P) const {
-        sofa::core::topology::BaseMeshTopology::Edge edge = getEdge(data.m_eid);
+    inline defaulttype::BoundingBox getBBox(const Edge & edge) const {
+        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
 
+        defaulttype::BoundingBox bbox;
+        bbox.include(x[edge[0]]);
+        bbox.include(x[edge[1]]);
+        return bbox;
+    }
+
+    inline EdgeProximity center(unsigned eid, const Edge & edge) const {
+        return EdgeProximity(eid, edge[0], edge[1], 0.5, 0.5);
+    }
+
+    inline EdgeProximity project(unsigned eid, const Edge & edge, const defaulttype::Vector3 & P) const {
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
 
         const defaulttype::Vector3 & E1 = x[edge[0]];
@@ -69,7 +79,7 @@ public:
 
         fact_u = 1.0-fact_v;
 
-        data = EdgeProximity(data.m_eid, edge[0], edge[1], fact_u,fact_v);
+        return EdgeProximity(eid, edge[0], edge[1], fact_u,fact_v);
     }
 
     inline void draw(const core::visual::VisualParams * vparams) {

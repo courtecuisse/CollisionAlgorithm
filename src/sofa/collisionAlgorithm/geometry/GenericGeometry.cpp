@@ -7,8 +7,15 @@ namespace collisionAlgorithm {
 
 SOFA_DECL_CLASS(GenericGeometry)
 
-//int GenericGeometryClass = core::RegisterObject("GenericGeometry")
-//.add< GeometryCreator<GenericGeometry<sofa::defaulttype::Vec3dTypes>> >();
+int GenericGeometryClass = core::RegisterObject("GenericGeometry")
+.add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::core::topology::BaseMeshTopology::Edge> >()
+.add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::core::topology::BaseMeshTopology::Triangle> >()
+.add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::core::topology::BaseMeshTopology::Quad> >();
+
+
+//Data<helper::vector<sofa::core::topology::BaseMeshTopology::Edge>> d_edges;
+//Data<helper::vector<sofa::core::topology::BaseMeshTopology::Triangle>> d_triangles;
+//Data<helper::vector<sofa::core::topology::BaseMeshTopology::Quad>> d_quads;
 
 }
 

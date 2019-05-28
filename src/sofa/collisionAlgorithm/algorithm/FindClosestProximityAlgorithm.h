@@ -25,10 +25,12 @@ public:
     FindClosestProximityAlgorithm()
     : l_from(initLink("from", "link to from geometry"))
     , l_dest(initLink("dest", "link to dest geometry"))
-    , d_drawCollision (initData(&d_drawCollision, false, "drawcollision", "draw collision"))
+    , d_drawCollision (initData(&d_drawCollision, true, "drawcollision", "draw collision"))
     , d_output(initData(&d_output,"output", "output of the collision detection")) {}
 
-    void draw(const core::visual::VisualParams* /*vparams*/) {
+    void draw(const core::visual::VisualParams* vparams) {
+        if (! vparams->displayFlags().getShowCollisionModels()) return ;
+
         if (! d_drawCollision.getValue()) return;
         glDisable(GL_LIGHTING);
         glColor4f(0,1,0,1);

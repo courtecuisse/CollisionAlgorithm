@@ -14,6 +14,7 @@ public:
     typedef DataTypes TDataTypes;
     typedef PointGeometry<DataTypes> GEOMETRY;
     typedef TBaseGeometry<DataTypes> Inherit;
+    typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef typename DataTypes::MatrixDeriv MatrixDeriv;
@@ -24,10 +25,11 @@ public:
     Data<double> d_drawRadius;
 
     PointGeometry()
-    : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "radius", "radius of drawing")) {}
+    : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {}
 
-    inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
-        return DefaultElementIterator<GEOMETRY, PointProximity>::create(this, this->l_state->getSize(), eid);
+    inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
+        const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
+        return DefaultElementIterator<PointProximity>::create(this, pos.ref(), eid);
     }
 
     void draw(const core::visual::VisualParams *vparams) override {
@@ -50,8 +52,20 @@ public:
         }
     }
 
+    inline defaulttype::BoundingBox getBBox(const Coord & p) const {
+        defaulttype::BoundingBox bbox;
+        bbox.include(p);
+        return bbox;
+    }
+
+    inline PointProximity center(unsigned eid, const Coord & /*p*/) const {
+        return PointProximity(eid);
+    }
+
     //do not change the dataProximity.
-    inline void project(PointProximity & /*data*/,const defaulttype::Vector3 & /*P*/) const {}
+    inline PointProximity project(unsigned pid, const Coord & /*P*/,const defaulttype::Vector3 & /*Q*/) const {
+        return PointProximity(pid);
+    }
 
     inline defaulttype::Vector3 getPosition(const PointProximity & data, core::VecCoordId v) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);

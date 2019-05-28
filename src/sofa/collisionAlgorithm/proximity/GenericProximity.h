@@ -6,15 +6,17 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-class EdgeProximity {
+
+class GenericProximity {
 public:
-    EdgeProximity(unsigned eid,unsigned p0,unsigned p1,double f0,double f1)
-    : m_eid(eid), m_p0(p0), m_p1(p1), m_f0(f0), m_f1(f1) {}
+    GenericProximity(unsigned eid, helper::vector<std::pair<unsigned,double> > prox)
+    : m_eid(eid), m_prox(prox) {}
 
     template<class MatrixDerivRowIterator>
     inline void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
-        it.addCol(m_p0, N * m_f0);
-        it.addCol(m_p1, N * m_f1);
+        for (unsigned i=0;i<m_prox.size();i++) {
+            it.addCol(m_prox[i].first, N * m_prox[i].second);
+        }
     }
 
     unsigned getElementId() const {
@@ -22,11 +24,10 @@ public:
     }
 
     unsigned m_eid;
-    unsigned m_p0,m_p1;
-    double m_f0,m_f1;
+    helper::vector<std::pair<unsigned, double> > m_prox;
 };
 
-
 }
 
 }
+

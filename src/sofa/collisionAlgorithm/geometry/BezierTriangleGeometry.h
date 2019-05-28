@@ -38,10 +38,8 @@ public:
     , d_nonlin_threshold(initData(&d_nonlin_threshold,(double) 0.00001,"nonlin_th", "Threshold"))
     , d_draw_tesselation(initData(&d_draw_tesselation,(unsigned) 0.0, "tesselation", "Number of tesselation")) {}
 
-    inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
-        return DefaultElementIterator<GEOMETRY, TriangleProximity>::create(this,
-                                                                           this->l_topology->getNbTriangles(),
-                                                                           eid);
+    inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
+        return DefaultElementIterator<TriangleProximity>::create(this,this->l_topology->getTriangles(),eid);
     }
 
     virtual void prepareDetection() {
@@ -158,7 +156,7 @@ public:
         glEnd();
     }
 
-    inline void project(TriangleProximity & data, const defaulttype::Vector3 & P) const {
+    inline TriangleProximity project(unsigned eid, const Triangle & triangle, const defaulttype::Vector3 & P) const {
         unsigned max_it = d_nonlin_max_it.getValue();
         double tolerance = d_nonlin_tolerance.getValue();
         double threshold = d_nonlin_threshold.getValue();
@@ -167,8 +165,7 @@ public:
         double delta = 0.00001;
 
         //initialize the algorithm xith the projection on a linear triangle
-        Inherit::project(data, P);
-        TriangleProximity & pinfo = data;
+        TriangleProximity pinfo = Inherit::project(eid,triangle,P);
 
         while(it< max_it)
         {
@@ -202,7 +199,7 @@ public:
             double P_v_fact2 = pinfo.m_f2 - delta * fact_v;
             if (P_v_fact0 < 0 || P_v_fact1 < 0 || P_v_fact2 < 0) break;
 
-            TriangleProximity P_v(data.m_eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_v_fact0, P_v_fact1, P_v_fact2);
+            TriangleProximity P_v(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_v_fact0, P_v_fact1, P_v_fact2);
             defaulttype::Vector3 p_v = (P - getPosition(P_v)).normalized();
             defaulttype::Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
 
@@ -212,7 +209,7 @@ public:
             double P_u_fact2 = pinfo.m_f2 - delta * fact_u;
             if (P_u_fact0 < 0 || P_u_fact1 < 0 || P_u_fact2 < 0) break;
 
-            TriangleProximity P_u(data.m_eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_u_fact0,P_u_fact1,P_u_fact2);
+            TriangleProximity P_u(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_u_fact0,P_u_fact1,P_u_fact2);
             defaulttype::Vector3 p_u = (P - getPosition(P_u)).normalized();
             defaulttype::Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
 
@@ -250,7 +247,7 @@ public:
 
             if (P_a_fact0 < 0 ||P_a_fact1 < 0 || P_a_fact2 < 0) break;
 
-            TriangleProximity P_a(data.m_eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_a_fact0,P_a_fact1,P_a_fact2);
+            TriangleProximity P_a(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_a_fact0,P_a_fact1,P_a_fact2);
             defaulttype::Vector3 QA = getPosition(P_a);
 
             double fact;
@@ -285,6 +282,8 @@ public:
 
             it++;
         }
+
+        return pinfo;
     }
 
     inline defaulttype::Vector3 getNormal(const TriangleProximity & data) const {

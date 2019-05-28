@@ -36,7 +36,7 @@ public:
 
     }
 
-    inline BaseElementIterator::UPtr begin(unsigned /* eid */) override {
+    inline BaseElementIterator::UPtr begin(unsigned /* eid */) const override {
         return BaseElementIterator::UPtr(new SubsetElementIterator(l_wholeGeometry.get(), d_indices.getValue()));
     }
 

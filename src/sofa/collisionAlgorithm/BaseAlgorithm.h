@@ -64,6 +64,7 @@ public :
 
     void init() {
         for (unsigned i=0;i<l_filters.size();i++) {
+            if (l_filters[i] == NULL) continue;
             this->addSlave(l_filters[i]);
         }
     }

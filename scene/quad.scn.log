@@ -1,0 +1,15 @@
+
+--- NEW SESSION: 28/05/2019 15:24:14 ---
+/algo.drawcollision = 1
+
+--- NEW SESSION: 28/05/2019 15:28:15 ---
+/element/topology.drawEdges = 1
+/element/topology.drawTriangles = 1
+/element/topology.drawTetrahedra = 1
+/element/topology.drawHexahedra = 1
+/element/topology.drawQuads = 1
+
+--- NEW SESSION: 28/05/2019 15:55:44 ---
+/OmniControler/omni.angle = 0 0.26889 -2.2105 -1.54406 0.790884 -2.0618
+/OmniControler/omni.omniVisu = 1
+/OmniControler/omni.posDevice = 0 -19.6532 -11.4343 0.0320223 0.626016 -0.31417 0.713004

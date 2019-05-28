@@ -32,8 +32,8 @@ public:
         l_topology.setPath("@.");
     }
 
-    inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
-        return DefaultElementIterator<GEOMETRY, TriangleProximity>::create(this, this->l_topology->getNbTriangles(), eid);
+    inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
+        return DefaultElementIterator<TriangleProximity>::create(this, this->l_topology->getTriangles(), eid);
     }
 
     void draw(const core::visual::VisualParams * vparams) {
@@ -125,13 +125,26 @@ public:
                pos[data.m_p2] * data.m_f2;
     }
 
+    TriangleProximity center(unsigned eid,const Triangle & triangle) const {
+        return TriangleProximity(eid, triangle[0], triangle[1], triangle[2], 0.3333, 0.3333, 0.3333);
+    }
+
+    defaulttype::BoundingBox getBBox(const Triangle & triangle) const {
+        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
+
+        defaulttype::BoundingBox bbox;
+        bbox.include(x[triangle[0]]);
+        bbox.include(x[triangle[1]]);
+        bbox.include(x[triangle[2]]);
+        return bbox;
+    }
+
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    inline void project(TriangleProximity & data, const defaulttype::Vector3 & P) const {
+    inline TriangleProximity project(unsigned eid, const Triangle & triangle, const defaulttype::Vector3 & P) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
-        const TriangleInfo & tinfo = m_triangle_info[data.m_eid];
-        core::topology::BaseMeshTopology::Triangle triangle = getTriangle(data.m_eid);
+        const TriangleInfo & tinfo = m_triangle_info[eid];
 
         defaulttype::Vector3 P0 = pos[triangle[0]];
         defaulttype::Vector3 P1 = pos[triangle[1]];
@@ -188,7 +201,7 @@ public:
             fact_w = 0;
         }
 
-        data = TriangleProximity(data.m_eid, triangle[0], triangle[1], triangle[2], fact_u, fact_v, fact_w);
+        return TriangleProximity(eid, triangle[0], triangle[1], triangle[2], fact_u, fact_v, fact_w);
     }
 
 protected:

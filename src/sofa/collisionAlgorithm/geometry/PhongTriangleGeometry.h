@@ -23,10 +23,8 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    inline BaseElementIterator::UPtr begin(unsigned eid = 0) override {
-        return DefaultElementIterator<GEOMETRY, TriangleProximity>::create(this,
-                                                                           this->l_topology->getNbTriangles(),
-                                                                           eid);
+    inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
+        return DefaultElementIterator<TriangleProximity>::create(this,this->l_topology->getTriangles(),eid);
     }
 
     inline defaulttype::Vector3 getNormal(const TriangleProximity & data) const {
