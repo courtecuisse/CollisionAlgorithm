@@ -55,7 +55,7 @@ public :
      */
     bool acceptFilter(const BaseProximity::SPtr & pfrom,const BaseProximity::SPtr & pdest) const {
         for (auto itfilter = l_filters.begin();itfilter != l_filters.end();itfilter++) {
-            const BaseFilter * filter = (*itfilter);
+            const BaseFilter * filter = (*itfilter).get();
             if (filter == NULL) continue;
             if (! filter->accept(pfrom,pdest)) return false;
         }
