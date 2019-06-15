@@ -28,7 +28,7 @@ public:
     void init( ) override {
         if (l_geometry != NULL) {
             sout << "Register to geometry " << l_geometry->getName() << sendl;
-            l_geometry->addBroadPhase(this);
+//            l_geometry->addBroadPhase(this);
         } else serr << "No geometry found" << sendl;
     }
 };
