@@ -15,6 +15,10 @@ public:
     FixedProximity(const defaulttype::Vector3 & p)
     : m_position(p) {}
 
+    static inline BaseProximity::SPtr create(const defaulttype::Vector3 & p) {
+        return BaseProximity::SPtr(new FixedProximity(p));
+    }
+
     defaulttype::Vector3 getPosition(core::VecCoordId ) const {
         return m_position;
     }
