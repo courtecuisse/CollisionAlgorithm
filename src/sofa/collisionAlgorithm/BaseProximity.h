@@ -75,8 +75,8 @@ public:
         return m_data.getElementId();
     }
 
-    inline BaseProximity::SPtr createProximity(const PROXIMITYDATA & data) const {
-        return BaseProximity::SPtr(new TBaseProximity<CONTAINER,PROXIMITYDATA>(m_container, data));
+    PROXIMITYDATA& getProximityData() {
+        return m_data;
     }
 
 protected:
