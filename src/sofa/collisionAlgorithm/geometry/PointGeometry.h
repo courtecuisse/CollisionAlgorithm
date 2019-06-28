@@ -23,9 +23,12 @@ public:
     SOFA_CLASS(GEOMETRY,Inherit);
 
     Data<double> d_drawRadius;
+    Data<sofa::helper::vector<defaulttype::Vector3> > d_normals;
 
     PointGeometry()
-    : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {}
+    : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing"))
+    , d_normals(initData(&d_normals,sofa::helper::vector<defaulttype::Vector3>(), "normals","normals"))
+    {}
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
         const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
@@ -59,12 +62,18 @@ public:
     }
 
     inline PointProximity center(unsigned eid, const Coord & /*p*/) const {
-        return PointProximity(eid);
+        if(d_normals.getValue().size())
+            return PointProximity(eid,d_normals.getValue()[eid]);
+        else
+            return PointProximity(eid);
     }
 
     //do not change the dataProximity.
     inline PointProximity project(unsigned pid, const Coord & /*P*/,const defaulttype::Vector3 & /*Q*/) const {
-        return PointProximity(pid);
+        if(d_normals.getValue().size())
+            return PointProximity(pid,d_normals.getValue()[pid]);
+        else
+            return PointProximity(pid);
     }
 
     inline defaulttype::Vector3 getPosition(const PointProximity & data, core::VecCoordId v) const {
@@ -72,8 +81,8 @@ public:
         return pos[data.m_eid];
     }
 
-    inline defaulttype::Vector3 getNormal(const PointProximity & /*data*/) const {
-        return defaulttype::Vector3();
+    inline defaulttype::Vector3 getNormal(const PointProximity & data) const {
+        return data.m_normal;
     }
 
 };
