@@ -12,11 +12,11 @@ namespace collisionAlgorithm
 class FixedProximity : public BaseProximity {
 public:
 
-    FixedProximity(const defaulttype::Vector3 & p)
-    : m_position(p) {}
+    FixedProximity(const defaulttype::Vector3 & p,const defaulttype::Vector3 & n = defaulttype::Vector3())
+    : m_position(p), m_normal(n) {}
 
-    static inline BaseProximity::SPtr create(const defaulttype::Vector3 & p) {
-        return BaseProximity::SPtr(new FixedProximity(p));
+    static inline BaseProximity::SPtr create(const defaulttype::Vector3 & p,const defaulttype::Vector3 & n = defaulttype::Vector3()) {
+        return BaseProximity::SPtr(new FixedProximity(p,n));
     }
 
     defaulttype::Vector3 getPosition(core::VecCoordId ) const {
@@ -28,7 +28,7 @@ public:
     }
 
     virtual defaulttype::Vector3 getNormal() const {
-        return defaulttype::Vector3();
+        return m_normal;
     }
 
     void buildJacobianConstraint(core::MultiMatrixDerivId /*cId*/, const helper::vector<defaulttype::Vector3> & /*m_normals*/, double /*fact*/, unsigned /*constraintId*/) const {}
@@ -36,6 +36,7 @@ public:
     void storeLambda(const core::ConstraintParams* /*cParams*/, core::MultiVecDerivId /*res*/, unsigned /*cid*/, const sofa::defaulttype::BaseVector* /*lambda*/) const {}
 
     defaulttype::Vector3 m_position;
+    defaulttype::Vector3 m_normal;
 };
 
 }
