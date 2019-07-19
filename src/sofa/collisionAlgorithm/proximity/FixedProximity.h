@@ -2,6 +2,7 @@
 
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 
+
 namespace sofa
 {
 
@@ -32,6 +33,9 @@ public:
     }
 
     void buildJacobianConstraint(core::MultiMatrixDerivId /*cId*/, const helper::vector<defaulttype::Vector3> & /*m_normals*/, double /*fact*/, unsigned /*constraintId*/) const {}
+
+    template<class MatrixDerivRowIterator>
+    inline void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3) const {}
 
     void storeLambda(const core::ConstraintParams* /*cParams*/, core::MultiVecDerivId /*res*/, unsigned /*cid*/, const sofa::defaulttype::BaseVector* /*lambda*/) const {}
 
