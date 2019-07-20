@@ -19,9 +19,6 @@ public:
 
     core::objectmodel::SingleLink<FixedAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
 
-    Data<helper::vector<int> > d_bindFrom;
-    Data<helper::vector<int> > d_bindDest;
-
     Data<bool> d_drawCollision ;
     Data<DetectionOutput> d_output;
 
