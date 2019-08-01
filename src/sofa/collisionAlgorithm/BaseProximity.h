@@ -18,6 +18,7 @@ namespace collisionAlgorithm
 class BaseProximity {
 public :
     typedef std::shared_ptr<BaseProximity> SPtr;
+    typedef std::function<void(unsigned,unsigned,const sofa::defaulttype::BaseVector* lambda)> CallbackFunction;
 
     /// return proximiy position in a vector3
     virtual defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
@@ -27,9 +28,16 @@ public :
 
     virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & dir, double fact, unsigned constraintId) const = 0;
 
-    virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const = 0;
+    virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, unsigned cid_global, unsigned cid_local, const sofa::defaulttype::BaseVector* lambda) const = 0;
 
     virtual unsigned getElementId() const = 0;
+
+    void addCallback(CallbackFunction c) {
+        m_callbacks.push_back(c);
+    }
+
+protected:
+    std::vector<CallbackFunction> m_callbacks;
 };
 
 /*!
@@ -67,8 +75,12 @@ public:
         m_container->buildJacobianConstraint(m_data,cId,normals,fact,constraintId);
     }
 
-    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const {
-        m_container->storeLambda(cParams,resId,cid,lambda);
+    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid_global, unsigned cid_local, const sofa::defaulttype::BaseVector* lambda) const {
+        for (unsigned i=0;i<m_callbacks.size();i++) {
+            m_callbacks[i](cid_global,cid_local, lambda);
+        }
+
+        m_container->storeLambda(cParams,resId,cid_global,cid_local, lambda);
     }
 
     inline unsigned getElementId() const override {

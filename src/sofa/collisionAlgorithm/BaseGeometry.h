@@ -155,11 +155,11 @@ public:
         c1_d.endEdit();
     }
 
-    inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid, const sofa::defaulttype::BaseVector* lambda) const {
+    inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid_global, unsigned cid_local, const sofa::defaulttype::BaseVector* lambda) const {
         auto res = sofa::helper::write(*resId[this->getState()].write(), cParams);
         const typename DataTypes::MatrixDeriv& j = cParams->readJ(this->getState())->getValue();
-        auto rowIt = j.readLine(cid);
-        const double f = lambda->element(cid);
+        auto rowIt = j.readLine(cid_global+cid_local);
+        const double f = lambda->element(cid_global+cid_local);
         for (auto colIt = rowIt.begin(), colItEnd = rowIt.end(); colIt != colItEnd; ++colIt)
         {
             res[colIt.index()] += colIt.val() * f;
