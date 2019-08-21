@@ -28,7 +28,7 @@ public:
     core::objectmodel::SingleLink<GEOMETRY,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
 
     TriangleGeometry()
-    : l_topology(initLink("topology", "link to topology")) {
+        : l_topology(initLink("topology", "link to topology")) {
         l_topology.setPath("@.");
     }
 
@@ -39,7 +39,7 @@ public:
     void draw(const core::visual::VisualParams * vparams) {
         this->drawNormals(vparams);
 
-//        if (! vparams->displayFlags().getShowCollisionModels()) return;
+        //        if (! vparams->displayFlags().getShowCollisionModels()) return;
         if (! this->drawCollision.getValue() && ! vparams->displayFlags().getShowCollisionModels()) return ;
         const defaulttype::Vector4 & color = this->d_color.getValue();
         if (color[3] == 0.0) return;
@@ -121,8 +121,8 @@ public:
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
 
         return pos[data.m_p0] * data.m_f0 +
-               pos[data.m_p1] * data.m_f1 +
-               pos[data.m_p2] * data.m_f2;
+                pos[data.m_p1] * data.m_f1 +
+                pos[data.m_p2] * data.m_f2;
     }
 
     TriangleProximity center(unsigned eid,const Triangle & triangle) const {
@@ -204,7 +204,7 @@ public:
         return TriangleProximity(eid, triangle[0], triangle[1], triangle[2], fact_u, fact_v, fact_w);
     }
 
-protected:
+
     typedef struct
     {
         defaulttype::Vector3 v0,v1;
@@ -217,7 +217,7 @@ protected:
     } TriangleInfo;
 
     //proj_P must be on the plane
-    void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w) const
+    static void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w)
     {
         defaulttype::Vector3 v2 = proj_P - p0;
 
@@ -228,6 +228,8 @@ protected:
         fact_w = (tinfo.d00 * d21 - tinfo.d01 * d20) * tinfo.invDenom;
         fact_u = 1.0 - fact_v  - fact_w;
     }
+
+protected:
 
     std::vector<TriangleInfo> m_triangle_info;
     helper::vector<defaulttype::Vector3> m_triangle_normals;
