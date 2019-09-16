@@ -83,11 +83,11 @@ public:
     void handleEvent(sofa::core::objectmodel::Event *event) {
         if (! dynamic_cast<sofa::simulation::AnimateBeginEvent*>(event)) return;
 
+        prepareDetection();
+
         for (unsigned i=0;i<m_broadPhase.size();i++) {
             m_broadPhase[i]->prepareDetection();
         }
-
-        prepareDetection();
     }
 
 protected:
