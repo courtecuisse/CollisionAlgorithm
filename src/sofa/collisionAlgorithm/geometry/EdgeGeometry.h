@@ -99,7 +99,9 @@ public:
         for (auto it=this->begin();it!=this->end();it++) {
             const sofa::core::topology::BaseMeshTopology::Edge & edge = this->l_topology->getEdge(it->id());
 
+            glColor4f(1.0,0.0,0.0,1.0);
             glVertex3dv(pos[edge[0]].data());
+            glColor4f(0.0,0.0,1.0,1.0);
             glVertex3dv(pos[edge[1]].data());
         }
         glEnd();
