@@ -15,9 +15,12 @@ class DetectionOutput {
 public:
     typedef std::pair<BaseProximity::SPtr,BaseProximity::SPtr> PairDetection;
 
-    friend std::ostream& operator<<(std::ostream& i, const DetectionOutput& t)  {
-        i << t.m_output.size();
-        return i;
+    friend std::ostream& operator<<(std::ostream& os, const DetectionOutput& t)  {
+        os << t.m_output.size() << ":" ;
+        for (unsigned i=0;i<t.m_output.size();i++) {
+            os << "[" << t.m_output[i].first->getPosition() << " | " << t.m_output[i].second->getPosition() << "] ";
+        }
+        return os;
     }
 
     friend std::istream& operator>>(std::istream& i, DetectionOutput& /*t*/) {

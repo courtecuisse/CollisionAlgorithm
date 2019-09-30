@@ -8,45 +8,40 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-template<class DataTypes>
-class FixedGeometry : public TBaseGeometry<DataTypes> {
+class FixedGeometry : public BaseGeometry {
 public:
-    typedef DataTypes TDataTypes;
-    typedef FixedGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes> Inherit;
-    typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    typedef FixedGeometry GEOMETRY;
+    typedef BaseGeometry Inherit;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
     Data<double> d_drawRadius;
+    Data<sofa::helper::vector<defaulttype::Vector3> > d_position;
     Data<sofa::helper::vector<defaulttype::Vector3> > d_normals;
 
     FixedGeometry()
     : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing"))
+    , d_position(initData(&d_position,sofa::helper::vector<defaulttype::Vector3>(), "position","normals"))
     , d_normals(initData(&d_normals,sofa::helper::vector<defaulttype::Vector3>(), "normals","normals"))
     {}
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
-        return DefaultElementIterator<FixedProximity>::create(this, pos.ref(), eid);
+        return DefaultElementIterator<FixedProximity>::create(this, d_position.getValue(), eid);
+    }
+
+    sofa::core::behavior::BaseMechanicalState * getState() const {
+        return NULL;
     }
 
     void draw(const core::visual::VisualParams *vparams) override {
-        this->drawNormals(vparams);
-
 //        if (! vparams->displayFlags().getShowCollisionModels()) return;
-        if (! this->drawCollision.getValue() && ! vparams->displayFlags().getShowCollisionModels()) {
-            return ;
-        }
+        if (! vparams->displayFlags().getShowCollisionModels()) return ;
+
         const defaulttype::Vector4 & color = this->d_color.getValue();
         if (color[3] == 0.0) return;
         if (d_drawRadius.getValue() == 0.0) return;
 
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+        const helper::vector<defaulttype::Vector3> & pos = d_position.getValue();
 
         glColor4f(color[0],color[1],color[2],color[3]);
 
@@ -55,14 +50,15 @@ public:
         }
     }
 
-    inline defaulttype::BoundingBox getBBox(const Coord & p) const {
+    inline defaulttype::BoundingBox getBBox(const defaulttype::Vector3 & p) const {
         defaulttype::BoundingBox bbox;
         bbox.include(p);
         return bbox;
     }
 
-    inline FixedProximity center(unsigned eid, const Coord & /*p*/) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+    inline FixedProximity center(unsigned eid, const defaulttype::Vector3 & /*p*/) const {
+        const helper::vector<defaulttype::Vector3> & pos = d_position.getValue();
+
         if(d_normals.getValue().size()>eid)
             return FixedProximity(pos[eid],d_normals.getValue()[eid]);
         else
@@ -70,8 +66,9 @@ public:
     }
 
     //do not change the dataProximity.
-    inline FixedProximity project(unsigned pid, const Coord & /*P*/,const defaulttype::Vector3 & /*Q*/) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+    inline FixedProximity project(unsigned pid, const defaulttype::Vector3 & /*P*/,const defaulttype::Vector3 & /*Q*/) const {
+        const helper::vector<defaulttype::Vector3> & pos = d_position.getValue();
+
         if(d_normals.getValue().size()>pid)
             return FixedProximity(pos[pid],d_normals.getValue()[pid]);
         else

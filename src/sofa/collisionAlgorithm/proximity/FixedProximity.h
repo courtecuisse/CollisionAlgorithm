@@ -32,6 +32,11 @@ public:
         return m_normal;
     }
 
+    template<class CONTAINER>
+    static BaseProximity::SPtr createProximity(const CONTAINER * /*container*/, const FixedProximity & data) {
+        return BaseProximity::SPtr(new FixedProximity(data.m_position,data.m_normal));
+    }
+
     void buildJacobianConstraint(core::MultiMatrixDerivId /*cId*/, const helper::vector<defaulttype::Vector3> & /*m_normals*/, double /*fact*/, unsigned /*constraintId*/) const {}
 
     template<class MatrixDerivRowIterator>

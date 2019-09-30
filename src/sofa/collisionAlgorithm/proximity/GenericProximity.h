@@ -19,6 +19,11 @@ public:
         }
     }
 
+    template<class CONTAINER>
+    static BaseProximity::SPtr createProximity(const CONTAINER * container, const GenericProximity & data) {
+        return BaseProximity::SPtr(new TBaseProximity<CONTAINER, GenericProximity>(container,data));
+    }
+
     unsigned getElementId() const {
         return m_eid;
     }

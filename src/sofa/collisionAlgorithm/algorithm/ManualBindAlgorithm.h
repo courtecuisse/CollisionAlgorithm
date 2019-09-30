@@ -12,10 +12,10 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class ManualBindAlgorithm : public BaseClosestProximityAlgorithm
+class ManualBindAlgorithm : public BaseAlgorithm
 {
 public:
-    SOFA_CLASS(ManualBindAlgorithm, BaseClosestProximityAlgorithm);
+    SOFA_CLASS(ManualBindAlgorithm, BaseAlgorithm);
 
     core::objectmodel::SingleLink<ManualBindAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
     core::objectmodel::SingleLink<ManualBindAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
@@ -66,9 +66,6 @@ public:
 
             auto first = itfrom->center();
             auto second = itdest->project(first->getPosition());
-
-            if (first == NULL) continue;
-            if (second == NULL) continue;
 
             output.add(first,second);
         }

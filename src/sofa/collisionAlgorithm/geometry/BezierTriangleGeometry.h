@@ -142,7 +142,7 @@ public:
         this->drawNormals(vparams);
 
 //        if (! vparams->displayFlags().getShowCollisionModels()) return;
-        if (! this->drawCollision.getValue() && ! vparams->displayFlags().getShowCollisionModels()) return ;
+        if (! vparams->displayFlags().getShowCollisionModels()) return ;
 
         const defaulttype::Vector4 & color = this->d_color.getValue();
         if (color[3] == 0.0) return;

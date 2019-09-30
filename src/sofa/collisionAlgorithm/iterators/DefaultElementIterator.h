@@ -38,13 +38,13 @@ public:
     }
 
     BaseProximity::SPtr project(const defaulttype::Vector3 & P) const override {
-        PROXIMITYDATA data = m_container->project(m_id, m_elements[m_id], P); // compute the projection
-        return BaseProximity::SPtr(new TBaseProximity<CONTAINER, PROXIMITYDATA>(m_container, data));
+        return PROXIMITYDATA::createProximity(m_container,
+                                              m_container->project(m_id, m_elements[m_id], P));
     }
 
     BaseProximity::SPtr center() const override {
-        PROXIMITYDATA data = m_container->center(m_id, m_elements[m_id]); // initialized with the center of the element
-        return BaseProximity::SPtr(new TBaseProximity<CONTAINER, PROXIMITYDATA>(m_container, data));
+        return PROXIMITYDATA::createProximity(m_container,
+                                              m_container->center(m_id, m_elements[m_id])); // initialized with the center of the element
     }
 
     defaulttype::BoundingBox getBBox() const override {
