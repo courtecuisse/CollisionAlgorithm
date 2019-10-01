@@ -4,8 +4,6 @@
 #include <sofa/collisionAlgorithm/BroadPhase.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 
-#include <sofa/collisionAlgorithm/data/DataDistanceMeasure.h>
-
 namespace sofa
 {
 

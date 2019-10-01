@@ -3,8 +3,6 @@
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/collisionAlgorithm/BroadPhase.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-
-#include <sofa/collisionAlgorithm/data/DataDistanceMeasure.h>
 #include <sofa/collisionAlgorithm/iterators/SubsetElementIterator.h>
 
 namespace sofa
@@ -13,23 +11,44 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+//Specific class to change the distance between proximities
+class BaseDistanceProximityMeasure : public sofa::core::objectmodel::BaseObject {
+public :
+    SOFA_ABSTRACT_CLASS(BaseDistanceProximityMeasure, sofa::core::objectmodel::BaseObject);
+
+    virtual double computeDistance(const collisionAlgorithm::PairDetection & d) = 0;
+
+} ;
+
+//Default implementation of a 3D distance
+class Distance3DProximityMeasure : public BaseDistanceProximityMeasure {
+public :
+    SOFA_CLASS(Distance3DProximityMeasure, BaseDistanceProximityMeasure);
+
+    double computeDistance(const collisionAlgorithm::PairDetection & d) override {
+        return (d.first->getPosition()-d.second->getPosition()).norm() ;
+    }
+} ;
+
+
 class BaseClosestProximityAlgorithm : public BaseAlgorithm
 {
 public:
     SOFA_CLASS(BaseClosestProximityAlgorithm, BaseAlgorithm);
 
     Data<unsigned> d_iterations;
-    Data<DistanceMeasure> d_distance_measure;
-
-    static double norme3(const collisionAlgorithm::PairDetection & d) {
-        return (d.first->getPosition()-d.second->getPosition()).norm() ;
-    }
+    core::objectmodel::SingleLink<BaseClosestProximityAlgorithm,BaseDistanceProximityMeasure, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_distance;
 
     BaseClosestProximityAlgorithm ()
     : d_iterations(initData(&d_iterations,(unsigned) 1,"iterations", "numberof iterations"))
-    , d_distance_measure(initData(&d_distance_measure,
-                                  DistanceMeasure(std::bind(&norme3, std::placeholders::_1)), "distance", "distance measure component"))
+    , l_distance(initLink("distance", "link to the compoenent that computes the distance between proximities"))
     {}
+
+    void init() { // make sure we have a direction
+        if (this->l_distance == NULL) l_distance = sofa::core::objectmodel::New<Distance3DProximityMeasure>();
+        l_distance->setName("defaultDistance");
+        this->addSlave(l_distance.get());
+    }
 
     void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
     {
@@ -212,7 +231,7 @@ public:
             }
 
             if (acceptFilter(pfrom,pdest)) {
-                double dist = d_distance_measure.getValue().compute(PairDetection(pfrom,pdest));
+                double dist = l_distance->computeDistance(PairDetection(pfrom,pdest));
 
                 if (dist<min_dist) {
                     min_dist = dist;
@@ -236,7 +255,7 @@ public:
             BaseProximity::SPtr pdest = itdest->project(pfrom->getPosition());
 
             if (acceptFilter(pfrom,pdest)) {
-                double dist = d_distance_measure.getValue().compute(PairDetection(pfrom,pdest));
+                double dist = l_distance->computeDistance(PairDetection(pfrom,pdest));
 
                 if (dist<min_dist) {
                     min_dist = dist;

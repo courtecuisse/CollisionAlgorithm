@@ -22,12 +22,35 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
+    class EdgeNormalHandler : public sofa::core::objectmodel::BaseObject {
+    public:
+        SOFA_ABSTRACT_CLASS(EdgeNormalHandler, sofa::core::objectmodel::BaseObject);
+
+        core::objectmodel::SingleLink<EdgeNormalHandler, EdgeGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+
+        EdgeNormalHandler()
+        : l_geometry(initLink("geometry", "link to the geometry")) {
+            l_geometry.setPath("@.");
+        }
+
+        void init() override {
+            if (l_geometry == NULL) return;
+            l_geometry->m_normalHandler = this;
+            l_geometry->addSlave(this);
+        }
+
+        virtual defaulttype::Vector3 computeNormal(const EdgeProximity & data) const = 0;
+    };
+
     core::objectmodel::SingleLink<GEOMETRY,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
 
     EdgeGeometry()
     : l_topology(initLink("topology", "link to topology")) {
         l_topology.setPath("@.");
     }
+
+    //Check at bwd init if the normal handler is set else create a default one
+    void bwdInit();
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
         return DefaultElementIterator<EdgeProximity>::create(this,this->l_topology->getEdges(), eid);
@@ -45,8 +68,8 @@ public:
     }
 
     inline defaulttype::Vector3 getNormal(const EdgeProximity & data) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-        return (pos[data.m_p1] - pos[data.m_p0]).normalized();
+        return m_normalHandler->computeNormal(data);
+
     }
 
     inline defaulttype::BoundingBox getBBox(const Edge & edge) const {
@@ -106,6 +129,9 @@ public:
         }
         glEnd();
     }
+
+protected:
+    typename EdgeNormalHandler::SPtr m_normalHandler;
 
 };
 
