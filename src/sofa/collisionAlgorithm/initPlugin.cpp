@@ -45,7 +45,6 @@ namespace collisionAlgorithm {
 		{
             first = false;
             sofa::helper::system::DataRepository.addLastPath(std::string(PLUGIN_DATA_DIR_));
-            sofa::helper::system::DataRepository.addLastPath(std::string(PLUGIN_DATA_DIR_) + "/data");
             sofa::helper::system::DataRepository.addLastPath(sofa::helper::system::SetDirectory::GetCurrentDir());
 		}
 	}
