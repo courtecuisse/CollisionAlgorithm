@@ -14,13 +14,15 @@ class NormalFilter : public BaseFilter {
 public:
     SOFA_ABSTRACT_CLASS(BaseFilter, BaseFilter);
 
-    Data<double> d_angle;
+    Data<defaulttype::Vec2f> d_angle;
 
     NormalFilter()
-    : d_angle(initData(&d_angle, 0.0, "angle", "Angle filter [-1..1]")) {}
+    : d_angle(initData(&d_angle, defaulttype::Vec2f(-1.0,1.0), "angle", "Angle filter [-1..1]")) {}
 
     bool accept(const BaseProximity::SPtr & p1,const BaseProximity::SPtr & p2) const {
-        return dot(p1->getNormal(),p2->getNormal())>d_angle.getValue();
+        double angle = dot(p1->getNormal(),p2->getNormal());
+
+        return (angle>=d_angle.getValue()[0] && angle <= d_angle.getValue()[1]);
     }
 };
 
