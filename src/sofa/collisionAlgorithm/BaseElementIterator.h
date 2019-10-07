@@ -48,6 +48,9 @@ public:
         }
     };
 
+    //This is necessary to have the correct behavior with the delete !
+    virtual ~BaseElementIterator() = default;
+
 
     ///returns a new EmptyIterator
     static BaseElementIterator::UPtr empty() {
