@@ -1,5 +1,4 @@
 # CMake package configuration file for the plugin
-
 @PACKAGE_INIT@
 
 set(PROJECT CollisionAlgorithm)
@@ -11,6 +10,3 @@ if(NOT TARGET ${PROJECT})
 endif()
 
 check_required_components(${PROJECT})
-
-set(${PROJECT} "${PROJECT}")
-set_and_check(${PROJECT}_INCLUDE_DIRS "@${PROJECT}_INCLUDE_DIRS@")
