@@ -37,10 +37,12 @@ public:
     SOFA_CLASS(BaseClosestProximityAlgorithm, BaseAlgorithm);
 
     Data<unsigned> d_iterations;
+    Data<double> d_threshold;
     core::objectmodel::SingleLink<BaseClosestProximityAlgorithm,BaseDistanceProximityMeasure, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_distance;
 
     BaseClosestProximityAlgorithm ()
-    : d_iterations(initData(&d_iterations,(unsigned) 1,"iterations", "numberof iterations"))
+    : d_iterations(initData(&d_iterations,(unsigned) 1,"iterations", "Number of reprojections of between pair of elements"))
+    , d_threshold(initData(&d_threshold,0.0000001,"threshold", "Threshold for iterations"))
     , l_distance(initLink("distance", "link to the compoenent that computes the distance between proximities"))
     {}
 
@@ -175,13 +177,40 @@ public:
         }
     }
 
-    BaseElementIterator::UPtr getDestIterator(const defaulttype::Vector3 & P, BaseGeometry *geo) {
+    BaseProximity::SPtr doFindClosestProximityIt(const BaseProximity::SPtr & pfrom, BaseElementIterator::UPtr & begin) {
+        double min_dist = std::numeric_limits<double>::max();
+        BaseProximity::SPtr minprox_dest = nullptr;
+        defaulttype::Vector3 P = pfrom->getPosition();
+
+        while (! begin->end()) {
+            BaseProximity::SPtr pdest = begin->project(P);
+
+            if (acceptFilter(pfrom,pdest)) {
+                double dist = l_distance->computeDistance(PairDetection(pfrom,pdest));
+
+                if (dist<min_dist) {
+                    min_dist = dist;
+                    minprox_dest = pdest;
+                }
+            }
+
+            begin++;
+        }
+
+        return minprox_dest;
+    }
+
+
+    BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo) {
         const std::vector<BaseGeometry::BroadPhase::SPtr> & decorators = geo->getBroadPhase();
 
-        if (decorators.empty()) return geo->begin();
-        else {
+        if (decorators.empty()) {
+            BaseElementIterator::UPtr begin = geo->begin();
+            return doFindClosestProximityIt(pfrom,begin);
+        } else {
             //take the first broad phase...
-            const BaseGeometry::BroadPhase::SPtr & decorator = decorators[0];
+            const BaseGeometry::BroadPhase::SPtr & decorator = decorators.front();
+            defaulttype::Vector3 P = pfrom->getPosition();
 
             defaulttype::Vec3i bindex = decorator->getBoxCoord(P);
             defaulttype::Vec3i bsize = decorator->getBoxSize();
@@ -192,79 +221,55 @@ public:
                 max = std::max (max, bindex[i]) ;
                 max = std::max (max, bsize[i]-bindex[i]) ;
             }
-    //        max = std::max(max,bindex[0]);
-    //        max = std::max(max,bindex[1]);
-    //        max = std::max(max,bindex[2]);
-    //        max = std::max(max,bsize[0]-bindex[0]);
-    //        max = std::max(max,bsize[1]-bindex[1]);
-    //        max = std::max(max,bsize[2]-bindex[2]);
 
+            BaseProximity::SPtr minprox_dest = nullptr;
             int d = 0;
             std::set<unsigned> selectedElements;
             while (selectedElements.empty() && d<max) {
                 fillElementSet(decorator,bindex,selectedElements,d);
+
+                BaseElementIterator::UPtr begin(new SubsetElementIterator(geo, selectedElements));
+                minprox_dest = doFindClosestProximityIt(pfrom, begin);
+
                 d++;// we look for boxed located at d+1
-            }
 
-            return BaseElementIterator::UPtr(new SubsetElementIterator(geo, selectedElements));
+                //take the first on that satisfy filters
+                if (minprox_dest != NULL) return minprox_dest;
+            }
         }
+
+        return NULL;
     }
 
-    PairDetection findClosestPoint(const BaseElementIterator *itfrom,  BaseGeometry *geo) {
-        double min_dist = std::numeric_limits<double>::max();
-        BaseProximity::SPtr minprox_from = nullptr;
-        BaseProximity::SPtr minprox_dest = nullptr;
+    PairDetection findClosestPoint(const BaseElementIterator *itfrom, BaseGeometry *geo) {
+        BaseProximity::SPtr pfrom = itfrom->center();
+        defaulttype::Vector3 prevPos = pfrom->getPosition();
+        BaseProximity::SPtr pdest = findClosestProximity(pfrom,geo);
 
-        for(BaseElementIterator::UPtr itdest = getDestIterator(itfrom->center()->getPosition(),geo); // this function may create an iterator on using the bradphase if defined in the geometry
-            itdest != geo->end(); itdest++)
-        {
-            BaseProximity::SPtr pfrom = itfrom->center();
-            BaseProximity::SPtr pdest = itdest->project(pfrom->getPosition());
+        if (pfrom == NULL || pdest == NULL) return PairDetection(pfrom,pdest);
 
-            // Internal iterations to reproject on the from element
-            // For linear elements (triangles, edges, ...) it = 1 should be sufficient
-            // For points (from) it can be set to 0 since the reprojection will not modify the proximity
-            // For non linear elements (bezier, ...) few iterations may be necessary
-            for (unsigned it=0;it<d_iterations.getValue();it++) {
-                pfrom = itfrom->project(pdest->getPosition());
-                pdest = itdest->project(pfrom->getPosition());
-            }
+        // Internal iterations to reproject on the from element
+        // For linear elements (triangles, edges, ...) it = 1 should be sufficient
+        // For points (from) it can be set to 0 since the reprojection will not modify the proximity
+        // For non linear elements (bezier, ...) few iterations may be necessary
+        for (unsigned it=0;it<d_iterations.getValue();it++) {
+            pfrom = itfrom->project(pdest->getPosition()); // reproject on pfrom
+            if ((prevPos - pfrom->getPosition()).norm() < d_threshold.getValue()) break;
 
-            if (acceptFilter(pfrom,pdest)) {
-                double dist = l_distance->computeDistance(PairDetection(pfrom,pdest));
+            pfrom = itfrom->center();
+            pdest = findClosestProximity(pfrom,geo);
 
-                if (dist<min_dist) {
-                    min_dist = dist;
-                    minprox_dest = pdest;
-                    minprox_from = pfrom;
-                }
-            }
+            if (pfrom == NULL || pdest == NULL) return PairDetection(pfrom,pdest);
         }
 
-        return PairDetection(minprox_from,minprox_dest);
+
+        return PairDetection(pfrom,pdest);
     }
 
 
-    PairDetection findClosestPoint(const BaseProximity::SPtr pfrom,  BaseGeometry *geo) {
-        double min_dist = std::numeric_limits<double>::max();
-        BaseProximity::SPtr minprox_dest = nullptr;
-
-        for(BaseElementIterator::UPtr itdest = getDestIterator(pfrom->getPosition(),geo); // this function may create an iterator on using the bradphase if defined in the geometry
-            itdest != geo->end(); itdest++)
-        {
-            BaseProximity::SPtr pdest = itdest->project(pfrom->getPosition());
-
-            if (acceptFilter(pfrom,pdest)) {
-                double dist = l_distance->computeDistance(PairDetection(pfrom,pdest));
-
-                if (dist<min_dist) {
-                    min_dist = dist;
-                    minprox_dest = pdest;
-                }
-            }
-        }
-
-        return PairDetection(pfrom,minprox_dest);
+    PairDetection findClosestPoint(const BaseProximity::SPtr & pfrom, BaseGeometry *geo) {
+        BaseProximity::SPtr pdest = findClosestProximity(pfrom,geo);
+        return PairDetection(pfrom,pdest);
     }
 
 };
