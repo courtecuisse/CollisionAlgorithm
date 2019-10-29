@@ -18,7 +18,6 @@ namespace collisionAlgorithm
 class BaseProximity {
 public :
     typedef std::shared_ptr<BaseProximity> SPtr;
-    typedef std::function<void(unsigned,unsigned,const sofa::defaulttype::BaseVector* lambda)> CallbackFunction;
 
     /// return proximiy position in a vector3
     virtual defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
@@ -31,22 +30,15 @@ public :
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, unsigned cid_global, unsigned cid_local, const sofa::defaulttype::BaseVector* lambda) const = 0;
 
     virtual unsigned getElementId() const = 0;
-
-    void addCallback(CallbackFunction c) {
-        m_callbacks.push_back(c);
-    }
-
-protected:
-    std::vector<CallbackFunction> m_callbacks;
 };
 
 /*!
  * Template implementation of BaseProximity
  */
-template<class CONTAINER, class PROXIMITYDATA>
+template<class GEOMETRY, class PROXIMITYDATA>
 class TBaseProximity : public BaseProximity {
 public:
-    typedef typename CONTAINER::TDataTypes DataTypes;
+    typedef typename GEOMETRY::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
@@ -59,28 +51,24 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    TBaseProximity(const CONTAINER * container, const PROXIMITYDATA & data)
-    : m_container(container)
+    TBaseProximity(const GEOMETRY * container, const PROXIMITYDATA & data)
+    : m_geometry(container)
     , m_data(data) {}
 
     defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
-        return m_container->getPosition(m_data,v);
+        return m_geometry->getPosition(m_data,v);
     }
 
     defaulttype::Vector3 getNormal() const override {
-        return m_container->getNormal(m_data);
+        return m_geometry->getNormal(m_data);
     }
 
     void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
-        m_container->buildJacobianConstraint(m_data,cId,normals,fact,constraintId);
+        m_geometry->buildJacobianConstraint(m_data,cId,normals,fact,constraintId);
     }
 
     void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid_global, unsigned cid_local, const sofa::defaulttype::BaseVector* lambda) const {
-        for (unsigned i=0;i<m_callbacks.size();i++) {
-            m_callbacks[i](cid_global,cid_local, lambda);
-        }
-
-        m_container->storeLambda(cParams,resId,cid_global,cid_local, lambda);
+        m_geometry->storeLambda(cParams,resId,cid_global,cid_local, lambda);
     }
 
     inline unsigned getElementId() const override {
@@ -92,13 +80,13 @@ public:
     }
 
 protected:
-    const CONTAINER * m_container;
+    const GEOMETRY * m_geometry;
     const PROXIMITYDATA m_data;
 };
 
-template<class CONTAINER, class PROXIMITYDATA>
-static BaseProximity::SPtr createProximity(const CONTAINER * container, const PROXIMITYDATA & data) {
-    return BaseProximity::SPtr(new TBaseProximity<CONTAINER,PROXIMITYDATA>(container, data));
+template<class GEOMETRY, class PROXIMITYDATA>
+static BaseProximity::SPtr createProximity(const GEOMETRY * container, const PROXIMITYDATA & data) {
+    return BaseProximity::SPtr(new TBaseProximity<GEOMETRY,PROXIMITYDATA>(container, data));
 }
 
 }

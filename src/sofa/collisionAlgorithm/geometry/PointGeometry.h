@@ -22,12 +22,11 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-
     class PointNormalHandler : public sofa::core::objectmodel::BaseObject {
     public:
         SOFA_ABSTRACT_CLASS(PointNormalHandler, sofa::core::objectmodel::BaseObject);
 
-        core::objectmodel::SingleLink<PointNormalHandler, PointGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+        core::objectmodel::SingleLink<PointNormalHandler, GEOMETRY, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
         PointNormalHandler()
         : l_geometry(initLink("geometry", "link to the geometry")) {

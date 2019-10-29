@@ -26,7 +26,7 @@ public:
     public:
         SOFA_ABSTRACT_CLASS(EdgeNormalHandler, sofa::core::objectmodel::BaseObject);
 
-        core::objectmodel::SingleLink<EdgeNormalHandler, EdgeGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+        core::objectmodel::SingleLink<EdgeNormalHandler, GEOMETRY, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
         EdgeNormalHandler()
         : l_geometry(initLink("geometry", "link to the geometry")) {
