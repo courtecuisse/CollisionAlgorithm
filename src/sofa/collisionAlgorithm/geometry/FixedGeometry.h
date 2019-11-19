@@ -10,6 +10,7 @@ namespace collisionAlgorithm {
 
 class FixedGeometry : public BaseGeometry {
 public:
+    typedef sofa::defaulttype::Vec3dTypes TDataTypes;
     typedef FixedGeometry GEOMETRY;
     typedef BaseGeometry Inherit;
 
@@ -83,6 +84,11 @@ public:
         return data.m_normal;
     }
 
+    inline void buildJacobianConstraint(const FixedProximity & data, core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
+        data.buildJacobianConstraint(cId,normals,fact,constraintId);
+    }
+
+    inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid_global, unsigned cid_local, const sofa::defaulttype::BaseVector* lambda) const {}
 };
 
 }

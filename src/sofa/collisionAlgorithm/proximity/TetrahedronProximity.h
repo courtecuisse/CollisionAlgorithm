@@ -25,11 +25,6 @@ public:
         return m_eid;
     }
 
-    template<class CONTAINER>
-    static BaseProximity::SPtr createProximity(const CONTAINER * container, const TetrahedronProximity & data) {
-        return BaseProximity::SPtr(new TBaseProximity<CONTAINER, TetrahedronProximity>(container,data));
-    }
-
     unsigned m_eid;
     unsigned m_p0,m_p1,m_p2,m_p3;
     double m_f0,m_f1,m_f2,m_f3;

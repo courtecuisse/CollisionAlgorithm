@@ -21,11 +21,6 @@ public:
         return m_eid;
     }
 
-    template<class CONTAINER>
-    static BaseProximity::SPtr createProximity(const CONTAINER * container, const EdgeProximity & data) {
-        return BaseProximity::SPtr(new TBaseProximity<CONTAINER, EdgeProximity>(container,data));
-    }
-
     unsigned m_eid;
     unsigned m_p0,m_p1;
     double m_f0,m_f1;

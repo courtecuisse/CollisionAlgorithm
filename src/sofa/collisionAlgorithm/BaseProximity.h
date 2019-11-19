@@ -75,7 +75,7 @@ public:
         return m_data.getElementId();
     }
 
-    PROXIMITYDATA& getProximityData() {
+    const PROXIMITYDATA& getProximityData() const {
         return m_data;
     }
 
