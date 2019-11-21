@@ -74,6 +74,7 @@ public:
     }
 
     virtual void prepareDetection() override {
+
         const VecTetrahedron& tetrahedra = this->l_topology->getTetrahedra();
 
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
@@ -199,8 +200,6 @@ public:
         return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], fact[0],fact[1],fact[2],fact[3]);
     }
 
-protected:
-
     typedef struct
     {
         double V0;
@@ -210,10 +209,13 @@ protected:
 
     } TetraInfo;
 
-
+    void computeBaryCoords(const defaulttype::Vector3 & P,unsigned eid, double & fact_u,double & fact_v, double & fact_w, double & fact_x)
+    {
+        computeBaryCoords(P,m_tetra_info[eid],fact_u, fact_v,  fact_w,  fact_x);
+    }
 
     //proj_P must be on the plane
-    void computeBaryCoords(const defaulttype::Vector3 & P,const TetraInfo & tinfo, double & fact_u,double & fact_v, double & fact_w, double & fact_x) const
+    static void computeBaryCoords(const defaulttype::Vector3 & P,const TetraInfo & tinfo, double & fact_u,double & fact_v, double & fact_w, double & fact_x)
     {
         defaulttype::Vector3 e = P - tinfo.p0;
 
@@ -227,6 +229,8 @@ protected:
         fact_u = 1.0 - (fact_v + fact_w + fact_x);
 
     }
+
+protected:
 
     std::vector<TetraInfo> m_tetra_info;
 

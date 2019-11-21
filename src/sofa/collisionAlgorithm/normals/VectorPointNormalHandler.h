@@ -18,6 +18,7 @@ public:
 
     virtual defaulttype::Vector3 computeNormal(const PointProximity & data) const {
         if(data.m_eid < d_normals.getValue().size()) return d_normals.getValue()[data.m_eid];
+        if(d_normals.getValue().size()==1) return d_normals.getValue()[0];
         return defaulttype::Vector3();
     }
 };

@@ -201,7 +201,7 @@ public:
             fact_w = 0;
         }
 
-        return TriangleProximity(eid, triangle[0], triangle[1], triangle[2], fact_u, fact_v, fact_w);
+        return TriangleProximity(eid, triangle[0], triangle[1], triangle[2],fact_u,fact_v,fact_w);
     }
 
 
