@@ -8,6 +8,17 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
+typedef struct
+{
+    defaulttype::Vector3 v0,v1;
+    double d00;
+    double d01;
+    double d11;
+    double invDenom;
+
+    defaulttype::Vector3 ax1,ax2;
+} TriangleInfo;
+
 template<class DataTypes>
 class TriangleGeometry : public TBaseGeometry<DataTypes> {
 public:
@@ -154,16 +165,7 @@ public:
 
     }
 
-    typedef struct
-    {
-        defaulttype::Vector3 v0,v1;
-        double d00;
-        double d01;
-        double d11;
-        double invDenom;
 
-        defaulttype::Vector3 ax1,ax2;
-    } TriangleInfo;
 
     inline static TriangleProximity projectOnTriangle(const unsigned eid, const Triangle & triangle, const TriangleInfo tinfo, const defaulttype::Vector3 projectP, const defaulttype::Vector3 triangleP0, const defaulttype::Vector3 triangleP1, const defaulttype::Vector3 triangleP2)
     {
