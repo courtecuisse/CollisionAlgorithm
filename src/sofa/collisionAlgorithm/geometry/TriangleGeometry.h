@@ -150,21 +150,38 @@ public:
         defaulttype::Vector3 P1 = pos[triangle[1]];
         defaulttype::Vector3 P2 = pos[triangle[2]];
 
-        defaulttype::Vector3 x1x2 = P - P0;
+        return projectOnTriangle(eid,triangle,tinfo,P,P0,P1,P2);
+
+    }
+
+    typedef struct
+    {
+        defaulttype::Vector3 v0,v1;
+        double d00;
+        double d01;
+        double d11;
+        double invDenom;
+
+        defaulttype::Vector3 ax1,ax2;
+    } TriangleInfo;
+
+    inline static TriangleProximity projectOnTriangle(const unsigned eid, const Triangle & triangle, const TriangleInfo tinfo, const defaulttype::Vector3 projectP, const defaulttype::Vector3 triangleP0, const defaulttype::Vector3 triangleP1, const defaulttype::Vector3 triangleP2)
+    {
+        defaulttype::Vector3 x1x2 = projectP - triangleP0;
 
         //corrdinate on the plane
         double c0 = dot(x1x2,tinfo.ax1);
         double c1 = dot(x1x2,tinfo.ax2);
-        defaulttype::Vector3 proj_P = P0 + tinfo.ax1 * c0 + tinfo.ax2 * c1;
+        defaulttype::Vector3 proj_P = triangleP0 + tinfo.ax1 * c0 + tinfo.ax2 * c1;
 
         double fact_u,fact_v,fact_w;
 
-        computeBaryCoords(proj_P, tinfo, P0, fact_u,fact_v,fact_w);
+        computeBaryCoords(proj_P, tinfo, triangleP0, fact_u,fact_v,fact_w);
 
         if (fact_u<0)
         {
-            defaulttype::Vector3 v3 = P1 - P2;
-            defaulttype::Vector3 v4 = proj_P - P2;
+            defaulttype::Vector3 v3 = triangleP1 - triangleP2;
+            defaulttype::Vector3 v4 = proj_P - triangleP2;
             double alpha = dot(v4,v3) / dot(v3,v3);
 
             if (alpha<0) alpha = 0;
@@ -176,8 +193,8 @@ public:
         }
         else if (fact_v<0)
         {
-            defaulttype::Vector3 v3 = P0 - P2;
-            defaulttype::Vector3 v4 = proj_P - P2;
+            defaulttype::Vector3 v3 = triangleP0 - triangleP2;
+            defaulttype::Vector3 v4 = proj_P - triangleP2;
             double alpha = dot(v4,v3) / dot(v3,v3);
 
             if (alpha<0) alpha = 0;
@@ -189,8 +206,8 @@ public:
         }
         else if (fact_w<0)
         {
-            defaulttype::Vector3 v3 = P1 - P0;
-            defaulttype::Vector3 v4 = proj_P - P0;
+            defaulttype::Vector3 v3 = triangleP1 - triangleP0;
+            defaulttype::Vector3 v4 = proj_P - triangleP0;
             double alpha = dot(v4,v3) / dot(v3,v3);
 
             if (alpha<0) alpha = 0;
@@ -204,17 +221,6 @@ public:
         return TriangleProximity(eid, triangle[0], triangle[1], triangle[2],fact_u,fact_v,fact_w);
     }
 
-
-    typedef struct
-    {
-        defaulttype::Vector3 v0,v1;
-        double d00;
-        double d01;
-        double d11;
-        double invDenom;
-
-        defaulttype::Vector3 ax1,ax2;
-    } TriangleInfo;
 
     //proj_P must be on the plane
     static void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w)
