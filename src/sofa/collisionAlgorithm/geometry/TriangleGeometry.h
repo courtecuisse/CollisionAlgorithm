@@ -8,7 +8,7 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-typedef struct
+struct TriangleInfo
 {
     defaulttype::Vector3 v0,v1;
     double d00;
@@ -17,7 +17,28 @@ typedef struct
     double invDenom;
 
     defaulttype::Vector3 ax1,ax2;
-} TriangleInfo;
+
+    friend std::ostream& operator<<(std::ostream& os, const TriangleInfo& t)  {
+        return os;
+    }
+
+    friend std::istream& operator>>(std::istream& i, TriangleInfo& /*t*/) {
+        return i;
+    }
+} ;
+
+//proj_P must be on the plane
+static void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w)
+{
+    defaulttype::Vector3 v2 = proj_P - p0;
+
+    double d20 = dot(v2,tinfo.v0);
+    double d21 = dot(v2,tinfo.v1);
+
+    fact_v = (tinfo.d11 * d20 - tinfo.d01 * d21) * tinfo.invDenom;
+    fact_w = (tinfo.d00 * d21 - tinfo.d01 * d20) * tinfo.invDenom;
+    fact_u = 1.0 - fact_v  - fact_w;
+}
 
 template<class DataTypes>
 class TriangleGeometry : public TBaseGeometry<DataTypes> {
@@ -165,7 +186,16 @@ public:
 
     }
 
+    typedef struct
+    {
+        defaulttype::Vector3 v0,v1;
+        double d00;
+        double d01;
+        double d11;
+        double invDenom;
 
+        defaulttype::Vector3 ax1,ax2;
+    } TriangleInfo;
 
     inline static TriangleProximity projectOnTriangle(const unsigned eid, const Triangle & triangle, const TriangleInfo tinfo, const defaulttype::Vector3 projectP, const defaulttype::Vector3 triangleP0, const defaulttype::Vector3 triangleP1, const defaulttype::Vector3 triangleP2)
     {
