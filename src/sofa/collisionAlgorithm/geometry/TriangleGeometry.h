@@ -40,6 +40,62 @@ static void computeBaryCoords(const defaulttype::Vector3 & proj_P,const Triangle
     fact_u = 1.0 - fact_v  - fact_w;
 }
 
+inline static TriangleProximity projectOnTriangle(const unsigned eid, const sofa::core::topology::BaseMeshTopology::Triangle & triangle, const TriangleInfo tinfo, const defaulttype::Vector3 projectP, const defaulttype::Vector3 triangleP0, const defaulttype::Vector3 triangleP1, const defaulttype::Vector3 triangleP2)
+{
+    defaulttype::Vector3 x1x2 = projectP - triangleP0;
+
+    //corrdinate on the plane
+    double c0 = dot(x1x2,tinfo.ax1);
+    double c1 = dot(x1x2,tinfo.ax2);
+    defaulttype::Vector3 proj_P = triangleP0 + tinfo.ax1 * c0 + tinfo.ax2 * c1;
+
+    double fact_u,fact_v,fact_w;
+
+    computeBaryCoords(proj_P, tinfo, triangleP0, fact_u,fact_v,fact_w);
+
+    if (fact_u<0)
+    {
+        defaulttype::Vector3 v3 = triangleP1 - triangleP2;
+        defaulttype::Vector3 v4 = proj_P - triangleP2;
+        double alpha = dot(v4,v3) / dot(v3,v3);
+
+        if (alpha<0) alpha = 0;
+        else if (alpha>1) alpha = 1;
+
+        fact_u = 0;
+        fact_v = alpha;
+        fact_w = 1.0 - alpha;
+    }
+    else if (fact_v<0)
+    {
+        defaulttype::Vector3 v3 = triangleP0 - triangleP2;
+        defaulttype::Vector3 v4 = proj_P - triangleP2;
+        double alpha = dot(v4,v3) / dot(v3,v3);
+
+        if (alpha<0) alpha = 0;
+        else if (alpha>1) alpha = 1;
+
+        fact_u = alpha;
+        fact_v = 0;
+        fact_w = 1.0 - alpha;
+    }
+    else if (fact_w<0)
+    {
+        defaulttype::Vector3 v3 = triangleP1 - triangleP0;
+        defaulttype::Vector3 v4 = proj_P - triangleP0;
+        double alpha = dot(v4,v3) / dot(v3,v3);
+
+        if (alpha<0) alpha = 0;
+        else if (alpha>1) alpha = 1;
+
+        fact_u = 1.0 - alpha;
+        fact_v = alpha;
+        fact_w = 0;
+    }
+
+    return TriangleProximity(eid, triangle[0], triangle[1], triangle[2],fact_u,fact_v,fact_w);
+}
+
 template<class DataTypes>
 class TriangleGeometry : public TBaseGeometry<DataTypes> {
 public:
