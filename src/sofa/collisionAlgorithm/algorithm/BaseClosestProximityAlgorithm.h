@@ -30,6 +30,10 @@ public :
     }
 } ;
 
+//Static functions
+void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d);
+BaseProximity::SPtr doFindClosestProximityIt(const BaseProximity::SPtr & pfrom, BaseElementIterator::UPtr & begin, std::function<bool(const BaseProximity::SPtr, const BaseProximity::SPtr)>& acceptFilter, BaseDistanceProximityMeasure* distance );
+BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo, std::function<bool(const BaseProximity::SPtr, const BaseProximity::SPtr)>& acceptFilter, BaseDistanceProximityMeasure* distance );
 
 class BaseClosestProximityAlgorithm : public BaseAlgorithm
 {
