@@ -38,8 +38,8 @@ void AABBBroadPhase::prepareDetection() {
     m_Bmax = m_Bmin;
 
     //updates bounding box area
-    for (unsigned i=1;i<mstate->getSize();i++) {
-        defaulttype::Vector3 pos(mstate->getPX(i),mstate->getPY(i),mstate->getPZ(i));
+    for (unsigned j=1;j<mstate->getSize();j++) {
+        defaulttype::Vector3 pos(mstate->getPX(j),mstate->getPY(j),mstate->getPZ(j));
 
         for (int i = 0 ; i < 3 ; i++) {
             if (pos[i] > m_Bmax[i])
