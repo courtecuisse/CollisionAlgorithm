@@ -40,7 +40,12 @@ static void computeBaryCoords(const defaulttype::Vector3 & proj_P,const Triangle
     fact_u = 1.0 - fact_v  - fact_w;
 }
 
-inline static TriangleProximity projectOnTriangle(const unsigned eid, const sofa::core::topology::BaseMeshTopology::Triangle & triangle, const TriangleInfo tinfo, const defaulttype::Vector3 projectP, const defaulttype::Vector3 triangleP0, const defaulttype::Vector3 triangleP1, const defaulttype::Vector3 triangleP2)
+inline static void projectOnTriangle(const defaulttype::Vector3 projectP,
+                                     const defaulttype::Vector3 & triangleP0,
+                                     const defaulttype::Vector3 & triangleP1,
+                                     const defaulttype::Vector3 & triangleP2,
+                                     const TriangleInfo & tinfo,
+                                     double & fact_u,double & fact_v,double & fact_w)
 {
     defaulttype::Vector3 x1x2 = projectP - triangleP0;
 
@@ -48,8 +53,6 @@ inline static TriangleProximity projectOnTriangle(const unsigned eid, const sofa
     double c0 = dot(x1x2,tinfo.ax1);
     double c1 = dot(x1x2,tinfo.ax2);
     defaulttype::Vector3 proj_P = triangleP0 + tinfo.ax1 * c0 + tinfo.ax2 * c1;
-
-    double fact_u,fact_v,fact_w;
 
     computeBaryCoords(proj_P, tinfo, triangleP0, fact_u,fact_v,fact_w);
 
@@ -92,8 +95,6 @@ inline static TriangleProximity projectOnTriangle(const unsigned eid, const sofa
         fact_v = alpha;
         fact_w = 0;
     }
-
-    return TriangleProximity(eid, triangle[0], triangle[1], triangle[2],fact_u,fact_v,fact_w);
 }
 
 template<class DataTypes>
