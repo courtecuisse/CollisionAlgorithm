@@ -27,6 +27,30 @@ struct TriangleInfo
     }
 } ;
 
+
+static TriangleInfo computeTinfo(const defaulttype::Vector3 & t0,const defaulttype::Vector3 & t1,const defaulttype::Vector3 & t2) {
+    //Compute the projection of the point on the plane
+    collisionAlgorithm::TriangleInfo tinfo;
+    tinfo.v0 = t1 - t0;
+    tinfo.v1 = t2 - t0;
+    defaulttype::Vector3 N=cross(tinfo.v0,tinfo.v1);
+    N.normalize();
+
+    tinfo.d00 = dot(tinfo.v0,tinfo.v0);
+    tinfo.d01 = dot(tinfo.v0,tinfo.v1);
+    tinfo.d11 = dot(tinfo.v1,tinfo.v1);
+
+    tinfo.invDenom = 1.0 / (tinfo.d00 * tinfo.d11 - tinfo.d01 * tinfo.d01);
+
+    tinfo.ax1 = tinfo.v0;
+    tinfo.ax2 = tinfo.v0.cross(N);
+
+    tinfo.ax1.normalize();
+    tinfo.ax2.normalize();
+
+    return tinfo;
+}
+
 //proj_P must be on the plane
 static void computeBaryCoords(const defaulttype::Vector3 & proj_P,const TriangleInfo & tinfo, const defaulttype::Vector3 & p0, double & fact_u,double & fact_v, double & fact_w)
 {
