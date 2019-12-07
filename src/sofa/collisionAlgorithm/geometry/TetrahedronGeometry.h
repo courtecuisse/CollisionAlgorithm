@@ -175,6 +175,11 @@ public:
         return bbox;
     }
 
+    inline TetrahedronProximity createProximity(unsigned eid,double & fact_u,double & fact_v, double & fact_w, double & fact_x) {
+        const Tetrahedron & tetrahedron = l_topology->getTetrahedron(eid);
+        return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], fact_u,fact_v,fact_w,fact_x);
+    }
+
     inline TetrahedronProximity project(unsigned eid, const Tetrahedron & tetrahedron, const defaulttype::Vector3 & P) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 

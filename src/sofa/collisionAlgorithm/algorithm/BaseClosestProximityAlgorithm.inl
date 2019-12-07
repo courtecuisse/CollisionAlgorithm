@@ -131,7 +131,7 @@ void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype:
     }
 }
 
-BaseProximity::SPtr doFindClosestProximityIt(const BaseProximity::SPtr & pfrom, BaseElementIterator::UPtr & begin, std::function<bool(const BaseProximity::SPtr, const BaseProximity::SPtr)>& acceptFilter, BaseDistanceProximityMeasure* distance ) {
+BaseProximity::SPtr doFindClosestProximityIt(const BaseProximity::SPtr & pfrom, BaseElementIterator::UPtr & begin, std::function<bool(const BaseProximity::SPtr, const BaseProximity::SPtr)>& acceptFilter, const BaseDistanceProximityMeasure& distance ) {
     double min_dist = std::numeric_limits<double>::max();
     BaseProximity::SPtr minprox_dest = nullptr;
     defaulttype::Vector3 P = pfrom->getPosition();
@@ -140,7 +140,7 @@ BaseProximity::SPtr doFindClosestProximityIt(const BaseProximity::SPtr & pfrom, 
         BaseProximity::SPtr pdest = begin->project(P);
 
         if (acceptFilter(pfrom,pdest)) {
-            double dist = distance->computeDistance(PairDetection(pfrom,pdest));
+            double dist = distance.computeDistance(PairDetection(pfrom,pdest));
 
             if (dist<min_dist) {
                 min_dist = dist;
@@ -154,7 +154,7 @@ BaseProximity::SPtr doFindClosestProximityIt(const BaseProximity::SPtr & pfrom, 
     return minprox_dest;
 }
 
-BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo, std::function<bool(const BaseProximity::SPtr, const BaseProximity::SPtr)>& acceptFilter, BaseDistanceProximityMeasure* distance ) {
+BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo, std::function<bool(const BaseProximity::SPtr, const BaseProximity::SPtr)>& acceptFilter, const BaseDistanceProximityMeasure& distance ) {
     const std::vector<BaseGeometry::BroadPhase::SPtr> & decorators = geo->getBroadPhase();
 
     if (decorators.empty()) {

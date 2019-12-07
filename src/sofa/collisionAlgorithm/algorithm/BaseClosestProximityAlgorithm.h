@@ -16,7 +16,7 @@ class BaseDistanceProximityMeasure : public sofa::core::objectmodel::BaseObject 
 public :
     SOFA_ABSTRACT_CLASS(BaseDistanceProximityMeasure, sofa::core::objectmodel::BaseObject);
 
-    virtual double computeDistance(const collisionAlgorithm::PairDetection & d) = 0;
+    virtual double computeDistance(const collisionAlgorithm::PairDetection & d) const = 0;
 
 } ;
 
@@ -25,15 +25,15 @@ class Distance3DProximityMeasure : public BaseDistanceProximityMeasure {
 public :
     SOFA_CLASS(Distance3DProximityMeasure, BaseDistanceProximityMeasure);
 
-    double computeDistance(const collisionAlgorithm::PairDetection & d) override {
+    double computeDistance(const collisionAlgorithm::PairDetection & d) const override {
         return (d.first->getPosition()-d.second->getPosition()).norm() ;
     }
 } ;
 
 //Static functions
 void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d);
-BaseProximity::SPtr doFindClosestProximityIt(const BaseProximity::SPtr & pfrom, BaseElementIterator::UPtr & begin, std::function<bool(const BaseProximity::SPtr, const BaseProximity::SPtr)>& acceptFilter, BaseDistanceProximityMeasure* distance );
-BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo, std::function<bool(const BaseProximity::SPtr, const BaseProximity::SPtr)>& acceptFilter, BaseDistanceProximityMeasure* distance );
+BaseProximity::SPtr doFindClosestProximityIt(const BaseProximity::SPtr & pfrom, BaseElementIterator::UPtr & begin, std::function<bool(const BaseProximity::SPtr, const BaseProximity::SPtr)>& acceptFilter, const BaseDistanceProximityMeasure& distance );
+BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo, std::function<bool(const BaseProximity::SPtr, const BaseProximity::SPtr)>& acceptFilter, const BaseDistanceProximityMeasure& distance );
 
 class BaseClosestProximityAlgorithm : public BaseAlgorithm
 {
