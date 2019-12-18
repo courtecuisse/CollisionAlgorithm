@@ -48,6 +48,10 @@ public:
         m_output.push_back(PairDetection(p1,std::shared_ptr<FixedProximity>(new FixedProximity(P))));
     }
 
+    inline void push_back(const PairDetection & d) {
+        m_output.push_back(d);
+    }
+
     inline void add(BaseProximity::SPtr p1, BaseProximity::SPtr p2) {
         if (p1 == NULL) return;
         if (p2 == NULL) return;
