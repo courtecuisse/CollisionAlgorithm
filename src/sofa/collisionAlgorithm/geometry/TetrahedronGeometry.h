@@ -11,11 +11,11 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class TetrahedronGeometry : public TBaseGeometry<DataTypes> {
+class TetrahedronGeometry : public TBaseGeometry<DataTypes,TetrahedronProximity> {
 public:
     typedef DataTypes TDataTypes;
     typedef TetrahedronGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes> Inherit;
+    typedef TBaseGeometry<DataTypes,TetrahedronProximity> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef typename DataTypes::MatrixDeriv MatrixDeriv;

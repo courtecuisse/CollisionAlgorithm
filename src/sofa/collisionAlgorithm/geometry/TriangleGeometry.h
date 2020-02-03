@@ -122,11 +122,12 @@ inline static void projectOnTriangle(const defaulttype::Vector3 projectP,
 }
 
 template<class DataTypes>
-class TriangleGeometry : public TBaseGeometry<DataTypes> {
+class TriangleGeometry : public TBaseGeometry<DataTypes,TriangleProximity> {
 public:
     typedef DataTypes TDataTypes;
     typedef TriangleGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes> Inherit;
+    typedef TBaseGeometry<DataTypes,TriangleProximity> Inherit;
+    typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef typename DataTypes::MatrixDeriv MatrixDeriv;
@@ -146,7 +147,7 @@ public:
     }
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        return DefaultElementIterator<TriangleProximity>::create(this, this->l_topology->getTriangles(), eid);
+        return DefaultElementIterator<PROXIMITYDATA>::create(this, this->l_topology->getTriangles(), eid);
     }
 
     void draw(const core::visual::VisualParams * vparams) {
@@ -224,13 +225,9 @@ public:
         return this->l_topology->getTriangle(eid);
     }
 
-    inline defaulttype::Vector3 getNormal(const TriangleProximity & data) const {
-        return m_triangle_normals[data.m_eid];
-    }
-
     ////Bezier triangle are computed according to :
     ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
-    inline defaulttype::Vector3 getPosition(const TriangleProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
+    inline defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
 
         return pos[data.m_p0] * data.m_f0 +
@@ -238,8 +235,8 @@ public:
                 pos[data.m_p2] * data.m_f2;
     }
 
-    TriangleProximity center(unsigned eid,const Triangle & triangle) const {
-        return TriangleProximity(eid, triangle[0], triangle[1], triangle[2], 0.3333, 0.3333, 0.3333);
+    PROXIMITYDATA center(unsigned eid,const Triangle & triangle) const {
+        return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 0.3333, 0.3333, 0.3333);
     }
 
     defaulttype::BoundingBox getBBox(const Triangle & triangle) const {
@@ -254,7 +251,7 @@ public:
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    inline TriangleProximity project(unsigned eid, const Triangle & triangle, const defaulttype::Vector3 & P) const {
+    inline PROXIMITYDATA project(unsigned eid, const Triangle & triangle, const defaulttype::Vector3 & P) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
         const TriangleInfo & tinfo = m_triangle_info[eid];
@@ -268,7 +265,7 @@ public:
     }
 
 
-    inline static TriangleProximity projectOnTriangle(const unsigned eid, const Triangle & triangle, const TriangleInfo tinfo, const defaulttype::Vector3 projectP, const defaulttype::Vector3 triangleP0, const defaulttype::Vector3 triangleP1, const defaulttype::Vector3 triangleP2)
+    inline static PROXIMITYDATA projectOnTriangle(const unsigned eid, const Triangle & triangle, const TriangleInfo tinfo, const defaulttype::Vector3 projectP, const defaulttype::Vector3 triangleP0, const defaulttype::Vector3 triangleP1, const defaulttype::Vector3 triangleP2)
     {
         defaulttype::Vector3 x1x2 = projectP - triangleP0;
 
@@ -321,7 +318,7 @@ public:
             fact_w = 0;
         }
 
-        return TriangleProximity(eid, triangle[0], triangle[1], triangle[2],fact_u,fact_v,fact_w);
+        return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2],fact_u,fact_v,fact_w);
     }
 
 

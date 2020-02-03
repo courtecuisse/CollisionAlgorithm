@@ -32,9 +32,7 @@ public:
     SubsetGeometry()
     : d_indices(initData(&d_indices, "indices", "Indices of the primitives in the underlying geometry"))
     , l_wholeGeometry(initLink("wholeGeometry", "Whole geometry on which we want the subet"))
-    {
-
-    }
+    {}
 
     inline BaseElementIterator::UPtr begin(unsigned /* eid */) const override {
         return BaseElementIterator::UPtr(new SubsetElementIterator(l_wholeGeometry.get(), d_indices.getValue()));
@@ -43,6 +41,10 @@ public:
     sofa::core::behavior::BaseMechanicalState * getState() const override
     {
         return l_wholeGeometry->getState();
+    }
+
+    void updateNormals() override {
+        l_wholeGeometry->updateNormals();
     }
 };
 

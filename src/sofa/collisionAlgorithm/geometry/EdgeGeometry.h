@@ -9,10 +9,11 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class EdgeGeometry : public TBaseGeometry<DataTypes> {
+class EdgeGeometry : public TBaseGeometry<DataTypes,EdgeProximity> {
 public:
     typedef DataTypes TDataTypes;
-    typedef TBaseGeometry<DataTypes> Inherit;
+    typedef TBaseGeometry<DataTypes,EdgeProximity> Inherit;
+    typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
     typedef EdgeGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
@@ -21,26 +22,6 @@ public:
     typedef sofa::core::topology::BaseMeshTopology::Edge Edge;
 
     SOFA_CLASS(GEOMETRY,Inherit);
-
-    class EdgeNormalHandler : public sofa::core::objectmodel::BaseObject {
-    public:
-        SOFA_ABSTRACT_CLASS(EdgeNormalHandler, sofa::core::objectmodel::BaseObject);
-
-        core::objectmodel::SingleLink<EdgeNormalHandler, GEOMETRY, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
-
-        EdgeNormalHandler()
-        : l_geometry(initLink("geometry", "link to the geometry")) {
-            l_geometry.setPath("@.");
-        }
-
-        void init() override {
-            if (l_geometry == NULL) return;
-            l_geometry->m_normalHandler = this;
-            l_geometry->addSlave(this);
-        }
-
-        virtual defaulttype::Vector3 computeNormal(const EdgeProximity & data) const = 0;
-    };
 
     core::objectmodel::SingleLink<GEOMETRY,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
 
@@ -53,23 +34,18 @@ public:
     void bwdInit();
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        return DefaultElementIterator<EdgeProximity>::create(this,this->l_topology->getEdges(), eid);
+        return DefaultElementIterator<PROXIMITYDATA>::create(this,this->l_topology->getEdges(), eid);
     }
 
     inline const sofa::core::topology::BaseMeshTopology::Edge getEdge(unsigned eid) const {
         return this->l_topology->getEdge(eid);
     }
 
-    inline defaulttype::Vector3 getPosition(const EdgeProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
+    inline defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
 
         return pos[data.m_p0] * data.m_f0 +
                pos[data.m_p1] * data.m_f1;
-    }
-
-    inline defaulttype::Vector3 getNormal(const EdgeProximity & data) const {
-        return m_normalHandler->computeNormal(data);
-
     }
 
     inline defaulttype::BoundingBox getBBox(const Edge & edge) const {
@@ -81,11 +57,11 @@ public:
         return bbox;
     }
 
-    inline EdgeProximity center(unsigned eid, const Edge & edge) const {
-        return EdgeProximity(eid, edge[0], edge[1], 0.5, 0.5);
+    inline PROXIMITYDATA center(unsigned eid, const Edge & edge) const {
+        return PROXIMITYDATA(eid, edge[0], edge[1], 0.5, 0.5);
     }
 
-    inline EdgeProximity project(unsigned eid, const Edge & edge, const defaulttype::Vector3 & P) const {
+    inline PROXIMITYDATA project(unsigned eid, const Edge & edge, const defaulttype::Vector3 & P) const {
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
 
         const defaulttype::Vector3 & E1 = x[edge[0]];
@@ -102,7 +78,7 @@ public:
 
         fact_u = 1.0-fact_v;
 
-        return EdgeProximity(eid, edge[0], edge[1], fact_u,fact_v);
+        return PROXIMITYDATA(eid, edge[0], edge[1], fact_u,fact_v);
     }
 
     inline void draw(const core::visual::VisualParams * vparams) {
@@ -129,9 +105,6 @@ public:
         }
         glEnd();
     }
-
-protected:
-    typename EdgeNormalHandler::SPtr m_normalHandler;
 
 };
 

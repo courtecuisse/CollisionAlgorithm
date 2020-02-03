@@ -7,9 +7,9 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class VectorPointNormalHandler : public PointGeometry<DataTypes>::PointNormalHandler {
+class VectorPointNormalHandler : public TBaseNormalHandler<DataTypes,PointProximity> {
 public:
-    SOFA_CLASS(SOFA_TEMPLATE(VectorPointNormalHandler,DataTypes), typename PointGeometry<DataTypes>::PointNormalHandler);
+    SOFA_CLASS(SOFA_TEMPLATE(VectorPointNormalHandler,DataTypes), SOFA_TEMPLATE2(TBaseNormalHandler,DataTypes,PointProximity));
 
     Data<helper::vector<defaulttype::Vector3>> d_normals;
 
