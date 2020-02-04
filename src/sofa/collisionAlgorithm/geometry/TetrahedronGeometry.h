@@ -152,6 +152,16 @@ public:
         return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], fact[0],fact[1],fact[2],fact[3]);
     }
 
+    inline void computeTetraBaryCoords(const Vec3d & P, unsigned eid, double & fact_u,double & fact_v, double & fact_w, double & fact_x)
+    {
+        const Tetrahedron & tetrahedron = l_topology->getTetrahedron(eid);
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+
+        const TetraInfo & tinfo = m_tetra_info[eid];
+
+        defaulttype::Vector3 P0 = pos[tetrahedron[0]];
+        toolBox::computeTetraBaryCoords(P,P0,tinfo,fact_u,fact_v,fact_w,fact_x);
+    }
 
 
     //proj_P must be on the plane

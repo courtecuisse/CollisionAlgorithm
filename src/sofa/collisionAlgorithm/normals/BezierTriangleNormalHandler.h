@@ -41,6 +41,7 @@ public:
 
     virtual defaulttype::Vector3 computeNormal(const GEOMETRY & data) const override
     {
+        //TODO
         return defaulttype::Vector3();
     }
 
