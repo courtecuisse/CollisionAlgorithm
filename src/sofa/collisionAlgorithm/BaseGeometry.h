@@ -9,6 +9,7 @@
 #include <sofa/simulation/Visitor.h>
 #include <sofa/helper/system/gl.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
+#include <sofa/collisionAlgorithm/toolBox.h>
 
 namespace sofa {
 

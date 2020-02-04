@@ -67,13 +67,7 @@ public:
         double fact_u;
         double fact_v;
 
-        defaulttype::Vector3 v = E2 - E1;
-        fact_v = dot (P - E1,v) / dot(v,v);
-
-        if (fact_v<0.0) fact_v = 0.0;
-        else if (fact_v>1.0) fact_v = 1.0;
-
-        fact_u = 1.0-fact_v;
+        toolBox::projectOnEdge(P,E1,E2,fact_u,fact_v);
 
         return PROXIMITYDATA(eid, edge[0], edge[1], fact_u,fact_v);
     }
