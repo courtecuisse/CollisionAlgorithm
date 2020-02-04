@@ -115,7 +115,7 @@ class BaseNormalHandler : public sofa::core::objectmodel::BaseObject {
 public:
     SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(BaseNormalHandler,PROXIMITYDATA), sofa::core::objectmodel::BaseObject);
 
-    virtual void updateNormals();
+    virtual void updateNormals() {}
 
     virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const = 0;
 };

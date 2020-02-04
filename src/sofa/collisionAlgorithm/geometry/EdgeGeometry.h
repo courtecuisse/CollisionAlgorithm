@@ -30,9 +30,6 @@ public:
         l_topology.setPath("@.");
     }
 
-    //Check at bwd init if the normal handler is set else create a default one
-    void bwdInit();
-
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
         return DefaultElementIterator<PROXIMITYDATA>::create(this,this->l_topology->getEdges(), eid);
     }
