@@ -39,6 +39,11 @@ public:
         return normal.normalized();
     }
 
+    virtual defaulttype::Vector3 computeNormal(const GEOMETRY & data) const override
+    {
+        return defaulttype::Vector3();
+    }
+
 };
 
 

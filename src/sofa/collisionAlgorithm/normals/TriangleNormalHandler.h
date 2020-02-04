@@ -24,7 +24,7 @@ public:
 
         for (size_t t=0 ; t<triangles.size() ; t++) {
             auto tinfo = this->l_geometry->getTriangleInfo(t);
-            m_triangle_normals[t] = tinfo.ax2.cross(tinfo.ax1);
+            m_triangle_normals[t] = tinfo.n;
 
         }
     }
