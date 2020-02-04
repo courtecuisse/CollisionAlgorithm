@@ -1,21 +1,22 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/geometry/EdgeGeometry.h>
 #include <sofa/collisionAlgorithm/BaseNormalHandler.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
-template<class DataTypes>
-class DefaultEdgeNormalHandler : public TBaseNormalHandler<DataTypes,EdgeProximity> {
+template<class GEOMETRY>
+class DefaultEdgeNormalHandler : public TBaseNormalHandler<GEOMETRY> {
 public:
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef typename GEOMETRY::VecCoord VecCoord;
+    typedef typename GEOMETRY::DataVecCoord DataVecCoord;
+    typedef typename GEOMETRY::PROXIMITYDATA PROXIMITYDATA;
+    typedef TBaseNormalHandler<GEOMETRY> Inherit;
 
-    SOFA_CLASS(SOFA_TEMPLATE(DefaultEdgeNormalHandler,DataTypes), SOFA_TEMPLATE2(TBaseNormalHandler,DataTypes,EdgeProximity));
+    SOFA_CLASS(SOFA_TEMPLATE(DefaultEdgeNormalHandler,GEOMETRY), Inherit);
 
-    defaulttype::Vector3 computeNormal(const EdgeProximity & data) const override {
+    defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
         const helper::ReadAccessor<DataVecCoord> & pos = this->l_geometry->getState()->read(core::VecCoordId::position());
         return (pos[data.m_p1] - pos[data.m_p0]).normalized();
     }

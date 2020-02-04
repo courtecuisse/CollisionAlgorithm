@@ -80,7 +80,7 @@ public:
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
         m_triangle_info.resize(triangles.size());
-        m_triangle_normals.resize(triangles.size());
+
 
         for (size_t t=0 ; t<triangles.size() ; t++)
         {
@@ -93,11 +93,7 @@ public:
 
             TriangleInfo & tinfo = m_triangle_info[t];
 
-
             tinfo = toolBox::computeTriangleInfo(p0, p1, p2);
-
-            m_triangle_normals[t] = tinfo.ax2.cross(tinfo.ax1);
-
         }
     }
 
@@ -148,11 +144,15 @@ public:
 
     }
 
+    inline const TriangleInfo & getTriangleInfo(unsigned eid) {
+        return m_triangle_info[eid];
+    }
+
 
 protected:
 
     std::vector<TriangleInfo> m_triangle_info;
-    helper::vector<defaulttype::Vector3> m_triangle_normals;
+
 
 };
 

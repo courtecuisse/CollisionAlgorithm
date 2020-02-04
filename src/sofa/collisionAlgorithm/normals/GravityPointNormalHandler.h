@@ -1,25 +1,27 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
+#include <sofa/collisionAlgorithm/BaseNormalHandler.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
-template<class DataTypes>
-class GravityPointNormalHandler : public TBaseNormalHandler<DataTypes,PointProximity> {
+template<class GEOMETRY>
+class GravityPointNormalHandler : public TBaseNormalHandler<GEOMETRY> {
 public:
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef typename GEOMETRY::VecCoord VecCoord;
+    typedef typename GEOMETRY::DataVecCoord DataVecCoord;
+    typedef typename GEOMETRY::PROXIMITYDATA PROXIMITYDATA;
+    typedef TBaseNormalHandler<GEOMETRY> Inherit;
 
-    SOFA_CLASS(SOFA_TEMPLATE(GravityPointNormalHandler,DataTypes), SOFA_TEMPLATE2(TBaseNormalHandler,DataTypes,PointProximity));
+    SOFA_CLASS(SOFA_TEMPLATE(GravityPointNormalHandler,GEOMETRY), Inherit);
 
     GravityPointNormalHandler() {
         this->f_listening.setValue(true);
     }
 
     void init() override {
-        TBaseNormalHandler<DataTypes,PointProximity>::init();
+        TBaseNormalHandler<GEOMETRY>::init();
         computeGravityCenter();
     }
 
