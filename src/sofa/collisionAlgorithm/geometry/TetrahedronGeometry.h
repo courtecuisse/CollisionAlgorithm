@@ -140,19 +140,19 @@ public:
 
         const TetraInfo & tinfo = m_tetra_info[eid];
 
+        defaulttype::Vector3 P0 = pos[tetrahedron[0]];
+        defaulttype::Vector3 P1 = pos[tetrahedron[1]];
+        defaulttype::Vector3 P2 = pos[tetrahedron[2]];
+        defaulttype::Vector3 P3 = pos[tetrahedron[3]];
+
         double fact[4];
 
-        toolBox::projectOnTetra( P, tinfo, fact[0],fact[1],fact[2],fact[3]);
+        toolBox::projectOnTetra( P, P0, P1, P2, P3, tinfo,fact[0],fact[1],fact[2],fact[3]);
 
         return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], fact[0],fact[1],fact[2],fact[3]);
     }
 
 
-
-    void computeBaryCoords(const defaulttype::Vector3 & P,unsigned eid, double & fact_u,double & fact_v, double & fact_w, double & fact_x)
-    {
-        toolBox::computeTetraBaryCoords(P,m_tetra_info[eid],fact_u, fact_v,  fact_w,  fact_x);
-    }
 
     //proj_P must be on the plane
 
