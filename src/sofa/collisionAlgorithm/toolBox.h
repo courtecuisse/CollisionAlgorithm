@@ -19,6 +19,7 @@ typedef defaulttype::Vector3 Vec3d;
 
 struct TriangleInfo
 {
+    Vec3d n;
     Vec3d v0,v1;
     double d00;
     double d01;
@@ -60,6 +61,7 @@ inline void computeTriangleBaryCoords(const Vec3d & proj_P, const Vec3d & triang
 
 inline void projectOnTriangle(const Vec3d projectP, const Vec3d triangleP0, const Vec3d triangleP1, const Vec3d triangleP2, const TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w);
 
+
 //------------ Tetrahedra methods ------------//
 
 inline TetraInfo computeTetraInfo(const Vec3d & p0, const Vec3d & p1, const Vec3d & p2, const Vec3d & p3);
@@ -67,8 +69,6 @@ inline TetraInfo computeTetraInfo(const Vec3d & p0, const Vec3d & p1, const Vec3
 inline void computeTetraBaryCoords(const Vec3d & P, const Vec3d & tetraP0, const TetraInfo & tinfo, double & fact_u,double & fact_v, double & fact_w, double & fact_x);
 
 inline void projectOnTetra(const Vec3d & projectP, const Vec3d tetraP0, const Vec3d tetraP1, const Vec3d tetraP2, const Vec3d tetraP3,  const TetraInfo & tinfo, double & fact_u, double & fact_v, double & fact_w, double & fact_x);
-
-
 
 
 }

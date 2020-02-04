@@ -271,7 +271,7 @@ public:
 
 protected:
     mutable std::vector<BezierTriangleInfo> m_bezier_info;
-    bool m_dirty;
+    mutable bool m_dirty;
 
     void recomputeBezierInfo(core::VecCoordId v = core::VecCoordId::position()) const {
         const helper::vector<Triangle>& triangles = this->l_topology->getTriangles();
@@ -288,13 +288,13 @@ protected:
             defaulttype::Vector3 n002;
 
             const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav0 = this->l_topology->getTrianglesAroundVertex(triangle[2]);
-            for (size_t t=0;t<tav0.size();t++) n200 += this->m_triangle_normals[tav0[t]];
+            for (size_t t=0;t<tav0.size();t++) n200 += this->m_triangle_info[tav0[t]].n;
 
             const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav1 = this->l_topology->getTrianglesAroundVertex(triangle[1]);
-            for (size_t t=0;t<tav1.size();t++) n020 += this->m_triangle_normals[tav1[t]];
+            for (size_t t=0;t<tav1.size();t++) n020 += this->m_triangle_info[tav1[t]].n;
 
             const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav2 = this->l_topology->getTrianglesAroundVertex(triangle[0]);
-            for (size_t t=0;t<tav2.size();t++) n002 += this->m_triangle_normals[tav2[t]];
+            for (size_t t=0;t<tav2.size();t++) n002 += this->m_triangle_info[tav2[t]].n;
 
             n200.normalize();
             n020.normalize();

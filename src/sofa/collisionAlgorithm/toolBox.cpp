@@ -43,6 +43,7 @@ inline TriangleInfo computeTriangleInfo(const Vec3d & t0,const Vec3d & t1,const 
 
     tinfo.ax1.normalize();
     tinfo.ax2.normalize();
+    tinfo.n = N;
 
     return tinfo;
 }
