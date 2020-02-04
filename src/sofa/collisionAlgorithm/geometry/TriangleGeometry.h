@@ -134,7 +134,7 @@ public:
     inline PROXIMITYDATA project(unsigned eid, const Triangle & triangle, const defaulttype::Vector3 & P) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
-        const TriangleInfo & tinfo = m_triangle_info[eid];
+        TriangleInfo  tinfo = m_triangle_info[eid];
 
         defaulttype::Vector3 P0 = pos[triangle[0]];
         defaulttype::Vector3 P1 = pos[triangle[1]];

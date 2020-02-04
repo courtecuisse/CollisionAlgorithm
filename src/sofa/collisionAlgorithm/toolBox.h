@@ -40,8 +40,7 @@ struct TriangleInfo
 struct TetraInfo
 {
     double V0;
-    defaulttype::Vector3 p0;
-    defaulttype::Vector3 ax1,ax2,ax3,ax2Cax3;
+    Vec3d ax1,ax2,ax3,ax2Cax3;
     std::vector<TriangleInfo> trianglesInfo ;
 
 };
@@ -57,22 +56,17 @@ inline void projectOnEdge(const Vec3d & projP, const Vec3d & e1, const Vec3d & e
 
 inline TriangleInfo computeTriangleInfo(const Vec3d & t0,const Vec3d & t1,const Vec3d & t2);
 
-inline void computeTriangleBaryCoords(const Vec3d & proj_P,const TriangleInfo & tinfo, const Vec3d & p0, double & fact_u,double & fact_v, double & fact_w);
+inline void computeTriangleBaryCoords(const Vec3d & proj_P, const Vec3d & triangleP0, const TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w);
 
-inline void projectOnTriangle(const Vec3d projectP,
-                              const Vec3d & triangleP0,
-                              const Vec3d & triangleP1,
-                              const Vec3d & triangleP2,
-                              const TriangleInfo & tinfo,
-                              double & fact_u,double & fact_v,double & fact_w);
+inline void projectOnTriangle(const Vec3d projectP, const Vec3d triangleP0, const Vec3d triangleP1, const Vec3d triangleP2, const TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w);
 
 //------------ Tetrahedra methods ------------//
 
 inline TetraInfo computeTetraInfo(const Vec3d & p0, const Vec3d & p1, const Vec3d & p2, const Vec3d & p3);
 
-inline void computeTetraBaryCoords(const Vec3d & P,const TetraInfo & tinfo, double & fact_u,double & fact_v, double & fact_w, double & fact_x);
+inline void computeTetraBaryCoords(const Vec3d & P, const Vec3d & tetraP0, const TetraInfo & tinfo, double & fact_u,double & fact_v, double & fact_w, double & fact_x);
 
-inline void projectOnTetra(const Vec3d & projectP, const TetraInfo & tinfo, double & fact_u, double & fact_v, double & fact_w, double & fact_x);
+inline void projectOnTetra(const Vec3d & projectP, const Vec3d tetraP0, const Vec3d tetraP1, const Vec3d tetraP2, const Vec3d tetraP3,  const TetraInfo & tinfo, double & fact_u, double & fact_v, double & fact_w, double & fact_x);
 
 
 
