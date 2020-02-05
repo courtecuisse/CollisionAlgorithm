@@ -8,9 +8,6 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-
-
-
 template<class DataTypes>
 class TriangleGeometry : public TBaseGeometry<DataTypes,TriangleProximity> {
 public:
@@ -75,26 +72,7 @@ public:
     }
 
     virtual void prepareDetection() override {
-        const VecTriangles& triangles = this->l_topology->getTriangles();
-
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-
-        m_triangle_info.resize(triangles.size());
-
-
-        for (size_t t=0 ; t<triangles.size() ; t++)
-        {
-            const Triangle& tri = triangles[t];
-
-            //Compute Bezier Positions
-            const defaulttype::Vector3 & p0 = pos[tri[0]];
-            const defaulttype::Vector3 & p1 = pos[tri[1]];
-            const defaulttype::Vector3 & p2 = pos[tri[2]];
-
-            TriangleInfo & tinfo = m_triangle_info[t];
-
-            tinfo = toolBox::computeTriangleInfo(p0, p1, p2);
-        }
+        m_triangle_info.clear();
     }
 
     inline const sofa::core::topology::BaseMeshTopology::Triangle getTriangle(unsigned eid) const {
@@ -128,32 +106,48 @@ public:
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
     inline PROXIMITYDATA project(unsigned eid, const Triangle & triangle, const defaulttype::Vector3 & P) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-
-        TriangleInfo  tinfo = m_triangle_info[eid];
-
-        defaulttype::Vector3 P0 = pos[triangle[0]];
-        defaulttype::Vector3 P1 = pos[triangle[1]];
-        defaulttype::Vector3 P2 = pos[triangle[2]];
+        TriangleInfo  tinfo = getTriangleInfo()[eid];
 
         double fact_u,fact_v,fact_w;
-
-        toolBox::projectOnTriangle(P,P0,P1,P2,tinfo,fact_u,fact_v,fact_w);
+        toolBox::projectOnTriangle(P,tinfo,fact_u,fact_v,fact_w);
 
         return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2],fact_u,fact_v,fact_w);
-
     }
 
-    inline const TriangleInfo & getTriangleInfo(unsigned eid) {
-        return m_triangle_info[eid];
+    virtual defaulttype::Vector3 getNormal(const PROXIMITYDATA & data) const {
+        if (this->m_normalHandler != NULL) return this->m_normalHandler->computeNormal(data);
+
+        auto tinfo = getTriangleInfo()[data.m_eid];
+        return cross(tinfo.ax1,tinfo.ax2);
+    }
+
+
+    inline const std::vector<TriangleInfo> & getTriangleInfo(core::VecCoordId v = core::VecCoordId::position()) const {
+        if (m_triangle_info[v.getIndex()].empty()) computeTriangleInfo(v);
+        return m_triangle_info[v.getIndex()];
     }
 
 
 protected:
+    mutable std::map<int,std::vector<TriangleInfo> > m_triangle_info;
 
-    std::vector<TriangleInfo> m_triangle_info;
+    void computeTriangleInfo(core::VecCoordId v = core::VecCoordId::position()) const {
+        std::vector<TriangleInfo> & vecInfo = m_triangle_info[v.getIndex()];
+        const VecTriangles& triangles = this->l_topology->getTriangles();
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
 
+        vecInfo.clear();
+        for (size_t t=0 ; t<triangles.size() ; t++) {
+            const Triangle& tri = triangles[t];
 
+            //Compute Positions
+            const defaulttype::Vector3 & p0 = pos[tri[0]];
+            const defaulttype::Vector3 & p1 = pos[tri[1]];
+            const defaulttype::Vector3 & p2 = pos[tri[2]];
+
+            vecInfo.push_back(toolBox::computeTriangleInfo(p0, p1, p2));
+        }
+    }
 };
 
 

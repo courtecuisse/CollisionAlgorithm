@@ -213,20 +213,20 @@ public:
     }
 
     void updateNormals() override {
-        if (m_normals != NULL) m_normals->updateNormals();
+        if (m_normalHandler != NULL) m_normalHandler->updateNormals();
     }
 
-    inline defaulttype::Vector3 getNormal(const PROXIMITYDATA & data) const {
-        if (m_normals == NULL) return defaulttype::Vector3();
-        return m_normals->computeNormal(data);
+    virtual defaulttype::Vector3 getNormal(const PROXIMITYDATA & data) const {
+        if (m_normalHandler == NULL) return defaulttype::Vector3();
+        return m_normalHandler->computeNormal(data);
     }
 
     void setNormalHandler(typename BaseNormalHandler<TPROXIMITYDATA>::SPtr n) {
-        m_normals = n;
+        m_normalHandler = n;
     }
 
-private :
-    typename BaseNormalHandler<TPROXIMITYDATA>::SPtr m_normals;
+protected :
+    typename BaseNormalHandler<TPROXIMITYDATA>::SPtr m_normalHandler;
 
 };
 

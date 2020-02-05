@@ -27,6 +27,10 @@ inline TriangleInfo computeTriangleInfo(const Vec3d & t0,const Vec3d & t1,const 
     //Compute the projection of the point on the plane
     TriangleInfo tinfo;
 
+    tinfo.P0 = t0;
+    tinfo.P1 = t1;
+    tinfo.P2 = t2;
+
     tinfo.v0 = t1 - t0;
     tinfo.v1 = t2 - t0;
     Vec3d N=cross(tinfo.v0,tinfo.v1);
@@ -43,7 +47,6 @@ inline TriangleInfo computeTriangleInfo(const Vec3d & t0,const Vec3d & t1,const 
 
     tinfo.ax1.normalize();
     tinfo.ax2.normalize();
-    tinfo.n = N;
 
     return tinfo;
 }
@@ -60,38 +63,38 @@ inline void computeTriangleBaryCoords(const Vec3d & proj_P, const Vec3d & triang
     fact_u = 1.0 - fact_v  - fact_w;
 }
 
-inline void projectOnTriangle(const Vec3d projectP, const Vec3d triangleP0, const Vec3d triangleP1, const Vec3d triangleP2, const TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w)
+inline void projectOnTriangle(const Vec3d projectP, const TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w)
 {
-    Vec3d x1x2 = projectP - triangleP0;
+    Vec3d x1x2 = projectP - tinfo.P0;
 
     //corrdinate on the plane
     double c0 = dot(x1x2,tinfo.ax1);
     double c1 = dot(x1x2,tinfo.ax2);
-    Vec3d proj_P = triangleP0 + tinfo.ax1 * c0 + tinfo.ax2 * c1;
+    Vec3d proj_P = tinfo.P0 + tinfo.ax1 * c0 + tinfo.ax2 * c1;
 
-    computeTriangleBaryCoords(proj_P, triangleP0, tinfo, fact_u,fact_v,fact_w);
+    computeTriangleBaryCoords(proj_P, tinfo.P0, tinfo, fact_u,fact_v,fact_w);
 
     if (fact_u<0)
     {
-        projectOnEdge(proj_P, triangleP1, triangleP2, fact_v, fact_w);
+        projectOnEdge(proj_P, tinfo.P1, tinfo.P2, fact_v, fact_w);
         fact_u=0;
     }
     else if (fact_v<0)
     {
-        projectOnEdge(proj_P, triangleP0, triangleP2, fact_u, fact_w);
+        projectOnEdge(proj_P, tinfo.P0, tinfo.P2, fact_u, fact_w);
         fact_v=0;
     }
     else if (fact_w<0)
     {
-        projectOnEdge(proj_P, triangleP0, triangleP1, fact_u, fact_v);
+        projectOnEdge(proj_P, tinfo.P0, tinfo.P1, fact_u, fact_v);
         fact_w=0;
     }
 }
 
 
-inline void computeTetraBaryCoords(const Vec3d & P, const Vec3d & tetraP0, const TetraInfo & tinfo, double & fact_u,double & fact_v, double & fact_w, double & fact_x)
+inline void computeTetraBaryCoords(const Vec3d & P, const TetraInfo & tinfo, double & fact_u,double & fact_v, double & fact_w, double & fact_x)
 {
-    Vec3d e = P - tetraP0;
+    Vec3d e = P - tinfo.P0;
 
     double Va = 1.0/6.0 * dot(e,tinfo.ax2Cax3);
     double Vb = 1.0/6.0 * dot(tinfo.ax1,e.cross(tinfo.ax3));
@@ -104,28 +107,28 @@ inline void computeTetraBaryCoords(const Vec3d & P, const Vec3d & tetraP0, const
 
 }
 
-inline void projectOnTetra(const Vec3d & projectP, const Vec3d tetraP0, const Vec3d tetraP1, const Vec3d tetraP2, const Vec3d tetraP3,  const TetraInfo & tinfo, double & fact_u, double & fact_v, double & fact_w, double & fact_x)
+inline void projectOnTetra(const Vec3d & projectP, const TetraInfo & tinfo, double & fact_u, double & fact_v, double & fact_w, double & fact_x)
 {
-    toolBox::computeTetraBaryCoords(projectP, tetraP0, tinfo, fact_u,fact_v,fact_w,fact_x);
+    toolBox::computeTetraBaryCoords(projectP, tinfo, fact_u,fact_v,fact_w,fact_x);
     if(fact_u<0)
     {
         fact_u = 0;
-        projectOnTriangle(projectP, tetraP1, tetraP2, tetraP3, tinfo.trianglesInfo[0],fact_v,fact_w,fact_x);
+        projectOnTriangle(projectP, computeTriangleInfo(tinfo.P1, tinfo.P2, tinfo.P3), fact_v,fact_w,fact_x);
     }
     else if(fact_v<0)
     {
         fact_v = 0;
-        projectOnTriangle(projectP, tetraP0, tetraP2, tetraP3, tinfo.trianglesInfo[1],fact_u,fact_w,fact_x);
+        projectOnTriangle(projectP, computeTriangleInfo(tinfo.P0, tinfo.P2, tinfo.P3),fact_u,fact_w,fact_x);
     }
     else if(fact_w<0)
     {
         fact_w = 0;
-        projectOnTriangle(projectP, tetraP0, tetraP1, tetraP3, tinfo.trianglesInfo[2],fact_u,fact_v,fact_x);
+        projectOnTriangle(projectP, computeTriangleInfo(tinfo.P0, tinfo.P1, tinfo.P3),fact_u,fact_v,fact_x);
     }
     else if(fact_x<0)
     {
         fact_x = 0;
-        projectOnTriangle(projectP, tetraP0, tetraP1, tetraP2, tinfo.trianglesInfo[3],fact_u,fact_v,fact_w);
+        projectOnTriangle(projectP, computeTriangleInfo(tinfo.P0, tinfo.P1, tinfo.P2),fact_u,fact_v,fact_w);
     }
 }
 
@@ -133,17 +136,16 @@ inline TetraInfo computeTetraInfo(const Vec3d & p0, const Vec3d & p1, const Vec3
 {
     TetraInfo tinfo;
 
+    tinfo.P0 = p0;
+    tinfo.P1 = p1;
+    tinfo.P2 = p2;
+    tinfo.P3 = p3;
+
     tinfo.ax1 = p1 - p0;
     tinfo.ax2 = p2 - p0;
     tinfo.ax3 = p3 - p0;
     tinfo.ax2Cax3 = tinfo.ax2.cross(tinfo.ax3);
     tinfo.V0 = 1.0/6.0 * dot(tinfo.ax1,tinfo.ax2Cax3);
-
-    tinfo.trianglesInfo.push_back(computeTriangleInfo(p1,p2,p3));
-    tinfo.trianglesInfo.push_back(computeTriangleInfo(p0,p2,p3));
-    tinfo.trianglesInfo.push_back(computeTriangleInfo(p0,p1,p3));
-    tinfo.trianglesInfo.push_back(computeTriangleInfo(p0,p1,p2));
-
 
     return tinfo;
 }
