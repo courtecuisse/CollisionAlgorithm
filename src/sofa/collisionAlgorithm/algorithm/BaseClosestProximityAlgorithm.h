@@ -246,7 +246,7 @@ public:
     }
 
     PairDetection findClosestPoint(const BaseElementIterator *itfrom, BaseGeometry *geo) {
-        BaseProximity::SPtr pfrom = itfrom->center();
+        BaseProximity::SPtr pfrom = itfrom->createProximity();
         defaulttype::Vector3 prevPos = pfrom->getPosition();
         BaseProximity::SPtr pdest = findClosestProximity(pfrom,geo);
 
@@ -260,7 +260,7 @@ public:
             pfrom = itfrom->project(pdest->getPosition()); // reproject on pfrom
             if ((prevPos - pfrom->getPosition()).norm() < d_threshold.getValue()) break;
 
-            pfrom = itfrom->center();
+            pfrom = itfrom->createProximity();
             pdest = findClosestProximity(pfrom,geo);
 
             if (pfrom == NULL || pdest == NULL) return PairDetection(pfrom,pdest);

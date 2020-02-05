@@ -36,7 +36,7 @@ public:
     }
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        return DefaultElementIterator<TetrahedronProximity>::create(this, this->l_topology->getTetrahedra(), eid);
+        return DefaultElementIterator<TetrahedronProximity,4>::create(this, this->l_topology->getTetrahedra(), eid);
     }
 
     void draw(const core::visual::VisualParams * vparams) {
@@ -75,32 +75,11 @@ public:
     }
 
     virtual void prepareDetection() override {
-
-        const VecTetrahedron& tetrahedra = this->l_topology->getTetrahedra();
-
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-
-        m_tetra_info.resize(tetrahedra.size());
-
-        for (size_t t=0 ; t<tetrahedra.size() ; t++)
-        {
-            const Tetrahedron& tri = tetrahedra[t];
-
-            const sofa::core::topology::BaseMeshTopology::TrianglesInTetrahedron& TIT = this->l_topology->getTrianglesInTetrahedron(t);
-
-            const defaulttype::Vector3 & p0 = pos[tri[0]];
-            const defaulttype::Vector3 & p1 = pos[tri[1]];
-            const defaulttype::Vector3 & p2 = pos[tri[2]];
-            const defaulttype::Vector3 & p3 = pos[tri[3]];
-
-            m_tetra_info[t] = toolBox::computeTetraInfo(p0,p1,p2,p3);
-
-
-        }
+        m_tetra_info.clear();
     }
 
     inline const sofa::core::topology::BaseMeshTopology::Tetrahedron getTetrahedron(unsigned eid) const {
-        return this->l_topology->getTetrahedra(eid);
+        return this->l_topology->getTetrahedron(eid);
     }
 
     inline defaulttype::Vector3 getPosition(const TetrahedronProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
@@ -116,19 +95,15 @@ public:
         return defaulttype::Vector3(0,0,0);
     }
 
-    TetrahedronProximity center(unsigned eid,const Tetrahedron & tetrahedron) const {
+    TetrahedronProximity createProximity(unsigned eid,int pid = -1) const {
+        auto tetrahedron = getTetrahedron(eid);
+
+        if (pid == 0) return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 1, 0, 0, 0);
+        else if (pid == 1) return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 0, 1, 0, 0);
+        else if (pid == 2) return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 0, 0, 1, 0);
+        else if (pid == 3) return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 0, 0, 0, 1);
+
         return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 0.25, 0.25, 0.25, 0.25);
-    }
-
-    defaulttype::BoundingBox getBBox(const Tetrahedron & tetrahedron) const {
-        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
-
-        defaulttype::BoundingBox bbox;
-        bbox.include(x[tetrahedron[0]]);
-        bbox.include(x[tetrahedron[1]]);
-        bbox.include(x[tetrahedron[2]]);
-        bbox.include(x[tetrahedron[3]]);
-        return bbox;
     }
 
     inline TetrahedronProximity createProximity(unsigned eid,double & fact_u,double & fact_v, double & fact_w, double & fact_x) {
@@ -136,13 +111,11 @@ public:
         return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], fact_u,fact_v,fact_w,fact_x);
     }
 
-    inline TetrahedronProximity project(unsigned eid, const Tetrahedron & tetrahedron, const defaulttype::Vector3 & P) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-
-        const TetraInfo & tinfo = m_tetra_info[eid];
+    inline TetrahedronProximity project(const defaulttype::Vector3 & P, unsigned eid) const {
+        auto tetrahedron = getTetrahedron(eid);
+        const TetraInfo & tinfo = getTetraInfo()[eid];
 
         double fact[4];
-
         toolBox::projectOnTetra( P, tinfo,fact[0],fact[1],fact[2],fact[3]);
 
         return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], fact[0],fact[1],fact[2],fact[3]);
@@ -150,14 +123,34 @@ public:
 
     //proj_P must be on the plane
 
-    const TetraInfo & getTetraInfo(unsigned eid) const {
-        return m_tetra_info[eid];
+    const std::vector<TetraInfo> & getTetraInfo(core::VecCoordId v = core::VecCoordId::position()) const {
+        if (m_tetra_info[v.getIndex()].empty()) computeTetraInfo(v);
+        return m_tetra_info[v.getIndex()];
     }
 
 protected:
+    mutable std::map<int,std::vector<TetraInfo> > m_tetra_info;
 
-    std::vector<TetraInfo> m_tetra_info;
+    void computeTetraInfo(core::VecCoordId v = core::VecCoordId::position()) const {
+        std::vector<TetraInfo> & vecInfo = m_tetra_info[v.getIndex()];
+        const VecTetrahedron& tetrahedra = this->l_topology->getTetrahedra();
 
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+
+        vecInfo.clear();
+        for (size_t t=0 ; t<tetrahedra.size() ; t++) {
+            const Tetrahedron& tri = tetrahedra[t];
+
+            const sofa::core::topology::BaseMeshTopology::TrianglesInTetrahedron& TIT = this->l_topology->getTrianglesInTetrahedron(t);
+
+            const defaulttype::Vector3 & p0 = pos[tri[0]];
+            const defaulttype::Vector3 & p1 = pos[tri[1]];
+            const defaulttype::Vector3 & p2 = pos[tri[2]];
+            const defaulttype::Vector3 & p3 = pos[tri[3]];
+
+            vecInfo.push_back(toolBox::computeTetraInfo(p0,p1,p2,p3));
+        }
+    }
 };
 
 

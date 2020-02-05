@@ -112,7 +112,10 @@ void AABBBroadPhase::prepareDetection() {
     for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
     {
         //std::cout << ++i << std::endl;
-        defaulttype::BoundingBox bbox = (*it)->getBBox();
+        defaulttype::BoundingBox bbox;
+        for (unsigned b=0;b<(*it)->elementSize();b++) {
+            bbox.include((*it)->createProximity(b)->getPosition());
+        }
 
         const defaulttype::Vector3 & minbox = bbox.minBBox();
         const defaulttype::Vector3 & maxbox = bbox.maxBBox();

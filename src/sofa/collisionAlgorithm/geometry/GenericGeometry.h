@@ -13,12 +13,12 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class DataTypes, class Element>
+template<class DataTypes, class Element, int SIZE>
 class GenericGeometry : public TBaseGeometry<DataTypes,GenericProximity> {
 public:
     typedef DataTypes TDataTypes;
     typedef TBaseGeometry<DataTypes,GenericProximity> Inherit;
-    typedef GenericGeometry<DataTypes,Element> GEOMETRY;
+    typedef GenericGeometry<DataTypes,Element,SIZE> GEOMETRY;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef Data<VecCoord> DataVecCoord;
@@ -43,7 +43,7 @@ public:
     , d_elements(initData(&d_elements, "elements", "Vector of Elements")) {}
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        return DefaultElementIterator<GenericProximity>::create(this, d_elements.getValue(), eid);
+        return DefaultElementIterator<GenericProximity,SIZE>::create(this, d_elements.getValue(), eid);
     }
 
     inline defaulttype::Vector3 getPosition(const GenericProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
@@ -59,10 +59,10 @@ public:
         return defaulttype::Vector3();
     }
 
-    inline GenericProximity center(unsigned eid,const Element & elmt) const {
+    inline GenericProximity createProximity(unsigned eid,int pid = -1) const {
         helper::vector<std::pair<unsigned,double> > prox;
         for (unsigned i=0;i<Element::size();i++) {
-            prox.push_back(std::pair<unsigned,double>(elmt[i], 1.0/Element::size()));
+            prox.push_back(std::pair<unsigned,double>(eid, 1.0/Element::size()));
         }
 
         return GenericProximity(eid, prox);
@@ -100,10 +100,10 @@ public:
         return m_inverse;
     }
 
-    inline GenericProximity project(unsigned eid, const Element & elmt, defaulttype::Vector3 Q) const {
+    inline GenericProximity project(defaulttype::Vector3 Q, unsigned eid) const {
         double delta = d_delta.getValue();
 
-        GenericProximity result = center(eid,elmt);
+        GenericProximity result = createProximity(eid);
 
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
 
@@ -207,7 +207,7 @@ public:
         return templateName(this);
     }
 
-    static std::string templateName(const GenericGeometry<DataTypes,Element>* )
+    static std::string templateName(const GenericGeometry<DataTypes,Element,SIZE>* )
     {
         std::stringstream ss;
         ss << Element::size();

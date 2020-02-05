@@ -62,7 +62,7 @@ public:
             if (itfrom == l_from->end()) continue;
             if (itdest == l_dest->end()) continue;
 
-            auto first = itfrom->center();
+            auto first = itfrom->createProximity();
             auto second = itdest->project(first->getPosition());
 
             output.add(first,second);

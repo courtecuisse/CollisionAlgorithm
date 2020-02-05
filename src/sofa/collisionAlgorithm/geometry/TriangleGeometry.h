@@ -35,7 +35,7 @@ public:
     }
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        return DefaultElementIterator<PROXIMITYDATA>::create(this, this->l_topology->getTriangles(), eid);
+        return DefaultElementIterator<PROXIMITYDATA,3>::create(this, this->l_topology->getTriangles(), eid);
     }
 
     void draw(const core::visual::VisualParams * vparams) {
@@ -90,24 +90,20 @@ public:
                 pos[data.m_p2] * data.m_f2;
     }
 
-    PROXIMITYDATA center(unsigned eid,const Triangle & triangle) const {
-        return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 0.3333, 0.3333, 0.3333);
-    }
+    PROXIMITYDATA createProximity(unsigned eid, int pid = -1) const {
+        auto triangle = getTriangle(eid);
+        if (pid == 0) return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 1, 0, 0);
+        else if (pid == 1) return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 0, 1, 0);
+        else if (pid == 2) return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 0, 0, 1);
 
-    defaulttype::BoundingBox getBBox(const Triangle & triangle) const {
-        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
-
-        defaulttype::BoundingBox bbox;
-        bbox.include(x[triangle[0]]);
-        bbox.include(x[triangle[1]]);
-        bbox.include(x[triangle[2]]);
-        return bbox;
+        return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 1.0/3.0, 1.0/3.0, 1.0/3.0);
     }
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    inline PROXIMITYDATA project(unsigned eid, const Triangle & triangle, const defaulttype::Vector3 & P) const {
+    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, unsigned eid) const {
         TriangleInfo  tinfo = getTriangleInfo()[eid];
+        auto triangle = getTriangle(eid);
 
         double fact_u,fact_v,fact_w;
         toolBox::projectOnTriangle(P,tinfo,fact_u,fact_v,fact_w);

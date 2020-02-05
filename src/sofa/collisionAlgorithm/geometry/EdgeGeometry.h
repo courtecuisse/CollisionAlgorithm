@@ -32,7 +32,7 @@ public:
     }
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        return DefaultElementIterator<PROXIMITYDATA>::create(this,this->l_topology->getEdges(), eid);
+        return DefaultElementIterator<PROXIMITYDATA,2>::create(this,this->l_topology->getEdges(), eid);
     }
 
     inline const sofa::core::topology::BaseMeshTopology::Edge getEdge(unsigned eid) const {
@@ -46,20 +46,18 @@ public:
                pos[data.m_p1] * data.m_f1;
     }
 
-    inline defaulttype::BoundingBox getBBox(const Edge & edge) const {
-        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
+    inline PROXIMITYDATA createProximity(unsigned eid, int pid = -1) const {
+        auto edge = getEdge(eid);
 
-        defaulttype::BoundingBox bbox;
-        bbox.include(x[edge[0]]);
-        bbox.include(x[edge[1]]);
-        return bbox;
-    }
+        if (pid == 0) return PROXIMITYDATA(eid, edge[0], edge[1], 1, 0);
+        else if (pid == 1) return PROXIMITYDATA(eid, edge[0], edge[1], 0, 1);
 
-    inline PROXIMITYDATA center(unsigned eid, const Edge & edge) const {
         return PROXIMITYDATA(eid, edge[0], edge[1], 0.5, 0.5);
     }
 
-    inline PROXIMITYDATA project(unsigned eid, const Edge & edge, const defaulttype::Vector3 & P) const {
+    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, unsigned eid) const {
+        auto edge = getEdge(eid);
+
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
 
         const defaulttype::Vector3 & E1 = x[edge[0]];

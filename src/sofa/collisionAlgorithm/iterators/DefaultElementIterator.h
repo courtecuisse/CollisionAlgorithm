@@ -16,55 +16,63 @@ namespace collisionAlgorithm
 /*!
  * \brief The BaseElement class is a basic abstract element container
  */
-template<class CONTAINER, class PROXIMITYDATA, class ELEMENT>
+template<class GEOMETRY, class PROXIMITYDATA, int ELEMENTSIZE>
 class TDefaultElementIterator : public BaseElementIterator {
 public:
 
-    TDefaultElementIterator(const CONTAINER * container, const helper::vector<ELEMENT> & elmts, unsigned start)
-    : m_container(container)
-    , m_elements(elmts)
-    , m_id(start) {}
+    TDefaultElementIterator(const GEOMETRY * geometry, unsigned size, unsigned start)
+    : m_geometry(geometry)
+    , m_size(size)
+    , m_it(start) {}
 
     void next() override {
-        this->m_id++;
+        this->m_it++;
     }
 
     bool end() const override {
-        return m_id >= m_elements.size();
+        return m_it >= m_size;
     }
 
     unsigned id() const override {
-        return m_id;
-    }
-
-    inline BaseProximity::SPtr createProximity(const CONTAINER * container, const PROXIMITYDATA & data) const {
-        return BaseProximity::SPtr(new TBaseProximity<CONTAINER, PROXIMITYDATA>(container,data));
+        return m_it;
     }
 
     BaseProximity::SPtr project(const defaulttype::Vector3 & P) const override {
-        return createProximity(m_container,m_container->project(m_id, m_elements[m_id], P));
+        return createSPtr(m_geometry,
+                          m_geometry->project(P, m_it));
     }
 
-    BaseProximity::SPtr center() const override {
-        return createProximity(m_container,m_container->center(m_id, m_elements[m_id])); // initialized with the center of the element
+    BaseProximity::SPtr createProximity(int pid = -1) const override {
+        return createSPtr(m_geometry,
+                          m_geometry->createProximity(m_it, pid)); // initialized with the center of the element
     }
 
-    defaulttype::BoundingBox getBBox() const override {
-        return m_container->getBBox(m_elements[m_id]);
+    unsigned elementSize() const override {
+        return ELEMENTSIZE;
     }
 
 private:
-    const CONTAINER * m_container;
-    const helper::vector<ELEMENT> & m_elements;
-    unsigned m_id;
+    const GEOMETRY * m_geometry;
+    unsigned m_it,m_size;
+
+
+    inline BaseProximity::SPtr createSPtr(const GEOMETRY * container, const PROXIMITYDATA & data) const {
+        return BaseProximity::SPtr(new TBaseProximity<GEOMETRY, PROXIMITYDATA>(container,data));
+    }
 };
 
-template<class PROXIMITYDATA>
+template<class PROXIMITYDATA, int ELEMENTSIZE>
 class DefaultElementIterator {
 public:
-    template<class CONTAINER, class ELEMENT>
-    static BaseElementIterator::UPtr create(const CONTAINER * c, const helper::vector<ELEMENT> & elmt, unsigned start = 0) {
-        return BaseElementIterator::UPtr(new TDefaultElementIterator<CONTAINER, PROXIMITYDATA, ELEMENT>(c, elmt, start));
+
+    template<class GEOMETRY, class ELEMENT>
+    static BaseElementIterator::UPtr create(const GEOMETRY * c, const helper::vector<ELEMENT> & elmt, unsigned start = 0) {
+        return BaseElementIterator::UPtr(new TDefaultElementIterator<GEOMETRY, PROXIMITYDATA, ELEMENTSIZE>(c, elmt.size(), start));
+    }
+
+    template<class GEOMETRY>
+    static BaseElementIterator::UPtr create(const GEOMETRY * c, unsigned size, unsigned start = 0) {
+        return BaseElementIterator::UPtr(new TDefaultElementIterator<GEOMETRY, PROXIMITYDATA, ELEMENTSIZE>(c, size, start));
     }
 };
 

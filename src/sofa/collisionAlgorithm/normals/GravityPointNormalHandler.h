@@ -33,7 +33,7 @@ public:
         m_gcenter = defaulttype::Vector3();
         unsigned size = 0;
         for (auto it = this->l_geometry->begin();it!=this->l_geometry->end();it++) {
-            m_gcenter += it->center()->getPosition();
+            m_gcenter += it->createProximity()->getPosition();
             size++;
         }
 

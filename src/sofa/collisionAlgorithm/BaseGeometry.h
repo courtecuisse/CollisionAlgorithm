@@ -154,7 +154,7 @@ public:
         color[3] = 1.0;
 
         for (auto it=this->begin();it!=this->end();it++) {
-            BaseProximity::SPtr center = (*it)->center();
+            BaseProximity::SPtr center = (*it)->createProximity();
             vparams->drawTool()->drawArrow(
                 center->getPosition(),
                 center->getPosition() + center->getNormal() * d_drawScaleNormal.getValue(),

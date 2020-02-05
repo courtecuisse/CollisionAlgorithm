@@ -27,7 +27,7 @@ public:
     {}
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        return DefaultElementIterator<FixedProximity>::create(this, d_position.getValue(), eid);
+        return DefaultElementIterator<FixedProximity,1>::create(this, d_position.getValue(), eid);
     }
 
     sofa::core::behavior::BaseMechanicalState * getState() const {
@@ -51,13 +51,7 @@ public:
         }
     }
 
-    inline defaulttype::BoundingBox getBBox(const defaulttype::Vector3 & p) const {
-        defaulttype::BoundingBox bbox;
-        bbox.include(p);
-        return bbox;
-    }
-
-    inline FixedProximity center(unsigned eid, const defaulttype::Vector3 & /*p*/) const {
+    inline FixedProximity createProximity(unsigned eid, int /*pid*/ = -1) const {
         const helper::vector<defaulttype::Vector3> & pos = d_position.getValue();
 
         if(d_normals.getValue().size()>eid)
@@ -67,7 +61,7 @@ public:
     }
 
     //do not change the dataProximity.
-    inline FixedProximity project(unsigned pid, const defaulttype::Vector3 & /*P*/,const defaulttype::Vector3 & /*Q*/) const {
+    inline FixedProximity project(const defaulttype::Vector3 & /*Q*/, unsigned pid) const {
         const helper::vector<defaulttype::Vector3> & pos = d_position.getValue();
 
         if(d_normals.getValue().size()>pid)

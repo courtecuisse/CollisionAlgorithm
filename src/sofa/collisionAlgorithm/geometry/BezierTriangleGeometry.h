@@ -1,390 +1,406 @@
-//#pragma once
-
-//#include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
+#pragma once
+
+#include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
 
-//namespace sofa
-//{
+namespace sofa
+{
 
-//namespace collisionAlgorithm
-//{
+namespace collisionAlgorithm
+{
 
-//template<class DataTypes>
-//class BezierTriangleGeometry : public TBaseGeometry<DataTypes,TriangleProximity> {
-//public:
-//    typedef DataTypes TDataTypes;
-//    typedef TBaseGeometry<DataTypes,TriangleProximity> Inherit;
-//    typedef BezierTriangleGeometry<DataTypes> GEOMETRY;
-//    typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
-//    typedef typename DataTypes::VecCoord VecCoord;
-//    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-//    typedef size_t TriangleID;
-//    typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
-//    typedef helper::vector<Triangle> VecTriangles;
-
-//    SOFA_CLASS(GEOMETRY,Inherit);
+template<class DataTypes>
+class BezierTriangleGeometry : public TBaseGeometry<DataTypes,TriangleProximity> {
+public:
+    typedef DataTypes TDataTypes;
+    typedef TBaseGeometry<DataTypes,TriangleProximity> Inherit;
+    typedef BezierTriangleGeometry<DataTypes> GEOMETRY;
+    typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef size_t TriangleID;
+    typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
+    typedef helper::vector<Triangle> VecTriangles;
 
-//    typedef struct
-//    {
-//        defaulttype::Vector3 p300,p030,p003;
-//        defaulttype::Vector3 p210,p120,p021,p012,p102,p201,p111;
-//        defaulttype::Vector3 n110,n011,n101;
-//        defaulttype::Vector3 n200,n020,n002;
-//    } BezierTriangleInfo;
+    SOFA_CLASS(GEOMETRY,Inherit);
 
-//    core::objectmodel::SingleLink<GEOMETRY,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
+    typedef struct
+    {
+        defaulttype::Vector3 p300,p030,p003;
+        defaulttype::Vector3 p210,p120,p021,p012,p102,p201,p111;
+        defaulttype::Vector3 n110,n011,n101;
+        defaulttype::Vector3 n200,n020,n002;
+    } BezierTriangleInfo;
 
-//    Data <unsigned> d_nonlin_max_it;
-//    Data <double> d_nonlin_tolerance;
-//    Data <double> d_nonlin_threshold;
-//    Data <unsigned> d_draw_tesselation;
+    core::objectmodel::SingleLink<GEOMETRY,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
 
-//    BezierTriangleGeometry()
-//    : l_topology(initLink("topology", "link to topology"))
-//    , d_nonlin_max_it(initData(&d_nonlin_max_it,(unsigned) 20,"nonlin_max_it", "number of iterations"))
-//    , d_nonlin_tolerance(initData(&d_nonlin_tolerance,(double) 0.001,"nonlin_tol", "Tolerance"))
-//    , d_nonlin_threshold(initData(&d_nonlin_threshold,(double) 0.00001,"nonlin_th", "Threshold"))
-//    , d_draw_tesselation(initData(&d_draw_tesselation,(unsigned) 0.0, "tesselation", "Number of tesselation")) {
-//            l_topology.setPath("@.");
-//    }
+    Data <unsigned> d_nonlin_max_it;
+    Data <double> d_nonlin_tolerance;
+    Data <double> d_nonlin_threshold;
+    Data <unsigned> d_draw_tesselation;
 
-//    inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-//        return DefaultElementIterator<PROXIMITYDATA>::create(this,this->l_topology->getTriangles(),eid);
-//    }
+    BezierTriangleGeometry()
+    : l_topology(initLink("topology", "link to topology"))
+    , d_nonlin_max_it(initData(&d_nonlin_max_it,(unsigned) 20,"nonlin_max_it", "number of iterations"))
+    , d_nonlin_tolerance(initData(&d_nonlin_tolerance,(double) 0.001,"nonlin_tol", "Tolerance"))
+    , d_nonlin_threshold(initData(&d_nonlin_threshold,(double) 0.00001,"nonlin_th", "Threshold"))
+    , d_draw_tesselation(initData(&d_draw_tesselation,(unsigned) 0.0, "tesselation", "Number of tesselation")) {
+            l_topology.setPath("@.");
+    }
 
-//    virtual void prepareDetection() {
-//        m_bezier_info.clear();
-//    }
+    inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
+        return DefaultElementIterator<PROXIMITYDATA,3>::create(this,this->l_topology->getTriangles(),eid);
+    }
 
-//    void tesselate(unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C) {
-//        if (level >= d_draw_tesselation.getValue()) {
+    virtual void prepareDetection() {
+        m_bezier_info.clear();
+    }
 
-//            const Triangle& triangle = this->l_topology->getTriangle(tid);
+    void tesselate(unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C) {
+        if (level >= d_draw_tesselation.getValue()) {
 
-//            PROXIMITYDATA proxA(tid, triangle[0],triangle[1],triangle[2], bary_A[0],bary_A[1],bary_A[2]);
-//            PROXIMITYDATA proxB(tid, triangle[0],triangle[1],triangle[2], bary_B[0],bary_B[1],bary_B[2]);
-//            PROXIMITYDATA proxC(tid, triangle[0],triangle[1],triangle[2], bary_C[0],bary_C[1],bary_C[2]);
+            const Triangle& triangle = this->l_topology->getTriangle(tid);
 
-//            // draw Triangle
-//            double delta = 0.2;
+            PROXIMITYDATA proxA(tid, triangle[0],triangle[1],triangle[2], bary_A[0],bary_A[1],bary_A[2]);
+            PROXIMITYDATA proxB(tid, triangle[0],triangle[1],triangle[2], bary_B[0],bary_B[1],bary_B[2]);
+            PROXIMITYDATA proxC(tid, triangle[0],triangle[1],triangle[2], bary_C[0],bary_C[1],bary_C[2]);
 
-//            const defaulttype::Vector4 & color = this->d_color.getValue();
+            // draw Triangle
+            double delta = 0.2;
 
-//            glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
-//            glVertex3dv(getPosition(proxA).data());
-//            glColor4f(color[0],fabs(color[1]-delta),color[2],color[3]);
-//            glVertex3dv(getPosition(proxB).data());
-//            glColor4f(color[0],color[1],fabs(color[2]-delta),color[3]);
-//            glVertex3dv(getPosition(proxC).data());
+            const defaulttype::Vector4 & color = this->d_color.getValue();
 
-//            return;
-//        }
+            glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
+            glVertex3dv(getPosition(proxA).data());
+            glColor4f(color[0],fabs(color[1]-delta),color[2],color[3]);
+            glVertex3dv(getPosition(proxB).data());
+            glColor4f(color[0],color[1],fabs(color[2]-delta),color[3]);
+            glVertex3dv(getPosition(proxC).data());
 
-//        defaulttype::Vector3 bary_D = (bary_A + bary_B)/2.0;
-//        defaulttype::Vector3 bary_E = (bary_A + bary_C)/2.0;
-//        defaulttype::Vector3 bary_F = (bary_B + bary_C)/2.0;
+            return;
+        }
 
-//        defaulttype::Vector3 bary_G = (bary_A + bary_B + bary_C)/3.0;
+        defaulttype::Vector3 bary_D = (bary_A + bary_B)/2.0;
+        defaulttype::Vector3 bary_E = (bary_A + bary_C)/2.0;
+        defaulttype::Vector3 bary_F = (bary_B + bary_C)/2.0;
 
-//        tesselate(level+1,tid,bary_A,bary_D,bary_G);
-//        tesselate(level+1,tid,bary_D,bary_B,bary_G);
+        defaulttype::Vector3 bary_G = (bary_A + bary_B + bary_C)/3.0;
 
-//        tesselate(level+1,tid,bary_G,bary_B,bary_F);
-//        tesselate(level+1,tid,bary_G,bary_F,bary_C);
+        tesselate(level+1,tid,bary_A,bary_D,bary_G);
+        tesselate(level+1,tid,bary_D,bary_B,bary_G);
 
-//        tesselate(level+1,tid,bary_G,bary_C,bary_E);
-//        tesselate(level+1,tid,bary_A,bary_G,bary_E);
-//    }
+        tesselate(level+1,tid,bary_G,bary_B,bary_F);
+        tesselate(level+1,tid,bary_G,bary_F,bary_C);
 
-//    void draw(const core::visual::VisualParams * vparams) {
-//        this->drawNormals(vparams);
+        tesselate(level+1,tid,bary_G,bary_C,bary_E);
+        tesselate(level+1,tid,bary_A,bary_G,bary_E);
+    }
 
-////        if (! vparams->displayFlags().getShowCollisionModels()) return;
-//        if (! vparams->displayFlags().getShowCollisionModels()) return ;
+    void draw(const core::visual::VisualParams * vparams) {
+        this->drawNormals(vparams);
 
-//        const defaulttype::Vector4 & color = this->d_color.getValue();
-//        if (color[3] == 0.0) return;
+//        if (! vparams->displayFlags().getShowCollisionModels()) return;
+        if (! vparams->displayFlags().getShowCollisionModels()) return ;
 
-//        glDisable(GL_LIGHTING);
+        const defaulttype::Vector4 & color = this->d_color.getValue();
+        if (color[3] == 0.0) return;
 
-//        glBegin(GL_TRIANGLES);
-//        for (auto it = this->begin();it != this->end();it++) {
-//            tesselate(0, it->id() , defaulttype::Vector3(1,0,0),defaulttype::Vector3(0,1,0),defaulttype::Vector3(0,0,1));
-//        }
-//        glEnd();
-//    }
+        glDisable(GL_LIGHTING);
 
-//    inline TriangleProximity project(unsigned eid, const Triangle & triangle, const defaulttype::Vector3 & P) const {
-//        unsigned max_it = d_nonlin_max_it.getValue();
-//        double tolerance = d_nonlin_tolerance.getValue();
-//        double threshold = d_nonlin_threshold.getValue();
+        glBegin(GL_TRIANGLES);
+        for (auto it = this->begin();it != this->end();it++) {
+            tesselate(0, it->id() , defaulttype::Vector3(1,0,0),defaulttype::Vector3(0,1,0),defaulttype::Vector3(0,0,1));
+        }
+        glEnd();
+    }
 
-//        unsigned int it=0;
-//        double delta = 0.00001;
+    inline const sofa::core::topology::BaseMeshTopology::Triangle getTriangle(unsigned eid) const {
+        return this->l_topology->getTriangle(eid);
+    }
 
-//        //initialize the algorithm xith the projection on a linear triangle
+    inline TriangleProximity project(const defaulttype::Vector3 & P, unsigned eid) const {
+        auto triangle = getTriangle(eid);
 
-//        auto tinfo = getBezierInfo()[eid];
-//        double fact_u,fact_v,fact_w;
-//        toolBox::projectOnTriangle(P,
-//                                   toolBox::computeTriangleInfo(tinfo.p300,tinfo.p030,tinfo.p003),
-//                                   fact_u,fact_v,fact_w);
+        unsigned max_it = d_nonlin_max_it.getValue();
+        double tolerance = d_nonlin_tolerance.getValue();
+        double threshold = d_nonlin_threshold.getValue();
 
-//        auto pinfo = PROXIMITYDATA(eid,triangle[0],triangle[1],triangle[2],fact_u,fact_v,fact_w);
+        unsigned int it=0;
+        double delta = 0.00001;
 
-//        while(it< max_it) {
-//            defaulttype::Vector3 Q = getPosition(pinfo);
+        //initialize the algorithm xith the projection on a linear triangle
 
-//            defaulttype::Vector3 nQP = P - Q;
-//            if (nQP.norm() < tolerance) break;
-//            nQP.normalize();
+        auto tinfo = getBezierInfo()[eid];
+        double fact_u,fact_v,fact_w;
+        toolBox::projectOnTriangle(P,
+                                   toolBox::computeTriangleInfo(tinfo.p300,tinfo.p030,tinfo.p003),
+                                   fact_u,fact_v,fact_w);
 
-//            defaulttype::Vector3 N1 = this->getNormal(pinfo);
-//            N1.normalize();
+        auto pinfo = PROXIMITYDATA(eid,triangle[0],triangle[1],triangle[2],fact_u,fact_v,fact_w);
 
-//            if (pinfo.m_f0 < 0 || pinfo.m_f1 < 0 || pinfo.m_f2 < 0) break;
+        while(it< max_it) {
+            defaulttype::Vector3 Q = getPosition(pinfo);
 
-//            defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(1,0,0)))>0.99) ? defaulttype::Vector3(0,1,0) : defaulttype::Vector3(1,0,0)));
-//            N2.normalize();
+            defaulttype::Vector3 nQP = P - Q;
+            if (nQP.norm() < tolerance) break;
+            nQP.normalize();
 
-//            defaulttype::Vector3 N3 = cross(N1,N2);
-//            N3.normalize();
+            defaulttype::Vector3 N1 = this->getNormal(pinfo);
+            N1.normalize();
 
-//            defaulttype::Vector2 e_0(dot(nQP,N2),dot(nQP,N3));
+            if (pinfo.m_f0 < 0 || pinfo.m_f1 < 0 || pinfo.m_f2 < 0) break;
 
-//            if(e_0.norm() < tolerance) break;
+            defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(1,0,0)))>0.99) ? defaulttype::Vector3(0,1,0) : defaulttype::Vector3(1,0,0)));
+            N2.normalize();
 
-//            double fact_u = (pinfo.m_f2 - delta < 0.0 || pinfo.m_f1 + delta > 1.0) ? -1.0 : 1.0;
-//            double fact_v = (pinfo.m_f2 - delta < 0.0 || pinfo.m_f0 + delta > 1.0) ? -1.0 : 1.0;
+            defaulttype::Vector3 N3 = cross(N1,N2);
+            N3.normalize();
 
-//            //variation point along v
-//            double P_v_fact0 = pinfo.m_f0 + delta * fact_v;
-//            double P_v_fact1 = pinfo.m_f1;
-//            double P_v_fact2 = pinfo.m_f2 - delta * fact_v;
-//            if (P_v_fact0 < 0 || P_v_fact1 < 0 || P_v_fact2 < 0) break;
+            defaulttype::Vector2 e_0(dot(nQP,N2),dot(nQP,N3));
 
-//            TriangleProximity P_v(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_v_fact0, P_v_fact1, P_v_fact2);
-//            defaulttype::Vector3 p_v = (P - getPosition(P_v)).normalized();
-//            defaulttype::Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
+            if(e_0.norm() < tolerance) break;
 
-//            //variation point along u
-//            double P_u_fact0 = pinfo.m_f0;
-//            double P_u_fact1 = pinfo.m_f1 + delta * fact_u;
-//            double P_u_fact2 = pinfo.m_f2 - delta * fact_u;
-//            if (P_u_fact0 < 0 || P_u_fact1 < 0 || P_u_fact2 < 0) break;
+            double fact_u = (pinfo.m_f2 - delta < 0.0 || pinfo.m_f1 + delta > 1.0) ? -1.0 : 1.0;
+            double fact_v = (pinfo.m_f2 - delta < 0.0 || pinfo.m_f0 + delta > 1.0) ? -1.0 : 1.0;
 
-//            TriangleProximity P_u(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_u_fact0,P_u_fact1,P_u_fact2);
-//            defaulttype::Vector3 p_u = (P - getPosition(P_u)).normalized();
-//            defaulttype::Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
+            //variation point along v
+            double P_v_fact0 = pinfo.m_f0 + delta * fact_v;
+            double P_v_fact1 = pinfo.m_f1;
+            double P_v_fact2 = pinfo.m_f2 - delta * fact_v;
+            if (P_v_fact0 < 0 || P_v_fact1 < 0 || P_v_fact2 < 0) break;
 
-//            defaulttype::Mat2x2d J, invJ;
-//            J[0][0] = (e_v[0] - e_0[0])/delta;
-//            J[1][0] = (e_v[1] - e_0[1])/delta;
-//            J[0][1] = (e_u[0] - e_0[0])/delta;
-//            J[1][1] = (e_u[1] - e_0[1])/delta;
+            TriangleProximity P_v(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_v_fact0, P_v_fact1, P_v_fact2);
+            defaulttype::Vector3 p_v = (P - getPosition(P_v)).normalized();
+            defaulttype::Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
 
-//            invertMatrix(invJ, J);
+            //variation point along u
+            double P_u_fact0 = pinfo.m_f0;
+            double P_u_fact1 = pinfo.m_f1 + delta * fact_u;
+            double P_u_fact2 = pinfo.m_f2 - delta * fact_u;
+            if (P_u_fact0 < 0 || P_u_fact1 < 0 || P_u_fact2 < 0) break;
 
-//            // dUV is the optimal direction
-//            defaulttype::Vector2 dUV = -invJ * e_0;
-//            if(dUV.norm() < threshold) break;
+            TriangleProximity P_u(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_u_fact0,P_u_fact1,P_u_fact2);
+            defaulttype::Vector3 p_u = (P - getPosition(P_u)).normalized();
+            defaulttype::Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
 
-//            //bary coords of the solution of the 2D problem
-//            double sol_v = pinfo.m_f0 + dUV[0];
-//            double sol_u = pinfo.m_f1 + dUV[1];
-//            double sol_w = 1.0 - sol_u - sol_v;
+            defaulttype::Mat2x2d J, invJ;
+            J[0][0] = (e_v[0] - e_0[0])/delta;
+            J[1][0] = (e_v[1] - e_0[1])/delta;
+            J[0][1] = (e_u[0] - e_0[0])/delta;
+            J[1][1] = (e_u[1] - e_0[1])/delta;
 
-//            // we now search what is the optimal displacmeent along this path
-//            defaulttype::Vector3 dir2d(sol_v - pinfo.m_f0,
-//                                       sol_u - pinfo.m_f1,
-//                                       sol_w - pinfo.m_f2);
-
-//            if(dir2d.norm() < threshold) break;
-
-//            //we apply a small perturbation arond the 2d direction
-//            dir2d.normalize();
-
-//            double fact_a = (pinfo.m_f0 + dir2d[0] * delta < 0 || pinfo.m_f1 + dir2d[1] * delta < 0 || pinfo.m_f2 + dir2d[2] * delta < 0) ? -1.0 : 1.0;
-//            double P_a_fact0 = pinfo.m_f0 + dir2d[0] * delta * fact_a;
-//            double P_a_fact1 = pinfo.m_f1 + dir2d[1] * delta * fact_a;
-//            double P_a_fact2 = pinfo.m_f2 + dir2d[2] * delta * fact_a;
-
-//            if (P_a_fact0 < 0 ||P_a_fact1 < 0 || P_a_fact2 < 0) break;
+            invertMatrix(invJ, J);
 
-//            TriangleProximity P_a(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_a_fact0,P_a_fact1,P_a_fact2);
-//            defaulttype::Vector3 QA = getPosition(P_a);
+            // dUV is the optimal direction
+            defaulttype::Vector2 dUV = -invJ * e_0;
+            if(dUV.norm() < threshold) break;
 
-//            double fact;
-//            if (fabs(dot(nQP,N1))>0.8) {
-//                double fx = acos(fabs(dot(nQP,N1)));
-//                double fxdx = acos(fabs(dot((P - QA).normalized(),this->getNormal(P_a))));
-//                double j = (fxdx - fx) / delta;
-//                fact = -fx / j;
-//            } else {
-//                defaulttype::Vector3 nQA = (Q-QA).normalized();
-//                double fx = dot(P-Q, nQA);
-//                double fxdx = dot(P-QA, nQA);
-//                double j = (fxdx - fx) / delta;
-//                fact = -fx / j;
-//            }
+            //bary coords of the solution of the 2D problem
+            double sol_v = pinfo.m_f0 + dUV[0];
+            double sol_u = pinfo.m_f1 + dUV[1];
+            double sol_w = 1.0 - sol_u - sol_v;
 
-//            if(fabs(fact) < threshold) break;
+            // we now search what is the optimal displacmeent along this path
+            defaulttype::Vector3 dir2d(sol_v - pinfo.m_f0,
+                                       sol_u - pinfo.m_f1,
+                                       sol_w - pinfo.m_f2);
+
+            if(dir2d.norm() < threshold) break;
 
-//            dir2d *= fact * fact_a;
+            //we apply a small perturbation arond the 2d direction
+            dir2d.normalize();
 
-//            double new_v = pinfo.m_f0 + dir2d[0];
-//            double new_u = pinfo.m_f1 + dir2d[1];
-//            double new_w = pinfo.m_f2 + dir2d[2];
+            double fact_a = (pinfo.m_f0 + dir2d[0] * delta < 0 || pinfo.m_f1 + dir2d[1] * delta < 0 || pinfo.m_f2 + dir2d[2] * delta < 0) ? -1.0 : 1.0;
+            double P_a_fact0 = pinfo.m_f0 + dir2d[0] * delta * fact_a;
+            double P_a_fact1 = pinfo.m_f1 + dir2d[1] * delta * fact_a;
+            double P_a_fact2 = pinfo.m_f2 + dir2d[2] * delta * fact_a;
 
-//            if (new_v<0 && fabs(dir2d[0])>0) dir2d *= -pinfo.m_f0 / dir2d[0];
-//            if (new_u<0 && fabs(dir2d[1])>0) dir2d *= -pinfo.m_f1 / dir2d[1];
-//            if (new_w<0 && fabs(dir2d[2])>0) dir2d *= -pinfo.m_f2 / dir2d[2];
+            if (P_a_fact0 < 0 ||P_a_fact1 < 0 || P_a_fact2 < 0) break;
 
-//            pinfo.m_f0 += dir2d[0];
-//            pinfo.m_f1 += dir2d[1];
-//            pinfo.m_f2 += dir2d[2];
+            TriangleProximity P_a(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_a_fact0,P_a_fact1,P_a_fact2);
+            defaulttype::Vector3 QA = getPosition(P_a);
 
-//            it++;
-//        }
+            double fact;
+            if (fabs(dot(nQP,N1))>0.8) {
+                double fx = acos(fabs(dot(nQP,N1)));
+                double fxdx = acos(fabs(dot((P - QA).normalized(),this->getNormal(P_a))));
+                double j = (fxdx - fx) / delta;
+                fact = -fx / j;
+            } else {
+                defaulttype::Vector3 nQA = (Q-QA).normalized();
+                double fx = dot(P-Q, nQA);
+                double fxdx = dot(P-QA, nQA);
+                double j = (fxdx - fx) / delta;
+                fact = -fx / j;
+            }
 
-//        return pinfo;
-//    }
-
-//    // Force use of the function to compute the normal (not the normal handler)
-//    defaulttype::Vector3 getNormal(const TriangleProximity & data) const override {
-//        auto tbinfo = getBezierInfo()[data.m_eid];
+            if(fabs(fact) < threshold) break;
 
-//        const defaulttype::Vector3 &n200 = tbinfo.n200;
-//        const defaulttype::Vector3 &n020 = tbinfo.n020;
-//        const defaulttype::Vector3 &n002 = tbinfo.n002;
+            dir2d *= fact * fact_a;
 
-//        double fact_w = data.m_f2;
-//        double fact_u = data.m_f1;
-//        double fact_v = data.m_f0;
+            double new_v = pinfo.m_f0 + dir2d[0];
+            double new_u = pinfo.m_f1 + dir2d[1];
+            double new_w = pinfo.m_f2 + dir2d[2];
 
-//        defaulttype::Vector3 normal = n200 * fact_w*fact_w +
-//                                      n020 * fact_u*fact_u +
-//                                      n002 * fact_v*fact_v +
-//                                      tbinfo.n110 * fact_w*fact_u +
-//                                      tbinfo.n011 * fact_u*fact_v +
-//                                      tbinfo.n101 * fact_w*fact_v;
+            if (new_v<0 && fabs(dir2d[0])>0) dir2d *= -pinfo.m_f0 / dir2d[0];
+            if (new_u<0 && fabs(dir2d[1])>0) dir2d *= -pinfo.m_f1 / dir2d[1];
+            if (new_w<0 && fabs(dir2d[2])>0) dir2d *= -pinfo.m_f2 / dir2d[2];
 
-//        return normal.normalized();
-//    }
+            pinfo.m_f0 += dir2d[0];
+            pinfo.m_f1 += dir2d[1];
+            pinfo.m_f2 += dir2d[2];
 
-//    ////Bezier triangle are computed according to :
-//    ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
-//    inline defaulttype::Vector3 getPosition(const TriangleProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
-//        const BezierTriangleInfo & tbinfo = getBezierInfo(v)[data.m_eid];
+            it++;
+        }
 
-//        const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(v);
+        return pinfo;
+    }
 
-//        const defaulttype::Vector3 & p300 = x[data.m_p2];
-//        const defaulttype::Vector3 & p030 = x[data.m_p1];
-//        const defaulttype::Vector3 & p003 = x[data.m_p0];
+    // Force use of the function to compute the normal (not the normal handler)
+    defaulttype::Vector3 getNormal(const TriangleProximity & data) const override {
+        auto tbinfo = getBezierInfo()[data.m_eid];
 
-//        double fact_w = data.m_f2;
-//        double fact_u = data.m_f1;
-//        double fact_v = data.m_f0;
+        const defaulttype::Vector3 &n200 = tbinfo.n200;
+        const defaulttype::Vector3 &n020 = tbinfo.n020;
+        const defaulttype::Vector3 &n002 = tbinfo.n002;
 
-//        return p300 *   fact_w*fact_w*fact_w +
-//               p030 *   fact_u*fact_u*fact_u +
-//               p003 *   fact_v*fact_v*fact_v +
-//               tbinfo.p210 * 3*fact_w*fact_w*fact_u +
-//               tbinfo.p120 * 3*fact_w*fact_u*fact_u +
-//               tbinfo.p201 * 3*fact_w*fact_w*fact_v +
-//               tbinfo.p021 * 3*fact_u*fact_u*fact_v +
-//               tbinfo.p102 * 3*fact_w*fact_v*fact_v +
-//               tbinfo.p012 * 3*fact_u*fact_v*fact_v +
-//               tbinfo.p111 * 6*fact_w*fact_u*fact_v;
-//    }
+        double fact_w = data.m_f2;
+        double fact_u = data.m_f1;
+        double fact_v = data.m_f0;
 
-//    const std::vector<BezierTriangleInfo> & getBezierInfo(core::VecCoordId v = core::VecCoordId::position()) const {
-//        if (m_bezier_info[v.getIndex()].empty()) recomputeBezierInfo(v);
-//        return m_bezier_info[v.getIndex()];
-//    }
+        defaulttype::Vector3 normal = n200 * fact_w*fact_w +
+                                      n020 * fact_u*fact_u +
+                                      n002 * fact_v*fact_v +
+                                      tbinfo.n110 * fact_w*fact_u +
+                                      tbinfo.n011 * fact_u*fact_v +
+                                      tbinfo.n101 * fact_w*fact_v;
 
-//protected:
-//    mutable std::map<int,std::vector<BezierTriangleInfo>> m_bezier_info;
+        return normal.normalized();
+    }
 
-//    void recomputeBezierInfo(core::VecCoordId v = core::VecCoordId::position()) const {
-//        std::vector<BezierTriangleInfo> & vecInfo = m_bezier_info[v.getIndex()];
+    ////Bezier triangle are computed according to :
+    ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
+    inline defaulttype::Vector3 getPosition(const TriangleProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
+        const BezierTriangleInfo & tbinfo = getBezierInfo(v)[data.m_eid];
 
-//        const helper::vector<Triangle>& triangles = this->l_topology->getTriangles();
-//        const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(v);
+        const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(v);
 
-//        vecInfo.clear();
-//        for (size_t t=0;t< triangles.size();t++)
-//        {
-//            const Triangle& triangle = this->l_topology->getTriangle(t);
+        const defaulttype::Vector3 & p300 = x[data.m_p2];
+        const defaulttype::Vector3 & p030 = x[data.m_p1];
+        const defaulttype::Vector3 & p003 = x[data.m_p0];
 
-//            defaulttype::Vector3 n200;
-//            defaulttype::Vector3 n020;
-//            defaulttype::Vector3 n002;
+        double fact_w = data.m_f2;
+        double fact_u = data.m_f1;
+        double fact_v = data.m_f0;
 
-//            std::cerr << "recomputeBezierInfo needs to compute point normals" << std::endl;
-//            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav0 = this->l_topology->getTrianglesAroundVertex(triangle[2]);
-////            for (size_t t=0;t<tav0.size();t++) n200 += this->m_triangle_info[tav0[t]].n;
+        return p300 *   fact_w*fact_w*fact_w +
+               p030 *   fact_u*fact_u*fact_u +
+               p003 *   fact_v*fact_v*fact_v +
+               tbinfo.p210 * 3*fact_w*fact_w*fact_u +
+               tbinfo.p120 * 3*fact_w*fact_u*fact_u +
+               tbinfo.p201 * 3*fact_w*fact_w*fact_v +
+               tbinfo.p021 * 3*fact_u*fact_u*fact_v +
+               tbinfo.p102 * 3*fact_w*fact_v*fact_v +
+               tbinfo.p012 * 3*fact_u*fact_v*fact_v +
+               tbinfo.p111 * 6*fact_w*fact_u*fact_v;
+    }
 
-//            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav1 = this->l_topology->getTrianglesAroundVertex(triangle[1]);
-////            for (size_t t=0;t<tav1.size();t++) n020 += this->m_triangle_info[tav1[t]].n;
 
-//            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav2 = this->l_topology->getTrianglesAroundVertex(triangle[0]);
-////            for (size_t t=0;t<tav2.size();t++) n002 += this->m_triangle_info[tav2[t]].n;
+    PROXIMITYDATA createProximity(unsigned eid, int pid = -1) const {
+        auto triangle = getTriangle(eid);
+        if (pid == 0) return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 1, 0, 0);
+        else if (pid == 1) return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 0, 1, 0);
+        else if (pid == 2) return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 0, 0, 1);
 
-//            n200.normalize();
-//            n020.normalize();
-//            n002.normalize();
+        return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 1.0/3.0, 1.0/3.0, 1.0/3.0);
+    }
 
-//            BezierTriangleInfo tbinfo;
-//            const Triangle& trpids = triangles[t];
+    const std::vector<BezierTriangleInfo> & getBezierInfo(core::VecCoordId v = core::VecCoordId::position()) const {
+        if (m_bezier_info[v.getIndex()].empty()) recomputeBezierInfo(v);
+        return m_bezier_info[v.getIndex()];
+    }
 
-//            tbinfo.p300 = x[trpids[2]];
-//            tbinfo.p030 = x[trpids[1]];
-//            tbinfo.p003 = x[trpids[0]];
+protected:
+    mutable std::map<int,std::vector<BezierTriangleInfo>> m_bezier_info;
 
-//            double w12 = dot(tbinfo.p030 - tbinfo.p300,n200);
-//            double w21 = dot(tbinfo.p300 - tbinfo.p030,n020);
-//            double w23 = dot(tbinfo.p003 - tbinfo.p030,n020);
-//            double w32 = dot(tbinfo.p030 - tbinfo.p003,n002);
-//            double w31 = dot(tbinfo.p300 - tbinfo.p003,n002);
-//            double w13 = dot(tbinfo.p003 - tbinfo.p300,n200);
+    void recomputeBezierInfo(core::VecCoordId v = core::VecCoordId::position()) const {
+        std::vector<BezierTriangleInfo> & vecInfo = m_bezier_info[v.getIndex()];
 
-//            tbinfo.p210 = (tbinfo.p300*2.0 + tbinfo.p030 - n200 * w12) / 3.0;
-//            tbinfo.p120 = (tbinfo.p030*2.0 + tbinfo.p300 - n020 * w21) / 3.0;
+        const helper::vector<Triangle>& triangles = this->l_topology->getTriangles();
+        const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(v);
 
-//            tbinfo.p021 = (tbinfo.p030*2.0 + tbinfo.p003 - n020 * w23) / 3.0;
-//            tbinfo.p012 = (tbinfo.p003*2.0 + tbinfo.p030 - n002 * w32) / 3.0;
+        vecInfo.clear();
+        for (size_t t=0;t< triangles.size();t++)
+        {
+            const Triangle& triangle = this->l_topology->getTriangle(t);
 
-//            tbinfo.p102 = (tbinfo.p003*2.0 + tbinfo.p300 - n002 * w31) / 3.0;
-//            tbinfo.p201 = (tbinfo.p300*2.0 + tbinfo.p003 - n200 * w13) / 3.0;
+            defaulttype::Vector3 n200;
+            defaulttype::Vector3 n020;
+            defaulttype::Vector3 n002;
 
-//            defaulttype::Vector3 E = (tbinfo.p210+tbinfo.p120+tbinfo.p102+tbinfo.p201+tbinfo.p021+tbinfo.p012) / 6.0;
-//            defaulttype::Vector3 V = (tbinfo.p300+tbinfo.p030+tbinfo.p003) / 3.0;
-//            tbinfo.p111 =  E + (E-V) / 2.0;
+            std::cerr << "recomputeBezierInfo needs to compute point normals" << std::endl;
+            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav0 = this->l_topology->getTrianglesAroundVertex(triangle[2]);
+//            for (size_t t=0;t<tav0.size();t++) n200 += this->m_triangle_info[tav0[t]].n;
 
-//            //Compute Bezier Normals
-//            double v12 = 2 * dot(tbinfo.p030-tbinfo.p300,n200+n020) / dot(tbinfo.p030-tbinfo.p300,tbinfo.p030-tbinfo.p300);
-//            double v23 = 2 * dot(tbinfo.p003-tbinfo.p030,n020+n002) / dot(tbinfo.p003-tbinfo.p030,tbinfo.p003-tbinfo.p030);
-//            double v31 = 2 * dot(tbinfo.p300-tbinfo.p003,n002+n200) / dot(tbinfo.p300-tbinfo.p003,tbinfo.p300-tbinfo.p003);
+            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav1 = this->l_topology->getTrianglesAroundVertex(triangle[1]);
+//            for (size_t t=0;t<tav1.size();t++) n020 += this->m_triangle_info[tav1[t]].n;
 
-//            defaulttype::Vector3 h110 = n200 + n020 - (tbinfo.p030-tbinfo.p300) * v12;
-//            defaulttype::Vector3 h011 = n020 + n002 - (tbinfo.p003-tbinfo.p030) * v23;
-//            defaulttype::Vector3 h101 = n002 + n200 - (tbinfo.p300-tbinfo.p003) * v31;
+            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav2 = this->l_topology->getTrianglesAroundVertex(triangle[0]);
+//            for (size_t t=0;t<tav2.size();t++) n002 += this->m_triangle_info[tav2[t]].n;
 
-//            tbinfo.n110 = h110 / h110.norm();
-//            tbinfo.n011 = h011 / h011.norm();
-//            tbinfo.n101 = h101 / h101.norm();
+            n200.normalize();
+            n020.normalize();
+            n002.normalize();
 
-//            tbinfo.n200 = n200;
-//            tbinfo.n020 = n020;
-//            tbinfo.n002 = n002;
+            BezierTriangleInfo tbinfo;
+            const Triangle& trpids = triangles[t];
 
-//            vecInfo.push_back(tbinfo);
-//        }
-//    }
+            tbinfo.p300 = x[trpids[2]];
+            tbinfo.p030 = x[trpids[1]];
+            tbinfo.p003 = x[trpids[0]];
 
-//};
+            double w12 = dot(tbinfo.p030 - tbinfo.p300,n200);
+            double w21 = dot(tbinfo.p300 - tbinfo.p030,n020);
+            double w23 = dot(tbinfo.p003 - tbinfo.p030,n020);
+            double w32 = dot(tbinfo.p030 - tbinfo.p003,n002);
+            double w31 = dot(tbinfo.p300 - tbinfo.p003,n002);
+            double w13 = dot(tbinfo.p003 - tbinfo.p300,n200);
 
-//}
+            tbinfo.p210 = (tbinfo.p300*2.0 + tbinfo.p030 - n200 * w12) / 3.0;
+            tbinfo.p120 = (tbinfo.p030*2.0 + tbinfo.p300 - n020 * w21) / 3.0;
 
-//}
+            tbinfo.p021 = (tbinfo.p030*2.0 + tbinfo.p003 - n020 * w23) / 3.0;
+            tbinfo.p012 = (tbinfo.p003*2.0 + tbinfo.p030 - n002 * w32) / 3.0;
+
+            tbinfo.p102 = (tbinfo.p003*2.0 + tbinfo.p300 - n002 * w31) / 3.0;
+            tbinfo.p201 = (tbinfo.p300*2.0 + tbinfo.p003 - n200 * w13) / 3.0;
+
+            defaulttype::Vector3 E = (tbinfo.p210+tbinfo.p120+tbinfo.p102+tbinfo.p201+tbinfo.p021+tbinfo.p012) / 6.0;
+            defaulttype::Vector3 V = (tbinfo.p300+tbinfo.p030+tbinfo.p003) / 3.0;
+            tbinfo.p111 =  E + (E-V) / 2.0;
+
+            //Compute Bezier Normals
+            double v12 = 2 * dot(tbinfo.p030-tbinfo.p300,n200+n020) / dot(tbinfo.p030-tbinfo.p300,tbinfo.p030-tbinfo.p300);
+            double v23 = 2 * dot(tbinfo.p003-tbinfo.p030,n020+n002) / dot(tbinfo.p003-tbinfo.p030,tbinfo.p003-tbinfo.p030);
+            double v31 = 2 * dot(tbinfo.p300-tbinfo.p003,n002+n200) / dot(tbinfo.p300-tbinfo.p003,tbinfo.p300-tbinfo.p003);
+
+            defaulttype::Vector3 h110 = n200 + n020 - (tbinfo.p030-tbinfo.p300) * v12;
+            defaulttype::Vector3 h011 = n020 + n002 - (tbinfo.p003-tbinfo.p030) * v23;
+            defaulttype::Vector3 h101 = n002 + n200 - (tbinfo.p300-tbinfo.p003) * v31;
+
+            tbinfo.n110 = h110 / h110.norm();
+            tbinfo.n011 = h011 / h011.norm();
+            tbinfo.n101 = h101 / h101.norm();
+
+            tbinfo.n200 = n200;
+            tbinfo.n020 = n020;
+            tbinfo.n002 = n002;
+
+            vecInfo.push_back(tbinfo);
+        }
+    }
+
+};
+
+}
+
+}

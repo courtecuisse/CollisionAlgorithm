@@ -34,12 +34,12 @@ public:
         return m_container->begin(id())->project(P);
     }
 
-    BaseProximity::SPtr center() const override {
-        return m_container->begin(id())->center();
+    BaseProximity::SPtr createProximity(int pid = -1) const override {
+        return m_container->begin(id())->createProximity(pid);
     }
 
-    defaulttype::BoundingBox getBBox() const override {
-        return m_container->begin(id())->getBBox();
+    unsigned elementSize() const override {
+        return m_container->begin(id())->elementSize();
     }
 
 private:

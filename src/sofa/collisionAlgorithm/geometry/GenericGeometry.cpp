@@ -8,9 +8,9 @@ namespace collisionAlgorithm {
 SOFA_DECL_CLASS(GenericGeometry)
 
 int GenericGeometryClass = core::RegisterObject("GenericGeometry")
-.add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::core::topology::BaseMeshTopology::Edge> >()
-.add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::core::topology::BaseMeshTopology::Triangle> >()
-.add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::core::topology::BaseMeshTopology::Quad> >();
+.add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::core::topology::BaseMeshTopology::Edge,2> >()
+.add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::core::topology::BaseMeshTopology::Triangle,3> >()
+.add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::core::topology::BaseMeshTopology::Quad,4> >();
 
 
 //Data<helper::vector<sofa::core::topology::BaseMeshTopology::Edge>> d_edges;

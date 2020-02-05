@@ -59,11 +59,11 @@ public:
 
             virtual void next() {}
 
-            virtual BaseProximity::SPtr project(const defaulttype::Vector3 &) const { return NULL; }
+            virtual BaseProximity::SPtr project(const defaulttype::Vector3 &) const override { return NULL; }
 
-            virtual BaseProximity::SPtr center() const { return NULL; }
+            virtual BaseProximity::SPtr createProximity(int id = -1) const override { return NULL; }
 
-            virtual defaulttype::BoundingBox getBBox() const { return defaulttype::BoundingBox(); }
+            virtual unsigned elementSize() const { return 0; }
 
             virtual unsigned id() const { return 0; }
         };
@@ -77,9 +77,9 @@ public:
 
     virtual BaseProximity::SPtr project(const defaulttype::Vector3 & P) const = 0;
 
-    virtual BaseProximity::SPtr center() const = 0;
+    virtual BaseProximity::SPtr createProximity(int id = -1) const = 0;
 
-    virtual defaulttype::BoundingBox getBBox() const = 0;
+    virtual unsigned elementSize() const = 0;
 
     virtual unsigned id() const = 0;
 

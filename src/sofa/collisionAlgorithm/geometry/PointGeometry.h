@@ -30,7 +30,7 @@ public:
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
         const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
-        return DefaultElementIterator<PROXIMITYDATA>::create(this, pos.ref(), eid);
+        return DefaultElementIterator<PROXIMITYDATA,1>::create(this, pos.ref(), eid);
     }
 
     void draw(const core::visual::VisualParams *vparams) override {
@@ -53,19 +53,13 @@ public:
         }
     }
 
-    inline defaulttype::BoundingBox getBBox(const Coord & p) const {
-        defaulttype::BoundingBox bbox;
-        bbox.include(p);
-        return bbox;
-    }
-
-    inline PointProximity center(unsigned eid, const Coord & /*p*/) const {
+    inline PointProximity createProximity(unsigned eid, int /*pid*/ = -1) const {
         return PointProximity(eid);
     }
 
     //do not change the dataProximity.
-    inline PointProximity project(unsigned pid, const Coord & /*P*/,const defaulttype::Vector3 & /*Q*/) const {
-        return PointProximity(pid);
+    inline PointProximity project(const defaulttype::Vector3 & /*Q*/, unsigned eid) const {
+        return PointProximity(eid);
     }
 
     inline defaulttype::Vector3 getPosition(const PointProximity & data, core::VecCoordId v) const {
