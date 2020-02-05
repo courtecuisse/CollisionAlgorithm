@@ -11,11 +11,11 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class TetrahedronGeometry : public TBaseGeometry<DataTypes> {
+class TetrahedronGeometry : public TBaseGeometry<DataTypes,TetrahedronProximity> {
 public:
     typedef DataTypes TDataTypes;
     typedef TetrahedronGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes> Inherit;
+    typedef TBaseGeometry<DataTypes,TetrahedronProximity> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef typename DataTypes::MatrixDeriv MatrixDeriv;
@@ -91,54 +91,9 @@ public:
             const defaulttype::Vector3 & p1 = pos[tri[1]];
             const defaulttype::Vector3 & p2 = pos[tri[2]];
             const defaulttype::Vector3 & p3 = pos[tri[3]];
-            defaulttype::Vector3 bary = (p0 + p1 + p2 + p3)/4.0;
 
+            m_tetra_info[t] = toolBox::computeTetraInfo(p0,p1,p2,p3);
 
-            TetraInfo & tinfo = m_tetra_info[t];
-
-            tinfo.ax1 = p1 - p0;
-            tinfo.ax2 = p2 - p0;
-            tinfo.ax3 = p3 - p0;
-            tinfo.p0 = p0;
-            tinfo.ax2Cax3 = tinfo.ax2.cross(tinfo.ax3);
-            tinfo.V0 = 1.0/6.0 * dot(tinfo.ax1,tinfo.ax2Cax3);
-
-//            tinfo.trianglesInfo.resize(4);
-
-            //Triangle part
-//            for(unsigned i=0;i<4;i++)
-//            {
-//                const defaulttype::Vector3 & P0 = pos[tri[(i+1)%4]];
-//                const defaulttype::Vector3 & P1 = pos[tri[(i+2)%4]];
-//                const defaulttype::Vector3 & P2 = pos[tri[(i+3)%4]];
-//                tinfo.trianglesInfo[i].v0 = P1 - P0;
-//                tinfo.trianglesInfo[i].v1 = P2 - P0;
-
-
-//                defaulttype::Vector3 normal = tinfo.trianglesInfo[i].v0.cross(tinfo.trianglesInfo[i].v1);
-//                if(dot((P0 + P1 + P2)/3-bary,normal)<0)
-//                {
-//                    normal = -normal;
-//                    defaulttype::Vector3 temp = tinfo.trianglesInfo[i].v0;
-//                    tinfo.trianglesInfo[i].v0 = tinfo.trianglesInfo[i].v1;
-//                    tinfo.trianglesInfo[i].v1 = temp;
-
-
-//                }
-//                tinfo.trianglesInfo[i].d00 = dot(tinfo.trianglesInfo[i].v0,tinfo.trianglesInfo[i].v0);
-//                tinfo.trianglesInfo[i].d01 = dot(tinfo.trianglesInfo[i].v0,tinfo.trianglesInfo[i].v1);
-//                tinfo.trianglesInfo[i].d11 = dot(tinfo.trianglesInfo[i].v1,tinfo.trianglesInfo[i].v1);
-
-//                tinfo.trianglesInfo[i].invDenom = 1.0 /
-//                        (tinfo.trianglesInfo[i].d00 * tinfo.trianglesInfo[i].d11
-//                         - tinfo.trianglesInfo[i].d01 * tinfo.trianglesInfo[i].d01);
-
-//                tinfo.trianglesInfo[i].ax1 = tinfo.trianglesInfo[i].v0;
-//                tinfo.trianglesInfo[i].ax2 = tinfo.trianglesInfo[i].v0.cross(normal);
-
-//                tinfo.trianglesInfo[i].ax1.normalize();
-//                tinfo.trianglesInfo[i].ax2.normalize();
-//            }
 
         }
     }
@@ -185,55 +140,32 @@ public:
 
         const TetraInfo & tinfo = m_tetra_info[eid];
 
+        defaulttype::Vector3 P0 = pos[tetrahedron[0]];
+        defaulttype::Vector3 P1 = pos[tetrahedron[1]];
+        defaulttype::Vector3 P2 = pos[tetrahedron[2]];
+        defaulttype::Vector3 P3 = pos[tetrahedron[3]];
+
         double fact[4];
 
-        computeBaryCoords(P, tinfo, fact[0],fact[1],fact[2],fact[3]);
-
-        //Verify if we are out of the tetra
-        double acc = 0;
-
-        for(unsigned i = 0; i<4; i++)
-        {
-            fact[i] = (fact[i]>=0)*fact[i];
-            acc += fact[i];
-        }
-        for(unsigned i = 0; i<4; i++)
-        {
-            fact[i] /= acc;
-        }
+        toolBox::projectOnTetra( P, P0, P1, P2, P3, tinfo,fact[0],fact[1],fact[2],fact[3]);
 
         return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], fact[0],fact[1],fact[2],fact[3]);
     }
 
-    typedef struct
+    inline void computeTetraBaryCoords(const Vec3d & P, unsigned eid, double & fact_u,double & fact_v, double & fact_w, double & fact_x)
     {
-        double V0;
-        defaulttype::Vector3 p0;
-        defaulttype::Vector3 ax1,ax2,ax3,ax2Cax3;
-//        std::vector<typename TriangleGeometry<DataTypes>::TriangleInfo> trianglesInfo ;
+        const Tetrahedron & tetrahedron = l_topology->getTetrahedron(eid);
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
-    } TetraInfo;
+        const TetraInfo & tinfo = m_tetra_info[eid];
 
-    void computeBaryCoords(const defaulttype::Vector3 & P,unsigned eid, double & fact_u,double & fact_v, double & fact_w, double & fact_x)
-    {
-        computeBaryCoords(P,m_tetra_info[eid],fact_u, fact_v,  fact_w,  fact_x);
+        defaulttype::Vector3 P0 = pos[tetrahedron[0]];
+        toolBox::computeTetraBaryCoords(P,P0,tinfo,fact_u,fact_v,fact_w,fact_x);
     }
+
 
     //proj_P must be on the plane
-    static void computeBaryCoords(const defaulttype::Vector3 & P,const TetraInfo & tinfo, double & fact_u,double & fact_v, double & fact_w, double & fact_x)
-    {
-        defaulttype::Vector3 e = P - tinfo.p0;
 
-        double Va = 1.0/6.0 * dot(e,tinfo.ax2Cax3);
-        double Vb = 1.0/6.0 * dot(tinfo.ax1,e.cross(tinfo.ax3));
-        double Vc = 1.0/6.0 * dot(tinfo.ax1,tinfo.ax2.cross(e));
-
-        fact_v = Va/tinfo.V0;
-        fact_w = Vb/tinfo.V0;
-        fact_x = Vc/tinfo.V0;
-        fact_u = 1.0 - (fact_v + fact_w + fact_x);
-
-    }
 
 protected:
 

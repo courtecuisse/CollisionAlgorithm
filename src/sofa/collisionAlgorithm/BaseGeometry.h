@@ -9,6 +9,7 @@
 #include <sofa/simulation/Visitor.h>
 #include <sofa/helper/system/gl.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
+#include <sofa/collisionAlgorithm/toolBox.h>
 
 namespace sofa {
 
@@ -21,6 +22,17 @@ namespace collisionAlgorithm {
 class BaseGeometry : public core::objectmodel::BaseObject
 {
 public:
+
+//    class BaseNormalHandler : public sofa::core::objectmodel::BaseObject {
+//    public:
+//        SOFA_ABSTRACT_CLASS(BaseNormalHandler, sofa::core::objectmodel::BaseObject);
+
+//        void bwdInit() {
+//            registerHandler();
+//        }
+
+//        virtual void registerHandler() = 0;
+//    };
 
     class BroadPhase : public core::objectmodel::BaseObject {
     public:
@@ -85,16 +97,32 @@ public:
 
         prepareDetection();
 
+        updateNormals();
+
         for (unsigned i=0;i<m_broadPhase.size();i++) {
             m_broadPhase[i]->prepareDetection();
         }
     }
 
+    virtual void updateNormals() = 0;
+
 protected:
     std::vector<BroadPhase::SPtr> m_broadPhase;
 };
 
-template<class DataTypes>
+
+template<class PROXIMITYDATA>
+class BaseNormalHandler : public sofa::core::objectmodel::BaseObject {
+public:
+    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(BaseNormalHandler,PROXIMITYDATA), sofa::core::objectmodel::BaseObject);
+
+    virtual void updateNormals() {}
+
+    virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const = 0;
+};
+
+
+template<class DataTypes,class TPROXIMITYDATA>
 class TBaseGeometry : public BaseGeometry {
 public:
 
@@ -109,10 +137,11 @@ public:
     typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+    typedef TPROXIMITYDATA PROXIMITYDATA;
 
-    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(TBaseGeometry,DataTypes),BaseGeometry);
+    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE2(TBaseGeometry,DataTypes,TPROXIMITYDATA),BaseGeometry);
 
-    core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
+    core::objectmodel::SingleLink<TBaseGeometry<DataTypes,PROXIMITYDATA>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
 
     TBaseGeometry()
     : l_state(initLink("mstate", "link to state")) {
@@ -179,9 +208,26 @@ public:
         return templateName(this);
     }
 
-    static std::string templateName(const TBaseGeometry<DataTypes>* = NULL) {
+    static std::string templateName(const TBaseGeometry<DataTypes,PROXIMITYDATA>* = NULL) {
         return DataTypes::Name();
     }
+
+    void updateNormals() override {
+        if (m_normals != NULL) m_normals->updateNormals();
+    }
+
+    inline defaulttype::Vector3 getNormal(const PROXIMITYDATA & data) const {
+        if (m_normals == NULL) return defaulttype::Vector3();
+        return m_normals->computeNormal(data);
+    }
+
+    void setNormalHandler(typename BaseNormalHandler<TPROXIMITYDATA>::SPtr n) {
+        m_normals = n;
+    }
+
+private :
+    typename BaseNormalHandler<TPROXIMITYDATA>::SPtr m_normals;
+
 };
 
 }

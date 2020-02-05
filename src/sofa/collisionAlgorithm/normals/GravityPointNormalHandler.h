@@ -1,22 +1,27 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
+#include <sofa/collisionAlgorithm/BaseNormalHandler.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
-template<class DataTypes>
-class GravityPointNormalHandler : public PointGeometry<DataTypes>::PointNormalHandler {
+template<class GEOMETRY>
+class GravityPointNormalHandler : public TBaseNormalHandler<GEOMETRY> {
 public:
-    SOFA_CLASS(SOFA_TEMPLATE(GravityPointNormalHandler,DataTypes), typename PointGeometry<DataTypes>::PointNormalHandler);
+    typedef typename GEOMETRY::VecCoord VecCoord;
+    typedef typename GEOMETRY::DataVecCoord DataVecCoord;
+    typedef typename GEOMETRY::PROXIMITYDATA PROXIMITYDATA;
+    typedef TBaseNormalHandler<GEOMETRY> Inherit;
+
+    SOFA_CLASS(SOFA_TEMPLATE(GravityPointNormalHandler,GEOMETRY), Inherit);
 
     GravityPointNormalHandler() {
         this->f_listening.setValue(true);
     }
 
     void init() override {
-        PointGeometry<DataTypes>::PointNormalHandler::init();
+        TBaseNormalHandler<GEOMETRY>::init();
         computeGravityCenter();
     }
 
@@ -37,7 +42,8 @@ public:
 
 
     defaulttype::Vector3 computeNormal(const PointProximity & data) const override {
-        return (this->l_geometry->getPosition(data,core::VecCoordId::position()) - m_gcenter).normalized();
+        const helper::ReadAccessor<DataVecCoord> & pos = this->l_geometry->getState()->read(core::VecCoordId::position());
+        return (pos[data.m_eid] - m_gcenter).normalized();
     }
 
 private :

@@ -14,10 +14,10 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes, class Element>
-class GenericGeometry : public TBaseGeometry<DataTypes> {
+class GenericGeometry : public TBaseGeometry<DataTypes,GenericProximity> {
 public:
     typedef DataTypes TDataTypes;
-    typedef TBaseGeometry<DataTypes> Inherit;
+    typedef TBaseGeometry<DataTypes,GenericProximity> Inherit;
     typedef GenericGeometry<DataTypes,Element> GEOMETRY;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;

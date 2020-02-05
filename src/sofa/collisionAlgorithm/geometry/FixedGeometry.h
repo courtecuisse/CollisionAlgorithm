@@ -89,6 +89,8 @@ public:
     }
 
     inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid_global, unsigned cid_local, const sofa::defaulttype::BaseVector* lambda) const {}
+
+    virtual void updateNormals() {}
 };
 
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/geometry/PhongTriangleGeometry.h>
+#include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
 
 namespace sofa
 {
@@ -9,10 +9,10 @@ namespace collisionAlgorithm
 {
 
 template<class DataTypes>
-class BezierTriangleGeometry : public PhongTriangleGeometry<DataTypes> {
+class BezierTriangleGeometry : public TriangleGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
-    typedef PhongTriangleGeometry<DataTypes> Inherit;
+    typedef TriangleGeometry<DataTypes> Inherit;
     typedef BezierTriangleGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
@@ -25,6 +25,7 @@ public:
     {
         defaulttype::Vector3 p210,p120,p021,p012,p102,p201,p111;
         defaulttype::Vector3 n110,n011,n101;
+        defaulttype::Vector3 n200,n020,n002;
     } BezierTriangleInfo;
 
     Data <unsigned> d_nonlin_max_it;
@@ -44,58 +45,7 @@ public:
 
     virtual void prepareDetection() {
         Inherit::prepareDetection();
-
-        const helper::vector<Triangle>& triangles = this->l_topology->getTriangles();
-        const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(core::VecCoordId::position());
-
-        unsigned nbTriangles = triangles.size();
-        m_beziertriangle_info.resize(nbTriangles);
-        for (size_t t=0;t< nbTriangles;t++)
-        {
-            BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[t];
-            const Triangle& trpids = triangles[t];
-
-            const defaulttype::Vector3 & p300 = x[trpids[2]];
-            const defaulttype::Vector3 & p030 = x[trpids[1]];
-            const defaulttype::Vector3 & p003 = x[trpids[0]];
-
-            const defaulttype::Vector3 & n200 = this->m_point_normals[trpids[2]];
-            const defaulttype::Vector3 & n020 = this->m_point_normals[trpids[1]];
-            const defaulttype::Vector3 & n002 = this->m_point_normals[trpids[0]];
-
-            double w12 = dot(p030 - p300,n200);
-            double w21 = dot(p300 - p030,n020);
-            double w23 = dot(p003 - p030,n020);
-            double w32 = dot(p030 - p003,n002);
-            double w31 = dot(p300 - p003,n002);
-            double w13 = dot(p003 - p300,n200);
-
-            tbinfo.p210 = (p300*2.0 + p030 - n200 * w12) / 3.0;
-            tbinfo.p120 = (p030*2.0 + p300 - n020 * w21) / 3.0;
-
-            tbinfo.p021 = (p030*2.0 + p003 - n020 * w23) / 3.0;
-            tbinfo.p012 = (p003*2.0 + p030 - n002 * w32) / 3.0;
-
-            tbinfo.p102 = (p003*2.0 + p300 - n002 * w31) / 3.0;
-            tbinfo.p201 = (p300*2.0 + p003 - n200 * w13) / 3.0;
-
-            defaulttype::Vector3 E = (tbinfo.p210+tbinfo.p120+tbinfo.p102+tbinfo.p201+tbinfo.p021+tbinfo.p012) / 6.0;
-            defaulttype::Vector3 V = (p300+p030+p003) / 3.0;
-            tbinfo.p111 =  E + (E-V) / 2.0;
-
-            //Compute Bezier Normals
-            double v12 = 2 * dot(p030-p300,n200+n020) / dot(p030-p300,p030-p300);
-            double v23 = 2 * dot(p003-p030,n020+n002) / dot(p003-p030,p003-p030);
-            double v31 = 2 * dot(p300-p003,n002+n200) / dot(p300-p003,p300-p003);
-
-            defaulttype::Vector3 h110 = n200 + n020 - (p030-p300) * v12;
-            defaulttype::Vector3 h011 = n020 + n002 - (p003-p030) * v23;
-            defaulttype::Vector3 h101 = n002 + n200 - (p300-p003) * v31;
-
-            tbinfo.n110 = h110 / h110.norm();
-            tbinfo.n011 = h011 / h011.norm();
-            tbinfo.n101 = h101 / h101.norm();
-        }
+        m_dirty = true;
     }
 
     void tesselate(unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C) {
@@ -175,7 +125,7 @@ public:
             if (nQP.norm() < tolerance) break;
             nQP.normalize();
 
-            defaulttype::Vector3 N1 = getNormal(pinfo);
+            defaulttype::Vector3 N1 = this->getNormal(pinfo);
             N1.normalize();
 
             if (pinfo.m_f0 < 0 || pinfo.m_f1 < 0 || pinfo.m_f2 < 0) break;
@@ -253,7 +203,7 @@ public:
             double fact;
             if (fabs(dot(nQP,N1))>0.8) {
                 double fx = acos(fabs(dot(nQP,N1)));
-                double fxdx = acos(fabs(dot((P - QA).normalized(),getNormal(P_a))));
+                double fxdx = acos(fabs(dot((P - QA).normalized(),this->getNormal(P_a))));
                 double j = (fxdx - fx) / delta;
                 fact = -fx / j;
             } else {
@@ -286,103 +236,119 @@ public:
         return pinfo;
     }
 
-    inline defaulttype::Vector3 getNormal(const TriangleProximity & data) const {
-        const defaulttype::Vector3 &n200 = this->m_triangle_normals[data.m_p2];
-        const defaulttype::Vector3 &n020 = this->m_triangle_normals[data.m_p1];
-        const defaulttype::Vector3 &n002 = this->m_triangle_normals[data.m_p0];
-        const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[data.m_eid];
+    ////Bezier triangle are computed according to :
+    ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
+    inline defaulttype::Vector3 getPosition(const TriangleProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
+        const BezierTriangleInfo & tbinfo = getBezierInfo(data.m_eid,v);
+
+        const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(v);
+
+        const defaulttype::Vector3 & p300 = x[data.m_p2];
+        const defaulttype::Vector3 & p030 = x[data.m_p1];
+        const defaulttype::Vector3 & p003 = x[data.m_p0];
 
         double fact_w = data.m_f2;
         double fact_u = data.m_f1;
         double fact_v = data.m_f0;
 
-        defaulttype::Vector3 normal = n200 * fact_w*fact_w +
-                                      n020 * fact_u*fact_u +
-                                      n002 * fact_v*fact_v +
-                                      tbinfo.n110 * fact_w*fact_u +
-                                      tbinfo.n011 * fact_u*fact_v +
-                                      tbinfo.n101 * fact_w*fact_v;
-
-        return normal.normalized();
+        return p300 *   fact_w*fact_w*fact_w +
+               p030 *   fact_u*fact_u*fact_u +
+               p003 *   fact_v*fact_v*fact_v +
+               tbinfo.p210 * 3*fact_w*fact_w*fact_u +
+               tbinfo.p120 * 3*fact_w*fact_u*fact_u +
+               tbinfo.p201 * 3*fact_w*fact_w*fact_v +
+               tbinfo.p021 * 3*fact_u*fact_u*fact_v +
+               tbinfo.p102 * 3*fact_w*fact_v*fact_v +
+               tbinfo.p012 * 3*fact_u*fact_v*fact_v +
+               tbinfo.p111 * 6*fact_w*fact_u*fact_v;
     }
 
-    ////Bezier triangle are computed according to :
-    ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
-    inline defaulttype::Vector3 getPosition(const TriangleProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
-        const BezierTriangleInfo & tbinfo = this->m_beziertriangle_info[data.m_eid];
+    const BezierTriangleInfo & getBezierInfo(unsigned tid, core::VecCoordId v = core::VecCoordId::position()) const {
+        if (m_dirty) recomputeBezierInfo(v);
 
-        if(v == core::VecCoordId::position())
-        {
-            const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(v);
-
-            const defaulttype::Vector3 & p300 = x[data.m_p2];
-            const defaulttype::Vector3 & p030 = x[data.m_p1];
-            const defaulttype::Vector3 & p003 = x[data.m_p0];
-
-            double fact_w = data.m_f2;
-            double fact_u = data.m_f1;
-            double fact_v = data.m_f0;
-
-            return p300 *   fact_w*fact_w*fact_w +
-                   p030 *   fact_u*fact_u*fact_u +
-                   p003 *   fact_v*fact_v*fact_v +
-                   tbinfo.p210 * 3*fact_w*fact_w*fact_u +
-                   tbinfo.p120 * 3*fact_w*fact_u*fact_u +
-                   tbinfo.p201 * 3*fact_w*fact_w*fact_v +
-                   tbinfo.p021 * 3*fact_u*fact_u*fact_v +
-                   tbinfo.p102 * 3*fact_w*fact_v*fact_v +
-                   tbinfo.p012 * 3*fact_u*fact_v*fact_v +
-                   tbinfo.p111 * 6*fact_w*fact_u*fact_v;
-        } else {
-            double fact_w = data.m_f2;
-            double fact_u = data.m_f1;
-            double fact_v = data.m_f0;
-
-            const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(v);
-
-            const defaulttype::Vector3 & p300_Free = x[data.m_p2];
-            const defaulttype::Vector3 & p030_Free = x[data.m_p1];
-            const defaulttype::Vector3 & p003_Free = x[data.m_p0];
-
-            const defaulttype::Vector3 & n200_Free = this->m_triangle_normals[data.m_p2];
-            const defaulttype::Vector3 & n020_Free = this->m_triangle_normals[data.m_p1];
-            const defaulttype::Vector3 & n002_Free = this->m_triangle_normals[data.m_p0];
-
-            double w12_free = dot(p030_Free - p300_Free,n200_Free);
-            double w21_free = dot(p300_Free - p030_Free,n020_Free);
-            double w23_free = dot(p003_Free - p030_Free,n020_Free);
-            double w32_free = dot(p030_Free - p003_Free,n002_Free);
-            double w31_free = dot(p300_Free - p003_Free,n002_Free);
-            double w13_free = dot(p003_Free - p300_Free,n200_Free);
-
-            const defaulttype::Vector3 & p210_Free = (p300_Free*2.0 + p030_Free - n200_Free * w12_free) / 3.0;
-            const defaulttype::Vector3 & p120_Free = (p030_Free*2.0 + p300_Free - n020_Free * w21_free) / 3.0;
-
-            const defaulttype::Vector3 & p021_Free = (p030_Free*2.0 + p003_Free - n020_Free * w23_free) / 3.0;
-            const defaulttype::Vector3 & p012_Free = (p003_Free*2.0 + p030_Free - n002_Free * w32_free) / 3.0;
-
-            const defaulttype::Vector3 & p102_Free = (p003_Free*2.0 + p300_Free - n002_Free * w31_free) / 3.0;
-            const defaulttype::Vector3 & p201_Free = (p300_Free*2.0 + p003_Free - n200_Free * w13_free) / 3.0;
-
-            const defaulttype::Vector3 & E_Free = (p210_Free+p120_Free+p102_Free+p201_Free+p021_Free+p012_Free) / 6.0;
-            const defaulttype::Vector3 & V_Free = (p300_Free+p030_Free+p003_Free) / 3.0;
-            const defaulttype::Vector3 & p111_Free =  E_Free + (E_Free-V_Free) / 2.0;
-
-            return p300_Free *   fact_w*fact_w*fact_w +
-                   p030_Free *   fact_u*fact_u*fact_u +
-                   p003_Free *   fact_v*fact_v*fact_v +
-                   p210_Free * 3*fact_w*fact_w*fact_u +
-                   p120_Free * 3*fact_w*fact_u*fact_u +
-                   p201_Free * 3*fact_w*fact_w*fact_v +
-                   p021_Free * 3*fact_u*fact_u*fact_v +
-                   p102_Free * 3*fact_w*fact_v*fact_v +
-                   p012_Free * 3*fact_u*fact_v*fact_v +
-                   p111_Free * 6*fact_w*fact_u*fact_v;
-        }
+        return m_bezier_info[tid];
     }
 
 protected:
-    std::vector<BezierTriangleInfo> m_beziertriangle_info;
+    mutable std::vector<BezierTriangleInfo> m_bezier_info;
+    mutable bool m_dirty;
+
+    void recomputeBezierInfo(core::VecCoordId v = core::VecCoordId::position()) const {
+        const helper::vector<Triangle>& triangles = this->l_topology->getTriangles();
+        const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(core::VecCoordId::position());
+
+        unsigned nbTriangles = triangles.size();
+        m_bezier_info.resize(nbTriangles);
+        for (size_t t=0;t< nbTriangles;t++)
+        {
+            const Triangle& triangle = this->l_topology->getTriangle(t);
+
+            defaulttype::Vector3 n200;
+            defaulttype::Vector3 n020;
+            defaulttype::Vector3 n002;
+
+            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav0 = this->l_topology->getTrianglesAroundVertex(triangle[2]);
+            for (size_t t=0;t<tav0.size();t++) n200 += this->m_triangle_info[tav0[t]].n;
+
+            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav1 = this->l_topology->getTrianglesAroundVertex(triangle[1]);
+            for (size_t t=0;t<tav1.size();t++) n020 += this->m_triangle_info[tav1[t]].n;
+
+            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav2 = this->l_topology->getTrianglesAroundVertex(triangle[0]);
+            for (size_t t=0;t<tav2.size();t++) n002 += this->m_triangle_info[tav2[t]].n;
+
+            n200.normalize();
+            n020.normalize();
+            n002.normalize();
+
+            BezierTriangleInfo & tbinfo = this->m_bezier_info[t];
+            const Triangle& trpids = triangles[t];
+
+            const defaulttype::Vector3 & p300 = x[trpids[2]];
+            const defaulttype::Vector3 & p030 = x[trpids[1]];
+            const defaulttype::Vector3 & p003 = x[trpids[0]];
+
+            double w12 = dot(p030 - p300,n200);
+            double w21 = dot(p300 - p030,n020);
+            double w23 = dot(p003 - p030,n020);
+            double w32 = dot(p030 - p003,n002);
+            double w31 = dot(p300 - p003,n002);
+            double w13 = dot(p003 - p300,n200);
+
+            tbinfo.p210 = (p300*2.0 + p030 - n200 * w12) / 3.0;
+            tbinfo.p120 = (p030*2.0 + p300 - n020 * w21) / 3.0;
+
+            tbinfo.p021 = (p030*2.0 + p003 - n020 * w23) / 3.0;
+            tbinfo.p012 = (p003*2.0 + p030 - n002 * w32) / 3.0;
+
+            tbinfo.p102 = (p003*2.0 + p300 - n002 * w31) / 3.0;
+            tbinfo.p201 = (p300*2.0 + p003 - n200 * w13) / 3.0;
+
+            defaulttype::Vector3 E = (tbinfo.p210+tbinfo.p120+tbinfo.p102+tbinfo.p201+tbinfo.p021+tbinfo.p012) / 6.0;
+            defaulttype::Vector3 V = (p300+p030+p003) / 3.0;
+            tbinfo.p111 =  E + (E-V) / 2.0;
+
+            //Compute Bezier Normals
+            double v12 = 2 * dot(p030-p300,n200+n020) / dot(p030-p300,p030-p300);
+            double v23 = 2 * dot(p003-p030,n020+n002) / dot(p003-p030,p003-p030);
+            double v31 = 2 * dot(p300-p003,n002+n200) / dot(p300-p003,p300-p003);
+
+            defaulttype::Vector3 h110 = n200 + n020 - (p030-p300) * v12;
+            defaulttype::Vector3 h011 = n020 + n002 - (p003-p030) * v23;
+            defaulttype::Vector3 h101 = n002 + n200 - (p300-p003) * v31;
+
+            tbinfo.n110 = h110 / h110.norm();
+            tbinfo.n011 = h011 / h011.norm();
+            tbinfo.n101 = h101 / h101.norm();
+
+            tbinfo.n200 = n200;
+            tbinfo.n020 = n020;
+            tbinfo.n002 = n002;
+        }
+
+        //m_dirty[v] = false
+        m_dirty = false;
+    }
+
 };
 
 }
