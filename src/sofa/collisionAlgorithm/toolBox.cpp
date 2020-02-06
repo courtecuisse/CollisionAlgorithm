@@ -51,9 +51,9 @@ TriangleInfo computeTriangleInfo(const Vec3d & t0,const Vec3d & t1,const Vec3d &
     return tinfo;
 }
 
-void computeTriangleBaryCoords(const Vec3d & proj_P, const Vec3d & triangleP0, const TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w)
+void computeTriangleBaryCoords(const Vec3d & proj_P, const TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w)
 {
-    Vec3d v2 = proj_P - triangleP0;
+    Vec3d v2 = proj_P - tinfo.P0;
 
     double d20 = dot(v2,tinfo.v0);
     double d21 = dot(v2,tinfo.v1);
@@ -72,7 +72,7 @@ void projectOnTriangle(const Vec3d projectP, const TriangleInfo & tinfo, double 
     double c1 = dot(x1x2,tinfo.ax2);
     Vec3d proj_P = tinfo.P0 + tinfo.ax1 * c0 + tinfo.ax2 * c1;
 
-    computeTriangleBaryCoords(proj_P, tinfo.P0, tinfo, fact_u,fact_v,fact_w);
+    computeTriangleBaryCoords(proj_P, tinfo, fact_u,fact_v,fact_w);
 
     if (fact_u<0)
     {
