@@ -5,6 +5,7 @@
 #include <sofa/collisionAlgorithm/proximity/TetrahedronProximity.h>
 #include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
 #include <sofa/core/topology/BaseMeshTopology.h>
+#include <sofa/collisionAlgorithm/toolBox/TetraToolBox.h>
 
 namespace sofa {
 

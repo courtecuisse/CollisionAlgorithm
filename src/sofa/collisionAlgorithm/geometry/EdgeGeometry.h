@@ -3,6 +3,7 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
+#include <sofa/collisionAlgorithm/toolBox/EdgeToolBox.h>
 
 namespace sofa {
 

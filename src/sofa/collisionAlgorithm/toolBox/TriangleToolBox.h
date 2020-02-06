@@ -6,7 +6,7 @@
 #include <sofa/defaulttype/SolidTypes.h>
 #include <Eigen/Core>
 #include <Eigen/SVD>
-#include <iostream>
+#include <sofa/collisionAlgorithm/toolBox/EdgeToolBox.h>
 
 
 namespace sofa
@@ -29,21 +29,8 @@ struct TriangleInfo
     Vec3d P0,P1,P2;
 };
 
-
-struct TetraInfo
-{
-    double V0;
-    Vec3d P0,P1,P2,P3;
-    Vec3d ax1,ax2,ax3,ax2Cax3;
-};
-
 namespace toolBox
 {
-//------------ Edges methods ------------//
-
-void projectOnEdge(const Vec3d & projP, const Vec3d & e1, const Vec3d & e2, double & fact_u, double & fact_v);
-
-
 //------------ Triangle methods ------------//
 
 TriangleInfo computeTriangleInfo(const Vec3d & t0,const Vec3d & t1,const Vec3d & t2);
@@ -51,15 +38,6 @@ TriangleInfo computeTriangleInfo(const Vec3d & t0,const Vec3d & t1,const Vec3d &
 void computeTriangleBaryCoords(const Vec3d & proj_P, const TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w);
 
 void projectOnTriangle(const Vec3d projectP, const TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w);
-
-
-//------------ Tetrahedra methods ------------//
-
-TetraInfo computeTetraInfo(const Vec3d & p0, const Vec3d & p1, const Vec3d & p2, const Vec3d & p3);
-
-void computeTetraBaryCoords(const Vec3d & P, const TetraInfo & tinfo, double & fact_u,double & fact_v, double & fact_w, double & fact_x);
-
-void projectOnTetra(const Vec3d & projectP, const TetraInfo & tinfo, double & fact_u, double & fact_v, double & fact_w, double & fact_x);
 
 
 }
