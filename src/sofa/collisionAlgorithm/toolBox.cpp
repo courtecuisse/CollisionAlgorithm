@@ -11,7 +11,7 @@ namespace collisionAlgorithm
 namespace toolBox
 {
 
-inline void projectOnEdge(const Vec3d & projP, const Vec3d & e1, const Vec3d & e2, double & fact_u, double & fact_v)
+void projectOnEdge(const Vec3d & projP, const Vec3d & e1, const Vec3d & e2, double & fact_u, double & fact_v)
 {
 
     Vec3d v = e2 - e1;
@@ -23,7 +23,7 @@ inline void projectOnEdge(const Vec3d & projP, const Vec3d & e1, const Vec3d & e
     fact_u = 1.0-fact_v;
 }
 
-inline TriangleInfo computeTriangleInfo(const Vec3d & t0,const Vec3d & t1,const Vec3d & t2) {
+TriangleInfo computeTriangleInfo(const Vec3d & t0,const Vec3d & t1,const Vec3d & t2) {
     //Compute the projection of the point on the plane
     TriangleInfo tinfo;
 
@@ -51,7 +51,7 @@ inline TriangleInfo computeTriangleInfo(const Vec3d & t0,const Vec3d & t1,const 
     return tinfo;
 }
 
-inline void computeTriangleBaryCoords(const Vec3d & proj_P, const Vec3d & triangleP0, const TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w)
+void computeTriangleBaryCoords(const Vec3d & proj_P, const Vec3d & triangleP0, const TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w)
 {
     Vec3d v2 = proj_P - triangleP0;
 
@@ -63,7 +63,7 @@ inline void computeTriangleBaryCoords(const Vec3d & proj_P, const Vec3d & triang
     fact_u = 1.0 - fact_v  - fact_w;
 }
 
-inline void projectOnTriangle(const Vec3d projectP, const TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w)
+void projectOnTriangle(const Vec3d projectP, const TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w)
 {
     Vec3d x1x2 = projectP - tinfo.P0;
 
@@ -92,7 +92,7 @@ inline void projectOnTriangle(const Vec3d projectP, const TriangleInfo & tinfo, 
 }
 
 
-inline void computeTetraBaryCoords(const Vec3d & P, const TetraInfo & tinfo, double & fact_u,double & fact_v, double & fact_w, double & fact_x)
+void computeTetraBaryCoords(const Vec3d & P, const TetraInfo & tinfo, double & fact_u,double & fact_v, double & fact_w, double & fact_x)
 {
     Vec3d e = P - tinfo.P0;
 
@@ -107,7 +107,7 @@ inline void computeTetraBaryCoords(const Vec3d & P, const TetraInfo & tinfo, dou
 
 }
 
-inline void projectOnTetra(const Vec3d & projectP, const TetraInfo & tinfo, double & fact_u, double & fact_v, double & fact_w, double & fact_x)
+void projectOnTetra(const Vec3d & projectP, const TetraInfo & tinfo, double & fact_u, double & fact_v, double & fact_w, double & fact_x)
 {
     toolBox::computeTetraBaryCoords(projectP, tinfo, fact_u,fact_v,fact_w,fact_x);
     if(fact_u<0)
@@ -132,7 +132,7 @@ inline void projectOnTetra(const Vec3d & projectP, const TetraInfo & tinfo, doub
     }
 }
 
-inline TetraInfo computeTetraInfo(const Vec3d & p0, const Vec3d & p1, const Vec3d & p2, const Vec3d & p3)
+TetraInfo computeTetraInfo(const Vec3d & p0, const Vec3d & p1, const Vec3d & p2, const Vec3d & p3)
 {
     TetraInfo tinfo;
 
