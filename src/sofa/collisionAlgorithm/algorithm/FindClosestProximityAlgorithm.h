@@ -27,9 +27,7 @@ public:
     , d_output(initData(&d_output,"output", "output of the collision detection")) {}
 
     void draw(const core::visual::VisualParams* vparams) {
-        if (! vparams->displayFlags().getShowCollisionModels()) return ;
-
-        if (! d_drawCollision.getValue()) return;
+        if (! vparams->displayFlags().getShowCollisionModels() && ! d_drawCollision.getValue()) return;
         glDisable(GL_LIGHTING);
         glColor4f(0,1,0,1);
 
