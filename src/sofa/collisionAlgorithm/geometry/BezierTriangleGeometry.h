@@ -117,7 +117,7 @@ public:
         return this->l_topology->getTriangle(eid);
     }
 
-    inline TriangleProximity project(const defaulttype::Vector3 & P, unsigned eid) const {
+    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, unsigned eid) const {
         auto triangle = getTriangle(eid);
 
         unsigned max_it = d_nonlin_max_it.getValue();
@@ -168,7 +168,7 @@ public:
             double P_v_fact2 = pinfo.m_f2 - delta * fact_v;
             if (P_v_fact0 < 0 || P_v_fact1 < 0 || P_v_fact2 < 0) break;
 
-            TriangleProximity P_v(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_v_fact0, P_v_fact1, P_v_fact2);
+            PROXIMITYDATA P_v(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_v_fact0, P_v_fact1, P_v_fact2);
             defaulttype::Vector3 p_v = (P - getPosition(P_v)).normalized();
             defaulttype::Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
 
@@ -178,7 +178,7 @@ public:
             double P_u_fact2 = pinfo.m_f2 - delta * fact_u;
             if (P_u_fact0 < 0 || P_u_fact1 < 0 || P_u_fact2 < 0) break;
 
-            TriangleProximity P_u(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_u_fact0,P_u_fact1,P_u_fact2);
+            PROXIMITYDATA P_u(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_u_fact0,P_u_fact1,P_u_fact2);
             defaulttype::Vector3 p_u = (P - getPosition(P_u)).normalized();
             defaulttype::Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
 
@@ -216,7 +216,7 @@ public:
 
             if (P_a_fact0 < 0 ||P_a_fact1 < 0 || P_a_fact2 < 0) break;
 
-            TriangleProximity P_a(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_a_fact0,P_a_fact1,P_a_fact2);
+            PROXIMITYDATA P_a(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_a_fact0,P_a_fact1,P_a_fact2);
             defaulttype::Vector3 QA = getPosition(P_a);
 
             double fact;
@@ -256,7 +256,7 @@ public:
     }
 
     // Force use of the function to compute the normal (not the normal handler)
-    defaulttype::Vector3 getNormal(const TriangleProximity & data) const override {
+    defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
         auto tbinfo = getBezierInfo()[data.m_eid];
 
         const defaulttype::Vector3 &n200 = tbinfo.n200;
@@ -279,7 +279,7 @@ public:
 
     ////Bezier triangle are computed according to :
     ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
-    inline defaulttype::Vector3 getPosition(const TriangleProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
+    inline defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
         const BezierTriangleInfo & tbinfo = getBezierInfo(v)[data.m_eid];
 
         const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(v);

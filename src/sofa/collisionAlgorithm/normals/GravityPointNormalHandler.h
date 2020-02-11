@@ -20,16 +20,7 @@ public:
         this->f_listening.setValue(true);
     }
 
-    void init() override {
-        TBaseNormalHandler<GEOMETRY>::init();
-        computeGravityCenter();
-    }
-
-    void handleEvent(sofa::core::objectmodel::Event* event) override {
-        if (dynamic_cast<sofa::simulation::AnimateBeginEvent*>(event)) computeGravityCenter();
-    }
-
-    void computeGravityCenter() {
+    virtual void updateNormals() override {
         m_gcenter = defaulttype::Vector3();
         unsigned size = 0;
         for (auto it = this->l_geometry->begin();it!=this->l_geometry->end();it++) {

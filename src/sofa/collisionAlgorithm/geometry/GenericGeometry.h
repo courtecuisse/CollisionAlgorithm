@@ -18,6 +18,7 @@ class GenericGeometry : public TBaseGeometry<DataTypes,GenericProximity> {
 public:
     typedef DataTypes TDataTypes;
     typedef TBaseGeometry<DataTypes,GenericProximity> Inherit;
+    typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
     typedef GenericGeometry<DataTypes,Element,SIZE> GEOMETRY;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
@@ -43,10 +44,10 @@ public:
     , d_elements(initData(&d_elements, "elements", "Vector of Elements")) {}
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        return DefaultElementIterator<GenericProximity,SIZE>::create(this, d_elements.getValue(), eid);
+        return DefaultElementIterator<PROXIMITYDATA,SIZE>::create(this, d_elements.getValue(), eid);
     }
 
-    inline defaulttype::Vector3 getPosition(const GenericProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
+    inline defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
         defaulttype::Vector3 P;
         for (unsigned i=0;i<data.m_prox.size();i++) {
@@ -55,17 +56,13 @@ public:
         return P;
     }
 
-    inline defaulttype::Vector3 getNormal(const GenericProximity & /*data*/) const {
-        return defaulttype::Vector3();
-    }
-
-    inline GenericProximity createProximity(unsigned eid,int pid = -1) const {
+    inline PROXIMITYDATA createProximity(unsigned eid,int pid = -1) const {
         helper::vector<std::pair<unsigned,double> > prox;
         for (unsigned i=0;i<Element::size();i++) {
             prox.push_back(std::pair<unsigned,double>(eid, 1.0/Element::size()));
         }
 
-        return GenericProximity(eid, prox);
+        return PROXIMITYDATA(eid, prox);
     }
 
     inline defaulttype::BoundingBox getBBox(const Element & elmt) const {
@@ -78,7 +75,7 @@ public:
         return bbox;
     }
 
-    void normalize(GenericProximity & result) const {
+    void normalize(PROXIMITYDATA & result) const {
         //Normalize (sum = 1)
         double sum = 0.0;
         for (unsigned i=0;i<result.m_prox.size();i++) sum += result.m_prox[i].second;
@@ -100,10 +97,14 @@ public:
         return m_inverse;
     }
 
-    inline GenericProximity project(defaulttype::Vector3 Q, unsigned eid) const {
+    virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & /*data*/) const override {
+        return defaulttype::Vector3();
+    }
+
+    inline PROXIMITYDATA project(defaulttype::Vector3 Q, unsigned eid) const {
         double delta = d_delta.getValue();
 
-        GenericProximity result = createProximity(eid);
+        PROXIMITYDATA result = createProximity(eid);
 
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
 
@@ -156,7 +157,7 @@ public:
 //            std::cout << "dx=\n" << dx << std::endl;
 
             //Apply increment dx obtained from newton
-            GenericProximity new_result = result;
+            PROXIMITYDATA new_result = result;
             for (unsigned i=0;i<JLin;i++) {
                 unsigned pid = normals[i].first;
                 new_result.m_prox[pid].second += dx(i);

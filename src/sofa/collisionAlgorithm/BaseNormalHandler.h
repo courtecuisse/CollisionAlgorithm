@@ -7,11 +7,10 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class GEOMETRY>
-class TBaseNormalHandler : public BaseNormalHandler<typename GEOMETRY::PROXIMITYDATA> {
+class TBaseNormalHandler : public sofa::core::objectmodel::BaseObject, public BaseNormalHandler<typename GEOMETRY::PROXIMITYDATA> {
 public:
-    typedef BaseNormalHandler<typename GEOMETRY::PROXIMITYDATA> Inherit;
 
-    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(TBaseNormalHandler,GEOMETRY), Inherit);
+    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(TBaseNormalHandler,GEOMETRY), sofa::core::objectmodel::BaseObject);
 
     core::objectmodel::SingleLink<TBaseNormalHandler<GEOMETRY>, GEOMETRY, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
@@ -27,6 +26,7 @@ public:
 
         l_geometry->addSlave(this);
     }
+
 };
 
 }

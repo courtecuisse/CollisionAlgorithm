@@ -111,11 +111,11 @@ public:
         return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2],fact_u,fact_v,fact_w);
     }
 
-    virtual defaulttype::Vector3 getNormal(const PROXIMITYDATA & data) const {
+    virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
         if (this->m_normalHandler != NULL) return this->m_normalHandler->computeNormal(data);
 
         auto tinfo = getTriangleInfo()[data.m_eid];
-        return cross(tinfo.ax1,tinfo.ax2);
+        return cross(tinfo.ax2,tinfo.ax1);
     }
 
 

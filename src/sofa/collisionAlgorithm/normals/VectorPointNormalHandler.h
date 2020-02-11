@@ -26,6 +26,8 @@ public:
         if(d_normals.getValue().size()==1) return d_normals.getValue()[0];
         return defaulttype::Vector3();
     }
+
+    virtual void updateNormals() override {}
 };
 
 }

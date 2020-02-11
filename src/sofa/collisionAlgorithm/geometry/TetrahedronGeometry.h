@@ -17,6 +17,7 @@ public:
     typedef DataTypes TDataTypes;
     typedef TetrahedronGeometry<DataTypes> GEOMETRY;
     typedef TBaseGeometry<DataTypes,TetrahedronProximity> Inherit;
+    typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef typename DataTypes::MatrixDeriv MatrixDeriv;
@@ -36,7 +37,7 @@ public:
     }
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        return DefaultElementIterator<TetrahedronProximity,4>::create(this, this->l_topology->getTetrahedra(), eid);
+        return DefaultElementIterator<PROXIMITYDATA,4>::create(this, this->l_topology->getTetrahedra(), eid);
     }
 
     void draw(const core::visual::VisualParams * vparams) {
@@ -82,7 +83,7 @@ public:
         return this->l_topology->getTetrahedron(eid);
     }
 
-    inline defaulttype::Vector3 getPosition(const TetrahedronProximity & data, core::VecCoordId v = core::VecCoordId::position()) const {
+    inline defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
 
         return pos[data.m_p0] * data.m_f0 +
@@ -91,34 +92,34 @@ public:
                pos[data.m_p3] * data.m_f3;
     }
 
-    inline defaulttype::Vector3 getNormal(const TetrahedronProximity & data) const {
+    virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
         return defaulttype::Vector3(0,0,0);
     }
 
-    TetrahedronProximity createProximity(unsigned eid,int pid = -1) const {
+    PROXIMITYDATA createProximity(unsigned eid,int pid = -1) const {
         auto tetrahedron = getTetrahedron(eid);
 
-        if (pid == 0) return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 1, 0, 0, 0);
-        else if (pid == 1) return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 0, 1, 0, 0);
-        else if (pid == 2) return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 0, 0, 1, 0);
-        else if (pid == 3) return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 0, 0, 0, 1);
+        if (pid == 0) return PROXIMITYDATA(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 1, 0, 0, 0);
+        else if (pid == 1) return PROXIMITYDATA(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 0, 1, 0, 0);
+        else if (pid == 2) return PROXIMITYDATA(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 0, 0, 1, 0);
+        else if (pid == 3) return PROXIMITYDATA(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 0, 0, 0, 1);
 
-        return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 0.25, 0.25, 0.25, 0.25);
+        return PROXIMITYDATA(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], 0.25, 0.25, 0.25, 0.25);
     }
 
-    inline TetrahedronProximity createProximity(unsigned eid,double & fact_u,double & fact_v, double & fact_w, double & fact_x) {
+    inline PROXIMITYDATA createProximity(unsigned eid,double & fact_u,double & fact_v, double & fact_w, double & fact_x) {
         const Tetrahedron & tetrahedron = l_topology->getTetrahedron(eid);
-        return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], fact_u,fact_v,fact_w,fact_x);
+        return PROXIMITYDATA(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], fact_u,fact_v,fact_w,fact_x);
     }
 
-    inline TetrahedronProximity project(const defaulttype::Vector3 & P, unsigned eid) const {
+    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, unsigned eid) const {
         auto tetrahedron = getTetrahedron(eid);
         const TetraInfo & tinfo = getTetraInfo()[eid];
 
         double fact[4];
         toolBox::projectOnTetra( P, tinfo,fact[0],fact[1],fact[2],fact[3]);
 
-        return TetrahedronProximity(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], fact[0],fact[1],fact[2],fact[3]);
+        return PROXIMITYDATA(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], fact[0],fact[1],fact[2],fact[3]);
     }
 
     //proj_P must be on the plane

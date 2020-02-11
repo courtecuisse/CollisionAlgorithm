@@ -31,7 +31,7 @@ public:
 
         m_triangle_normals.clear();
         for (size_t t=0;t<tvecinfo.size();t++) {
-            m_triangle_normals.push_back(cross(tvecinfo[t].ax1,tvecinfo[t].ax2));
+            m_triangle_normals.push_back(cross(tvecinfo[t].ax2,tvecinfo[t].ax1));
         }
 
         for (size_t p=0;p<m_point_normals.size();p++) {

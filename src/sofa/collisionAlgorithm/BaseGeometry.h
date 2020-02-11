@@ -22,17 +22,6 @@ class BaseGeometry : public core::objectmodel::BaseObject
 {
 public:
 
-//    class BaseNormalHandler : public sofa::core::objectmodel::BaseObject {
-//    public:
-//        SOFA_ABSTRACT_CLASS(BaseNormalHandler, sofa::core::objectmodel::BaseObject);
-
-//        void bwdInit() {
-//            registerHandler();
-//        }
-
-//        virtual void registerHandler() = 0;
-//    };
-
     class BroadPhase : public core::objectmodel::BaseObject {
     public:
 
@@ -111,18 +100,16 @@ protected:
 
 
 template<class PROXIMITYDATA>
-class BaseNormalHandler : public sofa::core::objectmodel::BaseObject {
+class BaseNormalHandler {
 public:
-    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(BaseNormalHandler,PROXIMITYDATA), sofa::core::objectmodel::BaseObject);
-
-    virtual void updateNormals() {}
+    virtual void updateNormals() = 0;
 
     virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const = 0;
 };
 
 
 template<class DataTypes,class TPROXIMITYDATA>
-class TBaseGeometry : public BaseGeometry {
+class TBaseGeometry : public BaseGeometry, public BaseNormalHandler<TPROXIMITYDATA> {
 public:
 
     typedef typename DataTypes::VecCoord VecCoord;
@@ -145,6 +132,7 @@ public:
     TBaseGeometry()
     : l_state(initLink("mstate", "link to state")) {
         l_state.setPath("@.");
+        setNormalHandler(this);
     }
 
     inline void drawNormals(const core::visual::VisualParams *vparams) {
@@ -211,21 +199,22 @@ public:
         return DataTypes::Name();
     }
 
-    void updateNormals() override {
-        if (m_normalHandler != NULL) m_normalHandler->updateNormals();
+    virtual void updateNormals() override {
+        m_normalHandler->updateNormals();
     }
 
     virtual defaulttype::Vector3 getNormal(const PROXIMITYDATA & data) const {
-        if (m_normalHandler == NULL) return defaulttype::Vector3();
         return m_normalHandler->computeNormal(data);
     }
 
-    void setNormalHandler(typename BaseNormalHandler<TPROXIMITYDATA>::SPtr n) {
+    void setNormalHandler(BaseNormalHandler<TPROXIMITYDATA> * n) {
+        if (n == NULL) return;
+
         m_normalHandler = n;
     }
 
 protected :
-    typename BaseNormalHandler<TPROXIMITYDATA>::SPtr m_normalHandler;
+    BaseNormalHandler<TPROXIMITYDATA> * m_normalHandler; // this pointer cannot be NULL either it's the geometry or a handler
 
 };
 

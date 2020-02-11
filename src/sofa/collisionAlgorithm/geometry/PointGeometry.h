@@ -53,18 +53,22 @@ public:
         }
     }
 
-    inline PointProximity createProximity(unsigned eid, int /*pid*/ = -1) const {
-        return PointProximity(eid);
+    inline PROXIMITYDATA createProximity(unsigned eid, int /*pid*/ = -1) const {
+        return PROXIMITYDATA(eid);
     }
 
     //do not change the dataProximity.
-    inline PointProximity project(const defaulttype::Vector3 & /*Q*/, unsigned eid) const {
-        return PointProximity(eid);
+    inline PROXIMITYDATA project(const defaulttype::Vector3 & /*Q*/, unsigned eid) const {
+        return PROXIMITYDATA(eid);
     }
 
-    inline defaulttype::Vector3 getPosition(const PointProximity & data, core::VecCoordId v) const {
+    inline defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
         return pos[data.m_eid];
+    }
+
+    virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
+        return defaulttype::Vector3();
     }
 };
 

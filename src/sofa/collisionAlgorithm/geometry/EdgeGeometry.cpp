@@ -1,5 +1,5 @@
 #include <sofa/collisionAlgorithm/geometry/EdgeGeometry.h>
-#include <sofa/collisionAlgorithm/normals/DefaultEdgeNormalHandler.h>
+#include <sofa/collisionAlgorithm/normals/EdgeNormalHandler.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa {

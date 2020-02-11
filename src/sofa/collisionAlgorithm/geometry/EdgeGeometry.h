@@ -71,6 +71,10 @@ public:
         return PROXIMITYDATA(eid, edge[0], edge[1], fact_u,fact_v);
     }
 
+    virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & /*data*/) const override {
+        return defaulttype::Vector3();
+    }
+
     inline void draw(const core::visual::VisualParams * vparams) {
         this->drawNormals(vparams);
 
