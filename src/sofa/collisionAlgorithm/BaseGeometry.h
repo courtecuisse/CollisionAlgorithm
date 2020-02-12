@@ -85,14 +85,14 @@ public:
 
         prepareDetection();
 
-        updateNormals();
+        recomputeNormals();
 
         for (unsigned i=0;i<m_broadPhase.size();i++) {
             m_broadPhase[i]->prepareDetection();
         }
     }
 
-    virtual void updateNormals() = 0;
+    virtual void recomputeNormals() = 0;
 
 protected:
     std::vector<BroadPhase::SPtr> m_broadPhase;
@@ -132,6 +132,8 @@ public:
     TBaseGeometry()
     : l_state(initLink("mstate", "link to state")) {
         l_state.setPath("@.");
+
+        //By default the normal handle is the geometry
         setNormalHandler(this);
     }
 
@@ -199,7 +201,9 @@ public:
         return DataTypes::Name();
     }
 
-    virtual void updateNormals() override {
+    virtual void updateNormals() override {}
+
+    virtual void recomputeNormals() override {
         m_normalHandler->updateNormals();
     }
 

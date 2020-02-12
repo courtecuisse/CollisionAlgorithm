@@ -43,8 +43,8 @@ public:
         return l_wholeGeometry->getState();
     }
 
-    void updateNormals() override {
-        l_wholeGeometry->updateNormals();
+    void recomputeNormals() override {
+        l_wholeGeometry->recomputeNormals();
     }
 };
 
