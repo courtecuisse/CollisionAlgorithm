@@ -61,7 +61,7 @@ public:
 
             virtual BaseProximity::SPtr project(const defaulttype::Vector3 &) const override { return NULL; }
 
-            virtual BaseProximity::SPtr createProximity(int id = -1) const override { return NULL; }
+            virtual BaseProximity::SPtr createProximity(CONTROL_POINT id = CONTROL_DEFAULT) const override { return NULL; }
 
             virtual unsigned elementSize() const { return 0; }
 
@@ -77,7 +77,7 @@ public:
 
     virtual BaseProximity::SPtr project(const defaulttype::Vector3 & P) const = 0;
 
-    virtual BaseProximity::SPtr createProximity(int id = -1) const = 0;
+    virtual BaseProximity::SPtr createProximity(CONTROL_POINT id = CONTROL_DEFAULT) const = 0;
 
     virtual unsigned elementSize() const = 0;
 

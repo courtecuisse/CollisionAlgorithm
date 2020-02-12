@@ -32,7 +32,7 @@ public:
     }
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        return DefaultElementIterator<PROXIMITYDATA,2>::create(this,this->l_topology->getEdges(), eid);
+        return DefaultElementIterator<PROXIMITYDATA>::create(this,this->l_topology->getEdges(), eid);
     }
 
     inline const sofa::core::topology::BaseMeshTopology::Edge getEdge(unsigned eid) const {
@@ -46,13 +46,8 @@ public:
                pos[data.m_p1] * data.m_f1;
     }
 
-    inline PROXIMITYDATA createProximity(unsigned eid, int pid = -1) const {
-        auto edge = getEdge(eid);
-
-        if (pid == 0) return PROXIMITYDATA(eid, edge[0], edge[1], 1, 0);
-        else if (pid == 1) return PROXIMITYDATA(eid, edge[0], edge[1], 0, 1);
-
-        return PROXIMITYDATA(eid, edge[0], edge[1], 0.5, 0.5);
+    inline PROXIMITYDATA createProximity(unsigned eid, CONTROL_POINT c = CONTROL_DEFAULT) const {
+        return PROXIMITYDATA::create(eid, getEdge(eid), c);
     }
 
     inline PROXIMITYDATA project(const defaulttype::Vector3 & P, unsigned eid) const {

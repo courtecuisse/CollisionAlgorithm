@@ -35,7 +35,7 @@ public:
     }
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        return DefaultElementIterator<PROXIMITYDATA,3>::create(this, this->l_topology->getTriangles(), eid);
+        return DefaultElementIterator<PROXIMITYDATA>::create(this, this->l_topology->getTriangles(), eid);
     }
 
     void draw(const core::visual::VisualParams * vparams) {
@@ -90,13 +90,8 @@ public:
                 pos[data.m_p2] * data.m_f2;
     }
 
-    PROXIMITYDATA createProximity(unsigned eid, int pid = -1) const {
-        auto triangle = getTriangle(eid);
-        if (pid == 0) return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 1, 0, 0);
-        else if (pid == 1) return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 0, 1, 0);
-        else if (pid == 2) return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 0, 0, 1);
-
-        return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2], 1.0/3.0, 1.0/3.0, 1.0/3.0);
+    PROXIMITYDATA createProximity(unsigned eid, CONTROL_POINT pid = CONTROL_DEFAULT) const {
+        return PROXIMITYDATA::create(eid,getTriangle(eid),pid);
     }
 
     //Barycentric coordinates are computed according to

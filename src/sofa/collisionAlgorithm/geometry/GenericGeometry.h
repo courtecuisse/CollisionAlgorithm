@@ -13,11 +13,11 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-template<class DataTypes, class Element, int SIZE>
-class GenericGeometry : public TBaseGeometry<DataTypes,GenericProximity> {
+template<class DataTypes, class Element, CONTROL_POINT SIZE>
+class GenericGeometry : public TBaseGeometry<DataTypes,GenericProximity<SIZE> > {
 public:
     typedef DataTypes TDataTypes;
-    typedef TBaseGeometry<DataTypes,GenericProximity> Inherit;
+    typedef TBaseGeometry<DataTypes,GenericProximity<SIZE> > Inherit;
     typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
     typedef GenericGeometry<DataTypes,Element,SIZE> GEOMETRY;
     typedef typename DataTypes::Coord Coord;
@@ -44,7 +44,7 @@ public:
     , d_elements(initData(&d_elements, "elements", "Vector of Elements")) {}
 
     virtual BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        return DefaultElementIterator<PROXIMITYDATA,SIZE>::create(this, d_elements.getValue(), eid);
+        return DefaultElementIterator<PROXIMITYDATA>::create(this, d_elements.getValue(), eid);
     }
 
     inline defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
@@ -56,23 +56,8 @@ public:
         return P;
     }
 
-    inline PROXIMITYDATA createProximity(unsigned eid,int pid = -1) const {
-        helper::vector<std::pair<unsigned,double> > prox;
-        for (unsigned i=0;i<Element::size();i++) {
-            prox.push_back(std::pair<unsigned,double>(eid, 1.0/Element::size()));
-        }
-
-        return PROXIMITYDATA(eid, prox);
-    }
-
-    inline defaulttype::BoundingBox getBBox(const Element & elmt) const {
-        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
-
-        defaulttype::BoundingBox bbox;
-        for (unsigned i=0;i<Element::size();i++) {
-            bbox.include(x[elmt[i]]);
-        }
-        return bbox;
+    inline PROXIMITYDATA createProximity(unsigned eid,CONTROL_POINT pid = CONTROL_DEFAULT) const {
+        return PROXIMITYDATA::create(eid, pid);
     }
 
     void normalize(PROXIMITYDATA & result) const {

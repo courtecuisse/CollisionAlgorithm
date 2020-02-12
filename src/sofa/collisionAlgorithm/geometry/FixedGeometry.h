@@ -27,7 +27,7 @@ public:
     {}
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
-        return DefaultElementIterator<FixedProximity,1>::create(this, d_position.getValue(), eid);
+        return DefaultElementIterator<FixedProximity>::create(this, d_position.getValue(), eid);
     }
 
     sofa::core::behavior::BaseMechanicalState * getState() const {

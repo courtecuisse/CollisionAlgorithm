@@ -30,7 +30,7 @@ public:
 
     inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
         const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
-        return DefaultElementIterator<PROXIMITYDATA,1>::create(this, pos.ref(), eid);
+        return DefaultElementIterator<PROXIMITYDATA>::create(this, pos.ref(), eid);
     }
 
     void draw(const core::visual::VisualParams *vparams) override {
@@ -53,8 +53,8 @@ public:
         }
     }
 
-    inline PROXIMITYDATA createProximity(unsigned eid, int /*pid*/ = -1) const {
-        return PROXIMITYDATA(eid);
+    inline PROXIMITYDATA createProximity(unsigned eid, CONTROL_POINT pid = CONTROL_DEFAULT) const {
+        return PROXIMITYDATA::create(eid,pid);
     }
 
     //do not change the dataProximity.

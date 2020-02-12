@@ -20,17 +20,15 @@ public:
         return BaseProximity::SPtr(new FixedProximity(p,n));
     }
 
-    defaulttype::Vector3 getPosition(core::VecCoordId ) const {
-        return m_position;
+    constexpr static CONTROL_POINT nbControlPoints() {
+        return CONTROL_1;
     }
 
-    virtual unsigned getElementId() const {
-        return 0;
-    }
+    defaulttype::Vector3 getPosition(core::VecCoordId ) const { return m_position; }
 
-    virtual defaulttype::Vector3 getNormal() const {
-        return m_normal;
-    }
+    virtual unsigned getElementId() const { return 0; }
+
+    virtual defaulttype::Vector3 getNormal() const { return m_normal; }
 
     void buildJacobianConstraint(core::MultiMatrixDerivId /*cId*/, const helper::vector<defaulttype::Vector3> & /*m_normals*/, double /*fact*/, unsigned /*constraintId*/) const {}
 

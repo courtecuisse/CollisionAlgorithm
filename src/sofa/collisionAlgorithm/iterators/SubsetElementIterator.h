@@ -34,7 +34,7 @@ public:
         return m_container->begin(id())->project(P);
     }
 
-    BaseProximity::SPtr createProximity(int pid = -1) const override {
+    BaseProximity::SPtr createProximity(CONTROL_POINT pid = CONTROL_DEFAULT) const override {
         return m_container->begin(id())->createProximity(pid);
     }
 

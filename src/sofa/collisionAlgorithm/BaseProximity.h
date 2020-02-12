@@ -12,6 +12,20 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
+enum CONTROL_POINT {
+    CONTROL_DEFAULT = -1,
+    CONTROL_0 = 0,
+    CONTROL_1 = 1,
+    CONTROL_2 = 2,
+    CONTROL_3 = 3,
+    CONTROL_4 = 4,
+    CONTROL_5 = 5,
+    CONTROL_6 = 6,
+    CONTROL_7 = 7,
+    CONTROL_8 = 8,
+};
+
+
 /*!
  * \brief The BaseProximity class is the basic abstract proximity class
  */
