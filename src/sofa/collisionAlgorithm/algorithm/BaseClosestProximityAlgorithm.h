@@ -1,59 +1,26 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
-#include <sofa/collisionAlgorithm/BroadPhase.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/iterators/SubsetElementIterator.h>
+#include <sofa/collisionAlgorithm/toolBox/ClosestProximityAlgorithm.h>
 
-namespace sofa
-{
+namespace sofa {
 
-namespace collisionAlgorithm
-{
+namespace collisionAlgorithm {
 
-//Specific class to change the distance between proximities
-class BaseDistanceProximityMeasure : public sofa::core::objectmodel::BaseObject {
-public :
-    SOFA_ABSTRACT_CLASS(BaseDistanceProximityMeasure, sofa::core::objectmodel::BaseObject);
-
-    virtual double computeDistance(const collisionAlgorithm::PairDetection & d) const = 0;
-
-} ;
-
-//Default implementation of a 3D distance
-class Distance3DProximityMeasure : public BaseDistanceProximityMeasure {
-public :
-    SOFA_CLASS(Distance3DProximityMeasure, BaseDistanceProximityMeasure);
-
-    double computeDistance(const collisionAlgorithm::PairDetection & d) const override {
-        return (d.first->getPosition()-d.second->getPosition()).norm() ;
-    }
-} ;
-
-//Static functions
-void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d);
-BaseProximity::SPtr doFindClosestProximityIt(const BaseProximity::SPtr & pfrom, BaseElementIterator::UPtr & begin, std::function<bool(const BaseProximity::SPtr, const BaseProximity::SPtr)>& acceptFilter, const BaseDistanceProximityMeasure& distance );
-BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo, std::function<bool(const BaseProximity::SPtr, const BaseProximity::SPtr)>& acceptFilter, const BaseDistanceProximityMeasure& distance );
-
-class BaseClosestProximityAlgorithm : public BaseAlgorithm
+class BaseClosestProximityAlgorithm : public BaseAlgorithm, public BaseDistanceProximityMeasure
 {
 public:
     SOFA_CLASS(BaseClosestProximityAlgorithm, BaseAlgorithm);
 
     Data<unsigned> d_iterations;
     Data<double> d_threshold;
-    core::objectmodel::SingleLink<BaseClosestProximityAlgorithm,BaseDistanceProximityMeasure, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_distance;
 
     BaseClosestProximityAlgorithm ()
     : d_iterations(initData(&d_iterations,(unsigned) 1,"iterations", "Number of reprojections of between pair of elements"))
-    , d_threshold(initData(&d_threshold,0.0000001,"threshold", "Threshold for iterations"))
-    , l_distance(initLink("distance", "link to the compoenent that computes the distance between proximities"))
-    {}
-
-    void init() { // make sure we have a direction
-        if (this->l_distance == NULL) l_distance = sofa::core::objectmodel::New<Distance3DProximityMeasure>();
-        l_distance->setName("defaultDistance");
-        this->addSlave(l_distance.get());
+    , d_threshold(initData(&d_threshold,0.0000001,"threshold", "Threshold for iterations")) {
+        setDistance(this);
     }
 
     void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
@@ -73,7 +40,7 @@ public:
                         if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                             continue;
 
-                        decorator->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k, selectElements);
+                        decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
                     }
                 }
             }
@@ -93,7 +60,7 @@ public:
                         if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                             continue;
 
-                        decorator->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k, selectElements);
+                        decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
                     }
                 }
             }
@@ -114,7 +81,7 @@ public:
                         if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                             continue;
 
-                        decorator->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k, selectElements);
+                        decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
                     }
                 }
             }
@@ -134,7 +101,7 @@ public:
                         if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                             continue;
 
-                        decorator->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k, selectElements);
+                        decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
                     }
                 }
             }
@@ -154,7 +121,7 @@ public:
                         if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
                             continue;
 
-                        decorator->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k, selectElements);
+                        decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
                     }
                 }
             }
@@ -174,46 +141,25 @@ public:
                         if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
                             continue;
 
-                        decorator->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k, selectElements);
+                        decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
                     }
                 }
             }
         }
     }
 
-    BaseProximity::SPtr doFindClosestProximityIt(const BaseProximity::SPtr & pfrom, BaseElementIterator::UPtr & begin) {
-        double min_dist = std::numeric_limits<double>::max();
-        BaseProximity::SPtr minprox_dest = nullptr;
-        defaulttype::Vector3 P = pfrom->getPosition();
-
-        while (! begin->end()) {
-            BaseProximity::SPtr pdest = begin->project(P);
-
-            if (acceptFilter(pfrom,pdest)) {
-                double dist = l_distance->computeDistance(PairDetection(pfrom,pdest));
-
-                if (dist<min_dist) {
-                    min_dist = dist;
-                    minprox_dest = pdest;
-                }
-            }
-
-            begin++;
-        }
-
-        return minprox_dest;
-    }
-
-
     BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo) {
-        const std::vector<BaseGeometry::BroadPhase::SPtr> & decorators = geo->getBroadPhase();
+        BaseGeometry::BroadPhase::SPtr decorator = geo->getBroadPhase();
 
-        if (decorators.empty()) {
+        auto filter = std::bind(&BaseAlgorithm::acceptFilter,this,std::placeholders::_1);
+        auto distance = std::bind(&BaseDistanceProximityMeasure::computeDistance,m_distance,std::placeholders::_1);
+
+        if (decorator == NULL) {
             BaseElementIterator::UPtr begin = geo->begin();
-            return doFindClosestProximityIt(pfrom,begin);
+            return toolBox::doFindClosestProximityIt(pfrom,begin,
+                                                     filter,distance);
         } else {
             //take the first broad phase...
-            const BaseGeometry::BroadPhase::SPtr & decorator = decorators.front();
             defaulttype::Vector3 P = pfrom->getPosition();
 
             defaulttype::Vec3i bindex = decorator->getBoxCoord(P);
@@ -233,7 +179,7 @@ public:
                 fillElementSet(decorator,bindex,selectedElements,d);
 
                 BaseElementIterator::UPtr begin(new SubsetElementIterator(geo, selectedElements));
-                minprox_dest = doFindClosestProximityIt(pfrom, begin);
+                minprox_dest = toolBox::doFindClosestProximityIt(pfrom, begin, filter, distance);
 
                 d++;// we look for boxed located at d+1
 
@@ -275,6 +221,17 @@ public:
         BaseProximity::SPtr pdest = findClosestProximity(pfrom,geo);
         return PairDetection(pfrom,pdest);
     }
+
+    virtual double computeDistance(const collisionAlgorithm::PairDetection & d) const override {
+        return (d.first->getPosition()-d.second->getPosition()).norm() ;
+    }
+
+    void setDistance(BaseDistanceProximityMeasure * m) {
+        m_distance = m;
+    }
+
+protected:
+    BaseDistanceProximityMeasure * m_distance;
 
 };
 

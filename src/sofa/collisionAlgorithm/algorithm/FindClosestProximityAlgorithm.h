@@ -1,7 +1,6 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/algorithm/BaseClosestProximityAlgorithm.h>
-#include <sofa/collisionAlgorithm/BroadPhase.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 
 namespace sofa

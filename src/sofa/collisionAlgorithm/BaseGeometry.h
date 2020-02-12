@@ -14,6 +14,10 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
+
+
+
+
 /*!
  * \brief The BaseGeometry class is an abstract class defining a basic geometry
  * iterates through Proximity elements and draws them
@@ -22,10 +26,25 @@ class BaseGeometry : public core::objectmodel::BaseObject
 {
 public:
 
+    SOFA_ABSTRACT_CLASS(BaseGeometry,core::objectmodel::BaseObject);
+
     class BroadPhase : public core::objectmodel::BaseObject {
     public:
 
         SOFA_ABSTRACT_CLASS(BroadPhase,core::objectmodel::BaseObject);
+
+        core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_geometry;
+
+        /*!
+         * \brief BroadPhase Constructor
+         */
+        BroadPhase()
+        : l_geometry(initLink("geometry", "link to the geometry")) {}
+
+        void init( ) override {
+            if (l_geometry == NULL) return;
+            l_geometry->setBroadPhase(this);
+        }
 
         /*!
          * \brief prepareDetection virtual method to implement
@@ -46,11 +65,9 @@ public:
          */
         virtual defaulttype::Vec3i getBoxCoord(const defaulttype::Vector3 & P) const = 0;
 
-        virtual void getElementSet(unsigned cx,unsigned cy, unsigned cz, std::set<unsigned> & selectElements) const = 0;
+        virtual void getElementSet(defaulttype::Vec3i c, std::set<unsigned> & selectElements) const = 0;
 
     };
-
-    SOFA_ABSTRACT_CLASS(BaseGeometry,core::objectmodel::BaseObject);
 
     Data<defaulttype::Vector4> d_color;
     Data<double> d_drawScaleNormal;
@@ -69,12 +86,12 @@ public:
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
-    void addBroadPhase(BroadPhase::SPtr d) {
-        m_broadPhase.push_back(d);
+    void setBroadPhase(BroadPhase::SPtr d) {
+        m_broadPhase = d;
         this->addSlave(d);
     }
 
-    const std::vector<BroadPhase::SPtr> getBroadPhase() {
+    const BroadPhase::SPtr getBroadPhase() {
         return m_broadPhase;
     }
 
@@ -87,15 +104,13 @@ public:
 
         recomputeNormals();
 
-        for (unsigned i=0;i<m_broadPhase.size();i++) {
-            m_broadPhase[i]->prepareDetection();
-        }
+        if (m_broadPhase != NULL) m_broadPhase->prepareDetection();
     }
 
     virtual void recomputeNormals() = 0;
 
 protected:
-    std::vector<BroadPhase::SPtr> m_broadPhase;
+    BroadPhase::SPtr m_broadPhase;
 };
 
 

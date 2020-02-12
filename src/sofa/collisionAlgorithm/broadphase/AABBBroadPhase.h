@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sofa/helper/AdvancedTimer.h>
-#include <sofa/collisionAlgorithm/BroadPhase.h>
+#include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 
 namespace sofa
@@ -14,7 +14,7 @@ namespace collisionAlgorithm
  * \brief The AABBBroadPhase class
  * Implementation of broad phase collision detection using bounding boxes
  */
-class AABBBroadPhase : public BaseBroadPhase {
+class AABBBroadPhase : public BaseGeometry::BroadPhase {
     friend class AABBElement;
 
 public:
@@ -86,8 +86,8 @@ public:
         return cbox;
     }
 
-    virtual void getElementSet(unsigned cx,unsigned cy, unsigned cz, std::set<unsigned> & selectElements) const {
-        auto it = m_indexedElement.find(getKey(cx,cy,cz));
+    virtual void getElementSet(defaulttype::Vec3i c, std::set<unsigned> & selectElements) const {
+        auto it = m_indexedElement.find(getKey(c[0],c[1],c[2]));
         if (it != m_indexedElement.end()) {
             const std::set<unsigned> & elemntsID = it->second;
             selectElements.insert(elemntsID.begin(),elemntsID.end());

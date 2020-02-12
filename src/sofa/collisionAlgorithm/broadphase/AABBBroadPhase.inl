@@ -170,12 +170,12 @@ void AABBBroadPhase::prepareDetection() {
 void AABBBroadPhase::draw(const core::visual::VisualParams * vparams) {
     if (! vparams->displayFlags().getShowBoundingCollisionModels()) return;
 
-    if (this->d_color.getValue()[3] == 0.0)
+    if (this->l_geometry->d_color.getValue()[3] == 0.0)
         return;
 
     glDisable(GL_LIGHTING);
 
-    glColor4dv(this->d_color.getValue().data());
+    glColor4dv(this->l_geometry->d_color.getValue().data());
 
     for (auto it = m_indexedElement.begin(); it != m_indexedElement.end(); it++) {
         unsigned eid = it->first;
