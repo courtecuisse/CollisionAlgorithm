@@ -34,7 +34,7 @@ public :
          * \brief BaseAlgorithm Constructor
          */
         BaseFilter()
-        : l_algo(initLink("filters","list of filters")){
+        : l_algo(initLink("algo","list of filters")){
             l_algo.setPath("@.");
             this->f_listening.setValue(true);
         }

@@ -8,14 +8,6 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-//Specific class to change the distance between proximities
-class BaseDistanceProximityMeasure {
-public :
-
-    virtual double computeDistance(const collisionAlgorithm::PairDetection & d) const = 0;
-
-} ;
-
 namespace toolBox {
 
 static bool noFilter(const collisionAlgorithm::PairDetection & ) { return true; }

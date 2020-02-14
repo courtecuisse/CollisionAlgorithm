@@ -9,192 +9,28 @@ namespace sofa {
 
 namespace collisionAlgorithm {
 
-class BaseClosestProximityAlgorithm : public BaseAlgorithm, public BaseDistanceProximityMeasure
-{
+class BaseClosestProximityAlgorithm : public BaseAlgorithm {
 public:
     SOFA_CLASS(BaseClosestProximityAlgorithm, BaseAlgorithm);
 
     Data<unsigned> d_iterations;
     Data<double> d_threshold;
 
+    typedef std::function<bool(const collisionAlgorithm::PairDetection & )> FilterMethod;
+    typedef std::function<double(const collisionAlgorithm::PairDetection & )> DistanceMethod;
+    typedef std::function<BaseProximity::SPtr(const BaseProximity::SPtr & , BaseGeometry *)> SearchMethod;
+
     BaseClosestProximityAlgorithm ()
     : d_iterations(initData(&d_iterations,(unsigned) 1,"iterations", "Number of reprojections of between pair of elements"))
     , d_threshold(initData(&d_threshold,0.0000001,"threshold", "Threshold for iterations")) {
-        setDistance(this);
-    }
-
-    void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) const
-    {
-        defaulttype::Vec3i nbox = decorator->getBoxSize();
-
-        {
-            int i=-d;
-            if (cbox[0]+i >= 0 && cbox[0]+i < nbox[0])
-            {
-                for (int j=-d; j <= d; j++)
-                {
-                    if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
-                        continue;
-                    for (int k=-d;k<=d;k++)
-                    {
-                        if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
-                            continue;
-
-                        decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
-                    }
-                }
-            }
-        }
-
-        {
-            int i=d;
-            if (cbox[0]+i >= 0 && cbox[0]+i < nbox[0])
-            {
-                for (int j=-d;j<=d;j++)
-                {
-                    if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
-                        continue;
-
-                    for (int k=-d;k<=d;k++)
-                    {
-                        if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
-                            continue;
-
-                        decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
-                    }
-                }
-            }
-        }
-
-
-        {
-            int j=-d;
-            if (cbox[1]+j >= 0 && cbox[1]+j < nbox[1])
-            {
-                for (int i=-d+1;i<d;i++)
-                {
-                    if (cbox[0]+i < 0 || cbox[0]+i >= nbox[0])
-                        continue;
-
-                    for (int k=-d;k<=d;k++)
-                    {
-                        if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
-                            continue;
-
-                        decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
-                    }
-                }
-            }
-        }
-
-        {
-            int j=d;
-            if (cbox[1]+j >= 0 && cbox[1]+j < nbox[1])
-            {
-                for (int i=-d+1;i<d;i++)
-                {
-                    if (cbox[0]+i < 0 || cbox[0]+i >= nbox[0])
-                        continue;
-
-                    for (int k=-d;k<=d;k++)
-                    {
-                        if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
-                            continue;
-
-                        decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
-                    }
-                }
-            }
-        }
-
-        {
-            int k=-d;
-            if (cbox[2]+k >= 0 && cbox[2]+k < nbox[2])
-            {
-                for (int i=-d+1;i<d;i++)
-                {
-                    if (cbox[0]+i < 0 || cbox[0]+i >= nbox[0])
-                        continue;
-
-                    for (int j=-d+1;j<d;j++)
-                    {
-                        if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
-                            continue;
-
-                        decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
-                    }
-                }
-            }
-        }
-
-        {
-            int k=d;
-            if (cbox[2]+k >= 0 && cbox[2]+k < nbox[2])
-            {
-                for (int i=-d+1;i<d;i++)
-                {
-                    if (cbox[0]+i < 0 || cbox[0]+i >= nbox[0])
-                        continue;
-
-                    for (int j=-d+1;j<d;j++)
-                    {
-                        if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
-                            continue;
-
-                        decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
-                    }
-                }
-            }
-        }
-    }
-
-    BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo) {
-        BaseGeometry::BroadPhase::SPtr decorator = geo->getBroadPhase();
-
-        auto filter = std::bind(&BaseAlgorithm::acceptFilter,this,std::placeholders::_1);
-        auto distance = std::bind(&BaseDistanceProximityMeasure::computeDistance,m_distance,std::placeholders::_1);
-
-        if (decorator == NULL) {
-            BaseElementIterator::UPtr begin = geo->begin();
-            return toolBox::doFindClosestProximityIt(pfrom,begin,
-                                                     filter,distance);
-        } else {
-            //take the first broad phase...
-            defaulttype::Vector3 P = pfrom->getPosition();
-
-            defaulttype::Vec3i bindex = decorator->getBoxCoord(P);
-            defaulttype::Vec3i bsize = decorator->getBoxSize();
-
-            int max = 0;
-
-            for (int i = 0 ; i < 3 ; i++) {
-                max = std::max (max, bindex[i]) ;
-                max = std::max (max, bsize[i]-bindex[i]) ;
-            }
-
-            BaseProximity::SPtr minprox_dest = nullptr;
-            int d = 0;
-            std::set<unsigned> selectedElements;
-            while (selectedElements.empty() && d<max) {
-                fillElementSet(decorator,bindex,selectedElements,d);
-
-                BaseElementIterator::UPtr begin(new SubsetElementIterator(geo, selectedElements));
-                minprox_dest = toolBox::doFindClosestProximityIt(pfrom, begin, filter, distance);
-
-                d++;// we look for boxed located at d+1
-
-                //take the first on that satisfy filters
-                if (minprox_dest != NULL) return minprox_dest;
-            }
-        }
-
-        return NULL;
+        m_distanceMethod = std::bind(&BaseClosestProximityAlgorithm::computeDistance,this,std::placeholders::_1);
+        m_searchMethod = std::bind(&BaseClosestProximityAlgorithm::findClosestProximity,this,std::placeholders::_1,std::placeholders::_2);
     }
 
     PairDetection findClosestPoint(const BaseElementIterator *itfrom, BaseGeometry *geo) {
         BaseProximity::SPtr pfrom = itfrom->createProximity();
         defaulttype::Vector3 prevPos = pfrom->getPosition();
-        BaseProximity::SPtr pdest = findClosestProximity(pfrom,geo);
+        BaseProximity::SPtr pdest = m_searchMethod(pfrom,geo);
 
         if (pfrom == NULL || pdest == NULL) return PairDetection(pfrom,pdest);
 
@@ -207,7 +43,7 @@ public:
             if ((prevPos - pfrom->getPosition()).norm() < d_threshold.getValue()) break;
 
             pfrom = itfrom->createProximity();
-            pdest = findClosestProximity(pfrom,geo);
+            pdest = m_searchMethod(pfrom,geo);
 
             if (pfrom == NULL || pdest == NULL) return PairDetection(pfrom,pdest);
         }
@@ -218,21 +54,48 @@ public:
 
 
     PairDetection findClosestPoint(const BaseProximity::SPtr & pfrom, BaseGeometry *geo) {
-        BaseProximity::SPtr pdest = findClosestProximity(pfrom,geo);
+        BaseProximity::SPtr pdest = m_searchMethod(pfrom,geo);
         return PairDetection(pfrom,pdest);
     }
 
-    virtual double computeDistance(const collisionAlgorithm::PairDetection & d) const override {
-        return (d.first->getPosition()-d.second->getPosition()).norm() ;
+
+    void setDistance(DistanceMethod m) {
+        m_distanceMethod = m;
     }
 
-    void setDistance(BaseDistanceProximityMeasure * m) {
-        m_distance = m;
+    void setSearchMethod(SearchMethod m) {
+        m_searchMethod = m;
+    }
+
+    inline DistanceMethod getDistanceMethod() const {
+        return m_distanceMethod;
+    }
+
+    inline FilterMethod getFilterMethod() const {
+        return std::bind(&BaseAlgorithm::acceptFilter,this,std::placeholders::_1);
+    }
+
+    inline SearchMethod getSearchMethod() const {
+        return m_searchMethod;
     }
 
 protected:
-    BaseDistanceProximityMeasure * m_distance;
+    DistanceMethod m_distanceMethod;
+    SearchMethod m_searchMethod;
 
+
+    double computeDistance(const collisionAlgorithm::PairDetection & d) const {
+        return (d.first->getPosition()-d.second->getPosition()).norm() ;
+    }
+
+    BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo) {
+        BaseElementIterator::UPtr begin = geo->begin();
+        return toolBox::doFindClosestProximityIt(pfrom,begin,
+                                                 getFilterMethod(),
+                                                 getDistanceMethod());
+
+        return NULL;
+    }
 };
 
 
