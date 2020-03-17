@@ -44,6 +44,8 @@ public :
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, unsigned cid_global, unsigned cid_local, const sofa::defaulttype::BaseVector* lambda) const = 0;
 
     virtual unsigned getElementId() const = 0;
+
+    virtual void getConstraintMatrix(int cId, sofa::defaulttype::BaseMatrix * J_from, double fact){}
 };
 
 /*!
