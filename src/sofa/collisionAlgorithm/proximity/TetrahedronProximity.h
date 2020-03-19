@@ -44,6 +44,13 @@ public:
         return CONTROL_4;
     }
 
+    inline void addColInJ0(int cId, sofa::defaulttype::BaseMatrix * J0, double fact) const{
+        J0->add(cId, m_p0, m_f0*fact);
+        J0->add(cId, m_p1, m_f1*fact);
+        J0->add(cId, m_p2, m_f2*fact);
+        J0->add(cId, m_p3, m_f3*fact);
+    }
+
     unsigned m_eid;
     unsigned m_p0,m_p1,m_p2,m_p3;
     double m_f0,m_f1,m_f2,m_f3;

@@ -41,10 +41,10 @@ public:
         return CONTROL_3;
     }
 
-    void getConstraintMatrix(int cId, sofa::defaulttype::BaseMatrix * J_from, double fact){
-        J_from->add(cId, m_p0, m_f0*fact);
-        J_from->add(cId, m_p1, m_f1*fact);
-        J_from->add(cId, m_p2, m_f2*fact);
+    inline void addColInJ0(int cId, sofa::defaulttype::BaseMatrix * J0, double fact) const{
+        J0->add(cId, m_p0, m_f0*fact);
+        J0->add(cId, m_p1, m_f1*fact);
+        J0->add(cId, m_p2, m_f2*fact);
     }
 
     unsigned m_eid;

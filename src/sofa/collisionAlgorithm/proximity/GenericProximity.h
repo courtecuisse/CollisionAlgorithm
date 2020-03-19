@@ -40,6 +40,12 @@ public:
         return SIZE;
     }
 
+    inline void addColInJ0(int cId, sofa::defaulttype::BaseMatrix * J0, double fact) const{
+        for (unsigned i=0;i<m_prox.size();i++) {
+            J0->add(cId, m_prox[i].first, m_prox[i].second);
+        }
+    }
+
     unsigned m_eid;
     helper::vector<std::pair<unsigned, double> > m_prox;
 };

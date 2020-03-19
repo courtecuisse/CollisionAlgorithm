@@ -232,6 +232,11 @@ public:
         m_normalHandler = n;
     }
 
+    template<class PROXIMITYDATA>
+    inline void buildConstraintMatrixJ0(const PROXIMITYDATA & data, int cId, sofa::defaulttype::BaseMatrix * J0, double fact) const {
+        data.addColInJ0(cId, J0, fact);
+    }
+
 protected :
     BaseNormalHandler<TPROXIMITYDATA> * m_normalHandler; // this pointer cannot be NULL either it's the geometry or a handler
 

@@ -31,6 +31,10 @@ public:
         return CONTROL_1;
     }
 
+    inline void addColInJ0(int cId, sofa::defaulttype::BaseMatrix * J0, double fact) const{
+        J0->add(cId, m_eid, fact);
+    }
+
     unsigned m_eid;
 };
 

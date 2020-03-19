@@ -45,7 +45,7 @@ public :
 
     virtual unsigned getElementId() const = 0;
 
-    virtual void getConstraintMatrix(int cId, sofa::defaulttype::BaseMatrix * J_from, double fact){}
+    virtual void buildConstraintMatrixJ0(int cId, sofa::defaulttype::BaseMatrix * J_from, double fact)const = 0;
 };
 
 /*!
@@ -93,6 +93,11 @@ public:
 
     const PROXIMITYDATA& getProximityData() const {
         return m_data;
+    }
+
+    void buildConstraintMatrixJ0(int cId, sofa::defaulttype::BaseMatrix * J0, double fact) const{
+//        m_geometry->buildConstraintMatrixJ0(m_data, cId, J0, fact);
+        m_data.addColInJ0(cId, J0, fact);
     }
 
 protected:
