@@ -60,7 +60,11 @@ public :
 
     virtual unsigned getElementId() const = 0;
 
-    virtual void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_from, double fact)const = 0;
+    virtual void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_from, double fact)const {
+        // temporary : leave this empty please
+        // thank you
+    }
+
 };
 
 /*!
