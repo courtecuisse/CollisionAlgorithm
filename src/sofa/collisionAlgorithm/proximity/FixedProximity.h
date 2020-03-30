@@ -35,7 +35,6 @@ public:
 
     template<class MatrixDerivRowIterator>
     inline void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3) const {}
-    inline void addColInJ0(int /*cId*/, sofa::defaulttype::BaseMatrix * /*J0*/, double /*fact*/) const{}
 
     void storeLambda(const core::ConstraintParams* /*cParams*/, core::MultiVecDerivId /*res*/, unsigned /*cid_global*/, unsigned /*cid_local*/,const sofa::defaulttype::BaseVector* /*lambda*/) const {}
 

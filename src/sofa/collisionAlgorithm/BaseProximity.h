@@ -25,6 +25,21 @@ enum CONTROL_POINT {
     CONTROL_8 = 8,
 };
 
+class MBaseIterator {
+public:
+
+    MBaseIterator(sofa::defaulttype::BaseMatrix * M, unsigned int row) : m_J(M), m_row(row) {}
+
+    void addCol(unsigned c, const defaulttype::Vector3 & N) {
+        double v = N[0];
+        m_J->add(m_row, c, v);
+    }
+
+private:
+    sofa::defaulttype::BaseMatrix * m_J;
+    unsigned int m_row;
+
+};
 
 /*!
  * \brief The BaseProximity class is the basic abstract proximity class
@@ -96,8 +111,9 @@ public:
     }
 
     void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_prox, double fact) const{
-//        m_geometry->buildConstraintMatrixJ0(m_data, cId, J0, fact);
-        m_data.addColInJ0(cId, J_prox, fact);
+        MBaseIterator J_iterator(J_prox, cId);
+        const defaulttype::Vector3 N(1,0,0);
+        m_data.addContributions(J_iterator, N);
     }
 
 protected:
