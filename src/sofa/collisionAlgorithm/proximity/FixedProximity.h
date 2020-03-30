@@ -31,7 +31,7 @@ public:
     virtual defaulttype::Vector3 getNormal() const { return m_normal; }
 
     void buildJacobianConstraint(core::MultiMatrixDerivId /*cId*/, const helper::vector<defaulttype::Vector3> & /*m_normals*/, double /*fact*/, unsigned /*constraintId*/) const {}
-    void buildConstraintMatrixJ0(int /*cId*/, sofa::defaulttype::BaseMatrix * /*J_from*/, double /*fact*/) const {}
+    void buildConstraintProximityMatrix(int /*cId*/, sofa::defaulttype::BaseMatrix * /*J_from*/, double /*fact*/) const {}
 
     template<class MatrixDerivRowIterator>
     inline void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3) const {}

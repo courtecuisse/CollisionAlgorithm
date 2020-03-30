@@ -45,6 +45,8 @@ public:
         J0->add(cId, m_p0, m_f0*fact);
         J0->add(cId, m_p1, m_f1*fact);
         J0->add(cId, m_p2, m_f2*fact);
+//        std::cout<<"DoFs = "<<m_p0<<" "<<m_p1<<" "<<m_p2<<std::endl;
+//        std::cout<<"vals = "<<m_f0<<" "<<m_f1<<" "<<m_f2<<std::endl;
     }
 
     unsigned m_eid;
