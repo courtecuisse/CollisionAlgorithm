@@ -62,6 +62,10 @@ public:
         return m_output[i];
     }
 
+    inline const PairDetection & back() const {
+        return m_output.back();
+    }
+
 protected:
     helper::vector< PairDetection > m_output;
 };
