@@ -22,6 +22,7 @@ TriangleInfo computeTriangleInfo(const Vec3d & t0,const Vec3d & t1,const Vec3d &
     tinfo.v0 = t1 - t0;
     tinfo.v1 = t2 - t0;
     Vec3d N=cross(tinfo.v0,tinfo.v1);
+    tinfo.area = N.norm()/2;
     N.normalize();
 
     tinfo.d00 = dot(tinfo.v0,tinfo.v0);

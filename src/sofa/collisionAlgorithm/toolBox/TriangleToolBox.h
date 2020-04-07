@@ -18,7 +18,8 @@ struct TriangleInfo
     double d01;
     double d11;
     double invDenom;
-
+    double area;
+    
     Vec3d ax1,ax2;
     Vec3d P0,P1,P2;
 };
