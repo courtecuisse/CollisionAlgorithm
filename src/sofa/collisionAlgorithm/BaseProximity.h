@@ -31,8 +31,17 @@ public:
     MBaseIterator(sofa::defaulttype::BaseMatrix * M, unsigned int row) : m_J(M), m_row(row) {}
 
     void addCol(unsigned c, const defaulttype::Vector3 & N) {
-        double v = N[0];
-        m_J->add(m_row, c, v);
+        if(N[1] == 0.0){
+            double v = N[0];
+            m_J->add(m_row, c, v);
+        }
+        else{
+            double v = N[0];
+            m_J->add(m_row*3, c*3, v);
+            m_J->add(m_row*3+1, c*3+1, v);
+            m_J->add(m_row*3+2, c*3+2, v);
+        }
+
     }
 
 private:
@@ -60,7 +69,7 @@ public :
 
     virtual unsigned getElementId() const = 0;
 
-    virtual void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_from, double fact)const {
+    virtual void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_from, double fact, const bool expand)const {
         // temporary : leave this empty please
         // thank you
     }
@@ -114,10 +123,11 @@ public:
         return m_data;
     }
 
-    void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_prox, double fact) const{
+    void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_prox, double fact, const bool expand) const{
         MBaseIterator J_iterator(J_prox, cId);
-        const defaulttype::Vector3 N(1,0,0);
-        m_data.addContributions(J_iterator, N);
+        defaulttype::Vector3 N(1,0,0);
+        if(expand) N = defaulttype::Vector3(1,1,1);
+        m_data.addContributions(J_iterator, N*fact);
     }
 
 protected:
