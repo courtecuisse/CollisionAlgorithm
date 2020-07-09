@@ -20,6 +20,11 @@ defaulttype::BoundingBox AABBBroadPhase::getBBox() const {
     return defaulttype::BoundingBox(m_Bmin,m_Bmax);
 }
 
+void AABBBroadPhase::init()
+{
+    prepareDetection();
+}
+
 /*!
  * \brief AABBBroadPhase::prepareDetection
  * checks if bounding boxes collided
