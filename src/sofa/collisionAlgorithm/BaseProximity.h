@@ -69,9 +69,12 @@ public :
 
     virtual unsigned getElementId() const = 0;
 
-    virtual void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_from, double fact, const bool expand)const {
+    virtual void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_prox, double fact, const bool expand)const {
         // temporary : leave this empty please
-        // thank you
+    }
+
+    virtual sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> * getState() const{
+        // temporary : leave this empty please
     }
 
 };
@@ -129,6 +132,12 @@ public:
         if(expand) N = defaulttype::Vector3(1,1,1);
         m_data.addContributions(J_iterator, N*fact);
     }
+
+    sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> * getState() const{
+        sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> *ms  = dynamic_cast<sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> *> (m_geometry->getState());
+        return ms;
+    }
+
 
 protected:
     const GEOMETRY * m_geometry;
