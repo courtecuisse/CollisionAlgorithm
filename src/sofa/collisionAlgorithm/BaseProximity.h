@@ -75,6 +75,7 @@ public :
 
     virtual sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> * getState() const{
         // temporary : leave this empty please
+        return NULL;
     }
 
 };
