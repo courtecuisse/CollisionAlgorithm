@@ -5,6 +5,7 @@
 #include <sofa/defaulttype/BaseVector.h>
 #include <sofa/core/ConstraintParams.h>
 #include <sofa/core/behavior/MechanicalState.h>
+#include <sofa/core/topology/Topology.h>
 
 namespace sofa
 {
@@ -27,10 +28,11 @@ enum CONTROL_POINT {
 
 class MBaseIterator {
 public:
+    typedef sofa::core::topology::Topology::index_type index_type;
 
-    MBaseIterator(sofa::defaulttype::BaseMatrix * M, unsigned int row) : m_J(M), m_row(row) {}
+    MBaseIterator(sofa::defaulttype::BaseMatrix * M, index_type row) : m_J(M), m_row(row) {}
 
-    void addCol(unsigned c, const defaulttype::Vector3 & N) {
+    void addCol(index_type c, const defaulttype::Vector3 & N) {
         if(N[1] == 0.0){
             double v = N[0];
             m_J->add(m_row, c, v);
@@ -46,7 +48,7 @@ public:
 
 private:
     sofa::defaulttype::BaseMatrix * m_J;
-    unsigned int m_row;
+    index_type m_row;
 
 };
 
@@ -55,6 +57,8 @@ private:
  */
 class BaseProximity {
 public :
+    typedef sofa::core::topology::Topology::index_type index_type;
+
     typedef std::shared_ptr<BaseProximity> SPtr;
 
     /// return proximiy position in a vector3
@@ -63,11 +67,11 @@ public :
     /// return normal in a vector3
     virtual defaulttype::Vector3 getNormal() const = 0;
 
-    virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & dir, double fact, unsigned constraintId) const = 0;
+    virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & dir, double fact, index_type constraintId) const = 0;
 
-    virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, unsigned cid_global, unsigned cid_local, const sofa::defaulttype::BaseVector* lambda) const = 0;
+    virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, index_type cid_global, index_type cid_local, const sofa::defaulttype::BaseVector* lambda) const = 0;
 
-    virtual unsigned getElementId() const = 0;
+    virtual index_type getElementId() const = 0;
 
     virtual void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_prox, double fact, const bool expand)const {
         // temporary : leave this empty please
@@ -86,6 +90,7 @@ public :
 template<class GEOMETRY, class PROXIMITYDATA>
 class TBaseProximity : public BaseProximity {
 public:
+    typedef BaseProximity::index_type index_type;
     typedef typename GEOMETRY::TDataTypes DataTypes;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
@@ -111,15 +116,15 @@ public:
         return m_geometry->getNormal(m_data);
     }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, index_type constraintId) const {
         m_geometry->buildJacobianConstraint(m_data,cId,normals,fact,constraintId);
     }
 
-    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid_global, unsigned cid_local, const sofa::defaulttype::BaseVector* lambda) const {
+    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, index_type cid_global, index_type cid_local, const sofa::defaulttype::BaseVector* lambda) const {
         m_geometry->storeLambda(cParams,resId,cid_global,cid_local, lambda);
     }
 
-    inline unsigned getElementId() const override {
+    inline index_type getElementId() const override {
         return m_data.getElementId();
     }
 

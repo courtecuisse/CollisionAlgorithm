@@ -11,10 +11,12 @@ namespace collisionAlgorithm
 
 class PointProximity {
 public:
-    PointProximity(unsigned eid)
+    typedef sofa::core::topology::Topology::PointID index_type;
+
+    PointProximity(index_type eid)
     : m_eid(eid){}
 
-    static inline PointProximity create(unsigned eid,CONTROL_POINT c) {
+    static inline PointProximity create(index_type eid,CONTROL_POINT c) {
         return PointProximity(eid);
     }
 
@@ -23,7 +25,7 @@ public:
         it.addCol(m_eid, N);
     }
 
-    unsigned getElementId() const {
+    index_type getElementId() const {
         return m_eid;
     }
 
@@ -31,7 +33,7 @@ public:
         return CONTROL_1;
     }
 
-    unsigned m_eid;
+    index_type m_eid;
 };
 
 }

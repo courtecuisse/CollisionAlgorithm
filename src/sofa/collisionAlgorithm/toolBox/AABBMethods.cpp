@@ -8,7 +8,7 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 namespace toolBox {
-void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype::Vec3i cbox, std::set<unsigned> & selectElements, int d) {
+void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype::Vec3i cbox, std::set<BaseProximity::index_type> & selectElements, int d) {
     defaulttype::Vec3i nbox = decorator->getBoxSize();
 
     {
@@ -159,7 +159,7 @@ BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, Base
 
         BaseProximity::SPtr minprox_dest = nullptr;
         int d = 0;
-        std::set<unsigned> selectedElements;
+        std::set<BaseProximity::index_type> selectedElements;
         while (selectedElements.empty() && d<max) {
             fillElementSet(decorator,bindex,selectedElements,d);
 

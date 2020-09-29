@@ -21,6 +21,8 @@ public:
 
     SOFA_CLASS(AABBBroadPhase,BroadPhase);
 
+    typedef BaseGeometry::BaseGeometry::index_type index_type;
+
     Data<defaulttype::Vec3i> d_nbox;
     Data<bool> d_refineBBox;
     Data<bool> d_static;
@@ -37,7 +39,7 @@ public:
 
     void draw(const core::visual::VisualParams * /*vparams*/) override;
 
-    inline unsigned getKey(size_t i,size_t j,size_t k) const {
+    inline index_type getKey(size_t i,size_t j,size_t k) const {
         return i*m_offset[0] + j * m_offset[1] + k;
     }
 
@@ -76,7 +78,7 @@ public:
 
         //project the box in the bounding box of the object
         //search with the closest box in bbox
-        for (unsigned int i=0;i<3;i++)
+        for (index_type i=0;i<3;i++)
         {
             if (cbox[i] < 0) {
                 cbox[i] = 0;
@@ -88,10 +90,10 @@ public:
         return cbox;
     }
 
-    virtual void getElementSet(defaulttype::Vec3i c, std::set<unsigned> & selectElements) const {
+    virtual void getElementSet(defaulttype::Vec3i c, std::set<index_type> & selectElements) const {
         auto it = m_indexedElement.find(getKey(c[0],c[1],c[2]));
         if (it != m_indexedElement.end()) {
-            const std::set<unsigned> & elemntsID = it->second;
+            const std::set<index_type> & elemntsID = it->second;
             selectElements.insert(elemntsID.begin(),elemntsID.end());
         }
     }
@@ -100,7 +102,7 @@ protected:
     defaulttype::Vector3 m_Bmin,m_Bmax,m_cellSize;
     defaulttype::Vec3i m_nbox;
     defaulttype::Vec<2, size_t> m_offset;
-    std::map<unsigned, std::set<unsigned> > m_indexedElement;
+    std::map<index_type, std::set<index_type> > m_indexedElement;
     bool m_staticInitDone;
 };
 

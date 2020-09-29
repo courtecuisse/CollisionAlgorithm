@@ -11,6 +11,7 @@ namespace collisionAlgorithm {
 class FixedGeometry : public BaseGeometry {
 public:
     typedef sofa::defaulttype::Vec3dTypes TDataTypes;
+    typedef BaseProximity::index_type index_type;
     typedef FixedGeometry GEOMETRY;
     typedef BaseGeometry Inherit;
 
@@ -26,7 +27,7 @@ public:
     , d_normals(initData(&d_normals,sofa::helper::vector<defaulttype::Vector3>(), "normals","normals"))
     {}
 
-    inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
+    inline BaseElementIterator::UPtr begin(index_type eid = 0) const override {
         return DefaultElementIterator<FixedProximity>::create(this, d_position.getValue(), eid);
     }
 
@@ -51,7 +52,7 @@ public:
         }
     }
 
-    inline FixedProximity createProximity(unsigned eid, int /*pid*/ = -1) const {
+    inline FixedProximity createProximity(index_type eid, int /*pid*/ = -1) const {
         const helper::vector<defaulttype::Vector3> & pos = d_position.getValue();
 
         if(d_normals.getValue().size()>eid)
@@ -61,7 +62,7 @@ public:
     }
 
     //do not change the dataProximity.
-    inline FixedProximity project(const defaulttype::Vector3 & /*Q*/, unsigned pid) const {
+    inline FixedProximity project(const defaulttype::Vector3 & /*Q*/, index_type pid) const {
         const helper::vector<defaulttype::Vector3> & pos = d_position.getValue();
 
         if(d_normals.getValue().size()>pid)
@@ -78,11 +79,11 @@ public:
         return data.m_normal;
     }
 
-    inline void buildJacobianConstraint(const FixedProximity & data, core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, unsigned constraintId) const {
+    inline void buildJacobianConstraint(const FixedProximity & data, core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, index_type constraintId) const {
         data.buildJacobianConstraint(cId,normals,fact,constraintId);
     }
 
-    inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, unsigned cid_global, unsigned cid_local, const sofa::defaulttype::BaseVector* lambda) const {}
+    inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, index_type cid_global, index_type cid_local, const sofa::defaulttype::BaseVector* lambda) const {}
 
     virtual void recomputeNormals() {}
 };

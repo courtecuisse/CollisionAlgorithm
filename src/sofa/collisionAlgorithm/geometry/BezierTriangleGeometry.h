@@ -13,6 +13,7 @@ class BezierTriangleGeometry : public TBaseGeometry<DataTypes,TriangleProximity>
 public:
     typedef DataTypes TDataTypes;
     typedef TBaseGeometry<DataTypes,TriangleProximity> Inherit;
+    typedef BaseProximity::index_type index_type;
     typedef BezierTriangleGeometry<DataTypes> GEOMETRY;
     typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
     typedef typename DataTypes::VecCoord VecCoord;
@@ -33,21 +34,21 @@ public:
 
     core::objectmodel::SingleLink<GEOMETRY,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
 
-    Data <unsigned> d_nonlin_max_it;
+    Data <index_type> d_nonlin_max_it;
     Data <double> d_nonlin_tolerance;
     Data <double> d_nonlin_threshold;
-    Data <unsigned> d_draw_tesselation;
+    Data <index_type> d_draw_tesselation;
 
     BezierTriangleGeometry()
     : l_topology(initLink("topology", "link to topology"))
-    , d_nonlin_max_it(initData(&d_nonlin_max_it,(unsigned) 20,"nonlin_max_it", "number of iterations"))
+    , d_nonlin_max_it(initData(&d_nonlin_max_it,(index_type) 20,"nonlin_max_it", "number of iterations"))
     , d_nonlin_tolerance(initData(&d_nonlin_tolerance,(double) 0.001,"nonlin_tol", "Tolerance"))
     , d_nonlin_threshold(initData(&d_nonlin_threshold,(double) 0.00001,"nonlin_th", "Threshold"))
-    , d_draw_tesselation(initData(&d_draw_tesselation,(unsigned) 0.0, "tesselation", "Number of tesselation")) {
+    , d_draw_tesselation(initData(&d_draw_tesselation,(index_type) 0.0, "tesselation", "Number of tesselation")) {
             l_topology.setPath("@.");
     }
 
-    inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
+    inline BaseElementIterator::UPtr begin(index_type eid = 0) const override {
         return DefaultElementIterator<PROXIMITYDATA>::create(this,this->l_topology->getTriangles(),eid);
     }
 
@@ -55,7 +56,7 @@ public:
         m_bezier_info.clear();
     }
 
-    void tesselate(unsigned level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C) {
+    void tesselate(index_type level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C) {
         if (level >= d_draw_tesselation.getValue()) {
 
             const Triangle& triangle = this->l_topology->getTriangle(tid);
@@ -113,18 +114,18 @@ public:
         glEnd();
     }
 
-    inline const sofa::core::topology::BaseMeshTopology::Triangle getTriangle(unsigned eid) const {
+    inline const sofa::core::topology::BaseMeshTopology::Triangle getTriangle(index_type eid) const {
         return this->l_topology->getTriangle(eid);
     }
 
-    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, unsigned eid) const {
+    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, index_type eid) const {
         auto triangle = getTriangle(eid);
 
-        unsigned max_it = d_nonlin_max_it.getValue();
+        index_type max_it = d_nonlin_max_it.getValue();
         double tolerance = d_nonlin_tolerance.getValue();
         double threshold = d_nonlin_threshold.getValue();
 
-        unsigned int it=0;
+        index_type it=0;
         double delta = 0.00001;
 
         //initialize the algorithm xith the projection on a linear triangle
@@ -305,7 +306,7 @@ public:
     }
 
 
-    PROXIMITYDATA createProximity(unsigned eid, CONTROL_POINT pid = CONTROL_DEFAULT) const {
+    PROXIMITYDATA createProximity(index_type eid, CONTROL_POINT pid = CONTROL_DEFAULT) const {
         return PROXIMITYDATA::create(eid, getTriangle(eid), pid);
     }
 

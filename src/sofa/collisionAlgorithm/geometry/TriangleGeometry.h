@@ -15,6 +15,7 @@ public:
     typedef DataTypes TDataTypes;
     typedef TriangleGeometry<DataTypes> GEOMETRY;
     typedef TBaseGeometry<DataTypes,TriangleProximity> Inherit;
+    typedef BaseProximity::index_type index_type;
     typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
@@ -34,7 +35,7 @@ public:
         l_topology.setPath("@.");
     }
 
-    inline BaseElementIterator::UPtr begin(unsigned eid = 0) const override {
+    inline BaseElementIterator::UPtr begin(index_type eid = 0) const override {
         return DefaultElementIterator<PROXIMITYDATA>::create(this, this->l_topology->getTriangles(), eid);
     }
 
@@ -76,7 +77,7 @@ public:
         m_triangle_info.clear();
     }
 
-    inline const sofa::core::topology::BaseMeshTopology::Triangle getTriangle(unsigned eid) const {
+    inline const sofa::core::topology::BaseMeshTopology::Triangle getTriangle(index_type eid) const {
         return this->l_topology->getTriangle(eid);
     }
 
@@ -90,13 +91,13 @@ public:
                 pos[data.m_p2] * data.m_f2;
     }
 
-    PROXIMITYDATA createProximity(unsigned eid, CONTROL_POINT pid = CONTROL_DEFAULT) const {
+    PROXIMITYDATA createProximity(index_type eid, CONTROL_POINT pid = CONTROL_DEFAULT) const {
         return PROXIMITYDATA::create(eid,getTriangle(eid),pid);
     }
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, unsigned eid) const {
+    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, index_type eid) const {
         TriangleInfo  tinfo = getTriangleInfo()[eid];
         auto triangle = getTriangle(eid);
 
