@@ -1,7 +1,6 @@
 #pragma once
 
 
-#include <sofa/defaulttype/defaulttype.h>
 #include <sofa/defaulttype/RigidTypes.h>
 #include <sofa/defaulttype/SolidTypes.h>
 
