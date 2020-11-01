@@ -17,7 +17,7 @@ public:
     typedef DataTypes TDataTypes;
     typedef TetrahedronGeometry<DataTypes> GEOMETRY;
     typedef TBaseGeometry<DataTypes,TetrahedronProximity> Inherit;
-    typedef BaseProximity::index_type index_type;
+    typedef BaseProximity::Index Index;
     typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
@@ -37,7 +37,7 @@ public:
         l_topology.setPath("@.");
     }
 
-    inline BaseElementIterator::UPtr begin(index_type eid = 0) const override {
+    inline BaseElementIterator::UPtr begin(Index eid = 0) const override {
         return DefaultElementIterator<PROXIMITYDATA>::create(this, this->l_topology->getTetrahedra(), eid);
     }
 
@@ -80,7 +80,7 @@ public:
         m_tetra_info.clear();
     }
 
-    inline const sofa::core::topology::BaseMeshTopology::Tetrahedron getTetrahedron(index_type eid) const {
+    inline const sofa::core::topology::BaseMeshTopology::Tetrahedron getTetrahedron(Index eid) const {
         return this->l_topology->getTetrahedron(eid);
     }
 
@@ -97,16 +97,16 @@ public:
         return defaulttype::Vector3(0,0,0);
     }
 
-    PROXIMITYDATA createProximity(index_type eid,CONTROL_POINT pid = CONTROL_DEFAULT) const {
+    PROXIMITYDATA createProximity(Index eid,CONTROL_POINT pid = CONTROL_DEFAULT) const {
         return PROXIMITYDATA::create(eid, getTetrahedron(eid), pid);
     }
 
-    inline PROXIMITYDATA createProximity(index_type eid,double & fact_u,double & fact_v, double & fact_w, double & fact_x) {
+    inline PROXIMITYDATA createProximity(Index eid,double & fact_u,double & fact_v, double & fact_w, double & fact_x) {
         const Tetrahedron & tetrahedron = l_topology->getTetrahedron(eid);
         return PROXIMITYDATA(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], fact_u,fact_v,fact_w,fact_x);
     }
 
-    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, index_type eid) const {
+    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, Index eid) const {
         auto tetrahedron = getTetrahedron(eid);
         const TetraInfo & tinfo = getTetraInfo()[eid];
 

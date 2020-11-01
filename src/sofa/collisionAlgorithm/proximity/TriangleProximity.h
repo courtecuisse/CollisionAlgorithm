@@ -10,12 +10,12 @@ namespace collisionAlgorithm
 
 class TriangleProximity {
 public:
-    typedef sofa::core::topology::Topology::TriangleID index_type;
+    typedef sofa::core::topology::Topology::TriangleID Index;
 
-    TriangleProximity(index_type eid,index_type p0,index_type p1,index_type p2, double f0,double f1,double f2)
+    TriangleProximity(Index eid,Index p0,Index p1,Index p2, double f0,double f1,double f2)
     : m_eid(eid), m_p0(p0), m_p1(p1), m_p2(p2), m_f0(f0), m_f1(f1), m_f2(f2) {}
 
-    static inline TriangleProximity create(index_type eid,index_type p0,index_type p1,index_type p2, CONTROL_POINT pid) {
+    static inline TriangleProximity create(Index eid,Index p0,Index p1,Index p2, CONTROL_POINT pid) {
         if (pid == 0) return TriangleProximity(eid, p0,p1,p2, 1, 0, 0);
         else if (pid == 1) return TriangleProximity(eid, p0,p1,p2, 0, 1, 0);
         else if (pid == 2) return TriangleProximity(eid, p0,p1,p2, 0, 0, 1);
@@ -23,7 +23,7 @@ public:
         return TriangleProximity(eid, p0,p1,p2, 1.0/3.0, 1.0/3.0, 1.0/3.0);
     }
 
-    static inline TriangleProximity create(index_type eid,const helper::fixed_array<index_type,3> & tri, CONTROL_POINT pid) {
+    static inline TriangleProximity create(Index eid,const helper::fixed_array<Index,3> & tri, CONTROL_POINT pid) {
         return create(eid,tri[0],tri[1],tri[2],pid);
     }
 
@@ -34,7 +34,7 @@ public:
         it.addCol(m_p2, N * m_f2);
     }
 
-    index_type getElementId() const {
+    Index getElementId() const {
         return m_eid;
     }
 
@@ -42,8 +42,8 @@ public:
         return CONTROL_3;
     }
 
-    index_type m_eid;
-    index_type m_p0,m_p1,m_p2;
+    Index m_eid;
+    Index m_p0,m_p1,m_p2;
     double m_f0,m_f1,m_f2;
 };
 

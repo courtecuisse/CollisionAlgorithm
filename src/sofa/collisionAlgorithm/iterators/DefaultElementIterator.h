@@ -19,9 +19,9 @@ namespace collisionAlgorithm
 template<class GEOMETRY, class PROXIMITYDATA, CONTROL_POINT CONTROL_SIZE>
 class TDefaultElementIterator : public BaseElementIterator {
 public:
-    typedef BaseGeometry::index_type index_type;
+    typedef BaseGeometry::Index Index;
 
-    TDefaultElementIterator(const GEOMETRY * geometry, index_type size, index_type start)
+    TDefaultElementIterator(const GEOMETRY * geometry, Index size, Index start)
     : m_geometry(geometry)
     , m_size(size)
     , m_it(start) {}
@@ -34,7 +34,7 @@ public:
         return m_it >= m_size;
     }
 
-    index_type id() const override {
+    Index id() const override {
         return m_it;
     }
 
@@ -48,14 +48,14 @@ public:
                           m_geometry->createProximity(m_it, pid)); // initialized with the center of the element
     }
 
-    index_type elementSize() const override {
+    Index elementSize() const override {
         return CONTROL_SIZE;
     }
 
 private:
     const GEOMETRY * m_geometry;
-    index_type m_it;
-    const index_type m_size;
+    Index m_it;
+    const Index m_size;
 
 
     inline BaseProximity::SPtr createSPtr(const GEOMETRY * container, const PROXIMITYDATA & data) const {
@@ -66,15 +66,15 @@ private:
 template<class PROXIMITYDATA>
 class DefaultElementIterator {
 public:
-typedef BaseGeometry::index_type index_type;
+typedef BaseGeometry::Index Index;
 
     template<class GEOMETRY, class ELEMENT>
-    static BaseElementIterator::UPtr create(const GEOMETRY * c, const helper::vector<ELEMENT> & elmt, index_type start = 0) {
+    static BaseElementIterator::UPtr create(const GEOMETRY * c, const helper::vector<ELEMENT> & elmt, Index start = 0) {
         return BaseElementIterator::UPtr(new TDefaultElementIterator<GEOMETRY, PROXIMITYDATA, PROXIMITYDATA::nbControlPoints()>(c, elmt.size(), start));
     }
 
     template<class GEOMETRY>
-    static BaseElementIterator::UPtr create(const GEOMETRY * c, index_type size, index_type start = 0) {
+    static BaseElementIterator::UPtr create(const GEOMETRY * c, Index size, Index start = 0) {
         return BaseElementIterator::UPtr(new TDefaultElementIterator<GEOMETRY, PROXIMITYDATA, PROXIMITYDATA::nbControlPoints()>(c, size, start));
     }
 };

@@ -28,7 +28,7 @@ public:
 
     SOFA_ABSTRACT_CLASS(BaseGeometry,core::objectmodel::BaseObject);
 
-    typedef sofa::core::topology::Topology::index_type index_type;
+    typedef sofa::core::topology::Topology::Index Index;
 
     class BroadPhase : public core::objectmodel::BaseObject {
     public:
@@ -67,7 +67,7 @@ public:
          */
         virtual defaulttype::Vec3i getBoxCoord(const defaulttype::Vector3 & P) const = 0;
 
-        virtual void getElementSet(defaulttype::Vec3i c, std::set<index_type> & selectElements) const = 0;
+        virtual void getElementSet(defaulttype::Vec3i c, std::set<Index> & selectElements) const = 0;
 
     };
 
@@ -80,7 +80,7 @@ public:
         this->f_listening.setValue(true);
     }
 
-    virtual BaseElementIterator::UPtr begin(index_type eid = 0) const = 0;
+    virtual BaseElementIterator::UPtr begin(Index eid = 0) const = 0;
 
     inline const BaseGeometry * end() const {
         return this;
@@ -176,11 +176,11 @@ public:
     }
 
     template<class PROXIMITYDATA>
-    inline void buildJacobianConstraint(const PROXIMITYDATA & data, core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, index_type constraintId) const {
+    inline void buildJacobianConstraint(const PROXIMITYDATA & data, core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, Index constraintId) const {
         DataMatrixDeriv & c1_d = *cId[this->getState()].write();
         MatrixDeriv & c1 = *c1_d.beginEdit();
 
-        for (index_type j=0;j<normals.size();j++) {
+        for (Index j=0;j<normals.size();j++) {
             MatrixDerivRowIterator c_it = c1.writeLine(constraintId+j);
             data.addContributions(c_it, normals[j] * fact);
         }
@@ -188,7 +188,7 @@ public:
         c1_d.endEdit();
     }
 
-    inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, index_type cid_global, index_type cid_local, const sofa::defaulttype::BaseVector* lambda) const {
+    inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const {
         auto res = sofa::helper::write(*resId[this->getState()].write(), cParams);
         const typename DataTypes::MatrixDeriv& j = cParams->readJ(this->getState())->getValue();
         auto rowIt = j.readLine(cid_global+cid_local);

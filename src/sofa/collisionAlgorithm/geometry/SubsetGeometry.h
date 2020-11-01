@@ -15,12 +15,12 @@ public:
     typedef BaseProximity TPROXIMITYDATA;
     typedef SubsetGeometry<DataTypes> GEOMETRY;
     typedef BaseGeometry Inherit;
-    typedef BaseProximity::index_type index_type;
+    typedef BaseProximity::Index Index;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef typename DataTypes::MatrixDeriv MatrixDeriv;
     typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
-    typedef std::set<index_type> SetIndex;
+    typedef std::set<Index> SetIndex;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
@@ -28,14 +28,14 @@ public:
     //whole geometry
     core::objectmodel::SingleLink<SubsetGeometry,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_wholeGeometry;
 
-    std::set<index_type> m_setIndices;
+    std::set<Index> m_setIndices;
 
     SubsetGeometry()
     : d_indices(initData(&d_indices, "indices", "Indices of the primitives in the underlying geometry"))
     , l_wholeGeometry(initLink("wholeGeometry", "Whole geometry on which we want the subet"))
     {}
 
-    inline BaseElementIterator::UPtr begin(index_type /* eid */) const override {
+    inline BaseElementIterator::UPtr begin(Index /* eid */) const override {
         return BaseElementIterator::UPtr(new SubsetElementIterator(l_wholeGeometry.get(), d_indices.getValue()));
     }
 
