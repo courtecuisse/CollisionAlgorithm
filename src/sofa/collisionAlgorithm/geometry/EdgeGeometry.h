@@ -14,7 +14,7 @@ class EdgeGeometry : public TBaseGeometry<DataTypes,EdgeProximity> {
 public:
     typedef DataTypes TDataTypes;
     typedef TBaseGeometry<DataTypes,EdgeProximity> Inherit;
-    typedef BaseProximity::index_type index_type;
+    typedef BaseProximity::Index Index;
     typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
     typedef EdgeGeometry<DataTypes> GEOMETRY;
     typedef typename DataTypes::VecCoord VecCoord;
@@ -32,11 +32,11 @@ public:
         l_topology.setPath("@.");
     }
 
-    inline BaseElementIterator::UPtr begin(index_type eid = 0) const override {
+    inline BaseElementIterator::UPtr begin(Index eid = 0) const override {
         return DefaultElementIterator<PROXIMITYDATA>::create(this,this->l_topology->getEdges(), eid);
     }
 
-    inline const sofa::core::topology::BaseMeshTopology::Edge getEdge(index_type eid) const {
+    inline const sofa::core::topology::BaseMeshTopology::Edge getEdge(Index eid) const {
         return this->l_topology->getEdge(eid);
     }
 
@@ -47,11 +47,11 @@ public:
                pos[data.m_p1] * data.m_f1;
     }
 
-    inline PROXIMITYDATA createProximity(index_type eid, CONTROL_POINT c = CONTROL_DEFAULT) const {
+    inline PROXIMITYDATA createProximity(Index eid, CONTROL_POINT c = CONTROL_DEFAULT) const {
         return PROXIMITYDATA::create(eid, getEdge(eid), c);
     }
 
-    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, index_type eid) const {
+    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, Index eid) const {
         auto edge = getEdge(eid);
 
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());

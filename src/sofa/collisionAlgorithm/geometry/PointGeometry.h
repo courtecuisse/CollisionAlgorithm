@@ -14,7 +14,7 @@ public:
     typedef DataTypes TDataTypes;
     typedef PointGeometry<DataTypes> GEOMETRY;
     typedef TBaseGeometry<DataTypes,PointProximity> Inherit;
-    typedef BaseProximity::index_type index_type;
+    typedef BaseProximity::Index Index;
     typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
@@ -29,7 +29,7 @@ public:
     PointGeometry()
     : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {}
 
-    inline BaseElementIterator::UPtr begin(index_type eid = 0) const override {
+    inline BaseElementIterator::UPtr begin(Index eid = 0) const override {
         const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
         return DefaultElementIterator<PROXIMITYDATA>::create(this, pos.ref(), eid);
     }
@@ -54,12 +54,12 @@ public:
         }
     }
 
-    inline PROXIMITYDATA createProximity(index_type eid, CONTROL_POINT pid = CONTROL_DEFAULT) const {
+    inline PROXIMITYDATA createProximity(Index eid, CONTROL_POINT pid = CONTROL_DEFAULT) const {
         return PROXIMITYDATA::create(eid,pid);
     }
 
     //do not change the dataProximity.
-    inline PROXIMITYDATA project(const defaulttype::Vector3 & /*Q*/, index_type eid) const {
+    inline PROXIMITYDATA project(const defaulttype::Vector3 & /*Q*/, Index eid) const {
         return PROXIMITYDATA(eid);
     }
 

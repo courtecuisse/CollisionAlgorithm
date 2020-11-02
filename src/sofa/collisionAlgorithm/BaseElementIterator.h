@@ -14,7 +14,7 @@ class BaseGeometry;
  * \brief The BaseElementIterator class defines an abstract iterator class for BaseElements
  */
 class BaseElementIterator {
-    typedef BaseProximity::index_type index_type;
+    typedef BaseProximity::Index Index;
 public:
 
     ///defines a unique pointer iterator of baseElements
@@ -64,9 +64,9 @@ public:
 
             virtual BaseProximity::SPtr createProximity(CONTROL_POINT id = CONTROL_DEFAULT) const override { return NULL; }
 
-            virtual index_type elementSize() const { return 0; }
+            virtual Index elementSize() const { return 0; }
 
-            virtual index_type id() const { return 0; }
+            virtual Index id() const { return 0; }
         };
 
         return UPtr(new EmptyIterator());
@@ -80,9 +80,9 @@ public:
 
     virtual BaseProximity::SPtr createProximity(CONTROL_POINT id = CONTROL_DEFAULT) const = 0;
 
-    virtual index_type elementSize() const = 0;
+    virtual Index elementSize() const = 0;
 
-    virtual index_type id() const = 0;
+    virtual Index id() const = 0;
 
 };
 

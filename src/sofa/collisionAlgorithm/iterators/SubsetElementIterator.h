@@ -12,9 +12,9 @@ namespace collisionAlgorithm
 //Internal iterator of elements
 class SubsetElementIterator : public BaseElementIterator {
 public:
-    typedef BaseProximity::index_type index_type;
+    typedef BaseProximity::Index Index;
 
-    SubsetElementIterator(BaseGeometry * geo, const std::set<index_type> & subsetElements)
+    SubsetElementIterator(BaseGeometry * geo, const std::set<Index> & subsetElements)
     : m_container(geo)
     , m_subsetElements(subsetElements) {
         m_iterator = m_subsetElements.cbegin();
@@ -24,7 +24,7 @@ public:
         m_iterator++;
     }
 
-    index_type id() const override {
+    Index id() const override {
         return *m_iterator;
     }
 
@@ -40,14 +40,14 @@ public:
         return m_container->begin(id())->createProximity(pid);
     }
 
-    index_type elementSize() const override {
+    Index elementSize() const override {
         return m_container->begin(id())->elementSize();
     }
 
 private:
     BaseGeometry * m_container;
-    const std::set<index_type> m_subsetElements;
-    std::set<index_type>::iterator m_iterator;
+    const std::set<Index> m_subsetElements;
+    std::set<Index>::iterator m_iterator;
 };
 
 
