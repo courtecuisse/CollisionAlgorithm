@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.1)
 project(CollisionAlgorithm)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+if(COMMAND setupGitInfo)
+    setupGitInfo(PLUGIN_GIT_INFO)
+endif()
 
 file(GLOB_RECURSE HEADER_FILES
     "src/*.h"

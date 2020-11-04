@@ -15,14 +15,6 @@
 #define PLUGIN_DATA_DIR_ QUOTE(PLUGIN_DATA_DIR)
 #endif
 
-#define DO_EXPAND(VAL)  VAL ## 1
-#define EXPAND(PLUGIN_GIT_INFO)     DO_EXPAND(PLUGIN_GIT_INFO)
-#if !defined(MYVARIABLE) || (EXPAND(MYVARIABLE) == 1)
-#define PLUGIN_GIT_INFO_ ""
-#else
-#define PLUGIN_GIT_INFO_ QUOTE(PLUGIN_GIT_INFO)
-#endif
-
 namespace sofa {
 
 namespace collisionAlgorithm {
@@ -56,7 +48,7 @@ namespace collisionAlgorithm {
 
 	const char* getModuleVersion()
 	{
-        return "0.0";
+        return PLUGIN_GIT_INFO;
 	}
 
 	const char* getModuleLicense()
@@ -64,16 +56,8 @@ namespace collisionAlgorithm {
 		return "LGPL";
 	}
 
-    const char* getModuleDescription()
-    {
-        std::ostringstream oss;
-        oss << "<MODULE_DESCRIPTION>" << std::endl
-            << "<GIT>" << PLUGIN_GIT_INFO_  << std::endl;
-
-        char* desc = new char[oss.str().size()];
-        strcpy(desc, oss.str().c_str());
-
-        return desc;
+    const char* getModuleDescription() {
+        return "Plugin for collision detection";
     }
 
 	const char* getModuleComponentList()
