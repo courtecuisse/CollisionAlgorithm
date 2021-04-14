@@ -32,6 +32,9 @@ file(GLOB_RECURSE DEPRECATED_FILES
     "deprecated/*.cpp"
 )
 
+find_package(SofaFramework REQUIRED)
+sofa_find_package(Sofa.GL QUIET)
+
 find_package( Eigen3 REQUIRED )
 include_directories(${EIGEN3_INCLUDE_DIR})
 
@@ -42,7 +45,7 @@ set_source_files_properties(${IGNORED_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${IGNORED_FILES} ${DEPRECATED_FILES} ${README_FILES} )
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DPLUGIN_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\"")
-target_link_libraries(${PROJECT_NAME} SofaSimulationCommon)
+target_link_libraries(${PROJECT_NAME} SofaSimulationCommon Sofa.GL)
 
 ## Install rules for the library and headers; CMake package configurations files
 set(${PROJECT_NAME}_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src")

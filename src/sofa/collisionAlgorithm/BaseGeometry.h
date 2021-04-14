@@ -7,8 +7,9 @@
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/core/objectmodel/DataCallback.h>
 #include <sofa/simulation/Visitor.h>
-#include <sofa/helper/system/gl.h>
+#include <sofa/gl/gl.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
+#include <sofa/core/topology/BaseMeshTopology.h>
 
 namespace sofa {
 
@@ -189,7 +190,7 @@ public:
     }
 
     inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const {
-        auto res = sofa::helper::write(*resId[this->getState()].write(), cParams);
+        auto res = sofa::helper::write(*resId[this->getState()].write());
         const typename DataTypes::MatrixDeriv& j = cParams->readJ(this->getState())->getValue();
         auto rowIt = j.readLine(cid_global+cid_local);
         const double f = lambda->element(cid_global+cid_local);

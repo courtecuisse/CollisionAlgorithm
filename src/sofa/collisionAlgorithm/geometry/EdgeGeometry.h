@@ -21,7 +21,7 @@ public:
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef typename DataTypes::MatrixDeriv MatrixDeriv;
     typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
-    typedef sofa::core::topology::BaseMeshTopology::Edge Edge;
+    typedef sofa::topology::Edge Edge;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
@@ -36,7 +36,7 @@ public:
         return DefaultElementIterator<PROXIMITYDATA>::create(this,this->l_topology->getEdges(), eid);
     }
 
-    inline const sofa::core::topology::BaseMeshTopology::Edge getEdge(Index eid) const {
+    inline const sofa::topology::Edge getEdge(Index eid) const {
         return this->l_topology->getEdge(eid);
     }
 
@@ -86,7 +86,7 @@ public:
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
         for (auto it=this->begin();it!=this->end();it++) {
-            const sofa::core::topology::BaseMeshTopology::Edge & edge = this->l_topology->getEdge(it->id());
+            const sofa::topology::Edge & edge = this->l_topology->getEdge(it->id());
 
             glColor4f(1.0,0.0,0.0,1.0);
             glVertex3dv(pos[edge[0]].data());

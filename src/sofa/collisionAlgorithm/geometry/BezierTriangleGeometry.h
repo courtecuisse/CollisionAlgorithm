@@ -19,7 +19,7 @@ public:
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef size_t TriangleID;
-    typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
+    typedef sofa::topology::Triangle Triangle;
     typedef helper::vector<Triangle> VecTriangles;
 
     SOFA_CLASS(GEOMETRY,Inherit);
@@ -114,7 +114,7 @@ public:
         glEnd();
     }
 
-    inline const sofa::core::topology::BaseMeshTopology::Triangle getTriangle(Index eid) const {
+    inline const sofa::topology::Triangle getTriangle(Index eid) const {
         return this->l_topology->getTriangle(eid);
     }
 

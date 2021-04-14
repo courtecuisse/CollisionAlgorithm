@@ -24,7 +24,7 @@ public:
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef Data<VecCoord> DataVecCoord;
-    typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
+    typedef sofa::topology::Triangle Triangle;
     typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
     typedef helper::vector<Triangle> VecTriangles;
 

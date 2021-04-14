@@ -3,6 +3,7 @@
 #include <sofa/core/VecId.h>
 #include <sofa/core/MultiVecId.h>
 #include <sofa/defaulttype/BaseVector.h>
+#include <sofa/defaulttype/BaseMatrix.h>
 #include <sofa/core/ConstraintParams.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/topology/Topology.h>

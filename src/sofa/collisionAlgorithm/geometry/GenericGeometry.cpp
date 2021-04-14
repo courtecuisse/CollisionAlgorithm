@@ -8,13 +8,13 @@ namespace collisionAlgorithm {
 SOFA_DECL_CLASS(GenericGeometry)
 
 int GenericGeometryClass = core::RegisterObject("GenericGeometry")
-.add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::core::topology::BaseMeshTopology::Edge,CONTROL_2> >()
-.add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::core::topology::BaseMeshTopology::Triangle,CONTROL_3> >()
+.add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::topology::Edge,CONTROL_2> >()
+.add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::topology::Triangle,CONTROL_3> >()
 .add< GenericGeometry<sofa::defaulttype::Vec3dTypes, sofa::core::topology::BaseMeshTopology::Quad,CONTROL_4> >();
 
 
-//Data<helper::vector<sofa::core::topology::BaseMeshTopology::Edge>> d_edges;
-//Data<helper::vector<sofa::core::topology::BaseMeshTopology::Triangle>> d_triangles;
+//Data<helper::vector<sofa::topology::Edge>> d_edges;
+//Data<helper::vector<sofa::topology::Triangle>> d_triangles;
 //Data<helper::vector<sofa::core::topology::BaseMeshTopology::Quad>> d_quads;
 
 }
@@ -87,14 +87,14 @@ public:
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef Data<VecCoord> DataVecCoord;
-    typedef sofa::core::topology::BaseMeshTopology::Triangle Triangle;
+    typedef sofa::topology::Triangle Triangle;
     typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
     typedef helper::vector<Triangle> VecTriangles;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    Data<helper::vector<sofa::core::topology::BaseMeshTopology::Edge>> d_edges;
-    Data<helper::vector<sofa::core::topology::BaseMeshTopology::Triangle>> d_triangles;
+    Data<helper::vector<sofa::topology::Edge>> d_edges;
+    Data<helper::vector<sofa::topology::Triangle>> d_triangles;
     Data<helper::vector<sofa::core::topology::BaseMeshTopology::Quad>> d_quads;
 
     GenericGeometry()
@@ -104,11 +104,11 @@ public:
 
     virtual BaseElementIterator::UPtr getElementIterator(unsigned eid = 0) const {
         if (eid < d_edges.getValue().size())
-            return DefaultElementIterator<GenericElement<GEOMETRY,sofa::core::topology::BaseMeshTopology::Edge> >::create(this, d_edges.getValue().size(), eid);
+            return DefaultElementIterator<GenericElement<GEOMETRY,sofa::topology::Edge> >::create(this, d_edges.getValue().size(), eid);
 
         eid -= d_edges.getValue().size();
         if (eid < d_triangles.getValue().size())
-            return DefaultElementIterator<GenericElement<GEOMETRY,sofa::core::topology::BaseMeshTopology::Triangle> >::create(this, d_triangles.getValue().size(), eid);
+            return DefaultElementIterator<GenericElement<GEOMETRY,sofa::topology::Triangle> >::create(this, d_triangles.getValue().size(), eid);
 
     }
 
