@@ -18,6 +18,7 @@ public:
     core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
     Data<bool> d_drawCollision ;
     Data<DetectionOutput> d_output;
+    Data<helper::vector<double> > d_outputDist;
     Data<helper::vector<unsigned>> d_matchIdFrom;
     Data<helper::vector<unsigned>> d_matchIdDest;
 
@@ -26,6 +27,7 @@ public:
     , l_dest(initLink("dest", "link to dest geometry"))
     , d_drawCollision (initData(&d_drawCollision, true, "drawcollision", "draw collision"))
     , d_output(initData(&d_output,"output", "output of the collision detection"))
+    , d_outputDist(initData(&d_outputDist,"outputDist", "Distance of the outpu pair of detections"))
     , d_matchIdFrom(initData(&d_matchIdFrom,"matchIdFrom", "from marker ID"))
     , d_matchIdDest(initData(&d_matchIdDest,"matchIdDest", "dest marker ID")) {}
 
@@ -49,6 +51,8 @@ public:
 
         DetectionOutput & output = *d_output.beginEdit();
         output.clear();
+        helper::vector<double> & outputDist = *d_outputDist.beginEdit();
+        outputDist.clear();
 
         helper::vector<unsigned> & matchIdFrom = *d_matchIdFrom.beginEdit();
         helper::vector<unsigned> & matchIdDest = *d_matchIdDest.beginEdit();
@@ -60,6 +64,7 @@ public:
             }
 
             output.add(min_pair.first,min_pair.second);
+            outputDist.push_back(m_distanceMethod(output.back()));
 
             matchIdFrom.push_back(min_pair.first->getElementId());
             matchIdDest.push_back(min_pair.second->getElementId());
