@@ -76,13 +76,13 @@ public:
 
 //        if (! vparams->displayFlags().getShowCollisionModels()) return;
         if (! vparams->displayFlags().getShowCollisionModels()) return ;
-        const defaulttype::Vector4 & color = this->d_color.getValue();
+        const sofa::type::RGBAColor & color = this->d_color.getValue();
         if (color[3] == 0.0) return;
 
         glDisable(GL_LIGHTING);
 
         glBegin(GL_LINES);
-        glColor4dv(color.data());
+        glColor4fv(color.data());
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
         for (auto it=this->begin();it!=this->end();it++) {

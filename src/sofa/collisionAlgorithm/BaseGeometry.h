@@ -72,11 +72,11 @@ public:
 
     };
 
-    Data<defaulttype::Vector4> d_color;
+    Data<sofa::helper::types::RGBAColor> d_color;
     Data<double> d_drawScaleNormal;
 
     BaseGeometry()
-    : d_color(initData(&d_color, defaulttype::Vector4(1,0,1,1), "color", "Color of the collision model"))
+    : d_color(initData(&d_color, sofa::helper::types::RGBAColor(1,0,1,1), "color", "Color of the collision model"))
     , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model")) {
         this->f_listening.setValue(true);
     }
@@ -158,7 +158,7 @@ public:
     inline void drawNormals(const core::visual::VisualParams *vparams) {
         if (! vparams->displayFlags().getShowNormals() || d_drawScaleNormal.getValue() == 0.0) return;
 
-        defaulttype::Vector4 color = d_color.getValue();
+        sofa::helper::types::RGBAColor color = d_color.getValue();
         color[3] = 1.0;
 
         for (auto it=this->begin();it!=this->end();it++) {

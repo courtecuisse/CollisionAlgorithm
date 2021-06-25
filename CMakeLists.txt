@@ -33,7 +33,7 @@ file(GLOB_RECURSE DEPRECATED_FILES
 )
 
 find_package(SofaFramework REQUIRED)
-sofa_find_package(Sofa.GL QUIET)
+sofa_find_package(Sofa.GL REQUIRED)
 
 find_package( Eigen3 REQUIRED )
 include_directories(${EIGEN3_INCLUDE_DIR})

@@ -68,7 +68,7 @@ public:
             // draw Triangle
             double delta = 0.2;
 
-            const defaulttype::Vector4 & color = this->d_color.getValue();
+            const sofa::type::RGBAColor & color = this->d_color.getValue();
 
             glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
             glVertex3dv(getPosition(proxA).data());
@@ -102,7 +102,7 @@ public:
 //        if (! vparams->displayFlags().getShowCollisionModels()) return;
         if (! vparams->displayFlags().getShowCollisionModels()) return ;
 
-        const defaulttype::Vector4 & color = this->d_color.getValue();
+        const sofa::type::RGBAColor & color = this->d_color.getValue();
         if (color[3] == 0.0) return;
 
         glDisable(GL_LIGHTING);

@@ -180,7 +180,7 @@ void AABBBroadPhase::draw(const core::visual::VisualParams * vparams) {
 
     glDisable(GL_LIGHTING);
 
-    glColor4dv(this->l_geometry->d_color.getValue().data());
+    glColor4fv(this->l_geometry->d_color.getValue().data());
 
     for (auto it = m_indexedElement.begin(); it != m_indexedElement.end(); it++) {
         unsigned eid = it->first;
