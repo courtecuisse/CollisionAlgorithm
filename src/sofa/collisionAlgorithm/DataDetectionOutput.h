@@ -31,11 +31,11 @@ public:
         m_output.clear();
     }
 
-    helper::vector<PairDetection>::const_iterator begin() const {
+    sofa::type::vector<PairDetection>::const_iterator begin() const {
         return m_output.begin();
     }
 
-    helper::vector<PairDetection>::const_iterator end() const {
+    sofa::type::vector<PairDetection>::const_iterator end() const {
         return m_output.begin();
     }
 
@@ -43,7 +43,7 @@ public:
         return m_output.size();
     }
 
-    inline void add(BaseProximity::SPtr p1,defaulttype::Vector3 & P) {
+    inline void add(BaseProximity::SPtr p1,type::Vector3 & P) {
         if (p1 == NULL) return;
         m_output.push_back(PairDetection(p1,std::shared_ptr<FixedProximity>(new FixedProximity(P))));
     }
@@ -67,7 +67,7 @@ public:
     }
 
 protected:
-    helper::vector< PairDetection > m_output;
+    sofa::type::vector< PairDetection > m_output;
 };
 
 }

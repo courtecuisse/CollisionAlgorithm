@@ -59,24 +59,24 @@ public:
          * \brief getBoxSize
          * \return bounding box size in a vec3i
          */
-        virtual defaulttype::Vec3i getBoxSize() const = 0;
+        virtual type::Vec3i getBoxSize() const = 0;
 
         /*!
          * \brief getBoxCoord
          * \param P : point in space
          * \return the box's coordinates (vec3i) containing point P
          */
-        virtual defaulttype::Vec3i getBoxCoord(const defaulttype::Vector3 & P) const = 0;
+        virtual type::Vec3i getBoxCoord(const type::Vector3 & P) const = 0;
 
-        virtual void getElementSet(defaulttype::Vec3i c, std::set<Index> & selectElements) const = 0;
+        virtual void getElementSet(type::Vec3i c, std::set<Index> & selectElements) const = 0;
 
     };
 
-    Data<sofa::helper::types::RGBAColor> d_color;
+    Data<sofa::type::RGBAColor> d_color;
     Data<double> d_drawScaleNormal;
 
     BaseGeometry()
-    : d_color(initData(&d_color, sofa::helper::types::RGBAColor(1,0,1,1), "color", "Color of the collision model"))
+    : d_color(initData(&d_color, sofa::type::RGBAColor(1,0,1,1), "color", "Color of the collision model"))
     , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model")) {
         this->f_listening.setValue(true);
     }
@@ -122,7 +122,7 @@ class BaseNormalHandler {
 public:
     virtual void updateNormals() = 0;
 
-    virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const = 0;
+    virtual type::Vector3 computeNormal(const PROXIMITYDATA & data) const = 0;
 };
 
 
@@ -158,7 +158,7 @@ public:
     inline void drawNormals(const core::visual::VisualParams *vparams) {
         if (! vparams->displayFlags().getShowNormals() || d_drawScaleNormal.getValue() == 0.0) return;
 
-        sofa::helper::types::RGBAColor color = d_color.getValue();
+        sofa::type::RGBAColor color = d_color.getValue();
         color[3] = 1.0;
 
         for (auto it=this->begin();it!=this->end();it++) {
@@ -177,7 +177,7 @@ public:
     }
 
     template<class PROXIMITYDATA>
-    inline void buildJacobianConstraint(const PROXIMITYDATA & data, core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, Index constraintId) const {
+    inline void buildJacobianConstraint(const PROXIMITYDATA & data, core::MultiMatrixDerivId cId, const sofa::type::vector<type::Vector3> & normals, double fact, Index constraintId) const {
         DataMatrixDeriv & c1_d = *cId[this->getState()].write();
         MatrixDeriv & c1 = *c1_d.beginEdit();
 
@@ -225,7 +225,7 @@ public:
         m_normalHandler->updateNormals();
     }
 
-    virtual defaulttype::Vector3 getNormal(const PROXIMITYDATA & data) const {
+    virtual type::Vector3 getNormal(const PROXIMITYDATA & data) const {
         return m_normalHandler->computeNormal(data);
     }
 

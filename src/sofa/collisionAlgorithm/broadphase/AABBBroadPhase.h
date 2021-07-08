@@ -23,7 +23,7 @@ public:
 
     typedef BaseGeometry::BaseGeometry::Index Index;
 
-    Data<defaulttype::Vec3i> d_nbox;
+    Data<type::Vec3i> d_nbox;
     Data<bool> d_refineBBox;
     Data<bool> d_static;
 
@@ -35,7 +35,7 @@ public:
 
     virtual void prepareDetection() override;
 
-    virtual defaulttype::BoundingBox getBBox() const;
+    virtual type::BoundingBox getBBox() const;
 
     void draw(const core::visual::VisualParams * /*vparams*/) override;
 
@@ -43,8 +43,8 @@ public:
         return i*m_offset[0] + j * m_offset[1] + k;
     }
 
-    inline defaulttype::Vec3i getCoord(const defaulttype::Vector3 & P) const {
-        defaulttype::Vec3i cbox;
+    inline type::Vec3i getCoord(const type::Vector3 & P) const {
+        type::Vec3i cbox;
         for (int i = 0 ; i < 3 ; i++) {
             cbox[i] = floor(P[i]/m_cellSize[i]);
         }
@@ -54,21 +54,21 @@ public:
         return cbox;
     }
 
-    inline const defaulttype::Vector3 & getMin() const {
+    inline const type::Vector3 & getMin() const {
         return m_Bmin;
     }
 
-    inline const defaulttype::Vector3 & getMax() const {
+    inline const type::Vector3 & getMax() const {
         return m_Bmax;
     }
 
-    virtual defaulttype::Vec3i getBoxSize() const {
+    virtual type::Vec3i getBoxSize() const {
         return m_nbox;
     }
 
-    virtual defaulttype::Vec3i getBoxCoord(const defaulttype::Vector3 & P) const {
+    virtual type::Vec3i getBoxCoord(const type::Vector3 & P) const {
         //compute the box where is P
-        defaulttype::Vec3i cbox;
+        type::Vec3i cbox;
         for (int i = 0 ; i < 3 ; i++) {
             cbox[i] = floor((P[i] - m_Bmin[i])/m_cellSize[i]);
         }
@@ -90,7 +90,7 @@ public:
         return cbox;
     }
 
-    virtual void getElementSet(defaulttype::Vec3i c, std::set<Index> & selectElements) const {
+    virtual void getElementSet(type::Vec3i c, std::set<Index> & selectElements) const {
         auto it = m_indexedElement.find(getKey(c[0],c[1],c[2]));
         if (it != m_indexedElement.end()) {
             const std::set<Index> & elemntsID = it->second;
@@ -99,9 +99,9 @@ public:
     }
 
 protected:
-    defaulttype::Vector3 m_Bmin,m_Bmax,m_cellSize;
-    defaulttype::Vec3i m_nbox;
-    defaulttype::Vec<2, size_t> m_offset;
+    type::Vector3 m_Bmin,m_Bmax,m_cellSize;
+    type::Vec3i m_nbox;
+    type::Vec<2, size_t> m_offset;
     std::map<Index, std::set<Index> > m_indexedElement;
     bool m_staticInitDone;
 };

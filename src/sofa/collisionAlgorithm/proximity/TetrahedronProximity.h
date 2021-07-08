@@ -26,12 +26,12 @@ public:
         return TetrahedronProximity(eid, p0,p1,p2,p3, 0.25, 0.25, 0.25, 0.25);
     }
 
-    static inline TetrahedronProximity create(Index eid,const helper::fixed_array<Index,4> & tetra, CONTROL_POINT pid) {
+    static inline TetrahedronProximity create(Index eid,const type::fixed_array<Index,4> & tetra, CONTROL_POINT pid) {
         return create(eid, tetra[0], tetra[1], tetra[2], tetra[3], pid);
     }
 
     template<class MatrixDerivRowIterator>
-    inline void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
+    inline void addContributions(MatrixDerivRowIterator & it, const sofa::type::Vector3 & N) const {
         it.addCol(m_p0, N * m_f0);
         it.addCol(m_p1, N * m_f1);
         it.addCol(m_p2, N * m_f2);

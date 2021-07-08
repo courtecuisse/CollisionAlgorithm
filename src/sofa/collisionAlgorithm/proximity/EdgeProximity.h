@@ -21,10 +21,10 @@ class EdgeProximity {
         return EdgeProximity(eid, p0, p1, 0.5, 0.5);
     }
 
-    static inline EdgeProximity create(Index eid, const helper::fixed_array<Index, 2>& edge, CONTROL_POINT c) { return create(eid, edge[0], edge[1], c); }
+    static inline EdgeProximity create(Index eid, const type::fixed_array<Index, 2>& edge, CONTROL_POINT c) { return create(eid, edge[0], edge[1], c); }
 
     template <class MatrixDerivRowIterator>
-    inline void addContributions(MatrixDerivRowIterator& it, const defaulttype::Vector3& N) const {
+    inline void addContributions(MatrixDerivRowIterator& it, const sofa::type::Vector3& N) const {
         it.addCol(m_p0, N * m_f0);
         it.addCol(m_p1, N * m_f1);
     }

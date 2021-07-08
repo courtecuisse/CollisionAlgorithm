@@ -16,7 +16,7 @@ public:
 
     SOFA_CLASS(SOFA_TEMPLATE(EdgeNormalHandler,GEOMETRY), Inherit);
 
-    defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
+    type::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
         const helper::ReadAccessor<DataVecCoord> & pos = this->l_geometry->getState()->read(core::VecCoordId::position());
         return (pos[data.m_p1] - pos[data.m_p0]).normalized();
     }

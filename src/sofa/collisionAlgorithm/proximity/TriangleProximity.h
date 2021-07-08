@@ -23,12 +23,12 @@ public:
         return TriangleProximity(eid, p0,p1,p2, 1.0/3.0, 1.0/3.0, 1.0/3.0);
     }
 
-    static inline TriangleProximity create(Index eid,const helper::fixed_array<Index,3> & tri, CONTROL_POINT pid) {
+    static inline TriangleProximity create(Index eid,const type::fixed_array<Index,3> & tri, CONTROL_POINT pid) {
         return create(eid,tri[0],tri[1],tri[2],pid);
     }
 
     template<class MatrixDerivRowIterator>
-    inline void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3 & N) const {
+    inline void addContributions(MatrixDerivRowIterator & it, const sofa::type::Vector3 & N) const {
         it.addCol(m_p0, N * m_f0);
         it.addCol(m_p1, N * m_f1);
         it.addCol(m_p2, N * m_f2);

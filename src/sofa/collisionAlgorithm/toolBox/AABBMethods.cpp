@@ -8,8 +8,8 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 namespace toolBox {
-void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype::Vec3i cbox, std::set<BaseProximity::Index> & selectElements, int d) {
-    defaulttype::Vec3i nbox = decorator->getBoxSize();
+void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, type::Vec3i cbox, std::set<BaseProximity::Index> & selectElements, int d) {
+    type::Vec3i nbox = decorator->getBoxSize();
 
     {
         int i=-d;
@@ -24,7 +24,7 @@ void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype:
                     if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                         continue;
 
-                    decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
+                    decorator->getElementSet(type::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
                 }
             }
         }
@@ -44,7 +44,7 @@ void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype:
                     if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                         continue;
 
-                    decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
+                    decorator->getElementSet(type::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
                 }
             }
         }
@@ -65,7 +65,7 @@ void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype:
                     if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                         continue;
 
-                    decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
+                    decorator->getElementSet(type::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
                 }
             }
         }
@@ -85,7 +85,7 @@ void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype:
                     if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                         continue;
 
-                    decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
+                    decorator->getElementSet(type::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
                 }
             }
         }
@@ -105,7 +105,7 @@ void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype:
                     if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
                         continue;
 
-                    decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
+                    decorator->getElementSet(type::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
                 }
             }
         }
@@ -125,7 +125,7 @@ void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype:
                     if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
                         continue;
 
-                    decorator->getElementSet(defaulttype::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
+                    decorator->getElementSet(type::Vec3i(cbox[0] + i,cbox[1] + j,cbox[2] + k), selectElements);
                 }
             }
         }
@@ -145,10 +145,10 @@ BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, Base
                                                  distance);
     } else {
         //take the first broad phase...
-        defaulttype::Vector3 P = pfrom->getPosition();
+        type::Vector3 P = pfrom->getPosition();
 
-        defaulttype::Vec3i bindex = decorator->getBoxCoord(P);
-        defaulttype::Vec3i bsize = decorator->getBoxSize();
+        type::Vec3i bindex = decorator->getBoxCoord(P);
+        type::Vec3i bsize = decorator->getBoxSize();
 
         int max = 0;
 

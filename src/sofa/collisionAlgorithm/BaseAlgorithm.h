@@ -89,7 +89,7 @@ protected:
         doDetection();
     }
 
-    helper::vector<BaseFilter::SPtr> m_filters;
+    sofa::type::vector<BaseFilter::SPtr> m_filters;
 };
 
 }

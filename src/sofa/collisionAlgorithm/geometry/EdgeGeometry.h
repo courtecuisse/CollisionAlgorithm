@@ -40,7 +40,7 @@ public:
         return this->l_topology->getEdge(eid);
     }
 
-    inline defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
+    inline sofa::type::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
 
         return pos[data.m_p0] * data.m_f0 +
@@ -51,13 +51,13 @@ public:
         return PROXIMITYDATA::create(eid, getEdge(eid), c);
     }
 
-    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, Index eid) const {
+    inline PROXIMITYDATA project(const sofa::type::Vector3 & P, Index eid) const {
         auto edge = getEdge(eid);
 
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
 
-        const defaulttype::Vector3 & E1 = x[edge[0]];
-        const defaulttype::Vector3 & E2 = x[edge[1]];
+        const sofa::type::Vector3 & E1 = x[edge[0]];
+        const sofa::type::Vector3 & E2 = x[edge[1]];
 
         double fact_u;
         double fact_v;
@@ -67,8 +67,8 @@ public:
         return PROXIMITYDATA(eid, edge[0], edge[1], fact_u,fact_v);
     }
 
-    virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & /*data*/) const override {
-        return defaulttype::Vector3();
+    virtual sofa::type::Vector3 computeNormal(const PROXIMITYDATA & /*data*/) const override {
+        return sofa::type::Vector3();
     }
 
     inline void draw(const core::visual::VisualParams * vparams) {

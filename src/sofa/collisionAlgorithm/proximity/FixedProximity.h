@@ -14,10 +14,10 @@ class FixedProximity : public BaseProximity {
 public:
     typedef BaseProximity::Index Index;
 
-    FixedProximity(const defaulttype::Vector3 & p,const defaulttype::Vector3 & n = defaulttype::Vector3())
+    FixedProximity(const sofa::type::Vector3 & p,const sofa::type::Vector3 & n = sofa::type::Vector3())
     : m_position(p), m_normal(n) {}
 
-    static inline BaseProximity::SPtr create(const defaulttype::Vector3 & p,const defaulttype::Vector3 & n = defaulttype::Vector3()) {
+    static inline BaseProximity::SPtr create(const sofa::type::Vector3 & p,const sofa::type::Vector3 & n = sofa::type::Vector3()) {
         return BaseProximity::SPtr(new FixedProximity(p,n));
     }
 
@@ -25,21 +25,21 @@ public:
         return CONTROL_1;
     }
 
-    defaulttype::Vector3 getPosition(core::VecCoordId ) const { return m_position; }
+    sofa::type::Vector3 getPosition(core::VecCoordId ) const { return m_position; }
 
     virtual Index getElementId() const { return 0; }
 
-    virtual defaulttype::Vector3 getNormal() const { return m_normal; }
+    virtual sofa::type::Vector3 getNormal() const { return m_normal; }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId /*cId*/, const helper::vector<defaulttype::Vector3> & /*m_normals*/, double /*fact*/, Index /*constraintId*/) const {}
+    void buildJacobianConstraint(core::MultiMatrixDerivId /*cId*/, const sofa::type::vector<sofa::type::Vector3> & /*m_normals*/, double /*fact*/, Index /*constraintId*/) const {}
 
     template<class MatrixDerivRowIterator>
-    inline void addContributions(MatrixDerivRowIterator & it, const defaulttype::Vector3) const {}
+    inline void addContributions(MatrixDerivRowIterator & it, const sofa::type::Vector3) const {}
 
     void storeLambda(const core::ConstraintParams* /*cParams*/, core::MultiVecDerivId /*res*/, Index /*cid_global*/, Index /*cid_local*/,const sofa::defaulttype::BaseVector* /*lambda*/) const {}
 
-    defaulttype::Vector3 m_position;
-    defaulttype::Vector3 m_normal;
+    sofa::type::Vector3 m_position;
+    sofa::type::Vector3 m_normal;
 };
 
 }

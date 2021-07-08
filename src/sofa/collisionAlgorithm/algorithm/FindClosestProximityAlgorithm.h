@@ -18,9 +18,9 @@ public:
     core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
     Data<bool> d_drawCollision ;
     Data<DetectionOutput> d_output;
-    Data<helper::vector<double> > d_outputDist;
-    Data<helper::vector<unsigned>> d_matchIdFrom;
-    Data<helper::vector<unsigned>> d_matchIdDest;
+    Data<sofa::type::vector<double> > d_outputDist;
+    Data<sofa::type::vector<unsigned>> d_matchIdFrom;
+    Data<sofa::type::vector<unsigned>> d_matchIdDest;
 
     FindClosestProximityAlgorithm()
     : l_from(initLink("from", "link to from geometry"))
@@ -51,11 +51,11 @@ public:
 
         DetectionOutput & output = *d_output.beginEdit();
         output.clear();
-        helper::vector<double> & outputDist = *d_outputDist.beginEdit();
+        sofa::type::vector<double> & outputDist = *d_outputDist.beginEdit();
         outputDist.clear();
 
-        helper::vector<unsigned> & matchIdFrom = *d_matchIdFrom.beginEdit();
-        helper::vector<unsigned> & matchIdDest = *d_matchIdDest.beginEdit();
+        sofa::type::vector<unsigned> & matchIdFrom = *d_matchIdFrom.beginEdit();
+        sofa::type::vector<unsigned> & matchIdDest = *d_matchIdDest.beginEdit();
 
         for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
             PairDetection min_pair = findClosestPoint(*itfrom,l_dest.get());

@@ -9,7 +9,7 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-typedef defaulttype::Vector3 Vec3d;
+typedef type::Vector3 Vec3d;
 
 
 struct TetraInfo

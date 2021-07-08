@@ -24,7 +24,7 @@ public:
 
     typedef size_t TriangleID;
     typedef sofa::topology::Triangle Triangle;
-    typedef helper::vector<Triangle> VecTriangles;
+    typedef sofa::type::vector<Triangle> VecTriangles;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
@@ -83,7 +83,7 @@ public:
 
     ////Bezier triangle are computed according to :
     ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
-    inline defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
+    inline type::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
 
         return pos[data.m_p0] * data.m_f0 +
@@ -97,7 +97,7 @@ public:
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, Index eid) const {
+    inline PROXIMITYDATA project(const type::Vector3 & P, Index eid) const {
         TriangleInfo  tinfo = getTriangleInfo()[eid];
         auto triangle = getTriangle(eid);
 
@@ -107,7 +107,7 @@ public:
         return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2],fact_u,fact_v,fact_w);
     }
 
-    virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
+    virtual type::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
         auto tinfo = getTriangleInfo()[data.m_eid];
         return cross(tinfo.ax2,tinfo.ax1);
     }
@@ -132,9 +132,9 @@ protected:
             const Triangle& tri = triangles[t];
 
             //Compute Positions
-            const defaulttype::Vector3 & p0 = pos[tri[0]];
-            const defaulttype::Vector3 & p1 = pos[tri[1]];
-            const defaulttype::Vector3 & p2 = pos[tri[2]];
+            const type::Vector3 & p0 = pos[tri[0]];
+            const type::Vector3 & p1 = pos[tri[1]];
+            const type::Vector3 & p2 = pos[tri[2]];
 
             vecInfo.push_back(toolBox::computeTriangleInfo(p0, p1, p2));
         }

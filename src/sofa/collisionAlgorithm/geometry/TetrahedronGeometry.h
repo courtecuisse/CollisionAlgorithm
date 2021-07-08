@@ -26,7 +26,7 @@ public:
 
     typedef size_t TetraID;
     typedef sofa::core::topology::BaseMeshTopology::Tetrahedron Tetrahedron;
-    typedef helper::vector<Tetrahedron> VecTetrahedron;
+    typedef sofa::type::vector<Tetrahedron> VecTetrahedron;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
@@ -84,7 +84,7 @@ public:
         return this->l_topology->getTetrahedron(eid);
     }
 
-    inline defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
+    inline type::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
 
         return pos[data.m_p0] * data.m_f0 +
@@ -93,8 +93,8 @@ public:
                pos[data.m_p3] * data.m_f3;
     }
 
-    virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
-        return defaulttype::Vector3(0,0,0);
+    virtual type::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
+        return type::Vector3(0,0,0);
     }
 
     PROXIMITYDATA createProximity(Index eid,CONTROL_POINT pid = CONTROL_DEFAULT) const {
@@ -106,7 +106,7 @@ public:
         return PROXIMITYDATA(eid, tetrahedron[0], tetrahedron[1], tetrahedron[2], tetrahedron[3], fact_u,fact_v,fact_w,fact_x);
     }
 
-    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, Index eid) const {
+    inline PROXIMITYDATA project(const type::Vector3 & P, Index eid) const {
         auto tetrahedron = getTetrahedron(eid);
         const TetraInfo & tinfo = getTetraInfo()[eid];
 
@@ -138,10 +138,10 @@ protected:
 
             const sofa::core::topology::BaseMeshTopology::TrianglesInTetrahedron& TIT = this->l_topology->getTrianglesInTetrahedron(t);
 
-            const defaulttype::Vector3 & p0 = pos[tri[0]];
-            const defaulttype::Vector3 & p1 = pos[tri[1]];
-            const defaulttype::Vector3 & p2 = pos[tri[2]];
-            const defaulttype::Vector3 & p3 = pos[tri[3]];
+            const type::Vector3 & p0 = pos[tri[0]];
+            const type::Vector3 & p1 = pos[tri[1]];
+            const type::Vector3 & p2 = pos[tri[2]];
+            const type::Vector3 & p3 = pos[tri[3]];
 
             vecInfo.push_back(toolBox::computeTetraInfo(p0,p1,p2,p3));
         }

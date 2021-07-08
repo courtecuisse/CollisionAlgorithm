@@ -9,15 +9,15 @@ namespace collisionAlgorithm
 {
 
 AABBBroadPhase::AABBBroadPhase()
-: d_nbox(initData(&d_nbox, defaulttype::Vec3i(8,8,8),"nbox", "number of bbox"))
+: d_nbox(initData(&d_nbox, type::Vec3i(8,8,8),"nbox", "number of bbox"))
 , d_refineBBox(initData(&d_refineBBox, false,"refine", "Optimization to project center of box in order to find the minimal set of intersecting boxes"))
 , d_static(initData(&d_static, false,"isStatic", "Optimization: object is not moving in the scene"))
 , m_staticInitDone(false)
 {
 }
 
-defaulttype::BoundingBox AABBBroadPhase::getBBox() const {
-    return defaulttype::BoundingBox(m_Bmin,m_Bmax);
+type::BoundingBox AABBBroadPhase::getBBox() const {
+    return type::BoundingBox(m_Bmin,m_Bmax);
 }
 
 void AABBBroadPhase::init()
@@ -39,12 +39,12 @@ void AABBBroadPhase::prepareDetection() {
 
     sofa::core::behavior::BaseMechanicalState * mstate = l_geometry->getState();
 
-    m_Bmin = defaulttype::Vector3(mstate->getPX(0),mstate->getPY(0),mstate->getPZ(0));
+    m_Bmin = type::Vector3(mstate->getPX(0),mstate->getPY(0),mstate->getPZ(0));
     m_Bmax = m_Bmin;
 
     //updates bounding box area
     for (unsigned j=1;j<mstate->getSize();j++) {
-        defaulttype::Vector3 pos(mstate->getPX(j),mstate->getPY(j),mstate->getPZ(j));
+        type::Vector3 pos(mstate->getPX(j),mstate->getPY(j),mstate->getPZ(j));
 
         for (int i = 0 ; i < 3 ; i++) {
             if (pos[i] > m_Bmax[i])
@@ -117,17 +117,17 @@ void AABBBroadPhase::prepareDetection() {
     for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
     {
         //std::cout << ++i << std::endl;
-        defaulttype::BoundingBox bbox;
+        type::BoundingBox bbox;
         for (int b=0;b<(*it)->elementSize();b++) {
             CONTROL_POINT c = (CONTROL_POINT) b;
             bbox.include((*it)->createProximity(c)->getPosition());
         }
 
-        const defaulttype::Vector3 & minbox = bbox.minBBox();
-        const defaulttype::Vector3 & maxbox = bbox.maxBBox();
+        const type::Vector3 & minbox = bbox.minBBox();
+        const type::Vector3 & maxbox = bbox.maxBBox();
 
-        defaulttype::Vec3i cminbox(0,0,0);
-        defaulttype::Vec3i cmaxbox(0,0,0);
+        type::Vec3i cminbox(0,0,0);
+        type::Vec3i cmaxbox(0,0,0);
 
         for (int i = 0 ; i < 3 ; i++) {
             cmaxbox[i] = ceil((maxbox[i] - m_Bmin[i])/m_cellSize[i]);
@@ -151,13 +151,13 @@ void AABBBroadPhase::prepareDetection() {
                 for (int k=cminbox[2];k<cmaxbox[2];k++)
                 {
                     if (refine) { // project the point on the element in order to know if the box is empty
-                        defaulttype::Vector3 P = m_Bmin + m_cellSize*0.5;
+                        type::Vector3 P = m_Bmin + m_cellSize*0.5;
 
                         P[0] += i*m_cellSize[0];
                         P[1] += j*m_cellSize[1];
                         P[2] += k*m_cellSize[2];
 
-                        defaulttype::Vector3 D = P - it->project(P)->getPosition();
+                        type::Vector3 D = P - it->project(P)->getPosition();
 
                         if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
                             (fabs(D[1])<=m_cellSize[1]*0.5) &&
@@ -189,20 +189,20 @@ void AABBBroadPhase::draw(const core::visual::VisualParams * vparams) {
         unsigned j = (eid - i*m_offset[0]) / m_offset[1];
         unsigned k = (eid - i*m_offset[0] - j*m_offset[1]);
 
-        defaulttype::Vector3 min = m_Bmin + defaulttype::Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-        defaulttype::Vector3 max = m_Bmin + defaulttype::Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
-        defaulttype::BoundingBox bbox(min,max);
+        type::Vector3 min = m_Bmin + type::Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
+        type::Vector3 max = m_Bmin + type::Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
+        type::BoundingBox bbox(min,max);
 
-        defaulttype::Vector3 points[8];
+        type::Vector3 points[8];
 
-        points[0] = defaulttype::Vector3(bbox.minBBox()[0], bbox.minBBox()[1], bbox.minBBox()[2]);
-        points[1] = defaulttype::Vector3(bbox.maxBBox()[0], bbox.minBBox()[1], bbox.minBBox()[2]);
-        points[2] = defaulttype::Vector3(bbox.minBBox()[0], bbox.maxBBox()[1], bbox.minBBox()[2]);
-        points[3] = defaulttype::Vector3(bbox.maxBBox()[0], bbox.maxBBox()[1], bbox.minBBox()[2]);
-        points[4] = defaulttype::Vector3(bbox.minBBox()[0], bbox.minBBox()[1], bbox.maxBBox()[2]);
-        points[5] = defaulttype::Vector3(bbox.maxBBox()[0], bbox.minBBox()[1], bbox.maxBBox()[2]);
-        points[6] = defaulttype::Vector3(bbox.minBBox()[0], bbox.maxBBox()[1], bbox.maxBBox()[2]);
-        points[7] = defaulttype::Vector3(bbox.maxBBox()[0], bbox.maxBBox()[1], bbox.maxBBox()[2]);
+        points[0] = type::Vector3(bbox.minBBox()[0], bbox.minBBox()[1], bbox.minBBox()[2]);
+        points[1] = type::Vector3(bbox.maxBBox()[0], bbox.minBBox()[1], bbox.minBBox()[2]);
+        points[2] = type::Vector3(bbox.minBBox()[0], bbox.maxBBox()[1], bbox.minBBox()[2]);
+        points[3] = type::Vector3(bbox.maxBBox()[0], bbox.maxBBox()[1], bbox.minBBox()[2]);
+        points[4] = type::Vector3(bbox.minBBox()[0], bbox.minBBox()[1], bbox.maxBBox()[2]);
+        points[5] = type::Vector3(bbox.maxBBox()[0], bbox.minBBox()[1], bbox.maxBBox()[2]);
+        points[6] = type::Vector3(bbox.minBBox()[0], bbox.maxBBox()[1], bbox.maxBBox()[2]);
+        points[7] = type::Vector3(bbox.maxBBox()[0], bbox.maxBBox()[1], bbox.maxBBox()[2]);
 
 
 //        if (vparams->displayFlags().getShowWireFrame()) {

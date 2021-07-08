@@ -16,15 +16,15 @@ public:
 
     SOFA_CLASS(SOFA_TEMPLATE(VectorPointNormalHandler,GEOMETRY), Inherit);
 
-    Data<helper::vector<defaulttype::Vector3>> d_normals;
+    Data<sofa::type::vector<type::Vector3>> d_normals;
 
     VectorPointNormalHandler()
     : d_normals(initData(&d_normals, "normals", "Vector of normals")) {}
 
-    virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const {
+    virtual type::Vector3 computeNormal(const PROXIMITYDATA & data) const {
         if(data.m_eid < d_normals.getValue().size()) return d_normals.getValue()[data.m_eid];
         if(d_normals.getValue().size()==1) return d_normals.getValue()[0];
-        return defaulttype::Vector3();
+        return type::Vector3();
     }
 
     virtual void updateNormals() override {}

@@ -18,13 +18,13 @@ public:
     SOFA_CLASS(GEOMETRY,Inherit);
 
     Data<double> d_drawRadius;
-    Data<sofa::helper::vector<defaulttype::Vector3> > d_position;
-    Data<sofa::helper::vector<defaulttype::Vector3> > d_normals;
+    Data<sofa::type::vector<type::Vector3> > d_position;
+    Data<sofa::type::vector<type::Vector3> > d_normals;
 
     FixedGeometry()
     : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing"))
-    , d_position(initData(&d_position,sofa::helper::vector<defaulttype::Vector3>(), "position","normals"))
-    , d_normals(initData(&d_normals,sofa::helper::vector<defaulttype::Vector3>(), "normals","normals"))
+    , d_position(initData(&d_position,sofa::type::vector<type::Vector3>(), "position","normals"))
+    , d_normals(initData(&d_normals,sofa::type::vector<type::Vector3>(), "normals","normals"))
     {}
 
     inline BaseElementIterator::UPtr begin(Index eid = 0) const override {
@@ -43,7 +43,7 @@ public:
         if (color[3] == 0.0) return;
         if (d_drawRadius.getValue() == 0.0) return;
 
-        const helper::vector<defaulttype::Vector3> & pos = d_position.getValue();
+        const sofa::type::vector<type::Vector3> & pos = d_position.getValue();
 
         glColor4f(color[0],color[1],color[2],color[3]);
 
@@ -53,7 +53,7 @@ public:
     }
 
     inline FixedProximity createProximity(Index eid, int /*pid*/ = -1) const {
-        const helper::vector<defaulttype::Vector3> & pos = d_position.getValue();
+        const sofa::type::vector<type::Vector3> & pos = d_position.getValue();
 
         if(d_normals.getValue().size()>eid)
             return FixedProximity(pos[eid],d_normals.getValue()[eid]);
@@ -62,8 +62,8 @@ public:
     }
 
     //do not change the dataProximity.
-    inline FixedProximity project(const defaulttype::Vector3 & /*Q*/, Index pid) const {
-        const helper::vector<defaulttype::Vector3> & pos = d_position.getValue();
+    inline FixedProximity project(const type::Vector3 & /*Q*/, Index pid) const {
+        const sofa::type::vector<type::Vector3> & pos = d_position.getValue();
 
         if(d_normals.getValue().size()>pid)
             return FixedProximity(pos[pid],d_normals.getValue()[pid]);
@@ -71,15 +71,15 @@ public:
             return FixedProximity(pos[pid]);
     }
 
-    inline defaulttype::Vector3 getPosition(const FixedProximity & data, core::VecCoordId v) const {
+    inline type::Vector3 getPosition(const FixedProximity & data, core::VecCoordId v) const {
         return data.getPosition(v);
     }
 
-    inline defaulttype::Vector3 getNormal(const FixedProximity & data) const {
+    inline type::Vector3 getNormal(const FixedProximity & data) const {
         return data.m_normal;
     }
 
-    inline void buildJacobianConstraint(const FixedProximity & data, core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, Index constraintId) const {
+    inline void buildJacobianConstraint(const FixedProximity & data, core::MultiMatrixDerivId cId, const sofa::type::vector<type::Vector3> & normals, double fact, Index constraintId) const {
         data.buildJacobianConstraint(cId,normals,fact,constraintId);
     }
 

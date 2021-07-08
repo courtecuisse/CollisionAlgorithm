@@ -21,7 +21,7 @@ public:
     }
 
     virtual void updateNormals() override {
-        m_gcenter = defaulttype::Vector3();
+        m_gcenter = type::Vector3();
         unsigned size = 0;
         for (auto it = this->l_geometry->begin();it!=this->l_geometry->end();it++) {
             m_gcenter += it->createProximity()->getPosition();
@@ -32,13 +32,13 @@ public:
     }
 
 
-    defaulttype::Vector3 computeNormal(const PointProximity & data) const override {
+    type::Vector3 computeNormal(const PointProximity & data) const override {
         const helper::ReadAccessor<DataVecCoord> & pos = this->l_geometry->getState()->read(core::VecCoordId::position());
         return (pos[data.m_eid] - m_gcenter).normalized();
     }
 
 private :
-    defaulttype::Vector3 m_gcenter;
+    type::Vector3 m_gcenter;
 };
 
 }

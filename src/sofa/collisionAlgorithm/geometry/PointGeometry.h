@@ -59,17 +59,17 @@ public:
     }
 
     //do not change the dataProximity.
-    inline PROXIMITYDATA project(const defaulttype::Vector3 & /*Q*/, Index eid) const {
+    inline PROXIMITYDATA project(const type::Vector3 & /*Q*/, Index eid) const {
         return PROXIMITYDATA(eid);
     }
 
-    inline defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v) const {
+    inline type::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
         return pos[data.m_eid];
     }
 
-    virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
-        return defaulttype::Vector3();
+    virtual type::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
+        return type::Vector3();
     }
 };
 

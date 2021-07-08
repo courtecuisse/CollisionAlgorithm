@@ -7,6 +7,7 @@
 #include <sofa/core/ConstraintParams.h>
 #include <sofa/core/behavior/MechanicalState.h>
 #include <sofa/core/topology/Topology.h>
+#include <sofa/type/Vec.h>
 
 namespace sofa
 {
@@ -33,7 +34,7 @@ public:
 
     MBaseIterator(sofa::defaulttype::BaseMatrix * M, Index row) : m_J(M), m_row(row) {}
 
-    void addCol(Index c, const defaulttype::Vector3 & N) {
+    void addCol(Index c, const sofa::type::Vector3 & N) {
         if(N[1] == 0.0){
             double v = N[0];
             m_J->add(m_row, c, v);
@@ -63,12 +64,12 @@ public :
     typedef std::shared_ptr<BaseProximity> SPtr;
 
     /// return proximiy position in a vector3
-    virtual defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
+    virtual sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
 
     /// return normal in a vector3
-    virtual defaulttype::Vector3 getNormal() const = 0;
+    virtual sofa::type::Vector3 getNormal() const = 0;
 
-    virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & dir, double fact, Index constraintId) const = 0;
+    virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const = 0;
 
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const = 0;
 
@@ -109,15 +110,15 @@ public:
     : m_geometry(container)
     , m_data(data) {}
 
-    defaulttype::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
+    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
         return m_geometry->getPosition(m_data,v);
     }
 
-    defaulttype::Vector3 getNormal() const override {
+    sofa::type::Vector3 getNormal() const override {
         return m_geometry->getNormal(m_data);
     }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, Index constraintId) const {
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & normals, double fact, Index constraintId) const {
         m_geometry->buildJacobianConstraint(m_data,cId,normals,fact,constraintId);
     }
 
@@ -135,8 +136,8 @@ public:
 
     void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_prox, double fact, const bool expand) const{
         MBaseIterator J_iterator(J_prox, cId);
-        defaulttype::Vector3 N(1,0,0);
-        if(expand) N = defaulttype::Vector3(1,1,1);
+        sofa::type::Vector3 N(1,0,0);
+        if(expand) N = sofa::type::Vector3(1,1,1);
         m_data.addContributions(J_iterator, N*fact);
     }
 

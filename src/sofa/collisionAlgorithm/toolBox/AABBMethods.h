@@ -11,7 +11,7 @@ namespace collisionAlgorithm {
 
 namespace toolBox {
 
-void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, defaulttype::Vec3i cbox, std::set<BaseProximity::Index> & selectElements, int d) ;
+void fillElementSet(const BaseGeometry::BroadPhase::SPtr decorator, type::Vec3i cbox, std::set<BaseProximity::Index> & selectElements, int d) ;
 
 BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo,
                                          std::function<bool(const collisionAlgorithm::PairDetection & )> acceptFilter = noFilter,

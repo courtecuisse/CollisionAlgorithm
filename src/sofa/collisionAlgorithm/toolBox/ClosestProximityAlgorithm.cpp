@@ -14,7 +14,7 @@ BaseProximity::SPtr doFindClosestProximityIt(const BaseProximity::SPtr & pfrom, 
 
     double min_dist = std::numeric_limits<double>::max();
     BaseProximity::SPtr minprox_dest = nullptr;
-    defaulttype::Vector3 P = pfrom->getPosition();
+    type::Vector3 P = pfrom->getPosition();
 
     while (! begin->end()) {
         BaseProximity::SPtr pdest = begin->project(P);

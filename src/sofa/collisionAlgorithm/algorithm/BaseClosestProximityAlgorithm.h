@@ -29,7 +29,7 @@ public:
 
     PairDetection findClosestPoint(const BaseElementIterator *itfrom, BaseGeometry *geo) {
         BaseProximity::SPtr pfrom = itfrom->createProximity();
-        defaulttype::Vector3 prevPos = pfrom->getPosition();
+        type::Vector3 prevPos = pfrom->getPosition();
         BaseProximity::SPtr pdest = m_searchMethod(pfrom,geo);
 
         if (pfrom == NULL || pdest == NULL) return PairDetection(pfrom,pdest);

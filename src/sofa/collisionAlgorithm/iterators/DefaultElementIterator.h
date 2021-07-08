@@ -38,7 +38,7 @@ public:
         return m_it;
     }
 
-    BaseProximity::SPtr project(const defaulttype::Vector3 & P) const override {
+    BaseProximity::SPtr project(const type::Vector3 & P) const override {
         return createSPtr(m_geometry,
                           m_geometry->project(P, m_it));
     }
@@ -69,7 +69,7 @@ public:
 typedef BaseGeometry::Index Index;
 
     template<class GEOMETRY, class ELEMENT>
-    static BaseElementIterator::UPtr create(const GEOMETRY * c, const helper::vector<ELEMENT> & elmt, Index start = 0) {
+    static BaseElementIterator::UPtr create(const GEOMETRY * c, const sofa::type::vector<ELEMENT> & elmt, Index start = 0) {
         return BaseElementIterator::UPtr(new TDefaultElementIterator<GEOMETRY, PROXIMITYDATA, PROXIMITYDATA::nbControlPoints()>(c, elmt.size(), start));
     }
 

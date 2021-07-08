@@ -26,7 +26,7 @@ public:
     typedef Data<VecCoord> DataVecCoord;
     typedef sofa::topology::Triangle Triangle;
     typedef size_t TriangleID; // to remove once TriangleID has been changed to size_t in BaseMeshTopology
-    typedef helper::vector<Triangle> VecTriangles;
+    typedef sofa::type::vector<Triangle> VecTriangles;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
@@ -35,7 +35,7 @@ public:
     Data <double> d_nonlin_threshold;
     Data <double> d_delta;
 
-    Data<helper::vector<Element> > d_elements;
+    Data<sofa::type::vector<Element> > d_elements;
 
     GenericGeometry()
     : d_nonlin_max_it(initData(&d_nonlin_max_it,(Index) 20,"nonlin_max_it", "number of iterations"))
@@ -48,9 +48,9 @@ public:
         return DefaultElementIterator<PROXIMITYDATA>::create(this, d_elements.getValue(), eid);
     }
 
-    inline defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
+    inline type::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
-        defaulttype::Vector3 P;
+        type::Vector3 P;
         for (Index i=0;i<data.m_prox.size();i++) {
             P += pos[data.m_prox[i].first] * data.m_prox[i].second;
         }
@@ -83,23 +83,23 @@ public:
         return m_inverse;
     }
 
-    virtual defaulttype::Vector3 computeNormal(const PROXIMITYDATA & /*data*/) const override {
-        return defaulttype::Vector3();
+    virtual type::Vector3 computeNormal(const PROXIMITYDATA & /*data*/) const override {
+        return type::Vector3();
     }
 
-    inline PROXIMITYDATA project(defaulttype::Vector3 Q, Index eid) const {
+    inline PROXIMITYDATA project(type::Vector3 Q, Index eid) const {
         double delta = d_delta.getValue();
 
         PROXIMITYDATA result = createProximity(eid);
 
         const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
 
-        helper::vector<bool> usePoints(static_cast<int>(Element::size()), true);
+        sofa::type::vector<bool> usePoints(static_cast<int>(Element::size()), true);
 
         Index it = 0;
         while (it< d_nonlin_max_it.getValue()) {
-            defaulttype::Vector3 P = getPosition(result);
-            defaulttype::Vector3 PQ = Q-P;
+            type::Vector3 P = getPosition(result);
+            type::Vector3 PQ = Q-P;
 
             //pair : index of control point <-> normals i.e. direction between the current point P and the control points of the element
             std::vector<std::pair<Index,Coord> > normals;
@@ -128,7 +128,7 @@ public:
 
             //Compute jacobian
             for (Index j=0;j<JLin;j++) {
-                const defaulttype::Vector3 RQ = PQ + normals[j].second * delta;
+                const type::Vector3 RQ = PQ + normals[j].second * delta;
                 for (Index i=0;i<JLin;i++) {
                     const double fxdx = dot(RQ, normals[i].second);
                     J(i,j) = (e0(i) - fxdx) / delta;

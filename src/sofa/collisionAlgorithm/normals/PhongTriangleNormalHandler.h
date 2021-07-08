@@ -18,7 +18,7 @@ public:
 
     SOFA_CLASS(SOFA_TEMPLATE(PhongTriangleNormalHandler,GEOMETRY), Inherit);
 
-    defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
+    type::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
         return m_point_normals[data.m_p0] * data.m_f0 +
                m_point_normals[data.m_p1] * data.m_f1 +
                m_point_normals[data.m_p2] * data.m_f2;
@@ -36,7 +36,7 @@ public:
 
         for (size_t p=0;p<m_point_normals.size();p++) {
             const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav = this->l_geometry->l_topology->getTrianglesAroundVertex(p);
-            m_point_normals[p] = defaulttype::Vector3(0,0,0);
+            m_point_normals[p] = type::Vector3(0,0,0);
             for (size_t t=0;t<tav.size();t++) {
                 m_point_normals[p] += m_triangle_normals[tav[t]];
             }
@@ -45,8 +45,8 @@ public:
     }
 
 protected:
-    helper::vector<defaulttype::Vector3> m_triangle_normals;
-    helper::vector<defaulttype::Vector3> m_point_normals;
+    sofa::type::vector<type::Vector3> m_triangle_normals;
+    sofa::type::vector<type::Vector3> m_point_normals;
 
 };
 

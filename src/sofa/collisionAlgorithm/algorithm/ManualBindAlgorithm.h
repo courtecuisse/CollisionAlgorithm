@@ -17,8 +17,8 @@ public:
     core::objectmodel::SingleLink<ManualBindAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
     core::objectmodel::SingleLink<ManualBindAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
 
-    Data<helper::vector<int> > d_bindFrom;
-    Data<helper::vector<int> > d_bindDest;
+    Data<sofa::type::vector<int> > d_bindFrom;
+    Data<sofa::type::vector<int> > d_bindDest;
 
     Data<bool> d_project ;
     Data<int> d_controlPointFrom ;

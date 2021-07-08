@@ -20,16 +20,16 @@ public:
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef size_t TriangleID;
     typedef sofa::topology::Triangle Triangle;
-    typedef helper::vector<Triangle> VecTriangles;
+    typedef sofa::type::vector<Triangle> VecTriangles;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
     typedef struct
     {
-        defaulttype::Vector3 p300,p030,p003;
-        defaulttype::Vector3 p210,p120,p021,p012,p102,p201,p111;
-        defaulttype::Vector3 n110,n011,n101;
-        defaulttype::Vector3 n200,n020,n002;
+        type::Vector3 p300,p030,p003;
+        type::Vector3 p210,p120,p021,p012,p102,p201,p111;
+        type::Vector3 n110,n011,n101;
+        type::Vector3 n200,n020,n002;
     } BezierTriangleInfo;
 
     core::objectmodel::SingleLink<GEOMETRY,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
@@ -56,7 +56,7 @@ public:
         m_bezier_info.clear();
     }
 
-    void tesselate(Index level,int tid, const defaulttype::Vector3 & bary_A,const defaulttype::Vector3 & bary_B, const defaulttype::Vector3 & bary_C) {
+    void tesselate(Index level,int tid, const type::Vector3 & bary_A,const type::Vector3 & bary_B, const type::Vector3 & bary_C) {
         if (level >= d_draw_tesselation.getValue()) {
 
             const Triangle& triangle = this->l_topology->getTriangle(tid);
@@ -80,11 +80,11 @@ public:
             return;
         }
 
-        defaulttype::Vector3 bary_D = (bary_A + bary_B)/2.0;
-        defaulttype::Vector3 bary_E = (bary_A + bary_C)/2.0;
-        defaulttype::Vector3 bary_F = (bary_B + bary_C)/2.0;
+        type::Vector3 bary_D = (bary_A + bary_B)/2.0;
+        type::Vector3 bary_E = (bary_A + bary_C)/2.0;
+        type::Vector3 bary_F = (bary_B + bary_C)/2.0;
 
-        defaulttype::Vector3 bary_G = (bary_A + bary_B + bary_C)/3.0;
+        type::Vector3 bary_G = (bary_A + bary_B + bary_C)/3.0;
 
         tesselate(level+1,tid,bary_A,bary_D,bary_G);
         tesselate(level+1,tid,bary_D,bary_B,bary_G);
@@ -109,7 +109,7 @@ public:
 
         glBegin(GL_TRIANGLES);
         for (auto it = this->begin();it != this->end();it++) {
-            tesselate(0, it->id() , defaulttype::Vector3(1,0,0),defaulttype::Vector3(0,1,0),defaulttype::Vector3(0,0,1));
+            tesselate(0, it->id() , type::Vector3(1,0,0),type::Vector3(0,1,0),type::Vector3(0,0,1));
         }
         glEnd();
     }
@@ -118,7 +118,7 @@ public:
         return this->l_topology->getTriangle(eid);
     }
 
-    inline PROXIMITYDATA project(const defaulttype::Vector3 & P, Index eid) const {
+    inline PROXIMITYDATA project(const type::Vector3 & P, Index eid) const {
         auto triangle = getTriangle(eid);
 
         Index max_it = d_nonlin_max_it.getValue();
@@ -139,24 +139,24 @@ public:
         auto pinfo = PROXIMITYDATA(eid,triangle[0],triangle[1],triangle[2],fact_u,fact_v,fact_w);
 
         while(it< max_it) {
-            defaulttype::Vector3 Q = getPosition(pinfo);
+            type::Vector3 Q = getPosition(pinfo);
 
-            defaulttype::Vector3 nQP = P - Q;
+            type::Vector3 nQP = P - Q;
             if (nQP.norm() < tolerance) break;
             nQP.normalize();
 
-            defaulttype::Vector3 N1 = this->getNormal(pinfo);
+            type::Vector3 N1 = this->getNormal(pinfo);
             N1.normalize();
 
             if (pinfo.m_f0 < 0 || pinfo.m_f1 < 0 || pinfo.m_f2 < 0) break;
 
-            defaulttype::Vector3 N2 = cross(N1,((fabs(dot(N1,defaulttype::Vector3(1,0,0)))>0.99) ? defaulttype::Vector3(0,1,0) : defaulttype::Vector3(1,0,0)));
+            type::Vector3 N2 = cross(N1,((fabs(dot(N1,type::Vector3(1,0,0)))>0.99) ? type::Vector3(0,1,0) : type::Vector3(1,0,0)));
             N2.normalize();
 
-            defaulttype::Vector3 N3 = cross(N1,N2);
+            type::Vector3 N3 = cross(N1,N2);
             N3.normalize();
 
-            defaulttype::Vector2 e_0(dot(nQP,N2),dot(nQP,N3));
+            type::Vector2 e_0(dot(nQP,N2),dot(nQP,N3));
 
             if(e_0.norm() < tolerance) break;
 
@@ -170,8 +170,8 @@ public:
             if (P_v_fact0 < 0 || P_v_fact1 < 0 || P_v_fact2 < 0) break;
 
             PROXIMITYDATA P_v(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_v_fact0, P_v_fact1, P_v_fact2);
-            defaulttype::Vector3 p_v = (P - getPosition(P_v)).normalized();
-            defaulttype::Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
+            type::Vector3 p_v = (P - getPosition(P_v)).normalized();
+            type::Vector2 e_v(dot(p_v,N2)*fact_v,dot(p_v,N3)*fact_v);
 
             //variation point along u
             double P_u_fact0 = pinfo.m_f0;
@@ -180,10 +180,10 @@ public:
             if (P_u_fact0 < 0 || P_u_fact1 < 0 || P_u_fact2 < 0) break;
 
             PROXIMITYDATA P_u(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_u_fact0,P_u_fact1,P_u_fact2);
-            defaulttype::Vector3 p_u = (P - getPosition(P_u)).normalized();
-            defaulttype::Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
+            type::Vector3 p_u = (P - getPosition(P_u)).normalized();
+            type::Vector2 e_u(dot(p_u,N2)*fact_u,dot(p_u,N3)*fact_u);
 
-            defaulttype::Mat2x2d J, invJ;
+            type::Mat2x2d J, invJ;
             J[0][0] = (e_v[0] - e_0[0])/delta;
             J[1][0] = (e_v[1] - e_0[1])/delta;
             J[0][1] = (e_u[0] - e_0[0])/delta;
@@ -192,7 +192,7 @@ public:
             invertMatrix(invJ, J);
 
             // dUV is the optimal direction
-            defaulttype::Vector2 dUV = -invJ * e_0;
+            type::Vector2 dUV = -invJ * e_0;
             if(dUV.norm() < threshold) break;
 
             //bary coords of the solution of the 2D problem
@@ -201,7 +201,7 @@ public:
             double sol_w = 1.0 - sol_u - sol_v;
 
             // we now search what is the optimal displacmeent along this path
-            defaulttype::Vector3 dir2d(sol_v - pinfo.m_f0,
+            type::Vector3 dir2d(sol_v - pinfo.m_f0,
                                        sol_u - pinfo.m_f1,
                                        sol_w - pinfo.m_f2);
 
@@ -218,7 +218,7 @@ public:
             if (P_a_fact0 < 0 ||P_a_fact1 < 0 || P_a_fact2 < 0) break;
 
             PROXIMITYDATA P_a(eid, pinfo.m_p0,pinfo.m_p1,pinfo.m_p2, P_a_fact0,P_a_fact1,P_a_fact2);
-            defaulttype::Vector3 QA = getPosition(P_a);
+            type::Vector3 QA = getPosition(P_a);
 
             double fact;
             if (fabs(dot(nQP,N1))>0.8) {
@@ -227,7 +227,7 @@ public:
                 double j = (fxdx - fx) / delta;
                 fact = -fx / j;
             } else {
-                defaulttype::Vector3 nQA = (Q-QA).normalized();
+                type::Vector3 nQA = (Q-QA).normalized();
                 double fx = dot(P-Q, nQA);
                 double fxdx = dot(P-QA, nQA);
                 double j = (fxdx - fx) / delta;
@@ -257,18 +257,18 @@ public:
     }
 
     // Force use of the function to compute the normal (not the normal handler)
-    defaulttype::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
+    type::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
         auto tbinfo = getBezierInfo()[data.m_eid];
 
-        const defaulttype::Vector3 &n200 = tbinfo.n200;
-        const defaulttype::Vector3 &n020 = tbinfo.n020;
-        const defaulttype::Vector3 &n002 = tbinfo.n002;
+        const type::Vector3 &n200 = tbinfo.n200;
+        const type::Vector3 &n020 = tbinfo.n020;
+        const type::Vector3 &n002 = tbinfo.n002;
 
         double fact_w = data.m_f2;
         double fact_u = data.m_f1;
         double fact_v = data.m_f0;
 
-        defaulttype::Vector3 normal = n200 * fact_w*fact_w +
+        type::Vector3 normal = n200 * fact_w*fact_w +
                                       n020 * fact_u*fact_u +
                                       n002 * fact_v*fact_v +
                                       tbinfo.n110 * fact_w*fact_u +
@@ -280,14 +280,14 @@ public:
 
     ////Bezier triangle are computed according to :
     ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
-    inline defaulttype::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
+    inline type::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
         const BezierTriangleInfo & tbinfo = getBezierInfo(v)[data.m_eid];
 
         const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(v);
 
-        const defaulttype::Vector3 & p300 = x[data.m_p2];
-        const defaulttype::Vector3 & p030 = x[data.m_p1];
-        const defaulttype::Vector3 & p003 = x[data.m_p0];
+        const type::Vector3 & p300 = x[data.m_p2];
+        const type::Vector3 & p030 = x[data.m_p1];
+        const type::Vector3 & p003 = x[data.m_p0];
 
         double fact_w = data.m_f2;
         double fact_u = data.m_f1;
@@ -321,7 +321,7 @@ protected:
     void recomputeBezierInfo(core::VecCoordId v = core::VecCoordId::position()) const {
         std::vector<BezierTriangleInfo> & vecInfo = m_bezier_info[v.getIndex()];
 
-        const helper::vector<Triangle>& triangles = this->l_topology->getTriangles();
+        const sofa::type::vector<Triangle>& triangles = this->l_topology->getTriangles();
         const helper::ReadAccessor<DataVecCoord> & x = this->getState()->read(v);
 
         vecInfo.clear();
@@ -329,9 +329,9 @@ protected:
         {
             const Triangle& triangle = this->l_topology->getTriangle(t);
 
-            defaulttype::Vector3 n200;
-            defaulttype::Vector3 n020;
-            defaulttype::Vector3 n002;
+            type::Vector3 n200;
+            type::Vector3 n020;
+            type::Vector3 n002;
 
             std::cerr << "recomputeBezierInfo needs to compute point normals" << std::endl;
             const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav0 = this->l_topology->getTrianglesAroundVertex(triangle[2]);
@@ -370,8 +370,8 @@ protected:
             tbinfo.p102 = (tbinfo.p003*2.0 + tbinfo.p300 - n002 * w31) / 3.0;
             tbinfo.p201 = (tbinfo.p300*2.0 + tbinfo.p003 - n200 * w13) / 3.0;
 
-            defaulttype::Vector3 E = (tbinfo.p210+tbinfo.p120+tbinfo.p102+tbinfo.p201+tbinfo.p021+tbinfo.p012) / 6.0;
-            defaulttype::Vector3 V = (tbinfo.p300+tbinfo.p030+tbinfo.p003) / 3.0;
+            type::Vector3 E = (tbinfo.p210+tbinfo.p120+tbinfo.p102+tbinfo.p201+tbinfo.p021+tbinfo.p012) / 6.0;
+            type::Vector3 V = (tbinfo.p300+tbinfo.p030+tbinfo.p003) / 3.0;
             tbinfo.p111 =  E + (E-V) / 2.0;
 
             //Compute Bezier Normals
@@ -379,9 +379,9 @@ protected:
             double v23 = 2 * dot(tbinfo.p003-tbinfo.p030,n020+n002) / dot(tbinfo.p003-tbinfo.p030,tbinfo.p003-tbinfo.p030);
             double v31 = 2 * dot(tbinfo.p300-tbinfo.p003,n002+n200) / dot(tbinfo.p300-tbinfo.p003,tbinfo.p300-tbinfo.p003);
 
-            defaulttype::Vector3 h110 = n200 + n020 - (tbinfo.p030-tbinfo.p300) * v12;
-            defaulttype::Vector3 h011 = n020 + n002 - (tbinfo.p003-tbinfo.p030) * v23;
-            defaulttype::Vector3 h101 = n002 + n200 - (tbinfo.p300-tbinfo.p003) * v31;
+            type::Vector3 h110 = n200 + n020 - (tbinfo.p030-tbinfo.p300) * v12;
+            type::Vector3 h011 = n020 + n002 - (tbinfo.p003-tbinfo.p030) * v23;
+            type::Vector3 h101 = n002 + n200 - (tbinfo.p300-tbinfo.p003) * v31;
 
             tbinfo.n110 = h110 / h110.norm();
             tbinfo.n011 = h011 / h011.norm();

@@ -60,7 +60,7 @@ public:
 
             virtual void next() {}
 
-            virtual BaseProximity::SPtr project(const defaulttype::Vector3 &) const override { return NULL; }
+            virtual BaseProximity::SPtr project(const sofa::type::Vector3 &) const override { return NULL; }
 
             virtual BaseProximity::SPtr createProximity(CONTROL_POINT id = CONTROL_DEFAULT) const override { return NULL; }
 
@@ -76,7 +76,7 @@ public:
 
     virtual void next() = 0;
 
-    virtual BaseProximity::SPtr project(const defaulttype::Vector3 & P) const = 0;
+    virtual BaseProximity::SPtr project(const sofa::type::Vector3 & P) const = 0;
 
     virtual BaseProximity::SPtr createProximity(CONTROL_POINT id = CONTROL_DEFAULT) const = 0;
 
