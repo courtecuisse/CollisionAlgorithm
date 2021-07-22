@@ -21,8 +21,8 @@ public:
         return CONTROL_1;
     }
 
-    defaulttype::Vector3 getPosition(core::VecCoordId v) const {
-        defaulttype::Vector3 position = defaulttype::Vector3(0,0,0);
+    type::Vector3 getPosition(core::VecCoordId v) const {
+        type::Vector3 position = type::Vector3(0,0,0);
         if (!m_list.size()) return (position);
         else{
             for(auto& prox : m_list){
@@ -32,8 +32,8 @@ public:
         }
     }
 
-   defaulttype::Vector3 getNormal() const {
-       defaulttype::Vector3 normal = defaulttype::Vector3(0,0,0);
+   type::Vector3 getNormal() const {
+       type::Vector3 normal = type::Vector3(0,0,0);
        if (!m_list.size()) return (normal);
        else{
            for(auto& prox : m_list){
@@ -43,10 +43,11 @@ public:
        }
     }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const helper::vector<defaulttype::Vector3> & normals, double fact, Index constraintId) const {
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const type::vector<type::Vector3> & normals, double fact, Index constraintId) const {
         // normals.size() == 1 because 1dof in FrictionProximity
-        helper::vector<defaulttype::Vector3> subNormals = {defaulttype::Vector3(0,0,0)};
-        subNormals[0] = normals[0]/m_list.size();
+        type::vector<type::Vector3> subNormals = {type::Vector3(0,0,0)};
+        subNormals[0] = normals[0]/m_list.size
+                                     ();
         for(auto& prox : m_list){
             std::cout<<"subNormals.size() = "<<subNormals.size()<<std::endl;
             std::cout<<"cId = "<<cId<<std::endl;
