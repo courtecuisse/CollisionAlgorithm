@@ -43,7 +43,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/ignored")
 
 set_source_files_properties(${IGNORED_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${IGNORED_FILES} ${DEPRECATED_FILES} ${README_FILES} )
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${IGNORED_FILES} ${DEPRECATED_FILES} ${README_FILES} src/sofa/collisionAlgorithm/filters/SubsetFilter.cpp src/sofa/collisionAlgorithm/filters/SubsetFilter.h src/sofa/collisionAlgorithm/proximity/FrictionProximity.h)
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DPLUGIN_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\"")
 target_link_libraries(${PROJECT_NAME} SofaSimulationCommon Sofa.GL)
 

@@ -11,9 +11,9 @@ namespace collisionAlgorithm {
 SOFA_DECL_CLASS(VectorPointNormalHandler)
 
 int VectorPointNormalHandlerClass = core::RegisterObject("Default implementation of normal computation for point geometry")
+.add< VectorPointNormalHandler<TBaseGeometry<sofa::defaulttype::Vec3dTypes,TriangleProximity> > >(true)
 .add< VectorPointNormalHandler<TBaseGeometry<sofa::defaulttype::Vec3dTypes,PointProximity> > >()
-.add< VectorPointNormalHandler<TBaseGeometry<sofa::defaulttype::Vec3dTypes,EdgeProximity> > >()
-.add< VectorPointNormalHandler<TBaseGeometry<sofa::defaulttype::Vec3dTypes,TriangleProximity> > >();
+.add< VectorPointNormalHandler<TBaseGeometry<sofa::defaulttype::Vec3dTypes,EdgeProximity> > >();
 
 }
 
