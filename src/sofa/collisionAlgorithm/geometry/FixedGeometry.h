@@ -36,6 +36,8 @@ public:
     }
 
     void draw(const core::visual::VisualParams *vparams) override {
+        if(!this->d_draw.getValue()) return;
+
 //        if (! vparams->displayFlags().getShowCollisionModels()) return;
         if (! vparams->displayFlags().getShowCollisionModels()) return ;
 

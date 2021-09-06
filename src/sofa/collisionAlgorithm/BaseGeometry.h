@@ -74,10 +74,12 @@ public:
 
     Data<sofa::type::RGBAColor> d_color;
     Data<double> d_drawScaleNormal;
+    Data<bool> d_draw;
 
     BaseGeometry()
     : d_color(initData(&d_color, sofa::type::RGBAColor(1,0,1,1), "color", "Color of the collision model"))
-    , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model")) {
+    , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model"))
+    , d_draw(initData(&d_draw, true, "draw", "draw")) {
         this->f_listening.setValue(true);
     }
 

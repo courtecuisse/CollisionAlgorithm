@@ -40,9 +40,9 @@ public:
     }
 
     void draw(const core::visual::VisualParams * vparams) {
+        if (! (this->d_draw.getValue())) return;
         this->drawNormals(vparams);
 
-        //        if (! vparams->displayFlags().getShowCollisionModels()) return;
         if (! vparams->displayFlags().getShowCollisionModels()) return ;
         const sofa::type::RGBAColor & color = this->d_color.getValue();
         if (color[3] == 0.0) return;
