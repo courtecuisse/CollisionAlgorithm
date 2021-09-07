@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Node name="Root" >
+
+	<RequiredPlugin pluginName="CollisionAlgorithm"/>
+	<RequiredPlugin pluginName="ConstraintGeometry"/>
+
+
+	<VisualStyle displayFlags="showCollisionModels" />
+	<DefaultPipeline />
+
+
+
+	<Node name="FROM">
+		<MechanicalObject name="State3D" position="0 0 0   1 0 0   0 1 0 " />
+		<PointGeometry name="geom" drawRadius="0.1" />
+	</Node>
+
+	<Node name="DEST">
+		<MechanicalObject name="State3D" position=" 0.7 1 0  0.5 0.5 0.5" />
+		<PointGeometry name="geom" drawRadius="0.1" color="0 150 150 255" />
+	</Node>
+
+	<FindUniqueClosestProximityAlgorithm name="algo" from="@FROM/geom" dest="@DEST/geom"  />
+</Node>
