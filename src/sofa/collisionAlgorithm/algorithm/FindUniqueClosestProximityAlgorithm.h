@@ -81,24 +81,36 @@ public:
             double min_dist = std::numeric_limits<double>::max();
             collisionAlgorithm::PairDetection min_pair(NULL,NULL);
             empty = true;
+            //For each remaining element of 'from' that haven't been paired : find in the minimum distance pair among
+            // all the 'from' points. Because of the sort, only comparing the smallest pair of each 'from' element is
+            // sufficient -> you always take the smallest pair among all the possible pair among all the 'from' points.
             for(auto it=potentialPairForEachFromElem.begin(); it!=potentialPairForEachFromElem.end(); it++)
             {
+                //Loop over the remaining potential pair in a increasing manner in terms of distance, delete those with
+                // the dest element already paired and stop at the first 'dest' element that is not paired
                 while(it->second.size() && destPointTaken[it->second.begin()->second.second->getElementId()])
                     it->second.pop_front();
+                // If no pair remains, this point should not be paired
                 if(!(it->second.size()))
                     continue;
+                // If here then the map is not empty, potential pairs still remains.
                 empty = false;
 
+                //Now find if it is the smallest of those already encountered
                 if(it->second.begin()->first<min_dist)
                 {
                     min_dist=it->second.begin()->first;
                     min_pair = it->second.begin()->second;
                 }
             }
+            //If oboth of the proximity are NULL then the map is empty, otherwise, stock this pair.
             if((min_pair.first != NULL )&& (min_pair.second != NULL))
             {
+                //Store the pair
                 uniqueCouple.push_back(min_pair);
+                //Mark the 'dest' element as taken
                 destPointTaken[min_pair.second->getElementId()] = true;
+                //Erase the line of the 'from' element --> no need to pair it anymore
                 potentialPairForEachFromElem.erase(min_pair.first->getElementId());
             }
         }
