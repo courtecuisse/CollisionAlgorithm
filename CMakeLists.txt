@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.1)
 project(CollisionAlgorithm)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-if(COMMAND setupGitInfo)
-    setupGitInfo(PLUGIN_GIT_INFO)
-endif()
 
 file(GLOB_RECURSE HEADER_FILES
     "src/*.h"
@@ -33,7 +30,8 @@ file(GLOB_RECURSE DEPRECATED_FILES
 )
 
 find_package(SofaFramework REQUIRED)
-sofa_find_package(Sofa.GL REQUIRED)
+find_package(Sofa.GL REQUIRED)
+find_package(Sofa.SimulationCore REQUIRED)
 
 find_package( Eigen3 REQUIRED )
 include_directories(${EIGEN3_INCLUDE_DIR})
@@ -45,7 +43,10 @@ set_source_files_properties(${IGNORED_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${IGNORED_FILES} ${DEPRECATED_FILES} ${README_FILES} src/sofa/collisionAlgorithm/filters/SubsetFilter.cpp src/sofa/collisionAlgorithm/filters/SubsetFilter.h src/sofa/collisionAlgorithm/proximity/FrictionProximity.h)
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DPLUGIN_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\"")
-target_link_libraries(${PROJECT_NAME} SofaSimulationCommon Sofa.GL)
+target_link_libraries(${PROJECT_NAME}
+    Sofa.SimulationCore
+    Sofa.GL
+)
 
 ## Install rules for the library and headers; CMake package configurations files
 set(${PROJECT_NAME}_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src")
