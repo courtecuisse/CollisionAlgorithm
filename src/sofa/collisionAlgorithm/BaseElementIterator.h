@@ -62,7 +62,7 @@ public:
 
             virtual BaseProximity::SPtr project(const sofa::type::Vector3 &) const override { return NULL; }
 
-            virtual BaseProximity::SPtr createProximity(CONTROL_POINT id = CONTROL_DEFAULT) const override { return NULL; }
+            virtual BaseProximity::SPtr createProximity(CONTROL_POINT /*id*/ = CONTROL_DEFAULT) const override { return NULL; }
 
             virtual Index elementSize() const { return 0; }
 
