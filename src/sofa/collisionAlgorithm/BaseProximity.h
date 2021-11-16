@@ -51,7 +51,6 @@ public:
 private:
     sofa::defaulttype::BaseMatrix * m_J;
     Index m_row;
-
 };
 
 /*!
@@ -74,15 +73,6 @@ public :
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const = 0;
 
     virtual Index getElementId() const = 0;
-
-    virtual void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_prox, double fact, const bool expand)const {
-        // temporary : leave this empty please
-    }
-
-    virtual sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> * getState() const{
-        // temporary : leave this empty please
-        return NULL;
-    }
 
 };
 
@@ -133,19 +123,6 @@ public:
     const PROXIMITYDATA& getProximityData() const {
         return m_data;
     }
-
-    void buildConstraintProximityMatrix(int cId, sofa::defaulttype::BaseMatrix * J_prox, double fact, const bool expand) const{
-        MBaseIterator J_iterator(J_prox, cId);
-        sofa::type::Vector3 N(1,0,0);
-        if(expand) N = sofa::type::Vector3(1,1,1);
-        m_data.addContributions(J_iterator, N*fact);
-    }
-
-    sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> * getState() const{
-        sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> *ms  = dynamic_cast<sofa::core::behavior::MechanicalState<defaulttype::Vec3Types> *> (m_geometry->getState());
-        return ms;
-    }
-
 
 protected:
     const GEOMETRY * m_geometry;
