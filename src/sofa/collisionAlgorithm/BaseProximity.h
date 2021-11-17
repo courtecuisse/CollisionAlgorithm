@@ -28,31 +28,6 @@ enum CONTROL_POINT {
     CONTROL_8 = 8,
 };
 
-class MBaseIterator {
-public:
-    typedef sofa::Index Index;
-
-    MBaseIterator(sofa::defaulttype::BaseMatrix * M, Index row) : m_J(M), m_row(row) {}
-
-    void addCol(Index c, const sofa::type::Vector3 & N) {
-        if(N[1] == 0.0){
-            double v = N[0];
-            m_J->add(m_row, c, v);
-        }
-        else{
-            double v = N[0];
-            m_J->add(m_row*3, c*3, v);
-            m_J->add(m_row*3+1, c*3+1, v);
-            m_J->add(m_row*3+2, c*3+2, v);
-        }
-
-    }
-
-private:
-    sofa::defaulttype::BaseMatrix * m_J;
-    Index m_row;
-};
-
 /*!
  * \brief The BaseProximity class is the basic abstract proximity class
  */
