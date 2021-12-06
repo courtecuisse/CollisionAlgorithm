@@ -15,9 +15,7 @@ namespace toolBox {
 
 BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo,
                                          std::function<bool(const collisionAlgorithm::PairDetection & )> acceptFilter = noFilter,
-                                         std::function<double(const collisionAlgorithm::PairDetection & )> distance = distance3d) {
-    return doFindClosestProximityIt(pfrom,geo->begin(),acceptFilter,distance);
-}
+                                         std::function<double(const collisionAlgorithm::PairDetection & )> distance = distance3d);
 
 }
 

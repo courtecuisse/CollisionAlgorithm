@@ -133,6 +133,13 @@ namespace toolBox {
 //    }
 //}
 
+BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo,
+                                         std::function<bool(const collisionAlgorithm::PairDetection & )> acceptFilter,
+                                         std::function<double(const collisionAlgorithm::PairDetection & )> distance )
+{
+   return doFindClosestProximityIt(pfrom,geo->begin(),acceptFilter,distance);
+}
+
 //BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo,
 //                                         std::function<bool(const collisionAlgorithm::PairDetection & )> acceptFilter,
 //                                         std::function<double(const collisionAlgorithm::PairDetection & )> distance )
