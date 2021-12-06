@@ -18,9 +18,9 @@ class BaseElementIterator {
 public:
 
     ///defines a unique pointer iterator of baseElements
-    class UPtr : public std::unique_ptr<BaseElementIterator> {
+    class SPtr : public std::shared_ptr<BaseElementIterator> {
     public:
-        UPtr(BaseElementIterator * ptr) : std::unique_ptr<BaseElementIterator>(ptr) {}
+        SPtr(BaseElementIterator * ptr) : std::shared_ptr<BaseElementIterator>(ptr) {}
 
         //we take the geometry as parameter for std::iterator compatibility i.e. it != m_geo->end();
         bool operator != (const BaseGeometry * ) {
@@ -53,7 +53,7 @@ public:
     virtual ~BaseElementIterator() = default;
 
     ///returns a new EmptyIterator
-    static BaseElementIterator::UPtr empty() {
+    static BaseElementIterator::SPtr empty() {
         class EmptyIterator : public BaseElementIterator {
         public:
             virtual bool end() const { return true; }
@@ -69,7 +69,7 @@ public:
             virtual Index id() const { return 0; }
         };
 
-        return UPtr(new EmptyIterator());
+        return SPtr(new EmptyIterator());
     }
 
     virtual bool end() const = 0;

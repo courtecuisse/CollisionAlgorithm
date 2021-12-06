@@ -48,7 +48,7 @@ public:
             l_topology.setPath("@.");
     }
 
-    inline BaseElementIterator::UPtr begin(Index eid = 0) const override {
+    inline BaseElementIterator::SPtr begin(Index eid = 0) const override {
         return DefaultElementIterator<PROXIMITYDATA>::create(this,this->l_topology->getTriangles(),eid);
     }
 

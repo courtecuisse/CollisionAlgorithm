@@ -14,18 +14,20 @@ namespace collisionAlgorithm
  * \brief The AABBBroadPhase class
  * Implementation of broad phase collision detection using bounding boxes
  */
-class AABBBroadPhase : public BaseGeometry::BroadPhase {
+class AABBBroadPhase : public BaseGeometry {
     friend class AABBElement;
 
 public:
 
-    SOFA_CLASS(AABBBroadPhase,BroadPhase);
+    SOFA_CLASS(AABBBroadPhase,BaseGeometry);
 
     typedef BaseGeometry::BaseGeometry::Index Index;
 
     Data<type::Vec3i> d_nbox;
     Data<bool> d_refineBBox;
     Data<bool> d_static;
+
+    core::objectmodel::SingleLink<AABBBroadPhase, BaseGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
     AABBBroadPhase();
 
@@ -34,6 +36,10 @@ public:
     virtual void init();
 
     virtual void prepareDetection() override;
+
+    virtual BaseElementIterator::SPtr begin(Index eid = 0) const override;
+
+    virtual sofa::core::behavior::BaseMechanicalState * getState() const override;
 
     virtual type::BoundingBox getBBox() const;
 
@@ -97,6 +103,8 @@ public:
             selectElements.insert(elemntsID.begin(),elemntsID.end());
         }
     }
+
+    virtual void recomputeNormals() {}
 
 protected:
     type::Vector3 m_Bmin,m_Bmax,m_cellSize;

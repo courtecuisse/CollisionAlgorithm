@@ -8,7 +8,7 @@ namespace collisionAlgorithm {
 
 namespace toolBox {
 
-BaseProximity::SPtr doFindClosestProximityIt(const BaseProximity::SPtr & pfrom, BaseElementIterator::UPtr & begin,
+BaseProximity::SPtr doFindClosestProximityIt(BaseProximity::SPtr pfrom, BaseElementIterator::SPtr begin,
                                              std::function<bool(const collisionAlgorithm::PairDetection & )> acceptFilter,
                                              std::function<double(const collisionAlgorithm::PairDetection & )> distance) {
 

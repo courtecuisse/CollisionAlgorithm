@@ -1,18 +1,18 @@
-#include <sofa/collisionAlgorithm/algorithm/AABBSearchMethod.h>
-#include <sofa/core/ObjectFactory.h>
+//#include <sofa/collisionAlgorithm/algorithm/AABBSearchMethod.h>
+//#include <sofa/core/ObjectFactory.h>
 
-namespace sofa {
+//namespace sofa {
 
-namespace collisionAlgorithm {
+//namespace collisionAlgorithm {
 
-SOFA_DECL_CLASS(AABBSearchMethod)
+//SOFA_DECL_CLASS(AABBSearchMethod)
 
-int AABBSearchMethodClass = core::RegisterObject("AABBSearchMethod")
-.add< AABBSearchMethod >();
+//int AABBSearchMethodClass = core::RegisterObject("AABBSearchMethod")
+//.add< AABBSearchMethod >();
 
-}
+//}
 
-}
+//}
 
 
 

@@ -27,7 +27,7 @@ public:
     , d_normals(initData(&d_normals,sofa::type::vector<type::Vector3>(), "normals","normals"))
     {}
 
-    inline BaseElementIterator::UPtr begin(Index eid = 0) const override {
+    inline BaseElementIterator::SPtr begin(Index eid = 0) const override {
         return DefaultElementIterator<FixedProximity>::create(this, d_position.getValue(), eid);
     }
 

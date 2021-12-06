@@ -31,47 +31,6 @@ public:
 
     typedef sofa::Index Index;
 
-    class BroadPhase : public core::objectmodel::BaseObject {
-    public:
-
-        SOFA_ABSTRACT_CLASS(BroadPhase,core::objectmodel::BaseObject);
-
-        core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_geometry;
-
-        /*!
-         * \brief BroadPhase Constructor
-         */
-        BroadPhase()
-        : l_geometry(initLink("geometry", "link to the geometry")) {}
-
-        void init( ) override {
-            if (l_geometry == NULL) return;
-            l_geometry->setBroadPhase(this);
-        }
-
-        /*!
-         * \brief prepareDetection virtual method to implement
-         * detection pre-processing
-         */
-        virtual void prepareDetection() = 0;
-
-        /*!
-         * \brief getBoxSize
-         * \return bounding box size in a vec3i
-         */
-        virtual type::Vec3i getBoxSize() const = 0;
-
-        /*!
-         * \brief getBoxCoord
-         * \param P : point in space
-         * \return the box's coordinates (vec3i) containing point P
-         */
-        virtual type::Vec3i getBoxCoord(const type::Vector3 & P) const = 0;
-
-        virtual void getElementSet(type::Vec3i c, std::set<Index> & selectElements) const = 0;
-
-    };
-
     Data<sofa::type::RGBAColor> d_color;
     Data<double> d_drawScaleNormal;
     Data<bool> d_draw;
@@ -83,22 +42,13 @@ public:
         this->f_listening.setValue(true);
     }
 
-    virtual BaseElementIterator::UPtr begin(Index eid = 0) const = 0;
+    virtual BaseElementIterator::SPtr begin(Index eid = 0) const = 0;
 
     inline const BaseGeometry * end() const {
         return this;
     }
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
-
-    void setBroadPhase(BroadPhase::SPtr d) {
-        m_broadPhase = d;
-        this->addSlave(d);
-    }
-
-    const BroadPhase::SPtr getBroadPhase() {
-        return m_broadPhase;
-    }
 
     virtual void prepareDetection() {}
 
@@ -108,14 +58,9 @@ public:
         prepareDetection();
 
         recomputeNormals();
-
-        if (m_broadPhase != NULL) m_broadPhase->prepareDetection();
     }
 
     virtual void recomputeNormals() = 0;
-
-protected:
-    BroadPhase::SPtr m_broadPhase;
 };
 
 

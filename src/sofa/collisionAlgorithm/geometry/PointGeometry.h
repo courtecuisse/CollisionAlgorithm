@@ -29,7 +29,7 @@ public:
     PointGeometry()
     : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {}
 
-    inline BaseElementIterator::UPtr begin(Index eid = 0) const override {
+    inline BaseElementIterator::SPtr begin(Index eid = 0) const override {
         const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
         return DefaultElementIterator<PROXIMITYDATA>::create(this, pos.ref(), eid);
     }

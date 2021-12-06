@@ -69,13 +69,13 @@ public:
 typedef BaseGeometry::Index Index;
 
     template<class GEOMETRY, class ELEMENT>
-    static BaseElementIterator::UPtr create(const GEOMETRY * c, const sofa::type::vector<ELEMENT> & elmt, Index start = 0) {
-        return BaseElementIterator::UPtr(new TDefaultElementIterator<GEOMETRY, PROXIMITYDATA, PROXIMITYDATA::nbControlPoints()>(c, elmt.size(), start));
+    static BaseElementIterator::SPtr create(const GEOMETRY * c, const sofa::type::vector<ELEMENT> & elmt, Index start = 0) {
+        return BaseElementIterator::SPtr(new TDefaultElementIterator<GEOMETRY, PROXIMITYDATA, PROXIMITYDATA::nbControlPoints()>(c, elmt.size(), start));
     }
 
     template<class GEOMETRY>
-    static BaseElementIterator::UPtr create(const GEOMETRY * c, Index size, Index start = 0) {
-        return BaseElementIterator::UPtr(new TDefaultElementIterator<GEOMETRY, PROXIMITYDATA, PROXIMITYDATA::nbControlPoints()>(c, size, start));
+    static BaseElementIterator::SPtr create(const GEOMETRY * c, Index size, Index start = 0) {
+        return BaseElementIterator::SPtr(new TDefaultElementIterator<GEOMETRY, PROXIMITYDATA, PROXIMITYDATA::nbControlPoints()>(c, size, start));
     }
 };
 

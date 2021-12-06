@@ -89,7 +89,7 @@ protected:
     }
 
     BaseProximity::SPtr findClosestProximity(const BaseProximity::SPtr & pfrom, BaseGeometry *geo) {
-        BaseElementIterator::UPtr begin = geo->begin();
+        BaseElementIterator::SPtr begin = geo->begin();
         return toolBox::doFindClosestProximityIt(pfrom,begin,
                                                  getFilterMethod(),
                                                  getDistanceMethod());

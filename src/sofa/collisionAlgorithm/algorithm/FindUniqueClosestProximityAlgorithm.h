@@ -25,11 +25,6 @@ public:
         sofa::type::vector<double> & outputDist = *d_outputDist.beginEdit();
         outputDist.clear();
 
-        sofa::type::vector<unsigned> & matchIdFrom = *d_matchIdFrom.beginEdit();
-        sofa::type::vector<unsigned> & matchIdDest = *d_matchIdDest.beginEdit();
-        matchIdFrom.clear();
-        matchIdDest.clear();
-
         //The goal is to find every potential pair given the filter. Then for each i in the from geom,
         // sort its potential pairs depending on the distance. Then iterate on every list of pair of the from geom and
         // always take the pair presenting the minimum distance if the second element hasn't been taken yet.
@@ -121,16 +116,9 @@ public:
         {
             output.add(it->first,it->second);
             outputDist.push_back(m_distanceMethod(output.back()));
-
-            matchIdFrom.push_back(it->first->getElementId());
-            matchIdDest.push_back(it->second->getElementId());
         }
 
-
-
         d_output.endEdit();
-        d_matchIdFrom.endEdit();
-        d_matchIdDest.endEdit();
     }
 
 };

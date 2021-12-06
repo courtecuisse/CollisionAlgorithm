@@ -44,7 +44,7 @@ public:
     , d_delta(initData(&d_delta,(double) 0.00001,"delta", "Delta"))
     , d_elements(initData(&d_elements, "elements", "Vector of Elements")) {}
 
-    virtual BaseElementIterator::UPtr begin(Index eid = 0) const override {
+    virtual BaseElementIterator::SPtr begin(Index eid = 0) const override {
         return DefaultElementIterator<PROXIMITYDATA>::create(this, d_elements.getValue(), eid);
     }
 

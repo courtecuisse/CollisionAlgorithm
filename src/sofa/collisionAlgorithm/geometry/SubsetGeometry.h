@@ -35,8 +35,8 @@ public:
     , l_wholeGeometry(initLink("wholeGeometry", "Whole geometry on which we want the subet"))
     {}
 
-    inline BaseElementIterator::UPtr begin(Index /* eid */) const override {
-        return BaseElementIterator::UPtr(new SubsetElementIterator(l_wholeGeometry.get(), d_indices.getValue()));
+    inline BaseElementIterator::SPtr begin(Index /* eid */) const override {
+        return BaseElementIterator::SPtr(new SubsetElementIterator(l_wholeGeometry.get(), d_indices.getValue()));
     }
 
     sofa::core::behavior::BaseMechanicalState * getState() const override
