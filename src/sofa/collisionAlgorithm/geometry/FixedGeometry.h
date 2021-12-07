@@ -85,7 +85,7 @@ public:
         data.buildJacobianConstraint(cId,normals,fact,constraintId);
     }
 
-    inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const {}
+    inline void storeLambda(const core::ConstraintParams* /*cParams*/, core::MultiVecDerivId /*resId*/, Index /*cid_global*/, Index /*cid_local*/, const sofa::defaulttype::BaseVector* /*lambda*/) const {}
 
     virtual void recomputeNormals() {}
 };

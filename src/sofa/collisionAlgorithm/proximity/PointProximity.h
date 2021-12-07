@@ -16,7 +16,7 @@ public:
     PointProximity(Index eid)
     : m_eid(eid){}
 
-    static inline PointProximity create(Index eid,CONTROL_POINT c) {
+    static inline PointProximity create(Index eid,CONTROL_POINT /*c*/) {
         return PointProximity(eid);
     }
 

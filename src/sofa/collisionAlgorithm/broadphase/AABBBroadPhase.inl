@@ -118,7 +118,7 @@ void AABBBroadPhase::prepareDetection() {
     {
         //std::cout << ++i << std::endl;
         type::BoundingBox bbox;
-        for (int b=0;b<(*it)->elementSize();b++) {
+        for (unsigned b=0;b<(*it)->elementSize();b++) {
             CONTROL_POINT c = (CONTROL_POINT) b;
             bbox.include((*it)->createProximity(c)->getPosition());
         }

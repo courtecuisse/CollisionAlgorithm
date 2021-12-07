@@ -327,20 +327,20 @@ protected:
         vecInfo.clear();
         for (size_t t=0;t< triangles.size();t++)
         {
-            const Triangle& triangle = this->l_topology->getTriangle(t);
+//            const Triangle& triangle = this->l_topology->getTriangle(t);
 
             type::Vector3 n200;
             type::Vector3 n020;
             type::Vector3 n002;
 
-            std::cerr << "recomputeBezierInfo needs to compute point normals" << std::endl;
-            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav0 = this->l_topology->getTrianglesAroundVertex(triangle[2]);
+//            std::cerr << "recomputeBezierInfo needs to compute point normals" << std::endl;
+//            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav0 = this->l_topology->getTrianglesAroundVertex(triangle[2]);
 //            for (size_t t=0;t<tav0.size();t++) n200 += this->m_triangle_info[tav0[t]].n;
 
-            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav1 = this->l_topology->getTrianglesAroundVertex(triangle[1]);
+//            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav1 = this->l_topology->getTrianglesAroundVertex(triangle[1]);
 //            for (size_t t=0;t<tav1.size();t++) n020 += this->m_triangle_info[tav1[t]].n;
 
-            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav2 = this->l_topology->getTrianglesAroundVertex(triangle[0]);
+//            const sofa::core::topology::BaseMeshTopology::TrianglesAroundVertex & tav2 = this->l_topology->getTrianglesAroundVertex(triangle[0]);
 //            for (size_t t=0;t<tav2.size();t++) n002 += this->m_triangle_info[tav2[t]].n;
 
             n200.normalize();

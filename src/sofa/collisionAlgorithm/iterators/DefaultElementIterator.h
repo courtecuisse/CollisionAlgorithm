@@ -54,8 +54,8 @@ public:
 
 private:
     const GEOMETRY * m_geometry;
-    Index m_it;
     const Index m_size;
+    Index m_it;
 
 
     inline BaseProximity::SPtr createSPtr(const GEOMETRY * container, const PROXIMITYDATA & data) const {
