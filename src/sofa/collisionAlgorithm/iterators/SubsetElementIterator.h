@@ -32,10 +32,6 @@ public:
         return m_iterator==m_subsetElements.cend();
     }
 
-    BaseProximity::SPtr project(const type::Vector3 & P) const override {
-        return m_container->begin(id())->project(P);
-    }
-
     BaseProximity::SPtr createProximity(CONTROL_POINT pid = CONTROL_DEFAULT) const override {
         return m_container->begin(id())->createProximity(pid);
     }

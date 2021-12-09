@@ -38,11 +38,6 @@ public:
         return m_it;
     }
 
-    BaseProximity::SPtr project(const type::Vector3 & P) const override {
-        return createSPtr(m_geometry,
-                          m_geometry->project(P, m_it));
-    }
-
     BaseProximity::SPtr createProximity(CONTROL_POINT pid = -1) const override {
         return createSPtr(m_geometry,
                           m_geometry->createProximity(m_it, pid)); // initialized with the center of the element

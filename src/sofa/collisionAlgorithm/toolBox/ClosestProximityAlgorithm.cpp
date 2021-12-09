@@ -8,33 +8,33 @@ namespace collisionAlgorithm {
 
 namespace toolBox {
 
-BaseProximity::SPtr doFindClosestProximityIt(BaseProximity::SPtr pfrom, BaseElementIterator::SPtr begin,
-                                             std::function<bool(const collisionAlgorithm::PairDetection & )> acceptFilter,
-                                             std::function<double(const collisionAlgorithm::PairDetection & )> distance) {
+//BaseProximity::SPtr doFindClosestProximityIt(BaseProximity::SPtr pfrom, BaseElementIterator::SPtr begin,
+//                                             std::function<bool(const collisionAlgorithm::PairDetection & )> acceptFilter,
+//                                             std::function<double(const collisionAlgorithm::PairDetection & )> distance) {
 
-    double min_dist = std::numeric_limits<double>::max();
-    BaseProximity::SPtr minprox_dest = nullptr;
-    type::Vector3 P = pfrom->getPosition();
+//    double min_dist = std::numeric_limits<double>::max();
+//    BaseProximity::SPtr minprox_dest = nullptr;
+//    type::Vector3 P = pfrom->getPosition();
 
-    while (! begin->end()) {
-        BaseProximity::SPtr pdest = begin->project(P);
+//    while (! begin->end()) {
+//        BaseProximity::SPtr pdest = begin->project(P);
 
-        collisionAlgorithm::PairDetection pair(pfrom,pdest);
+//        collisionAlgorithm::PairDetection pair(pfrom,pdest);
 
-        if (acceptFilter(pair)) {
-            double dist = distance(pair);
+//        if (acceptFilter(pair)) {
+//            double dist = distance(pair);
 
-            if (dist<min_dist) {
-                min_dist = dist;
-                minprox_dest = pdest;
-            }
-        }
+//            if (dist<min_dist) {
+//                min_dist = dist;
+//                minprox_dest = pdest;
+//            }
+//        }
 
-        begin++;
-    }
+//        begin++;
+//    }
 
-    return minprox_dest;
-}
+//    return minprox_dest;
+//}
 
 }
 

@@ -134,41 +134,33 @@ void AABBBroadPhase::prepareDetection() {
             cminbox[i] = floor((minbox[i] - m_Bmin[i])/m_cellSize[i]); //second m_Bmax was Bmin => bug ?
         }
 
-//        cminbox[0] = floor((minbox[0] - m_Bmin[0])/m_cellSize[0]);
-//        cminbox[1] = floor((minbox[1] - m_Bmin[1])/m_cellSize[1]);
-//        cminbox[2] = floor((minbox[2] - m_Bmin[2])/m_cellSize[2]);
+//        const bool refine = d_refineBBox.getValue();
 
-//        cmaxbox[0] = ceil((maxbox[0] - m_Bmin[0])/m_cellSize[0]);
-//        cmaxbox[1] = ceil((maxbox[1] - m_Bmin[1])/m_cellSize[1]);
-//        cmaxbox[2] = ceil((maxbox[2] - m_Bmin[2])/m_cellSize[2]);
+//        for (int i=cminbox[0];i<cmaxbox[0];i++)
+//        {
+//            for (int j=cminbox[1];j<cmaxbox[1];j++)
+//            {
+//                for (int k=cminbox[2];k<cmaxbox[2];k++)
+//                {
+//                    if (refine) { // project the point on the element in order to know if the box is empty
+//                        type::Vector3 P = m_Bmin + m_cellSize*0.5;
 
-        const bool refine = d_refineBBox.getValue();
+//                        P[0] += i*m_cellSize[0];
+//                        P[1] += j*m_cellSize[1];
+//                        P[2] += k*m_cellSize[2];
 
-        for (int i=cminbox[0];i<cmaxbox[0];i++)
-        {
-            for (int j=cminbox[1];j<cmaxbox[1];j++)
-            {
-                for (int k=cminbox[2];k<cmaxbox[2];k++)
-                {
-                    if (refine) { // project the point on the element in order to know if the box is empty
-                        type::Vector3 P = m_Bmin + m_cellSize*0.5;
+//                        type::Vector3 D = P - it->project(P)->getPosition();
 
-                        P[0] += i*m_cellSize[0];
-                        P[1] += j*m_cellSize[1];
-                        P[2] += k*m_cellSize[2];
-
-                        type::Vector3 D = P - it->project(P)->getPosition();
-
-                        if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
-                            (fabs(D[1])<=m_cellSize[1]*0.5) &&
-                            (fabs(D[2])<=m_cellSize[2]*0.5))
-                            m_indexedElement[getKey(i,j,k)].insert(it->id());
-                    } else {
-                        m_indexedElement[getKey(i,j,k)].insert(it->id());
-                    }
-                }
-            }
-        }
+//                        if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
+//                            (fabs(D[1])<=m_cellSize[1]*0.5) &&
+//                            (fabs(D[2])<=m_cellSize[2]*0.5))
+//                            m_indexedElement[getKey(i,j,k)].insert(it->id());
+//                    } else {
+//                        m_indexedElement[getKey(i,j,k)].insert(it->id());
+//                    }
+//                }
+//            }
+//        }
     }
 }
 

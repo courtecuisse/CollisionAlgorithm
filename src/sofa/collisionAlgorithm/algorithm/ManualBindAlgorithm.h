@@ -20,10 +20,6 @@ public:
     Data<sofa::type::vector<int> > d_bindFrom;
     Data<sofa::type::vector<int> > d_bindDest;
 
-    Data<bool> d_project ;
-    Data<int> d_controlPointFrom ;
-    Data<int> d_controlPointDest ;
-
     Data<bool> d_drawCollision ;
     Data<DetectionOutput> d_output;
 
@@ -32,9 +28,6 @@ public:
     , l_dest(initLink("dest", "link to dest geometry"))
     , d_bindFrom (initData(&d_bindFrom, "bindFirst", "draw collision"))
     , d_bindDest (initData(&d_bindDest, "bindDest", "draw collision"))
-    , d_project (initData(&d_project, true,  "project", "If true: the Dest proximity is the projection of the From on the bindDest element" ))
-    , d_controlPointFrom (initData(&d_controlPointFrom, -1,  "controlPointFrom", "Control point taken for the From proximity (see BaseProximity.h)" ))
-    , d_controlPointDest (initData(&d_controlPointDest, -1,  "controlPointDest", "Control point taken for the Dest proximity if project == false (see BaseProximity.h)" ))
     , d_drawCollision (initData(&d_drawCollision, false, "drawcollision", "draw collision"))
     , d_output(initData(&d_output,"output", "output of the collision detection")) {}
 
@@ -68,13 +61,8 @@ public:
             if (itfrom == l_from->end()) continue;
             if (itdest == l_dest->end()) continue;
 
-            auto first = itfrom->createProximity((CONTROL_POINT) d_controlPointFrom.getValue());
-            BaseProximity::SPtr second;
-            if(d_project.getValue())
-                second = itdest->project(first->getPosition());
-            else
-                second = itdest->createProximity((CONTROL_POINT) d_controlPointDest.getValue());
-
+            BaseProximity::SPtr first = itfrom->createProximity();
+            BaseProximity::SPtr second = itdest->createProximity();
 
             output.add(first,second);
         }

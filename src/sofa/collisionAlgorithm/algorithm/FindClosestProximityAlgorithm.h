@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/algorithm/BaseClosestProximityAlgorithm.h>
+#include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 
 namespace sofa
@@ -9,10 +9,10 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-class FindClosestProximityAlgorithm : public BaseClosestProximityAlgorithm
+class FindClosestProximityAlgorithm : public BaseAlgorithm
 {
 public:
-    SOFA_CLASS(FindClosestProximityAlgorithm, BaseClosestProximityAlgorithm);
+    SOFA_CLASS(FindClosestProximityAlgorithm, BaseAlgorithm);
 
     core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
     core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
@@ -25,7 +25,9 @@ public:
     , l_dest(initLink("dest", "link to dest geometry"))
     , d_drawCollision (initData(&d_drawCollision, true, "drawcollision", "draw collision"))
     , d_output(initData(&d_output,"output", "output of the collision detection"))
-    , d_outputDist(initData(&d_outputDist,"outputDist", "Distance of the outpu pair of detections")) {}
+    , d_outputDist(initData(&d_outputDist,"outputDist", "Distance of the outpu pair of detections"))
+    , m_distance([=](BaseProximity::SPtr a,BaseProximity::SPtr b){ return (a->getPosition()-b->getPosition()).norm(); })
+    {}
 
     void draw(const core::visual::VisualParams* vparams) {
         if (! vparams->displayFlags().getShowCollisionModels() && ! d_drawCollision.getValue()) return;
@@ -47,21 +49,30 @@ public:
 
         DetectionOutput & output = *d_output.beginEdit();
         output.clear();
-        sofa::type::vector<double> & outputDist = *d_outputDist.beginEdit();
-        outputDist.clear();
-
         for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
-            PairDetection min_pair = findClosestPoint(*itfrom,l_dest.get());
-            if (min_pair.first == nullptr || min_pair.second == nullptr) {
-                continue;
+            auto pfrom = itfrom->createProximity();
+            if (pfrom == nullptr) continue;
+
+            double min_dist = std::numeric_limits<double>::max();
+            PairDetection min_pair;
+
+            for (auto itdest=l_dest->begin();itdest!=l_dest->end();itdest++) {
+                auto pdest = itdest->createProximity();
+                if (pdest == nullptr) continue;
+
+                double d = m_distance(pfrom,pdest);
+                if (d < min_dist) min_pair = PairDetection(pfrom,pdest);
             }
 
-            output.add(min_pair.first,min_pair.second);
-            outputDist.push_back(m_distanceMethod(output.back()));
+            if (min_pair.first == nullptr || min_pair.second == nullptr) continue;
 
+            output.add(min_pair.first,min_pair.second);
         }
         d_output.endEdit();
     }
+
+private:
+    std::function<double(BaseProximity::SPtr,BaseProximity::SPtr)> m_distance;
 
 };
 
