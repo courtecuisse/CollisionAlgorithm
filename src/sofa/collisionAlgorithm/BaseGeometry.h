@@ -1,7 +1,8 @@
 #pragma once
 
+#include <sofa/collisionAlgorithm/BaseOperation.h>
 #include <sofa/simulation/CollisionBeginEvent.h>
-#include <sofa/collisionAlgorithm/BaseElementIterator.h>
+#include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/core/BehaviorModel.h>
 #include <sofa/core/visual/VisualParams.h>
@@ -14,10 +15,6 @@
 namespace sofa {
 
 namespace collisionAlgorithm {
-
-
-
-
 
 /*!
  * \brief The BaseGeometry class is an abstract class defining a basic geometry
@@ -42,7 +39,9 @@ public:
         this->f_listening.setValue(true);
     }
 
-    virtual BaseElementIterator::SPtr begin(Index eid = 0) const = 0;
+    virtual BaseElement::Iterator begin(Index eid = 0) const = 0;
+
+    virtual const BaseOperations * getOperations() = 0;
 
     inline const BaseGeometry * end() const {
         return this;
@@ -64,6 +63,23 @@ public:
 };
 
 
+//Index id() const override {
+//    return m_it;
+//}
+
+//BaseProximity::SPtr createProximity(CONTROL_POINT pid = -1) const override {
+//    return createSPtr(m_geometry,
+//                      m_geometry->createProximity(m_it, pid)); // initialized with the center of the element
+//}
+
+//Index elementSize() const override {
+//    return CONTROL_SIZE;
+//}
+
+
+
+
+
 template<class PROXIMITYDATA>
 class BaseNormalHandler {
 public:
@@ -73,8 +89,8 @@ public:
 };
 
 
-template<class DataTypes,class TPROXIMITYDATA>
-class TBaseGeometry : public BaseGeometry, public BaseNormalHandler<TPROXIMITYDATA> {
+template<class DataTypes>
+class TBaseGeometry : public BaseGeometry {
 public:
 
     typedef typename DataTypes::VecCoord VecCoord;
@@ -88,11 +104,10 @@ public:
     typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
-    typedef TPROXIMITYDATA PROXIMITYDATA;
 
-    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE2(TBaseGeometry,DataTypes,TPROXIMITYDATA),BaseGeometry);
+    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(TBaseGeometry,DataTypes),BaseGeometry);
 
-    core::objectmodel::SingleLink<TBaseGeometry<DataTypes,PROXIMITYDATA>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
+    core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
 
     TBaseGeometry()
     : l_state(initLink("mstate", "link to state")) {
@@ -108,8 +123,11 @@ public:
         sofa::type::RGBAColor color = d_color.getValue();
         color[3] = 1.0;
 
+        auto createPorximityCenter = BaseOperations::createCenterProximity(getOperations());
+
         for (auto it=this->begin();it!=this->end();it++) {
-            BaseProximity::SPtr center = (*it)->createProximity();
+            auto element = *it;
+            BaseProximity::SPtr center = createPorximityCenter(element);
             vparams->drawTool()->drawArrow(
                 center->getPosition(),
                 center->getPosition() + center->getNormal() * d_drawScaleNormal.getValue(),
@@ -162,7 +180,7 @@ public:
         return templateName(this);
     }
 
-    static std::string templateName(const TBaseGeometry<DataTypes,PROXIMITYDATA>* = NULL) {
+    static std::string templateName(const TBaseGeometry<DataTypes>* = NULL) {
         return DataTypes::Name();
     }
 

@@ -29,9 +29,9 @@ public:
     PointGeometry()
     : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {}
 
-    inline BaseElementIterator::SPtr begin(Index eid = 0) const override {
+    inline BaseElement::Iterator begin(Index eid = 0) const override {
         const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
-        return DefaultElementIterator<PROXIMITYDATA>::create(this, pos.ref(), eid);
+        return DefaultElementIterator::create(this, pos, eid);
     }
 
     void draw(const core::visual::VisualParams *vparams) override {
@@ -68,7 +68,7 @@ public:
         return pos[data.m_eid];
     }
 
-    virtual type::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
+    virtual type::Vector3 computeNormal(const PROXIMITYDATA & /*data*/) const override {
         return type::Vector3();
     }
 };

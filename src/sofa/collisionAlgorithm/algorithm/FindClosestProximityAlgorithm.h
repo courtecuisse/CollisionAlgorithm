@@ -2,6 +2,7 @@
 
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <sofa/collisionAlgorithm/BaseOperation.h>
 
 namespace sofa
 {
@@ -49,25 +50,32 @@ public:
 
         DetectionOutput & output = *d_output.beginEdit();
         output.clear();
+
+
+        auto createProximityFunc = BaseOperations::createCenterProximity(l_from->getOperations());
+        auto projectFunc = BaseOperations::project(l_dest->getOperations());
+
+
         for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
-            auto pfrom = itfrom->createProximity();
+            auto pfrom = createProximityFunc(itfrom->element());
             if (pfrom == nullptr) continue;
 
             double min_dist = std::numeric_limits<double>::max();
             PairDetection min_pair;
 
             for (auto itdest=l_dest->begin();itdest!=l_dest->end();itdest++) {
-                auto pdest = itdest->createProximity();
-                if (pdest == nullptr) continue;
+                auto edest = *itdest;
+                if (edest == nullptr) continue;
+
+                BaseProximity::SPtr pdest = projectFunc(pfrom,edest);
 
                 double d = m_distance(pfrom,pdest);
                 if (d < min_dist) min_pair = PairDetection(pfrom,pdest);
             }
 
-            if (min_pair.first == nullptr || min_pair.second == nullptr) continue;
-
-            output.add(min_pair.first,min_pair.second);
+            if (min_pair.first != nullptr && min_pair.second != nullptr) output.push_back(min_pair);
         }
+
         d_output.endEdit();
     }
 

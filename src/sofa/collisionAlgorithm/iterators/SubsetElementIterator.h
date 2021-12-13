@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <sofa/collisionAlgorithm/BaseElementIterator.h>
+#include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
 
 namespace sofa
@@ -10,7 +10,7 @@ namespace collisionAlgorithm
 {
 
 //Internal iterator of elements
-class SubsetElementIterator : public BaseElementIterator {
+class SubsetElementIterator : public BaseElement::ElementIterator {
 public:
     typedef BaseProximity::Index Index;
 
@@ -24,21 +24,17 @@ public:
         m_iterator++;
     }
 
-    Index id() const override {
-        return *m_iterator;
-    }
-
     bool end() const override {
         return m_iterator==m_subsetElements.cend();
     }
 
-    BaseProximity::SPtr createProximity(CONTROL_POINT pid = CONTROL_DEFAULT) const override {
-        return m_container->begin(id())->createProximity(pid);
-    }
+//    BaseProximity::SPtr createProximity(CONTROL_POINT pid = CONTROL_DEFAULT) const override {
+//        return m_container->begin(id())->createProximity(pid);
+//    }
 
-    Index elementSize() const override {
-        return m_container->begin(id())->elementSize();
-    }
+//    Index elementSize() const override {
+//        return m_container->begin(id())->elementSize();
+//    }
 
 private:
     BaseGeometry * m_container;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/proximity/FixedProximity.h>
 
 namespace sofa
 {
@@ -41,11 +40,6 @@ public:
 
     unsigned size() const {
         return m_output.size();
-    }
-
-    inline void add(BaseProximity::SPtr p1,type::Vector3 & P) {
-        if (p1 == NULL) return;
-        m_output.push_back(PairDetection(p1,std::shared_ptr<FixedProximity>(new FixedProximity(P))));
     }
 
     inline void push_back(const PairDetection & d) {

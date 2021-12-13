@@ -2,15 +2,14 @@
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
-#include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
-#include <sofa/collisionAlgorithm/toolBox/EdgeToolBox.h>
+#include <sofa/collisionAlgorithm/operations/EdgeOperation.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class EdgeGeometry : public TBaseGeometry<DataTypes,EdgeProximity> {
+class EdgeGeometry : public TBaseGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
     typedef TBaseGeometry<DataTypes,EdgeProximity> Inherit;
