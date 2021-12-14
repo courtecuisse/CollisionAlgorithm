@@ -31,6 +31,15 @@ public:
         l_topology.setPath("@.");
     }
 
+    template<class DataTypes>
+    static BaseElement::SPtr createElement(sofa::core::behavior::MechanicalState<DataTypes> * state, core::topology::BaseMeshTopology::Edge edge) {
+        auto p0 = PointOperation::createProximity(state,edge[0]);
+        auto p1 = PointOperation::createProximity(state,edge[1]);
+
+        return BaseElement::SPtr(new EdgeElement(p0,p1));
+    }
+
+
     inline BaseElementIterator::SPtr begin(Index eid = 0) const override {
         return DefaultElementIterator<PROXIMITYDATA>::create(this,this->l_topology->getEdges(), eid);
     }

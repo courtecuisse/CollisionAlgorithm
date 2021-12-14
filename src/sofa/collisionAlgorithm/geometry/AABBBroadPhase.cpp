@@ -1,4 +1,4 @@
-#include <sofa/collisionAlgorithm/broadphase/AABBBroadPhase.inl>
+#include <sofa/collisionAlgorithm/geometry/AABBBroadPhase.inl>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa {

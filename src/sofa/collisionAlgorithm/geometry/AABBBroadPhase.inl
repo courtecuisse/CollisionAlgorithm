@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <sofa/collisionAlgorithm/broadphase/AABBBroadPhase.h>
+#include <sofa/collisionAlgorithm/geometry/AABBBroadPhase.h>
 
 namespace sofa
 {

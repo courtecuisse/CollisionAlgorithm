@@ -55,39 +55,8 @@ public:
         if (! dynamic_cast<sofa::simulation::AnimateBeginEvent*>(event)) return;
 
         prepareDetection();
-
-        recomputeNormals();
     }
-
-    virtual void recomputeNormals() = 0;
 };
-
-
-//Index id() const override {
-//    return m_it;
-//}
-
-//BaseProximity::SPtr createProximity(CONTROL_POINT pid = -1) const override {
-//    return createSPtr(m_geometry,
-//                      m_geometry->createProximity(m_it, pid)); // initialized with the center of the element
-//}
-
-//Index elementSize() const override {
-//    return CONTROL_SIZE;
-//}
-
-
-
-
-
-template<class PROXIMITYDATA>
-class BaseNormalHandler {
-public:
-    virtual void updateNormals() = 0;
-
-    virtual type::Vector3 computeNormal(const PROXIMITYDATA & data) const = 0;
-};
-
 
 template<class DataTypes>
 class TBaseGeometry : public BaseGeometry {
@@ -112,9 +81,6 @@ public:
     TBaseGeometry()
     : l_state(initLink("mstate", "link to state")) {
         l_state.setPath("@.");
-
-        //By default the normal handle is the geometry
-        setNormalHandler(this);
     }
 
     inline void drawNormals(const core::visual::VisualParams *vparams) {
@@ -139,19 +105,6 @@ public:
 
     inline sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
-    }
-
-    template<class PROXIMITYDATA>
-    inline void buildJacobianConstraint(const PROXIMITYDATA & data, core::MultiMatrixDerivId cId, const sofa::type::vector<type::Vector3> & normals, double fact, Index constraintId) const {
-        DataMatrixDeriv & c1_d = *cId[this->getState()].write();
-        MatrixDeriv & c1 = *c1_d.beginEdit();
-
-        for (Index j=0;j<normals.size();j++) {
-            MatrixDerivRowIterator c_it = c1.writeLine(constraintId+j);
-            data.addContributions(c_it, normals[j] * fact);
-        }
-
-        c1_d.endEdit();
     }
 
     inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const {
@@ -183,25 +136,6 @@ public:
     static std::string templateName(const TBaseGeometry<DataTypes>* = NULL) {
         return DataTypes::Name();
     }
-
-    virtual void updateNormals() override {}
-
-    virtual void recomputeNormals() override {
-        m_normalHandler->updateNormals();
-    }
-
-    virtual type::Vector3 getNormal(const PROXIMITYDATA & data) const {
-        return m_normalHandler->computeNormal(data);
-    }
-
-    void setNormalHandler(BaseNormalHandler<TPROXIMITYDATA> * n) {
-        if (n == NULL) return;
-
-        m_normalHandler = n;
-    }
-
-protected :
-    BaseNormalHandler<TPROXIMITYDATA> * m_normalHandler; // this pointer cannot be NULL either it's the geometry or a handler
 
 };
 

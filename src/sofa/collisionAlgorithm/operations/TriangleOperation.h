@@ -103,16 +103,6 @@ public:
         BaseProximity::SPtr m_p0,m_p1,m_p2;
     };
 
-    template<class DataTypes>
-    static BaseElement::SPtr createElement(sofa::core::behavior::MechanicalState<DataTypes> * state, core::topology::BaseMeshTopology::Triangle tri) {
-        auto p0 = PointOperation::createProximity(state,tri[0]);
-        auto p1 = PointOperation::createProximity(state,tri[1]);
-        auto p2 = PointOperation::createProximity(state,tri[2]);
-
-        return BaseElement::SPtr(new TriangleElement(p0,p1,p2));
-    }
-
-
     static const BaseOperations * operation() {
         static TriangleOperation s_triop;
         return &s_triop;
@@ -162,17 +152,17 @@ public:
 
         if (fact_u<0)
         {
-            projectOnEdge(proj_P, tinfo.P1, tinfo.P2, fact_v, fact_w);
+            EdgeOperation::projectOnEdge(proj_P, tinfo.P1, tinfo.P2, fact_v, fact_w);
             fact_u=0;
         }
         else if (fact_v<0)
         {
-            projectOnEdge(proj_P, tinfo.P0, tinfo.P2, fact_u, fact_w);
+            EdgeOperation::projectOnEdge(proj_P, tinfo.P0, tinfo.P2, fact_u, fact_w);
             fact_v=0;
         }
         else if (fact_w<0)
         {
-            projectOnEdge(proj_P, tinfo.P0, tinfo.P1, fact_u, fact_v);
+            EdgeOperation::projectOnEdge(proj_P, tinfo.P0, tinfo.P1, fact_u, fact_v);
             fact_w=0;
         }
     }
