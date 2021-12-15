@@ -55,7 +55,7 @@ public:
         }
     }
 
-    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local,const sofa::defaulttype::BaseVector* lambda) const {
+    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local,const sofa::linearalgebra::BaseVector* lambda) const {
         for(auto& prox : m_list){
             prox->storeLambda(cParams, res, cid_global, cid_local, lambda);
         }
