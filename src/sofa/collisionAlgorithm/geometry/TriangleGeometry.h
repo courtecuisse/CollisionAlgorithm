@@ -37,27 +37,30 @@ public:
     class PointTriangleNormalHandler : public PointOperation::NormalHandler {
     public:
 
-        virtual sofa::type::Vector3 getNormal() const {
-//            auto tinfo = getTriangleInfo()[data.m_eid];
-//            return cross(tinfo.ax2,tinfo.ax1);
-        }
+        PointTriangleNormalHandler(TriangleOperation::TriangleInfo & t) : m_tinfo(t) {}
+
+        virtual sofa::type::Vector3 getNormal() const { return cross(m_tinfo.ax2,m_tinfo.ax1); }
+
+        TriangleOperation::TriangleInfo & m_tinfo;
     };
 
     void init() {
-        for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
-            this->l_topology->getTriangles();
+        m_tinfoVector.resize(this->l_topology->getNbTriangles());
 
+        for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
+            auto tri = this->l_topology->getTriangle(i);
+
+            auto p0 = BaseProximity::SPtr(new PointOperation::PointProximity(this->getState(),PointOperation::NormalHandler::SPtr(new PointTriangleNormalHandler(m_tinfoVector[i])),tri[0]));
+            auto p1 = BaseProximity::SPtr(new PointOperation::PointProximity(this->getState(),PointOperation::NormalHandler::SPtr(new PointTriangleNormalHandler(m_tinfoVector[i])),tri[1]));
+            auto p2 = BaseProximity::SPtr(new PointOperation::PointProximity(this->getState(),PointOperation::NormalHandler::SPtr(new PointTriangleNormalHandler(m_tinfoVector[i])),tri[2]));
+
+            auto elmt = BaseElement::SPtr(new TriangleOperation::TriangleElement(p0,p1,p2,m_tinfoVector[i]));
+
+
+
+//            auto triangle = this->l_topology->getTriangles()[i];
         }
     }
-
-    BaseElement::SPtr createElement(sofa::core::behavior::MechanicalState<DataTypes> * state, core::topology::BaseMeshTopology::Triangle tri) {
-        auto p0 = PointOperation::createProximity(state,tri[0]);
-        auto p1 = PointOperation::createProximity(state,tri[1]);
-        auto p2 = PointOperation::createProximity(state,tri[2]);
-
-        return BaseElement::SPtr(new TriangleOperation::TriangleElement(p0,p1,p2));
-    }
-
 
     inline BaseElement::Iterator begin(Index eid = 0) const override {
         return TriangleOperation::begin(this, this->l_topology->getTriangles(), eid);
@@ -68,7 +71,7 @@ public:
 //        return cross(tinfo.ax2,tinfo.ax1);
 //    }
 
-
+    std::vector<TriangleOperation::TriangleInfo> m_tinfoVector;
 
 };
 

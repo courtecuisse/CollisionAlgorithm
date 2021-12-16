@@ -50,24 +50,24 @@ public:
         double m_f0,m_f1,m_f2;
     };
 
+    struct TriangleInfo
+    {
+        type::Vec3d v0,v1;
+        double d00;
+        double d01;
+        double d11;
+        double invDenom;
+        double area;
+
+        type::Vec3d ax1,ax2;
+        type::Vec3d P0,P1,P2;
+    };
+
     class TriangleElement : public BaseElement {
     public:
 
-        struct TriangleInfo
-        {
-            type::Vec3d v0,v1;
-            double d00;
-            double d01;
-            double d11;
-            double invDenom;
-            double area;
-
-            type::Vec3d ax1,ax2;
-            type::Vec3d P0,P1,P2;
-        };
-
-        TriangleElement(BaseProximity::SPtr p0,BaseProximity::SPtr p1, BaseProximity::SPtr p2)
-        : m_p0(p0), m_p1(p1), m_p2(p2) {}
+        TriangleElement(BaseProximity::SPtr p0,BaseProximity::SPtr p1, BaseProximity::SPtr p2,TriangleInfo t)
+        : m_p0(p0), m_p1(p1), m_p2(p2), m_tinfo(t) {}
 
         void update() override {
             m_tinfo.P0 = m_p0->getPosition();
@@ -99,8 +99,8 @@ public:
         BaseProximity::SPtr getP2() const { return m_p2; }
 
     private:
-        TriangleInfo m_tinfo;
         BaseProximity::SPtr m_p0,m_p1,m_p2;
+        TriangleInfo & m_tinfo;
     };
 
     static const BaseOperations * operation() {
