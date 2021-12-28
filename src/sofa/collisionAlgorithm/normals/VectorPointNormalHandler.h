@@ -1,35 +1,35 @@
-#pragma once
+//#pragma once
 
-#include <sofa/collisionAlgorithm/BaseNormalHandler.h>
+//#include <sofa/collisionAlgorithm/BaseNormalHandler.h>
 
-namespace sofa {
+//namespace sofa {
 
-namespace collisionAlgorithm {
+//namespace collisionAlgorithm {
 
-template<class GEOMETRY>
-class VectorPointNormalHandler : public TBaseNormalHandler<GEOMETRY> {
-public:
-    typedef typename GEOMETRY::VecCoord VecCoord;
-    typedef typename GEOMETRY::DataVecCoord DataVecCoord;
-    typedef typename GEOMETRY::PROXIMITYDATA PROXIMITYDATA;
-    typedef TBaseNormalHandler<GEOMETRY> Inherit;
+//template<class GEOMETRY>
+//class VectorPointNormalHandler : public TBaseNormalHandler<GEOMETRY> {
+//public:
+//    typedef typename GEOMETRY::VecCoord VecCoord;
+//    typedef typename GEOMETRY::DataVecCoord DataVecCoord;
+//    typedef typename GEOMETRY::PROXIMITYDATA PROXIMITYDATA;
+//    typedef TBaseNormalHandler<GEOMETRY> Inherit;
 
-    SOFA_CLASS(SOFA_TEMPLATE(VectorPointNormalHandler,GEOMETRY), Inherit);
+//    SOFA_CLASS(SOFA_TEMPLATE(VectorPointNormalHandler,GEOMETRY), Inherit);
 
-    Data<sofa::type::vector<type::Vector3>> d_normals;
+//    Data<sofa::type::vector<type::Vector3>> d_normals;
 
-    VectorPointNormalHandler()
-    : d_normals(initData(&d_normals, "normals", "Vector of normals")) {}
+//    VectorPointNormalHandler()
+//    : d_normals(initData(&d_normals, "normals", "Vector of normals")) {}
 
-    virtual type::Vector3 computeNormal(const PROXIMITYDATA & data) const {
-        if(data.m_eid < d_normals.getValue().size()) return d_normals.getValue()[data.m_eid];
-        if(d_normals.getValue().size()==1) return d_normals.getValue()[0];
-        return type::Vector3();
-    }
+//    virtual type::Vector3 computeNormal(const PROXIMITYDATA & data) const {
+//        if(data.m_eid < d_normals.getValue().size()) return d_normals.getValue()[data.m_eid];
+//        if(d_normals.getValue().size()==1) return d_normals.getValue()[0];
+//        return type::Vector3();
+//    }
 
-    virtual void updateNormals() override {}
-};
+//    virtual void updateNormals() override {}
+//};
 
-}
+//}
 
-}
+//}

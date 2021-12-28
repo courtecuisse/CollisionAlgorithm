@@ -4,6 +4,7 @@
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 #include <sofa/collisionAlgorithm/operations/TriangleOperation.h>
+#include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 
 namespace sofa {
 
@@ -45,18 +46,18 @@ public:
     };
 
     void init() {
-        m_tinfoVector.resize(this->l_topology->getNbTriangles());
+//        m_tinfoVector.resize(this->l_topology->getNbTriangles());
 
         for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
             auto tri = this->l_topology->getTriangle(i);
-
-            auto p0 = BaseProximity::SPtr(new PointOperation::PointProximity(this->getState(),PointOperation::NormalHandler::SPtr(new PointTriangleNormalHandler(m_tinfoVector[i])),tri[0]));
-            auto p1 = BaseProximity::SPtr(new PointOperation::PointProximity(this->getState(),PointOperation::NormalHandler::SPtr(new PointTriangleNormalHandler(m_tinfoVector[i])),tri[1]));
-            auto p2 = BaseProximity::SPtr(new PointOperation::PointProximity(this->getState(),PointOperation::NormalHandler::SPtr(new PointTriangleNormalHandler(m_tinfoVector[i])),tri[2]));
-
-            auto elmt = BaseElement::SPtr(new TriangleOperation::TriangleElement(p0,p1,p2,m_tinfoVector[i]));
+            createElement<TriangleElement<TriangleProximity> >(this->getState(),tri[0],tri[1],tri[2]);
 
 
+//            auto p0 = BaseProximity::SPtr(new PointOperation::PointProximity(this->getState(),PointOperation::NormalHandler::SPtr(new PointTriangleNormalHandler(m_tinfoVector[i])),tri[0]));
+//            auto p1 = BaseProximity::SPtr(new PointOperation::PointProximity(this->getState(),PointOperation::NormalHandler::SPtr(new PointTriangleNormalHandler(m_tinfoVector[i])),tri[1]));
+//            auto p2 = BaseProximity::SPtr(new PointOperation::PointProximity(this->getState(),PointOperation::NormalHandler::SPtr(new PointTriangleNormalHandler(m_tinfoVector[i])),tri[2]));
+
+//            auto elmt = BaseElement::SPtr(new TriangleOperation::TriangleElement(p0,p1,p2,m_tinfoVector[i]));
 
 //            auto triangle = this->l_topology->getTriangles()[i];
         }
@@ -71,7 +72,7 @@ public:
 //        return cross(tinfo.ax2,tinfo.ax1);
 //    }
 
-    std::vector<TriangleOperation::TriangleInfo> m_tinfoVector;
+//    std::vector<TriangleOperation::TriangleInfo> m_tinfoVector;
 
 };
 

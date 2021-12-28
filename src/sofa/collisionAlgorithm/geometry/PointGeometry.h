@@ -9,11 +9,11 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class PointGeometry : public TBaseGeometry<DataTypes,PointProximity> {
+class PointGeometry : public TBaseGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
     typedef PointGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes,PointProximity> Inherit;
+    typedef TBaseGeometry<DataTypes> Inherit;
     typedef BaseProximity::Index Index;
     typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
     typedef typename DataTypes::Coord Coord;
@@ -52,6 +52,8 @@ public:
         for(auto it=this->begin();it != this->end();it++) {
             vparams->drawTool()->drawSphere(pos[it->id()],d_drawRadius.getValue());
         }
+
+        typeid(this).hash_code();
     }
 
     inline PROXIMITYDATA createProximity(Index eid, CONTROL_POINT pid = CONTROL_DEFAULT) const {

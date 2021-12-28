@@ -8,15 +8,7 @@ namespace sofa::collisionAlgorithm {
 class PointOperation : public BaseOperations {
 public:
 
-    class NormalHandler {
-    public:
-        typedef std::shared_ptr<NormalHandler> SPtr;
-
-        virtual sofa::type::Vector3 getNormal() const = 0;
-    };
-
-
-    template<class DataTypes>
+    template<class DataTypes,class >
     class PointProximity : public BaseProximity {
     public:
         typedef sofa::core::behavior::MechanicalState<DataTypes> State;
@@ -31,8 +23,8 @@ public:
         typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
         typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
 
-        PointProximity(State * s, NormalHandler::SPtr h, unsigned pid)
-        : m_state(s), m_normalHandler(h), m_pid(pid) {}
+        PointProximity(State * s, unsigned pid)
+        : m_state(s), m_pid(pid) {}
 
         void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
             DataMatrixDeriv & c1_d = *cId[this->getState()].write();
@@ -46,7 +38,9 @@ public:
             c1_d.endEdit();
         }
 
-        virtual sofa::type::Vector3 getNormal() const { return m_normalHandler->getNormal(); }
+        virtual sofa::type::Vector3 getNormal() const {
+            return m_normalHandler->getNormal();
+        }
 
         /// return proximiy position in a vector3
         sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
@@ -57,7 +51,6 @@ public:
 
     private:
         State * m_state;
-        NormalHandler::SPtr m_normalHandler;
         unsigned m_pid;
     };
 

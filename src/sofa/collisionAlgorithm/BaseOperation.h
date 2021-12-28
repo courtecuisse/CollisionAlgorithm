@@ -3,59 +3,42 @@
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
 
-namespace sofa::collisionAlgorithm {
+namespace sofa::collisionAlgorithm::Operations {
 
-class BaseOperations {
+class BaseOperation {
+protected:
+    BaseOperation() {}
+};
+
+template<class FUNC>
+class GenericOperation {
 public:
 
-    typedef std::function<BaseProximity::SPtr(BaseElement::SPtr)> CreateCenterProximityFunc;
-    typedef std::function<BaseProximity::SPtr(BaseProximity::SPtr, BaseElement::SPtr)> ProjectFunc;
-
-    static CreateCenterProximityFunc createCenterProximity(const BaseOperations * op) {
-        auto it = m_createCenterProximity.find(op);
-        if (it == m_createCenterProximity.end()) return &default_createCenterProximity;
+    static FUNC func(const BaseOperation * op) {
+        auto it = m_map.find(op);
+        if (it == m_map.end()) return &default_func;
         return it->second;
     }
 
-    static ProjectFunc project(const BaseOperations * op) {
-        auto it = m_project.find(op);
-        if (it == m_project.end()) return &default_project;
-        return it->second;
+    static int register_func(const BaseOperation* op, FUNC f) {
+        auto it = m_map.find(op);
+        if (it != m_map.end()) std::cerr << "createCenterPointProximity with operation " << typeid(op).name() << " already in the factory" << std::endl;
+        m_map[op] = f;
+        return 0;
     }
 
 private:
-    static std::map<const BaseOperations*,CreateCenterProximityFunc> m_createCenterProximity;
-    static std::map<const BaseOperations*,ProjectFunc> m_project;
-
-protected :
-    BaseOperations() {}
-
-    static BaseProximity::SPtr default_createCenterProximity(BaseElement::SPtr ) {
+    static BaseProximity::SPtr default_func(BaseElement::SPtr ) {
         std::cerr << "createCenterPointProximity with operation not in the factory" << std::endl;
         return NULL;
     }
 
-    static int register_createCenterProximity(const BaseOperations* op, CreateCenterProximityFunc f) {
-        auto it = m_createCenterProximity.find(op);
-        if (it != m_createCenterProximity.end()) std::cerr << "createCenterPointProximity with operation " << typeid(op).name() << " already in the factory" << std::endl;
-        m_createCenterProximity[op] = f;
-        return 0;
-    }
-
-
-
-    static BaseProximity::SPtr default_project(BaseProximity::SPtr, BaseElement::SPtr) {
-        std::cerr << "project with operation not in the factory" << std::endl;
-        return NULL;
-    }
-
-    static int register_project(const BaseOperations* op, ProjectFunc f) {
-        auto it = m_project.find(op);
-        if (it != m_project.end()) std::cerr << "project with operation " << typeid(op).name() << " already in the factory" << std::endl;
-        m_project[op] = f;
-        return 0;
-    }
+    static std::map<const BaseOperation*,FUNC> m_map;
 
 };
+
+class CreateCenterProximity : public GenericOperation<std::function<BaseProximity::SPtr(BaseElement::SPtr)>> {};
+
+class Project : public GenericOperation<std::function<BaseProximity::SPtr(BaseProximity::SPtr, BaseElement::SPtr)>> {};
 
 }

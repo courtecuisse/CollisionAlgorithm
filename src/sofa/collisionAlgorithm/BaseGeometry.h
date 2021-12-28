@@ -11,6 +11,7 @@
 #include <sofa/gl/gl.h>
 #include <sofa/simulation/AnimateBeginEvent.h>
 #include <sofa/core/topology/BaseMeshTopology.h>
+#include <sofa/collisionAlgorithm/BaseElement.h>
 
 namespace sofa {
 
@@ -54,8 +55,21 @@ public:
     void handleEvent(sofa::core::objectmodel::Event *event) {
         if (! dynamic_cast<sofa::simulation::AnimateBeginEvent*>(event)) return;
 
+        for (unsigned i=0;i<m_elements.size();i++) m_elements[i]->update();
+
         prepareDetection();
     }
+
+    template<class ELEMENT, typename... Args>
+    inline void createElement(Args...) {
+//        typedef typename ELEMENT<PROXIMITY> ELEMENT_PRPOXIMITY;
+        BaseElement::SPtr elmt(new ELEMENT(Args...));
+        m_elements.push_back(elmt);
+    }
+
+private:
+    std::vector<BaseElement::SPtr> m_elements;
+
 };
 
 template<class DataTypes>

@@ -5,108 +5,12 @@
 #include <sofa/collisionAlgorithm/operations/PointOperation.h>
 #include <sofa/collisionAlgorithm/operations/EdgeOperation.h>
 
-namespace sofa::collisionAlgorithm {
+namespace sofa::collisionAlgorithm::Operations {
 
 //static int createPointProximity =
 
-class TriangleOperation : public BaseOperations {
+class TriangleOperation : public BaseOperation {
 public:
-
-    class TriangleProximity : public BaseProximity {
-    public:
-        TriangleProximity(BaseProximity::SPtr p0,BaseProximity::SPtr p1, BaseProximity::SPtr p2, double f0,double f1,double f2)
-        : m_p0(p0), m_p1(p1), m_p2(p2), m_f0(f0), m_f1(f1), m_f2(f2) {}
-
-        void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
-            for (Index j=0;j<dir.size();j++) {
-                std::vector<sofa::type::Vector3> N0,N1,N2;
-
-                N0.push_back(dir[j] * m_f0);
-                N1.push_back(dir[j] * m_f1);
-                N2.push_back(dir[j] * m_f2);
-
-                m_p0->buildJacobianConstraint(cId,N0,fact,constraintId + j);
-                m_p1->buildJacobianConstraint(cId,N1,fact,constraintId + j);
-                m_p2->buildJacobianConstraint(cId,N2,fact,constraintId + j);
-            }
-        }
-
-        virtual sofa::type::Vector3 getNormal() const {
-            sofa::type::Vector3 G = m_p0->getNormal() * m_f0 +
-                                    m_p1->getNormal() * m_f1 +
-                                    m_p2->getNormal() * m_f2;
-            return G * 1.0/3.0;
-        }
-
-        /// return proximiy position in a vector3
-        sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
-            sofa::type::Vector3 G = m_p0->getPosition(v) * m_f0 +
-                                    m_p1->getPosition(v) * m_f1 +
-                                    m_p2->getPosition(v) * m_f2;
-            return G * 1.0/3.0;
-        }
-
-        BaseProximity::SPtr m_p0,m_p1,m_p2;
-        double m_f0,m_f1,m_f2;
-    };
-
-    struct TriangleInfo
-    {
-        type::Vec3d v0,v1;
-        double d00;
-        double d01;
-        double d11;
-        double invDenom;
-        double area;
-
-        type::Vec3d ax1,ax2;
-        type::Vec3d P0,P1,P2;
-    };
-
-    class TriangleElement : public BaseElement {
-    public:
-
-        TriangleElement(BaseProximity::SPtr p0,BaseProximity::SPtr p1, BaseProximity::SPtr p2,TriangleInfo t)
-        : m_p0(p0), m_p1(p1), m_p2(p2), m_tinfo(t) {}
-
-        void update() override {
-            m_tinfo.P0 = m_p0->getPosition();
-            m_tinfo.P1 = m_p1->getPosition();
-            m_tinfo.P2 = m_p2->getPosition();
-
-            m_tinfo.v0 = m_tinfo.P1 - m_tinfo.P0;
-            m_tinfo.v1 = m_tinfo.P2 - m_tinfo.P0;
-            type::Vec3d N=cross(m_tinfo.v0,m_tinfo.v1);
-            m_tinfo.area = N.norm()/2;
-            N.normalize();
-
-            m_tinfo.d00 = dot(m_tinfo.v0,m_tinfo.v0);
-            m_tinfo.d01 = dot(m_tinfo.v0,m_tinfo.v1);
-            m_tinfo.d11 = dot(m_tinfo.v1,m_tinfo.v1);
-
-            m_tinfo.invDenom = 1.0 / (m_tinfo.d00 * m_tinfo.d11 - m_tinfo.d01 * m_tinfo.d01);
-
-            m_tinfo.ax1 = m_tinfo.v0;
-            m_tinfo.ax2 = m_tinfo.v0.cross(N);
-
-            m_tinfo.ax1.normalize();
-            m_tinfo.ax2.normalize();
-        }
-
-        const TriangleInfo & getTriangleInfo() const { return m_tinfo; }
-        BaseProximity::SPtr getP0() const { return m_p0; }
-        BaseProximity::SPtr getP1() const { return m_p1; }
-        BaseProximity::SPtr getP2() const { return m_p2; }
-
-    private:
-        BaseProximity::SPtr m_p0,m_p1,m_p2;
-        TriangleInfo & m_tinfo;
-    };
-
-    static const BaseOperations * operation() {
-        static TriangleOperation s_triop;
-        return &s_triop;
-    }
 
     static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
         auto tri = toTriangleElement(elmt);
@@ -124,7 +28,8 @@ public:
         double fact_u,fact_v,fact_w;
         projectOnTriangle(P->getPosition(),tinfo,fact_u,fact_v,fact_w);
 
-        return BaseProximity::SPtr(new TriangleProximity(tri->getP0(),tri->getP1(),tri->getP2(),fact_u,fact_v,fact_w));
+        return elmt.createProximity(fact_u,fact_v,fact_w);
+//        return BaseProximity::SPtr(new TriangleProximity(tri->getP0(),tri->getP1(),tri->getP2(),fact_u,fact_v,fact_w));
     }
 
 
@@ -169,8 +74,11 @@ public:
 
 protected:
     TriangleOperation() {
-        BaseOperations::register_createCenterProximity(TriangleOperation::operation(),&TriangleOperation::createCenterProximity);
-        BaseOperations::register_project(TriangleOperation::operation(),&TriangleOperation::project);
+        static TriangleOperation s_triop;
+
+        CreateCenterProximity::register_func(&s_triop,&TriangleOperation::createCenterProximity);
+
+        Project::register_func(&s_triop,&TriangleOperation::project);
     }
 
     static const TriangleElement * toTriangleElement(BaseElement::SPtr elmt) {
