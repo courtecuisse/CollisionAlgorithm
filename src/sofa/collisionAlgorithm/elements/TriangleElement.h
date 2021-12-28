@@ -48,7 +48,9 @@ public:
         m_tinfo.ax2.normalize();
     }
 
-
+    void createProximity(double f0,double f1,double f2) {
+        return
+    }
 
 private:
     const BaseGeometry * m_geometry;

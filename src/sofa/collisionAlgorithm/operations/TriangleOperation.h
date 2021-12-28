@@ -14,6 +14,9 @@ public:
 
     static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
         auto tri = toTriangleElement(elmt);
+
+
+
         return BaseProximity::SPtr(new TriangleProximity(tri->getP0(),tri->getP1(),tri->getP2(),1.0/3.0,1.0/3.0,1.0/3.0));
     }
 
