@@ -3,24 +3,21 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
+#include <sofa/collisionAlgorithm/elements/PointElement.h>
+#include <sofa/collisionAlgorithm/operations/PointOperation.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class PointGeometry : public TBaseGeometry<DataTypes> {
+class PointGeometry : public TBaseGeometry<DataTypes>, public PointElementGeometry {
 public:
     typedef DataTypes TDataTypes;
     typedef PointGeometry<DataTypes> GEOMETRY;
     typedef TBaseGeometry<DataTypes> Inherit;
-    typedef BaseProximity::Index Index;
-    typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
-    typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
@@ -29,9 +26,18 @@ public:
     PointGeometry()
     : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {}
 
+    const Operations::BaseOperation * getOperations() const override { return Operations::PointOperation::getOperation(); }
+
+    void init() {
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+
+        for (unsigned i=0;i<pos.size();i++) {
+            m_elements.push_back(BaseElement::SPtr(new PointElement(this,i)));
+        }
+    }
+
     inline BaseElement::Iterator begin(Index eid = 0) const override {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
-        return DefaultElementIterator::create(this, pos, eid);
+        return BaseElement::Iterator(new TDefaultElementIterator(m_elements,eid));
     }
 
     void draw(const core::visual::VisualParams *vparams) override {
@@ -56,23 +62,17 @@ public:
         typeid(this).hash_code();
     }
 
-    inline PROXIMITYDATA createProximity(Index eid, CONTROL_POINT pid = CONTROL_DEFAULT) const {
-        return PROXIMITYDATA::create(eid,pid);
+    type::Vector3 getPosition(unsigned pid) const override {
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+        return pos[pid];
     }
 
-    //do not change the dataProximity.
-    inline PROXIMITYDATA project(const type::Vector3 & /*Q*/, Index eid) const {
-        return PROXIMITYDATA(eid);
+    BaseProximity::SPtr createProximity(unsigned p0) const override {
+
     }
 
-    inline type::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
-        return pos[data.m_eid];
-    }
-
-    virtual type::Vector3 computeNormal(const PROXIMITYDATA & /*data*/) const override {
-        return type::Vector3();
-    }
+private:
+    std::vector<PointElement::SPtr> m_elements;
 };
 
 }

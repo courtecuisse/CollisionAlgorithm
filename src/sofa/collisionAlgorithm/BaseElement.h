@@ -65,21 +65,13 @@ public:
     typedef ElementIterator::SPtr Iterator;
 
     virtual void update() = 0;
-//    virtual BaseProximity::SPtr createProximity(CONTROL_POINT id = CONTROL_DEFAULT) const = 0;
 
-//    virtual Index elementSize() const = 0;
+    template<typename CAST>
+    inline CAST * cast() {
+        return (CAST*)this;
+    }
 
-//    virtual Index id() const = 0;
-};
+ };
 
-
-//template<class ElementType>
-//class TBaseElement : public BaseElement {
-//public:
-
-//    static BaseElement::SPtr create(const ElementType & cont) {
-//        return BaseElement::SPtr(new TBaseElement(cont));
-//    }
-//};
 
 }

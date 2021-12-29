@@ -42,11 +42,9 @@ public:
 
     virtual BaseElement::Iterator begin(Index eid = 0) const = 0;
 
-    virtual const BaseOperations * getOperations() = 0;
+    virtual const Operations::BaseOperation * getOperations() const = 0;
 
-    inline const BaseGeometry * end() const {
-        return this;
-    }
+    inline const BaseGeometry * end() const { return this; }
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
@@ -55,20 +53,10 @@ public:
     void handleEvent(sofa::core::objectmodel::Event *event) {
         if (! dynamic_cast<sofa::simulation::AnimateBeginEvent*>(event)) return;
 
-        for (unsigned i=0;i<m_elements.size();i++) m_elements[i]->update();
+        for (auto it = begin(); it != end(); it++) it->element()->update();
 
         prepareDetection();
     }
-
-    template<class ELEMENT, typename... Args>
-    inline void createElement(Args...) {
-//        typedef typename ELEMENT<PROXIMITY> ELEMENT_PRPOXIMITY;
-        BaseElement::SPtr elmt(new ELEMENT(Args...));
-        m_elements.push_back(elmt);
-    }
-
-private:
-    std::vector<BaseElement::SPtr> m_elements;
 
 };
 
@@ -103,7 +91,7 @@ public:
         sofa::type::RGBAColor color = d_color.getValue();
         color[3] = 1.0;
 
-        auto createPorximityCenter = BaseOperations::createCenterProximity(getOperations());
+        auto createPorximityCenter = Operations::CreateCenterProximity::func(getOperations());
 
         for (auto it=this->begin();it!=this->end();it++) {
             auto element = *it;

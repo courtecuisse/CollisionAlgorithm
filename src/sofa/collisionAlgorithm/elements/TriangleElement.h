@@ -4,7 +4,13 @@
 
 namespace sofa::collisionAlgorithm {
 
-template<class PROXIMITY>
+class TriangleElementGeometry {
+public:
+    virtual type::Vector3 getPosition(unsigned pid) const = 0;
+
+    virtual BaseProximity::SPtr createProximity(unsigned p0, unsigned p1,unsigned p2, double f0,double f1,double f2) const = 0;
+};
+
 class TriangleElement : public BaseElement {
 public:
 
@@ -21,13 +27,13 @@ public:
         type::Vec3d P0,P1,P2;
     };
 
-    TriangleElement(BaseGeometry * geo, unsigned p0,unsigned p1,unsigned p2)
-    : m_geometry(geo), m_p0(p0), m_p1(p1), m_p2(p2) {}
+    TriangleElement(const TriangleElementGeometry * c, unsigned p0,unsigned p1,unsigned p2)
+    : m_geometry(c), m_p0(p0), m_p1(p1), m_p2(p2) {}
 
     void update() override {
-        m_tinfo.P0 = m_p0->getPosition();
-        m_tinfo.P1 = m_p1->getPosition();
-        m_tinfo.P2 = m_p2->getPosition();
+        m_tinfo.P0 = getP0();
+        m_tinfo.P1 = getP1();
+        m_tinfo.P2 = getP2();
 
         m_tinfo.v0 = m_tinfo.P1 - m_tinfo.P0;
         m_tinfo.v1 = m_tinfo.P2 - m_tinfo.P0;
@@ -48,12 +54,18 @@ public:
         m_tinfo.ax2.normalize();
     }
 
-    void createProximity(double f0,double f1,double f2) {
-        return
-    }
+    inline BaseProximity::SPtr createProximity(double f0,double f1,double f2) const { return m_geometry->createProximity(m_p0,m_p1,m_p2,f0,f1,f2); }
+
+    inline const TriangleInfo & getTriangleInfo() const { return m_tinfo; }
+
+    inline type::Vector3 getP0() const { return m_geometry->getPosition(m_p0); }
+
+    inline type::Vector3 getP1() const { return m_geometry->getPosition(m_p1); }
+
+    inline type::Vector3 getP2() const { return m_geometry->getPosition(m_p2); }
 
 private:
-    const BaseGeometry * m_geometry;
+    const TriangleElementGeometry * m_geometry;
     unsigned m_p0,m_p1,m_p2;
     TriangleInfo m_tinfo;
 };

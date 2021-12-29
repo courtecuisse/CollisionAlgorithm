@@ -16,7 +16,7 @@ public:
 
     static FUNC func(const BaseOperation * op) {
         auto it = m_map.find(op);
-        if (it == m_map.end()) return &default_func;
+        if (it == m_map.end()) return m_default;
         return it->second;
     }
 
@@ -28,12 +28,8 @@ public:
     }
 
 private:
-    static BaseProximity::SPtr default_func(BaseElement::SPtr ) {
-        std::cerr << "createCenterPointProximity with operation not in the factory" << std::endl;
-        return NULL;
-    }
-
     static std::map<const BaseOperation*,FUNC> m_map;
+    static const FUNC m_default;
 
 };
 

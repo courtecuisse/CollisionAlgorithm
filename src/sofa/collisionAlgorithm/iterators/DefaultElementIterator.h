@@ -21,7 +21,7 @@ class TDefaultElementIterator : public BaseElement::ElementIterator {
 public:
     typedef BaseGeometry::Index Index;
 
-    TDefaultElementIterator(const CONTAINER & container, Index start)
+    TDefaultElementIterator(const CONTAINER & container, unsigned start)
     : m_container(container)
     , m_it(start) {}
 
@@ -29,13 +29,13 @@ public:
 
     bool end() const override { return m_it>=m_container.size(); }
 
-    virtual BaseElement::SPtr element() { return *m_it; }
+    virtual BaseElement::SPtr element() { return m_container[m_it]; }
 
-    virtual const BaseElement::SPtr element() const { return *m_it; }
+    virtual const BaseElement::SPtr element() const { return m_container[m_it]; }
 
 private:
     const CONTAINER & m_container;
-    typename CONTAINER::iterator m_it;
+    unsigned m_it;
 
 };
 

@@ -5,26 +5,20 @@
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 #include <sofa/collisionAlgorithm/operations/TriangleOperation.h>
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
+#include <sofa/collisionAlgorithm/operations/TriangleOperation.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class TriangleGeometry : public TBaseGeometry<DataTypes> {
+class TriangleGeometry : public TBaseGeometry<DataTypes>, public TriangleElementGeometry {
 public:
     typedef DataTypes TDataTypes;
     typedef TriangleGeometry<DataTypes> GEOMETRY;
     typedef TBaseGeometry<DataTypes> Inherit;
-    typedef BaseProximity::Index Index;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
-
-    typedef size_t TriangleID;
-    typedef sofa::topology::Triangle Triangle;
-    typedef sofa::type::vector<Triangle> VecTriangles;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
@@ -35,44 +29,30 @@ public:
         l_topology.setPath("@.");
     }
 
-    class PointTriangleNormalHandler : public PointOperation::NormalHandler {
-    public:
-
-        PointTriangleNormalHandler(TriangleOperation::TriangleInfo & t) : m_tinfo(t) {}
-
-        virtual sofa::type::Vector3 getNormal() const { return cross(m_tinfo.ax2,m_tinfo.ax1); }
-
-        TriangleOperation::TriangleInfo & m_tinfo;
-    };
-
     void init() {
-//        m_tinfoVector.resize(this->l_topology->getNbTriangles());
-
         for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
             auto tri = this->l_topology->getTriangle(i);
-            createElement<TriangleElement<TriangleProximity> >(this->getState(),tri[0],tri[1],tri[2]);
-
-
-//            auto p0 = BaseProximity::SPtr(new PointOperation::PointProximity(this->getState(),PointOperation::NormalHandler::SPtr(new PointTriangleNormalHandler(m_tinfoVector[i])),tri[0]));
-//            auto p1 = BaseProximity::SPtr(new PointOperation::PointProximity(this->getState(),PointOperation::NormalHandler::SPtr(new PointTriangleNormalHandler(m_tinfoVector[i])),tri[1]));
-//            auto p2 = BaseProximity::SPtr(new PointOperation::PointProximity(this->getState(),PointOperation::NormalHandler::SPtr(new PointTriangleNormalHandler(m_tinfoVector[i])),tri[2]));
-
-//            auto elmt = BaseElement::SPtr(new TriangleOperation::TriangleElement(p0,p1,p2,m_tinfoVector[i]));
-
-//            auto triangle = this->l_topology->getTriangles()[i];
+            m_elements.push_back(BaseElement::SPtr(new TriangleElement(this,tri[0],tri[1],tri[2])));
         }
     }
 
-    inline BaseElement::Iterator begin(Index eid = 0) const override {
-        return TriangleOperation::begin(this, this->l_topology->getTriangles(), eid);
+    const Operations::BaseOperation * getOperations() const override { return Operations::TriangleOperation::getOperation(); }
+
+    BaseProximity::SPtr createProximity(unsigned p0, unsigned p1, unsigned p2, double f0,double f1,double f2) const override {
+
     }
 
-//    virtual type::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
-//        auto tinfo = getTriangleInfo()[data.m_eid];
-//        return cross(tinfo.ax2,tinfo.ax1);
-//    }
+    type::Vector3 getPosition(unsigned pid) const override {
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+        return pos[pid];
+    }
 
-//    std::vector<TriangleOperation::TriangleInfo> m_tinfoVector;
+    inline BaseElement::Iterator begin(Index eid = 0) const override {
+        return BaseElement::Iterator(new TDefaultElementIterator(m_elements,eid));
+    }
+
+private:
+    std::vector<TriangleElement::SPtr> m_elements;
 
 };
 

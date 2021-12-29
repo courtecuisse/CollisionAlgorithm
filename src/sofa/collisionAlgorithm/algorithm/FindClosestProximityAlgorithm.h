@@ -51,8 +51,8 @@ public:
         DetectionOutput & output = *d_output.beginEdit();
         output.clear();
 
-        auto createProximityFunc = BaseOperations::createCenterProximity(l_from);
-        auto projectFunc = BaseOperations::project(l_dest);
+        auto createProximityFunc = Operations::CreateCenterProximity::func(l_from->getOperations());
+        auto projectFunc = Operations::Project::func(l_dest->getOperations());
 
         for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
             auto pfrom = createProximityFunc(itfrom->element());
