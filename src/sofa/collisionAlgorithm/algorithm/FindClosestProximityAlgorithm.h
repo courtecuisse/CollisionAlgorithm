@@ -3,15 +3,13 @@
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/BaseOperation.h>
+#include <sofa/collisionAlgorithm/operations/CreateCenterProximity.h>
+#include <sofa/collisionAlgorithm/operations/Project.h>
+#include <sofa/collisionAlgorithm/operations/BroadPhase.h>
 
-namespace sofa
-{
+namespace sofa::collisionAlgorithm {
 
-namespace collisionAlgorithm
-{
-
-class FindClosestProximityAlgorithm : public BaseAlgorithm
-{
+class FindClosestProximityAlgorithm : public BaseAlgorithm {
 public:
     SOFA_CLASS(FindClosestProximityAlgorithm, BaseAlgorithm);
 
@@ -51,21 +49,22 @@ public:
         DetectionOutput & output = *d_output.beginEdit();
         output.clear();
 
-        auto createProximityFunc = Operations::CreateCenterProximity::func(l_from->getOperations());
-        auto projectFunc = Operations::Project::func(l_dest->getOperations());
+        auto createProximityOp = Operations::CreateCenterProximity::func(l_from);
+        auto projectOp = Operations::Project::func(l_dest);
+        auto broadPhaseOp = Operations::BroadPhase::func(l_dest);
 
         for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
-            auto pfrom = createProximityFunc(itfrom->element());
+            auto pfrom = createProximityOp(itfrom->element());
             if (pfrom == nullptr) continue;
 
             double min_dist = std::numeric_limits<double>::max();
             PairDetection min_pair;
 
-            for (auto itdest=l_dest->begin();itdest!=l_dest->end();itdest++) {
+            for (auto itdest = broadPhaseOp(pfrom,l_dest);itdest!=l_dest->end();itdest++) {
                 auto edest = *itdest;
                 if (edest == nullptr) continue;
 
-                BaseProximity::SPtr pdest = projectFunc(pfrom,edest);
+                BaseProximity::SPtr pdest = projectOp(pfrom,edest);
 
                 double d = m_distance(pfrom,pdest);
                 if (d < min_dist) min_pair = PairDetection(pfrom,pdest);
@@ -82,7 +81,5 @@ private:
 
 };
 
-
 }
 
-}

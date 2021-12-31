@@ -1,40 +1,43 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseProximity.h>
-#include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/BaseGeometry.h>
 
 namespace sofa::collisionAlgorithm::Operations {
-
-class BaseOperation {
-protected:
-    BaseOperation() {}
-};
 
 template<class FUNC>
 class GenericOperation {
 public:
 
-    static FUNC func(const BaseOperation * op) {
-        auto it = m_map.find(op);
-        if (it == m_map.end()) return m_default;
+    static FUNC func(const BaseGeometry * geo) {
+        size_t id = geo->getOperationsHash();
+        auto it = m_singleton.m_map.find(id);
+        if (it == m_singleton.m_map.end()) return m_singleton.getDefault();
         return it->second;
     }
 
-    static int register_func(const BaseOperation* op, FUNC f) {
-        auto it = m_map.find(op);
-        if (it != m_map.end()) std::cerr << "createCenterPointProximity with operation " << typeid(op).name() << " already in the factory" << std::endl;
-        m_map[op] = f;
+    template<class T>
+    static int register_func(FUNC f) {
+        size_t id = typeid(T).hash_code();
+        auto it = m_singleton.m_map.find(id);
+        if (it != m_singleton.m_map.end()) std::cerr << "createCenterPointProximity with operation " << id << " already in the factory" << std::endl;
+        m_singleton.m_map[id] = f;
         return 0;
     }
 
+    //This function must be overloaded in all the operations !!!
+    //The code below makes no sens and will probably result in a sefgault unless the function is overloaded
+    //It cannot be made virtual pure since the singleton is intantiated in this class
+    virtual FUNC getDefault() const {
+        std::cerr << "YOU MUST DEFINE THE DEFUALT OPERATION" << std::endl;
+        return FUNC();
+    }
+
 private:
-    static std::map<const BaseOperation*,FUNC> m_map;
-    static const FUNC m_default;
+    std::map<size_t,FUNC> m_map;
+    static GenericOperation m_singleton;
 
+    //No construction of the is is allowed
+    GenericOperation() {}
 };
-
-class CreateCenterProximity : public GenericOperation<std::function<BaseProximity::SPtr(BaseElement::SPtr)>> {};
-
-class Project : public GenericOperation<std::function<BaseProximity::SPtr(BaseProximity::SPtr, BaseElement::SPtr)>> {};
 
 }

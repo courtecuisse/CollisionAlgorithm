@@ -1,14 +1,12 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseProximity.h>
-#include <sofa/collisionAlgorithm/BaseOperation.h>
-#include <sofa/collisionAlgorithm/operations/PointOperation.h>
-#include <sofa/collisionAlgorithm/operations/EdgeOperation.h>
+#include <sofa/collisionAlgorithm/toolbox/EdgeToolBox.h>
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 
-namespace sofa::collisionAlgorithm::Operations {
+namespace sofa::collisionAlgorithm::toolbox {
 
-class TriangleOperation : public BaseOperation {
+class TriangleToolBox {
 public:
 
     static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
@@ -54,31 +52,19 @@ public:
 
         if (fact_u<0)
         {
-            EdgeOperation::projectOnEdge(proj_P, tinfo.P1, tinfo.P2, fact_v, fact_w);
+            EdgeToolBox::projectOnEdge(proj_P, tinfo.P1, tinfo.P2, fact_v, fact_w);
             fact_u=0;
         }
         else if (fact_v<0)
         {
-            EdgeOperation::projectOnEdge(proj_P, tinfo.P0, tinfo.P2, fact_u, fact_w);
+            EdgeToolBox::projectOnEdge(proj_P, tinfo.P0, tinfo.P2, fact_u, fact_w);
             fact_v=0;
         }
         else if (fact_w<0)
         {
-            EdgeOperation::projectOnEdge(proj_P, tinfo.P0, tinfo.P1, fact_u, fact_v);
+            EdgeToolBox::projectOnEdge(proj_P, tinfo.P0, tinfo.P1, fact_u, fact_v);
             fact_w=0;
         }
-    }
-
-    static BaseOperation * getOperation() {
-        static TriangleOperation s_op;
-        return &s_op;
-    }
-
-private:
-    TriangleOperation() {
-        CreateCenterProximity::register_func(getOperation(),&TriangleOperation::createCenterProximity);
-
-        Project::register_func(getOperation(),&TriangleOperation::project);
     }
 
 };

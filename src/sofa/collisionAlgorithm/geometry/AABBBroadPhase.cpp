@@ -1,15 +1,15 @@
-#include <sofa/collisionAlgorithm/geometry/AABBBroadPhase.inl>
-#include <sofa/core/ObjectFactory.h>
+//#include <sofa/collisionAlgorithm/geometry/AABBBroadPhase.inl>
+//#include <sofa/core/ObjectFactory.h>
 
-namespace sofa {
+//namespace sofa {
 
-namespace collisionAlgorithm {
+//namespace collisionAlgorithm {
 
-SOFA_DECL_CLASS(AABBBroadPhase)
+//SOFA_DECL_CLASS(AABBBroadPhase)
 
-int AABBBroadPhaseClass = core::RegisterObject("AABBBroadPhase")
-.add< AABBBroadPhase >();
+//int AABBBroadPhaseClass = core::RegisterObject("AABBBroadPhase")
+//.add< AABBBroadPhase >();
 
-}
+//}
 
-}
+//}

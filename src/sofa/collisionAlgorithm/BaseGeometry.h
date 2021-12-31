@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseOperation.h>
+//#include <sofa/collisionAlgorithm/BaseOperation.h>
 #include <sofa/simulation/CollisionBeginEvent.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
@@ -13,9 +13,7 @@
 #include <sofa/core/topology/BaseMeshTopology.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
 
-namespace sofa {
-
-namespace collisionAlgorithm {
+namespace sofa ::collisionAlgorithm {
 
 /*!
  * \brief The BaseGeometry class is an abstract class defining a basic geometry
@@ -42,7 +40,7 @@ public:
 
     virtual BaseElement::Iterator begin(Index eid = 0) const = 0;
 
-    virtual const Operations::BaseOperation * getOperations() const = 0;
+    virtual size_t getOperationsHash() const = 0;
 
     inline const BaseGeometry * end() const { return this; }
 
@@ -60,7 +58,7 @@ public:
 
 };
 
-template<class DataTypes>
+template<class DataTypes, class ELEMENT>
 class TBaseGeometry : public BaseGeometry {
 public:
 
@@ -76,34 +74,34 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(TBaseGeometry,DataTypes),BaseGeometry);
+    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE2(TBaseGeometry,DataTypes,ELEMENT),BaseGeometry);
 
-    core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
+    core::objectmodel::SingleLink<TBaseGeometry<DataTypes,ELEMENT>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
 
     TBaseGeometry()
     : l_state(initLink("mstate", "link to state")) {
         l_state.setPath("@.");
     }
 
-    inline void drawNormals(const core::visual::VisualParams *vparams) {
-        if (! vparams->displayFlags().getShowNormals() || d_drawScaleNormal.getValue() == 0.0) return;
+//    inline void drawNormals(const core::visual::VisualParams *vparams) {
+//        if (! vparams->displayFlags().getShowNormals() || d_drawScaleNormal.getValue() == 0.0) return;
 
-        sofa::type::RGBAColor color = d_color.getValue();
-        color[3] = 1.0;
+//        sofa::type::RGBAColor color = d_color.getValue();
+//        color[3] = 1.0;
 
-        auto createPorximityCenter = Operations::CreateCenterProximity::func(getOperations());
+//        auto createPorximityCenter = Operations::CreateCenterProximity::func(this);
 
-        for (auto it=this->begin();it!=this->end();it++) {
-            auto element = *it;
-            BaseProximity::SPtr center = createPorximityCenter(element);
-            vparams->drawTool()->drawArrow(
-                center->getPosition(),
-                center->getPosition() + center->getNormal() * d_drawScaleNormal.getValue(),
-                d_drawScaleNormal.getValue() * 0.1,
-                color
-            );
-        }
-    }
+//        for (auto it=this->begin();it!=this->end();it++) {
+//            auto element = *it;
+//            BaseProximity::SPtr center = createPorximityCenter(element);
+//            vparams->drawTool()->drawArrow(
+//                center->getPosition(),
+//                center->getPosition() + center->getNormal() * d_drawScaleNormal.getValue(),
+//                d_drawScaleNormal.getValue() * 0.1,
+//                color
+//            );
+//        }
+//    }
 
     inline sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
@@ -135,13 +133,20 @@ public:
         return templateName(this);
     }
 
-    static std::string templateName(const TBaseGeometry<DataTypes>* = NULL) {
+    static std::string templateName(const TBaseGeometry<DataTypes,ELEMENT>* = NULL) {
         return DataTypes::Name();
     }
 
-};
+    size_t getOperationsHash() const override {
+        return typeid(ELEMENT).hash_code();
+    }
 
-}
+    template<class... ARGS>
+    BaseElement::SPtr createElement(ARGS... args) {
+        return BaseElement::SPtr(new ELEMENT(args...));
+    }
+
+};
 
 }
 

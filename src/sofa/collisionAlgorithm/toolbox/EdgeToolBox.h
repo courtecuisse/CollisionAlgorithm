@@ -1,18 +1,12 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseProximity.h>
-#include <sofa/collisionAlgorithm/BaseOperation.h>
 #include <sofa/collisionAlgorithm/elements/EdgeElement.h>
 
-namespace sofa::collisionAlgorithm::Operations {
+namespace sofa::collisionAlgorithm::toolbox {
 
-class EdgeOperation : public BaseOperation {
+class EdgeToolBox {
 public:
-
-    static BaseOperation * getOperation() {
-        static EdgeOperation s_op;
-        return &s_op;
-    }
 
     static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
         auto edge = elmt->cast<EdgeElement>();
@@ -39,15 +33,6 @@ public:
         else if (fact_v>1.0) fact_v = 1.0;
 
         fact_u = 1.0-fact_v;
-    }
-
-
-protected:
-    EdgeOperation() {
-        CreateCenterProximity::register_func(getOperation(),&EdgeOperation::createCenterProximity);
-
-        Project::register_func(getOperation(),&EdgeOperation::project);
-
     }
 
 };

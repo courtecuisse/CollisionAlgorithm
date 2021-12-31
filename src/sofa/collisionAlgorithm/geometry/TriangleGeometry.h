@@ -3,20 +3,20 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
-#include <sofa/collisionAlgorithm/operations/TriangleOperation.h>
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
-#include <sofa/collisionAlgorithm/operations/TriangleOperation.h>
+#include <sofa/collisionAlgorithm/toolbox/TriangleToolBox.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class TriangleGeometry : public TBaseGeometry<DataTypes>, public TriangleElementGeometry {
+class TriangleGeometry : public TBaseGeometry<DataTypes,TriangleElement>, public TriangleElementGeometry {
 public:
     typedef DataTypes TDataTypes;
+    typedef TriangleElement ELEMENT;
     typedef TriangleGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes> Inherit;
+    typedef TBaseGeometry<DataTypes,ELEMENT> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
 
@@ -32,11 +32,9 @@ public:
     void init() {
         for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
             auto tri = this->l_topology->getTriangle(i);
-            m_elements.push_back(BaseElement::SPtr(new TriangleElement(this,tri[0],tri[1],tri[2])));
+            m_elements.push_back(this->createElement(this,tri[0],tri[1],tri[2]));
         }
     }
-
-    const Operations::BaseOperation * getOperations() const override { return Operations::TriangleOperation::getOperation(); }
 
     BaseProximity::SPtr createProximity(unsigned p0, unsigned p1, unsigned p2, double f0,double f1,double f2) const override {
 

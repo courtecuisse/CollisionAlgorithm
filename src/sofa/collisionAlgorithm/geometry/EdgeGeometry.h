@@ -2,18 +2,19 @@
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
-#include <sofa/collisionAlgorithm/operations/EdgeOperation.h>
+#include <sofa/collisionAlgorithm/toolbox/EdgeToolBox.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class EdgeGeometry : public TBaseGeometry<DataTypes>, public EdgeElementGeometry {
+class EdgeGeometry : public TBaseGeometry<DataTypes,EdgeElement>, public EdgeElementGeometry {
 public:
     typedef DataTypes TDataTypes;
+    typedef EdgeElement ELEMENT;
     typedef EdgeGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes> Inherit;
+    typedef TBaseGeometry<DataTypes,ELEMENT> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
 
@@ -26,12 +27,10 @@ public:
         l_topology.setPath("@.");
     }
 
-    const Operations::BaseOperation * getOperations() const override { return Operations::EdgeOperation::getOperation(); }
-
     void init() {
         for (unsigned i=0;i<this->l_topology->getNbEdges();i++) {
             auto edge = this->l_topology->getEdge(i);
-            m_elements.push_back(BaseElement::SPtr(new EdgeElement(this,edge[0],edge[1])));
+            m_elements.push_back(this->createElement(this,edge[0],edge[1]));
         }
     }
 
