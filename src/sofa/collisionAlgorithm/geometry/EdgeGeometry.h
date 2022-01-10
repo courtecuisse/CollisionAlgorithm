@@ -9,7 +9,7 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class EdgeGeometry : public TBaseGeometry<DataTypes,EdgeElement>, public EdgeElementGeometry {
+class EdgeGeometry : public TBaseGeometry<DataTypes,EdgeElement> {
 public:
     typedef DataTypes TDataTypes;
     typedef EdgeElement ELEMENT;
@@ -30,7 +30,16 @@ public:
     void init() {
         for (unsigned i=0;i<this->l_topology->getNbEdges();i++) {
             auto edge = this->l_topology->getEdge(i);
-            m_elements.push_back(this->createElement(this,edge[0],edge[1]));
+            m_elements.push_back(this->createElement(edge[0],edge[1]));
+        }
+
+        //default proximity creator
+        setPoximityCreator(&EdgeGeometry::createProximity);
+    }
+
+    void setPoximityCreator(EdgeElement::ProxCreatorFunc f) {
+        for (unsigned i=0;i<m_elements.size();i++) {
+            m_elements[i]->setProximityCreator(f);
         }
     }
 
@@ -51,13 +60,7 @@ public:
 //        return this->l_topology->getEdge(eid);
 //    }
 
-    sofa::type::Vector3 getPosition(unsigned pid) const override{
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-
-        return pos[pid];
-    }
-
-    BaseProximity::SPtr createProximity(unsigned p0, unsigned p1, double f0,double f1) const override {
+    static BaseProximity::SPtr createProximity(const EdgeElement * elmt, double f0,double f1) {
 
     }
 

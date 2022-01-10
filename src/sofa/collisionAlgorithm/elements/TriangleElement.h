@@ -4,15 +4,10 @@
 
 namespace sofa::collisionAlgorithm {
 
-class TriangleElementGeometry {
+class TriangleElement : public TBaseElement<std::function<BaseProximity::SPtr(const TriangleElement *, double ,double , double )> > {
 public:
-    virtual type::Vector3 getPosition(unsigned pid) const = 0;
 
-    virtual BaseProximity::SPtr createProximity(unsigned p0, unsigned p1,unsigned p2, double f0,double f1,double f2) const = 0;
-};
-
-class TriangleElement : public BaseElement {
-public:
+    typedef std::shared_ptr<TriangleElement> SPtr;
 
     struct TriangleInfo
     {
@@ -27,13 +22,13 @@ public:
         type::Vec3d P0,P1,P2;
     };
 
-    TriangleElement(const TriangleElementGeometry * c, unsigned p0,unsigned p1,unsigned p2)
-    : m_geometry(c), m_p0(p0), m_p1(p1), m_p2(p2) {}
+    TriangleElement(unsigned p0,unsigned p1,unsigned p2)
+    : m_p0(p0), m_p1(p1), m_p2(p2) {}
 
     void update() override {
-        m_tinfo.P0 = getP0();
-        m_tinfo.P1 = getP1();
-        m_tinfo.P2 = getP2();
+        m_tinfo.P0 = createProximity(1,0,0)->getPosition();
+        m_tinfo.P1 = createProximity(0,1,0)->getPosition();
+        m_tinfo.P2 = createProximity(0,0,1)->getPosition();
 
         m_tinfo.v0 = m_tinfo.P1 - m_tinfo.P0;
         m_tinfo.v1 = m_tinfo.P2 - m_tinfo.P0;
@@ -54,20 +49,25 @@ public:
         m_tinfo.ax2.normalize();
     }
 
-    inline BaseProximity::SPtr createProximity(double f0,double f1,double f2) const { return m_geometry->createProximity(m_p0,m_p1,m_p2,f0,f1,f2); }
+    inline BaseProximity::SPtr createProximity(double f0,double f1,double f2) const {
+        return m_createProxFunc(this,f0,f1,f2);
+    }
 
     inline const TriangleInfo & getTriangleInfo() const { return m_tinfo; }
 
-    inline type::Vector3 getP0() const { return m_geometry->getPosition(m_p0); }
+    inline unsigned getP0() const { return m_p0; }
 
-    inline type::Vector3 getP1() const { return m_geometry->getPosition(m_p1); }
+    inline unsigned getP1() const { return m_p1; }
 
-    inline type::Vector3 getP2() const { return m_geometry->getPosition(m_p2); }
+    inline unsigned getP2() const { return m_p2; }
+
+    type::Vector3 getNormal() const {
+        return cross(m_tinfo.ax1,m_tinfo.ax2).normalized();
+    }
 
 private:
-    const TriangleElementGeometry * m_geometry;
     unsigned m_p0,m_p1,m_p2;
-    TriangleInfo m_tinfo;
+    TriangleInfo m_tinfo;    
 };
 
 }

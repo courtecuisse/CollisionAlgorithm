@@ -17,8 +17,8 @@ public:
         auto edge = elmt->cast<EdgeElement>();
 
         double fact_u,fact_v;
-        const type::Vector3 P0 = edge->getP0();
-        const type::Vector3 P1 = edge->getP1();
+        const type::Vector3 P0 = edge->createProximity(1,0)->getPosition();
+        const type::Vector3 P1 = edge->createProximity(0,1)->getPosition();
 
         projectOnEdge(P->getPosition(),P0,P1,fact_u,fact_v);
 

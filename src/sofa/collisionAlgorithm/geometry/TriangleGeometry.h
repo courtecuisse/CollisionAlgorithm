@@ -11,7 +11,7 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class TriangleGeometry : public TBaseGeometry<DataTypes,TriangleElement>, public TriangleElementGeometry {
+class TriangleGeometry : public TBaseGeometry<DataTypes,TriangleElement> {
 public:
     typedef DataTypes TDataTypes;
     typedef TriangleElement ELEMENT;
@@ -32,17 +32,25 @@ public:
     void init() {
         for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
             auto tri = this->l_topology->getTriangle(i);
-            m_elements.push_back(this->createElement(this,tri[0],tri[1],tri[2]));
+            auto elmt = this->createElement(tri[0],tri[1],tri[2]);
+            m_elements.push_back(elmt);
         }
+
+        //default proximity creator
+        setPoximityCreator(
+            [=](const TriangleElement * elmt, double f0,double f1,double f2) -> BaseProximity::SPtr {
+                return BaseProximity::SPtr(new GouraudTriangleProximity<DataTypes>(this->getState(),
+                                                                            elmt->getP0(),elmt->getP1(),elmt->getP2(),
+                                                                            f0,f1,f2,
+                                                                            std::bind(&TriangleElement::getNormal,elmt)));
+            }
+        );
     }
 
-    BaseProximity::SPtr createProximity(unsigned p0, unsigned p1, unsigned p2, double f0,double f1,double f2) const override {
-
-    }
-
-    type::Vector3 getPosition(unsigned pid) const override {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-        return pos[pid];
+    void setPoximityCreator(TriangleElement::ProxCreatorFunc f) {
+        for (unsigned i=0;i<m_elements.size();i++) {
+            m_elements[i]->setProximityCreator(f);
+        }
     }
 
     inline BaseElement::Iterator begin(Index eid = 0) const override {

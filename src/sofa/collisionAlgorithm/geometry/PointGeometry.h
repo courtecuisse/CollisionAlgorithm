@@ -11,7 +11,7 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class PointGeometry : public TBaseGeometry<DataTypes,PointElement>, public PointElementGeometry {
+class PointGeometry : public TBaseGeometry<DataTypes,PointElement> {
 public:
     typedef DataTypes TDataTypes;
     typedef PointElement ELEMENT;
@@ -31,7 +31,16 @@ public:
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
         for (unsigned i=0;i<pos.size();i++) {
-            m_elements.push_back(this->createElement(this,i));
+            m_elements.push_back(this->createElement(i));
+        }
+
+        //default proximity creator
+        setPoximityCreator(&PointGeometry::createProximity);
+    }
+
+    void setPoximityCreator(PointElement::ProxCreatorFunc f) {
+        for (unsigned i=0;i<m_elements.size();i++) {
+            m_elements[i]->setProximityCreator(f);
         }
     }
 
@@ -59,12 +68,7 @@ public:
 //        }
 //    }
 
-    type::Vector3 getPosition(unsigned pid) const override {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-        return pos[pid];
-    }
-
-    BaseProximity::SPtr createProximity(unsigned p0) const override {
+    static BaseProximity::SPtr createProximity(const PointElement * elmt) {
 
     }
 

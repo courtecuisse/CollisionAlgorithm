@@ -142,8 +142,8 @@ public:
     }
 
     template<class... ARGS>
-    BaseElement::SPtr createElement(ARGS... args) {
-        return BaseElement::SPtr(new ELEMENT(args...));
+    typename ELEMENT::SPtr createElement(ARGS... args) {
+        return typename ELEMENT::SPtr(new ELEMENT(args...));
     }
 
 };
