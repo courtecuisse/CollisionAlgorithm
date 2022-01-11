@@ -18,6 +18,10 @@ public:
         return m_createProxFunc(this,f0,f1);
     }
 
+    inline unsigned getP0() const { return m_p0; }
+
+    inline unsigned getP1() const { return m_p1; }
+
 private:
     unsigned m_p0,m_p1;
 };

@@ -135,6 +135,14 @@ public:
         return typename ELEMENT::SPtr(new ELEMENT(args...));
     }
 
+
+    void setPoximityCreator(typename ELEMENT::ProxCreatorFunc f) {
+        for (auto it = begin();it!=end();it++) {
+            auto telement = it->element()->cast<ELEMENT>();
+            telement->setProximityCreator(f);
+        }
+    }
+
 };
 
 }

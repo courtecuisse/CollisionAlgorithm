@@ -6,9 +6,7 @@
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 #include <sofa/collisionAlgorithm/toolbox/TriangleToolBox.h>
 
-namespace sofa {
-
-namespace collisionAlgorithm {
+namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
 class TriangleGeometry : public TBaseGeometry<DataTypes,TriangleElement> {
@@ -37,28 +35,17 @@ public:
         }
 
         //default proximity creator
-        setPoximityCreator(
+        this->setPoximityCreator(
             [=](const TriangleElement * elmt, double f0,double f1,double f2) -> BaseProximity::SPtr {
-                return BaseProximity::SPtr(new GouraudTriangleProximity<DataTypes>(this->getState(),
+                return BaseProximity::SPtr(new BaseTriangleProximity<DataTypes>(this->getState(),
                                                                             elmt->getP0(),elmt->getP1(),elmt->getP2(),
-                                                                            f0,f1,f2,
-                                                                            elmt->getTriangleInfo().N));
+                                                                            f0,f1,f2));
             }
         );
     }
 
-    void setPoximityCreator(TriangleElement::ProxCreatorFunc f) {
-        for (unsigned i=0;i<m_elements.size();i++) {
-            m_elements[i]->setProximityCreator(f);
-        }
-    }
-
     inline BaseElement::Iterator begin(Index eid = 0) const override {
         return BaseElement::Iterator(new TDefaultElementIterator(m_elements,eid));
-    }
-
-    const std::vector<TriangleElement::SPtr> & getElements() const {
-        return m_elements;
     }
 
 private:
@@ -66,7 +53,5 @@ private:
 
 };
 
-
 }
 
-}

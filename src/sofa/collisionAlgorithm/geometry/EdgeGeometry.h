@@ -3,6 +3,7 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/toolbox/EdgeToolBox.h>
+#include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
 
 namespace sofa {
 
@@ -34,59 +35,18 @@ public:
         }
 
         //default proximity creator
-        setPoximityCreator(&EdgeGeometry::createProximity);
+        this->setPoximityCreator(
+            [=](const EdgeElement * elmt, double f0,double f1) -> BaseProximity::SPtr {
+                return BaseProximity::SPtr(new BaseEdgeProximity<DataTypes>(this->getState(),
+                                                                               elmt->getP0(),elmt->getP1(),
+                                                                               f0,f1));
+            }
+        );
     }
-
-    void setPoximityCreator(EdgeElement::ProxCreatorFunc f) {
-        for (unsigned i=0;i<m_elements.size();i++) {
-            m_elements[i]->setProximityCreator(f);
-        }
-    }
-
-//    template<class DataTypes>
-//    static BaseElement::SPtr createElement(sofa::core::behavior::MechanicalState<DataTypes> * state, core::topology::BaseMeshTopology::Edge edge) {
-//        auto p0 = PointOperation::createProximity(state,edge[0]);
-//        auto p1 = PointOperation::createProximity(state,edge[1]);
-
-//        return BaseElement::SPtr(new EdgeElement(p0,p1));
-//    }
-
 
     inline BaseElement::Iterator begin(Index eid = 0) const override {
         return BaseElement::Iterator(new TDefaultElementIterator(m_elements,eid));
     }
-
-//    inline const sofa::topology::Edge getEdge(Index eid) const {
-//        return this->l_topology->getEdge(eid);
-//    }
-
-    static BaseProximity::SPtr createProximity(const EdgeElement * elmt, double f0,double f1) {
-
-    }
-
-//    inline PROXIMITYDATA createProximity(Index eid, CONTROL_POINT c = CONTROL_DEFAULT) const {
-//        return PROXIMITYDATA::create(eid, getEdge(eid), c);
-//    }
-
-//    inline PROXIMITYDATA project(const sofa::type::Vector3 & P, Index eid) const {
-//        auto edge = getEdge(eid);
-
-//        const helper::ReadAccessor<Data <VecCoord> >& x = this->getState()->read(core::VecCoordId::position());
-
-//        const sofa::type::Vector3 & E1 = x[edge[0]];
-//        const sofa::type::Vector3 & E2 = x[edge[1]];
-
-//        double fact_u;
-//        double fact_v;
-
-//        toolBox::projectOnEdge(P,E1,E2,fact_u,fact_v);
-
-//        return PROXIMITYDATA(eid, edge[0], edge[1], fact_u,fact_v);
-//    }
-
-//    virtual sofa::type::Vector3 computeNormal(const PROXIMITYDATA & /*data*/) const override {
-//        return sofa::type::Vector3();
-//    }
 
 //    inline void draw(const core::visual::VisualParams * vparams) {
 //        this->drawNormals(vparams);

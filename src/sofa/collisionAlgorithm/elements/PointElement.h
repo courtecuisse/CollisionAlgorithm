@@ -18,6 +18,8 @@ public:
         return m_createProxFunc(this);
     }
 
+    inline unsigned getP0() const { return m_point; }
+
 private:
     unsigned m_point;
 };

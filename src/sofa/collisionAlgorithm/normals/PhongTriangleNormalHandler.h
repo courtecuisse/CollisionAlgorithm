@@ -3,10 +3,7 @@
 #include <sofa/collisionAlgorithm/CollisionPipeline.h>
 #include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
 
-namespace sofa {
-
-namespace collisionAlgorithm {
-
+namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
 class PhongTriangleNormalHandler : public CollisionComponent {
@@ -16,11 +13,26 @@ public:
 
     core::objectmodel::SingleLink<PhongTriangleNormalHandler<DataTypes>,TriangleGeometry<DataTypes>,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
-    /*!
-     * \brief BaseAlgorithm Constructor
-     */
     PhongTriangleNormalHandler()
     : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
+
+    class PhongTriangleProximity : public BaseTriangleProximity<DataTypes> {
+    public:
+        typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+
+        PhongTriangleProximity(State * state, unsigned p0,unsigned p1, unsigned p2, double f0,double f1,double f2, type::vector<type::Vector3> & pn)
+        : BaseTriangleProximity<DataTypes>(state,p0,p1,p2,f0,f1,f2)
+        , m_pointNormals(pn) {}
+
+        virtual sofa::type::Vector3 getNormal() const override {
+            return m_pointNormals[this->m_p0] * this->m_f0 +
+                   m_pointNormals[this->m_p1] * this->m_f1 +
+                   m_pointNormals[this->m_p2] * this->m_f2;
+        }
+
+    private:
+        const type::vector<type::Vector3> & m_pointNormals;
+    };
 
     void init() {
         update();
@@ -28,10 +40,10 @@ public:
         //change the behavior of elements
         l_geometry->setPoximityCreator(
             [=](const TriangleElement * elmt, double f0,double f1,double f2) -> BaseProximity::SPtr {
-                return BaseProximity::SPtr(new PhongTriangleProximity<DataTypes>(l_geometry->getState(),
-                                                                                 elmt->getP0(),elmt->getP1(),elmt->getP2(),
-                                                                                 f0,f1,f2,
-                                                                                 m_point_normals));
+                return BaseProximity::SPtr(new PhongTriangleProximity(l_geometry->getState(),
+                                                                      elmt->getP0(),elmt->getP1(),elmt->getP2(),
+                                                                      f0,f1,f2,
+                                                                      m_point_normals));
             }
         );
     }
@@ -39,11 +51,11 @@ public:
     void update() override {
         m_point_normals.resize(this->l_geometry->l_topology->getNbPoints());
 
-        auto elements = this->l_geometry->getElements();
-
         m_triangle_normals.clear();
-        for (size_t t=0;t<elements.size();t++) {
-            auto tinfo = elements[t]->getTriangleInfo();
+        for (auto it=l_geometry->begin();it!=l_geometry->end();it++) {
+            BaseElement::SPtr elmt = it->element();
+            auto telement = elmt->cast<TriangleElement>();
+            auto tinfo = telement->getTriangleInfo();
             m_triangle_normals.push_back(tinfo.N);
         }
 
@@ -62,8 +74,5 @@ protected:
     type::vector<type::Vector3> m_point_normals;
 
 };
-
-
-}
 
 }

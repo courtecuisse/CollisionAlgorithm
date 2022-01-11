@@ -35,13 +35,11 @@ public:
         }
 
         //default proximity creator
-        setPoximityCreator(&PointGeometry::createProximity);
-    }
-
-    void setPoximityCreator(PointElement::ProxCreatorFunc f) {
-        for (unsigned i=0;i<m_elements.size();i++) {
-            m_elements[i]->setProximityCreator(f);
-        }
+        this->setPoximityCreator(
+            [=](const PointElement * elmt) -> BaseProximity::SPtr {
+                return BaseProximity::SPtr(new BasePointProximity<DataTypes>(this->getState(),elmt->getP0()));
+            }
+        );
     }
 
     inline BaseElement::Iterator begin(Index eid = 0) const override {
@@ -67,10 +65,6 @@ public:
 //            vparams->drawTool()->drawSphere(pos[it->id()],d_drawRadius.getValue());
 //        }
 //    }
-
-    static BaseProximity::SPtr createProximity(const PointElement * elmt) {
-
-    }
 
 private:
     std::vector<PointElement::SPtr> m_elements;
