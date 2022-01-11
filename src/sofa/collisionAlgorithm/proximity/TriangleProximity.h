@@ -36,9 +36,16 @@ public:
         c1_d.endEdit();
     }
 
-//    virtual sofa::type::Vector3 getNormal() const override {
-////        return getNormalFunc(m_p0,m_p1,m_p2,m_f0,m_f1,m_f2,);
-//    }
+    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::linearalgebra::BaseVector* lambda) const override {
+        auto res = sofa::helper::getWriteAccessor(*resId[m_state].write());
+        const typename DataTypes::MatrixDeriv& j = cParams->readJ(m_state)->getValue();
+        auto rowIt = j.readLine(cid_global+cid_local);
+        const double f = lambda->element(cid_global+cid_local);
+        for (auto colIt = rowIt.begin(), colItEnd = rowIt.end(); colIt != colItEnd; ++colIt)
+        {
+            res[colIt.index()] += colIt.val() * f;
+        }
+    }
 
     /// return proximiy position in a vector3
     sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
@@ -47,7 +54,7 @@ public:
         return G * 1.0/3.0;
     }
 
-private:
+protected:
     State * m_state;
     unsigned m_p0,m_p1,m_p2;
     double m_f0,m_f1,m_f2;
@@ -69,6 +76,27 @@ public:
 
 private:
     GetNormalFunc m_func;
+};
+
+
+
+template<class DataTypes>
+class PhongTriangleProximity : public TriangleProximity<DataTypes> {
+public:
+    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+
+    PhongTriangleProximity(State * state, unsigned p0,unsigned p1, unsigned p2, double f0,double f1,double f2, type::vector<type::Vector3> & pn)
+    : TriangleProximity<DataTypes>(state,p0,p1,p2,f0,f1,f2)
+    , m_pointNormals(pn) {}
+
+    virtual sofa::type::Vector3 getNormal() const override {
+        return m_pointNormals[this->m_p0] * this->m_f0 +
+               m_pointNormals[this->m_p1] * this->m_f1 +
+               m_pointNormals[this->m_p2] * this->m_f2;
+    }
+
+private:
+    const type::vector<type::Vector3> & m_pointNormals;
 };
 
 

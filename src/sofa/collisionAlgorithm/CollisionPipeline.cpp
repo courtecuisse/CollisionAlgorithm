@@ -1,9 +1,17 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/CollisionPipeline.h>
+//#include <sofa/collisionAlgorithm/BaseOperation.h>
+#include <sofa/simulation/CollisionBeginEvent.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
+#include <sofa/core/BehaviorModel.h>
+#include <sofa/core/visual/VisualParams.h>
+#include <sofa/core/objectmodel/DataCallback.h>
+#include <sofa/simulation/Visitor.h>
 #include <sofa/gl/gl.h>
+#include <sofa/simulation/AnimateBeginEvent.h>
+#include <sofa/core/topology/BaseMeshTopology.h>
+#include <sofa/collisionAlgorithm/BaseElement.h>
 
 namespace sofa ::collisionAlgorithm {
 
@@ -11,10 +19,11 @@ namespace sofa ::collisionAlgorithm {
  * \brief The BaseGeometry class is an abstract class defining a basic geometry
  * iterates through Proximity elements and draws them
  */
-class BaseGeometry : public CollisionComponent {
+class BaseGeometry : public core::objectmodel::BaseObject
+{
 public:
 
-    SOFA_ABSTRACT_CLASS(BaseGeometry,CollisionComponent);
+    SOFA_ABSTRACT_CLASS(BaseGeometry,core::objectmodel::BaseObject);
 
     typedef sofa::Index Index;
 
@@ -39,7 +48,9 @@ public:
 
     virtual void prepareDetection() {}
 
-    void update() {
+    void handleEvent(sofa::core::objectmodel::Event *event) {
+        if (! dynamic_cast<sofa::simulation::AnimateBeginEvent*>(event)) return;
+
         for (auto it = begin(); it != end(); it++) it->element()->update();
 
         prepareDetection();
