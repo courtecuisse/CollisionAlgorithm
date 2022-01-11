@@ -42,7 +42,7 @@ public:
                 return BaseProximity::SPtr(new GouraudTriangleProximity<DataTypes>(this->getState(),
                                                                             elmt->getP0(),elmt->getP1(),elmt->getP2(),
                                                                             f0,f1,f2,
-                                                                            std::bind(&TriangleElement::getNormal,elmt)));
+                                                                            elmt->getTriangleInfo().N));
             }
         );
     }
@@ -55,6 +55,10 @@ public:
 
     inline BaseElement::Iterator begin(Index eid = 0) const override {
         return BaseElement::Iterator(new TDefaultElementIterator(m_elements,eid));
+    }
+
+    const std::vector<TriangleElement::SPtr> & getElements() const {
+        return m_elements;
     }
 
 private:

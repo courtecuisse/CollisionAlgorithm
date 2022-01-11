@@ -56,7 +56,7 @@ public:
 
     virtual State * getState() const = 0;
 
-    virtual void addContributions(MatrixDerivRowIterator & it, const sofa::type::Vector3 & N) const = 0;
+    virtual void addContributions(MatrixDerivRowIterator & it, const sofa::type::Vector3 & N, double fact) const = 0;
 
     void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
         DataMatrixDeriv & c1_d = *cId[getState()].write();
@@ -64,11 +64,7 @@ public:
 
         for (Index j=0;j<dir.size();j++) {
             MatrixDerivRowIterator c_it = c1.writeLine(constraintId+j);
-
-            addContributions(c_it,dir[j]);
-//            c_it.addCol(m_p0, dir[j] * m_f0 * fact);
-//            c_it.addCol(m_p1, dir[j] * m_f1 * fact);
-//            c_it.addCol(m_p2, dir[j] * m_f2 * fact);
+            addContributions(c_it,dir[j],fact);
         }
 
         c1_d.endEdit();

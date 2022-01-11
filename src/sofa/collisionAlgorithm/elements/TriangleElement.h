@@ -20,6 +20,7 @@ public:
 
         type::Vec3d ax1,ax2;
         type::Vec3d P0,P1,P2;
+        type::Vec3d N;
     };
 
     TriangleElement(unsigned p0,unsigned p1,unsigned p2)
@@ -32,9 +33,9 @@ public:
 
         m_tinfo.v0 = m_tinfo.P1 - m_tinfo.P0;
         m_tinfo.v1 = m_tinfo.P2 - m_tinfo.P0;
-        type::Vec3d N=cross(m_tinfo.v0,m_tinfo.v1);
-        m_tinfo.area = N.norm()/2;
-        N.normalize();
+        m_tinfo.N=cross(m_tinfo.v0,m_tinfo.v1);
+        m_tinfo.area = m_tinfo.N.norm()/2;
+        m_tinfo.N.normalize();
 
         m_tinfo.d00 = dot(m_tinfo.v0,m_tinfo.v0);
         m_tinfo.d01 = dot(m_tinfo.v0,m_tinfo.v1);
@@ -43,7 +44,7 @@ public:
         m_tinfo.invDenom = 1.0 / (m_tinfo.d00 * m_tinfo.d11 - m_tinfo.d01 * m_tinfo.d01);
 
         m_tinfo.ax1 = m_tinfo.v0;
-        m_tinfo.ax2 = m_tinfo.v0.cross(N);
+        m_tinfo.ax2 = m_tinfo.v0.cross(m_tinfo.N);
 
         m_tinfo.ax1.normalize();
         m_tinfo.ax2.normalize();
@@ -60,10 +61,6 @@ public:
     inline unsigned getP1() const { return m_p1; }
 
     inline unsigned getP2() const { return m_p2; }
-
-    type::Vector3 getNormal() const {
-        return cross(m_tinfo.ax1,m_tinfo.ax2).normalized();
-    }
 
 private:
     unsigned m_p0,m_p1,m_p2;

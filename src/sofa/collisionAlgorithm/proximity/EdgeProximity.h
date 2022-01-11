@@ -24,17 +24,13 @@ public:
     EdgeProximity(State * s, unsigned p0,unsigned p1,double f0,double f1,std::function<type::Vector3()> f)
     : m_state(s), m_p0(p0), m_p1(p1), m_f0(f0), m_f1(f1) {}
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
-        DataMatrixDeriv & c1_d = *cId[m_state].write();
-        MatrixDeriv & c1 = *c1_d.beginEdit();
+    State * getState() const {
+        return m_state;
+    }
 
-        for (Index j=0;j<dir.size();j++) {
-            MatrixDerivRowIterator c_it = c1.writeLine(constraintId+j);
-            c_it.addCol(m_p0, dir[j] * m_f0);
-            c_it.addCol(m_p1, dir[j] * m_f1);
-        }
-
-        c1_d.endEdit();
+    void addContributions(MatrixDerivRowIterator & c_it, const sofa::type::Vector3 & N,double fact) const override {
+        c_it.addCol(m_p0, N * m_f0 * fact);
+        c_it.addCol(m_p1, N * m_f1 * fact);
     }
 
     sofa::type::Vector3 getNormal() const override { return getNormalFunc(); }
