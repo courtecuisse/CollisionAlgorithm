@@ -1,5 +1,3 @@
-#pragma once
-
 //#include <sofa/collisionAlgorithm/BaseOperation.h>
 #include <sofa/simulation/CollisionBeginEvent.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
