@@ -22,6 +22,11 @@ public:
 
     inline unsigned getP1() const { return m_p1; }
 
+    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
+        res.push_back(createProximity(1,0));
+        res.push_back(createProximity(0,1));
+    }
+
 private:
     unsigned m_p0,m_p1;
 };

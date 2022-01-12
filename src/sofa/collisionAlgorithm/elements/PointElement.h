@@ -20,6 +20,10 @@ public:
 
     inline unsigned getP0() const { return m_point; }
 
+    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
+        res.push_back(createProximity());
+    }
+
 private:
     unsigned m_point;
 };

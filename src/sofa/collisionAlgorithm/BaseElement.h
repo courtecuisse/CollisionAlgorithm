@@ -71,6 +71,8 @@ public:
         return (CAST*)this;
     }
 
+    virtual void getControlProximities(std::vector<BaseProximity::SPtr> & res) const = 0;
+
  };
 
 
