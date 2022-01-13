@@ -65,8 +65,8 @@ public:
     }
 
     virtual size_t getOperationsHash() const {
-//        return typeid(AABBElements).hash_code();
-        return l_geometry->getOperationsHash();
+        return typeid(AABBBroadPhaseGeometry).hash_code();
+//        return l_geometry->getOperationsHash();
     }
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const {

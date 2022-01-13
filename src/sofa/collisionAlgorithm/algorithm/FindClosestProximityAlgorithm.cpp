@@ -136,7 +136,7 @@ static BaseElement::Iterator broadPhase(type::Vector3 P, BaseGeometry * geometry
 //    }
 }
 
-int register_FindClosestProximityAlgorithm_BroadPhase = FindClosestProximityAlgorithm_BroadPhase::register_func<AABBBroadPhaseGeometry::AABBBElement>(&broadPhase);
+int register_FindClosestProximityAlgorithm_BroadPhase = FindClosestProximityAlgorithm_BroadPhase::register_func<AABBBroadPhaseGeometry>(&broadPhase);
 
 }
 

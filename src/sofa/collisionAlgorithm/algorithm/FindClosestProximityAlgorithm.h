@@ -15,7 +15,7 @@ public:
 
     //By default no broadPhase so we loop over all elements
     GenericOperation::FUNC getDefault() const override {
-        return [=](type::Vector3 ,BaseGeometry * geo) -> BaseElement::Iterator {
+        return [=](type::Vector3 , BaseGeometry * geo) -> BaseElement::Iterator {
             return geo->begin();
         };
     }
