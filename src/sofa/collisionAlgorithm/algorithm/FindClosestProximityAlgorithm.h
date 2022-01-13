@@ -5,9 +5,22 @@
 #include <sofa/collisionAlgorithm/BaseOperation.h>
 #include <sofa/collisionAlgorithm/operations/CreateCenterProximity.h>
 #include <sofa/collisionAlgorithm/operations/Project.h>
-#include <sofa/collisionAlgorithm/operations/BroadPhase.h>
 
 namespace sofa::collisionAlgorithm {
+
+class FindClosestProximityAlgorithm_BroadPhase : public Operations::GenericOperation<std::function<BaseElement::Iterator(type::Vector3,BaseGeometry *) > > {
+public:
+
+    using Inherit = GenericOperation;
+
+    //By default no broadPhase so we loop over all elements
+    GenericOperation::FUNC getDefault() const override {
+        return [=](type::Vector3 ,BaseGeometry * geo) -> BaseElement::Iterator {
+            return geo->begin();
+        };
+    }
+
+};
 
 class FindClosestProximityAlgorithm : public BaseAlgorithm {
 public:
@@ -51,7 +64,7 @@ public:
 
         auto createProximityOp = Operations::CreateCenterProximity::func(l_from);
         auto projectOp = Operations::Project::func(l_dest);
-        auto broadPhaseOp = Operations::BroadPhase::func(l_dest);
+        auto broadPhaseOp = FindClosestProximityAlgorithm_BroadPhase::func(l_dest);
 
         for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
             auto pfrom = createProximityOp(itfrom->element());
@@ -60,7 +73,7 @@ public:
             double min_dist = std::numeric_limits<double>::max();
             PairDetection min_pair;
 
-            for (auto itdest = broadPhaseOp(pfrom,l_dest);itdest!=l_dest->end();itdest++) {
+            for (auto itdest = broadPhaseOp(pfrom->getPosition(),l_dest);itdest!=l_dest->end();itdest++) {
                 auto edest = *itdest;
                 if (edest == nullptr) continue;
 

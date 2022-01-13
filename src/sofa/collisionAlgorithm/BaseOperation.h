@@ -4,9 +4,11 @@
 
 namespace sofa::collisionAlgorithm::Operations {
 
-template<class FUNC>
+template<class TFUNC>
 class GenericOperation {
 public:
+
+    typedef TFUNC FUNC;
 
     static FUNC func(const BaseGeometry * geo) {
         size_t id = geo->getOperationsHash();
@@ -15,9 +17,9 @@ public:
         return it->second;
     }
 
-    template<class T>
+    template<class ELMT>
     static int register_func(FUNC f) {
-        size_t id = typeid(T).hash_code();
+        size_t id = typeid(ELMT).hash_code();
         auto it = m_singleton.m_map.find(id);
         if (it != m_singleton.m_map.end()) std::cerr << "createCenterPointProximity with operation " << id << " already in the factory" << std::endl;
         m_singleton.m_map[id] = f;

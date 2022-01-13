@@ -6,16 +6,16 @@
 
 namespace sofa::collisionAlgorithm::Operations {
 
-typedef std::function<BaseProximity::SPtr(BaseElement::SPtr)> CreateCenterProximity_FUNC;
-
-class CreateCenterProximity : public GenericOperation<CreateCenterProximity_FUNC> {
+class CreateCenterProximity : public GenericOperation<std::function<BaseProximity::SPtr(BaseElement::SPtr)> > {
 public:
 
-    static BaseProximity::SPtr s_default(BaseElement::SPtr){
-        return NULL;
-    }
+    using Inherit = GenericOperation;
 
-    CreateCenterProximity_FUNC getDefault() const override { return &CreateCenterProximity::s_default; }
+    Inherit::FUNC getDefault() const override {
+        return [=](BaseElement::SPtr) -> BaseProximity::SPtr {
+            return NULL;
+        };
+    }
 
 };
 
