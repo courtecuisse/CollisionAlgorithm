@@ -30,16 +30,14 @@ public:
     void init() {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 
-        for (unsigned i=0;i<pos.size();i++) {
-            m_elements.push_back(this->createElement(i));
-        }
-
         //default proximity creator
-        this->setPoximityCreator(
-            [=](const PointElement * elmt) -> BaseProximity::SPtr {
-                return BaseProximity::SPtr(new BasePointProximity<DataTypes>(this->getState(),elmt->getP0()));
-            }
-        );
+        auto f = [=](const PointElement * elmt) -> BaseProximity::SPtr {
+            return BaseProximity::SPtr(new BasePointProximity<DataTypes>(this->getState(),elmt->getP0()));
+        };
+
+        for (unsigned i=0;i<pos.size();i++) {
+            m_elements.push_back(this->createElement(i,f));
+        }
     }
 
     inline BaseElement::Iterator begin(Index eid = 0) const override {

@@ -6,12 +6,12 @@
 
 namespace sofa::collisionAlgorithm::Operations {
 
-typedef std::function<BaseProximity::SPtr(BaseProximity::SPtr, BaseElement::SPtr)> Project_FUNC;
+typedef std::function<BaseProximity::SPtr(type::Vector3 , BaseElement::SPtr)> Project_FUNC;
 
 class Project : public GenericOperation<Project_FUNC> {
 public:
 
-    static BaseProximity::SPtr s_default(BaseProximity::SPtr, BaseElement::SPtr){
+    static BaseProximity::SPtr s_default(type::Vector3 , BaseElement::SPtr){
         return NULL;
     }
 

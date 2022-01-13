@@ -7,10 +7,12 @@ namespace sofa::collisionAlgorithm {
 class PointElement : public TBaseElement<std::function<BaseProximity::SPtr(const PointElement *)> > {
 public:
 
+    using Inherit = TBaseElement;
     typedef std::shared_ptr<PointElement> SPtr;
 
-    PointElement(unsigned p)
-    : m_point(p) {}
+    PointElement(unsigned p,Inherit::ProxCreatorFunc f)
+    : TBaseElement(f)
+    , m_point(p) {}
 
     void update() override {}
 

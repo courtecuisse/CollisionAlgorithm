@@ -13,14 +13,14 @@ public:
         return edge->createProximity(0.5,0.5);
     }
 
-    static BaseProximity::SPtr project(const BaseProximity::SPtr & P, BaseElement::SPtr elmt) {
+    static BaseProximity::SPtr project(const type::Vector3 & P, BaseElement::SPtr elmt) {
         auto edge = elmt->cast<EdgeElement>();
 
         double fact_u,fact_v;
         const type::Vector3 P0 = edge->createProximity(1,0)->getPosition();
         const type::Vector3 P1 = edge->createProximity(0,1)->getPosition();
 
-        projectOnEdge(P->getPosition(),P0,P1,fact_u,fact_v);
+        projectOnEdge(P,P0,P1,fact_u,fact_v);
 
         return edge->createProximity(fact_u,fact_v);
     }

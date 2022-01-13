@@ -64,7 +64,7 @@ public:
                 auto edest = *itdest;
                 if (edest == nullptr) continue;
 
-                BaseProximity::SPtr pdest = projectOp(pfrom,edest);
+                BaseProximity::SPtr pdest = projectOp(pfrom->getPosition(),edest);
 
                 double d = m_distance(pfrom,pdest);
                 if (d < min_dist) min_pair = PairDetection(pfrom,pdest);

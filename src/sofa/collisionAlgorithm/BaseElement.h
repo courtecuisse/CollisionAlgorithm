@@ -81,6 +81,8 @@ class TBaseElement : public BaseElement {
 public:
     typedef TProxCreatorFunc ProxCreatorFunc;
 
+    TBaseElement(TProxCreatorFunc f) : m_createProxFunc(f) {}
+
     inline void setProximityCreator(ProxCreatorFunc f) { m_createProxFunc = f; }
 
 protected:

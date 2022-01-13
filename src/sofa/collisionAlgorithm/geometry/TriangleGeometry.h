@@ -28,20 +28,18 @@ public:
     }
 
     void init() {
+        //default proximity creator
+        auto f = [=](const TriangleElement * elmt, double f0,double f1,double f2) -> BaseProximity::SPtr {
+            return BaseProximity::SPtr(new BaseTriangleProximity<DataTypes>(this->getState(),
+                                                                        elmt->getP0(),elmt->getP1(),elmt->getP2(),
+                                                                        f0,f1,f2));
+        };
+
         for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
             auto tri = this->l_topology->getTriangle(i);
-            auto elmt = this->createElement(tri[0],tri[1],tri[2]);
+            auto elmt = this->createElement(tri[0],tri[1],tri[2],f);
             m_elements.push_back(elmt);
         }
-
-        //default proximity creator
-        this->setPoximityCreator(
-            [=](const TriangleElement * elmt, double f0,double f1,double f2) -> BaseProximity::SPtr {
-                return BaseProximity::SPtr(new BaseTriangleProximity<DataTypes>(this->getState(),
-                                                                            elmt->getP0(),elmt->getP1(),elmt->getP2(),
-                                                                            f0,f1,f2));
-            }
-        );
     }
 
     inline BaseElement::Iterator begin(Index eid = 0) const override {

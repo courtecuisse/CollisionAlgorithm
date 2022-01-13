@@ -14,7 +14,7 @@ public:
     }
 
 
-    static BaseProximity::SPtr project(const BaseProximity::SPtr & /*P*/, BaseElement::SPtr elmt) {
+    static BaseProximity::SPtr project(const type::Vector3 & /*P*/, BaseElement::SPtr elmt) {
         auto point = elmt->cast<PointElement>();
         return point->createProximity();
     }

@@ -3,12 +3,9 @@
 #include <sofa/helper/AdvancedTimer.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
+#include <sofa/collisionAlgorithm/operations/Project.h>
 
-namespace sofa
-{
-
-namespace collisionAlgorithm
-{
+namespace sofa::collisionAlgorithm {
 
 /*!
  * \brief The AABBBroadPhaseGeometry class
@@ -18,6 +15,33 @@ class AABBBroadPhaseGeometry : public BaseGeometry {
     friend class AABBElement;
 
 public:
+
+
+    class AABBBElement : public TBaseElement<std::function<BaseProximity::SPtr(const AABBBElement *)> > {
+    public:
+
+        using Inherit = TBaseElement;
+        typedef std::shared_ptr<AABBBElement> SPtr;
+
+
+
+        void update() override {}
+
+        inline BaseProximity::SPtr createProximity() const {
+            return m_createProxFunc(this);
+        }
+
+        void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
+            res.push_back(createProximity());
+        }
+
+        void insert(BaseElement::SPtr elmt) {
+            m_elementId.insert(elmt);
+        }
+
+    private:
+        std::set<BaseElement::SPtr> m_elementId;
+    };
 
     SOFA_CLASS(AABBBroadPhaseGeometry,BaseGeometry);
 
@@ -148,10 +172,12 @@ public:
 
         for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
         {
+            BaseElement::SPtr elmt = it->element();
+
             //std::cout << ++i << std::endl;
             type::BoundingBox bbox;
             std::vector<BaseProximity::SPtr> v_prox;
-            it->element()->getControlProximities(v_prox);
+            elmt->getControlProximities(v_prox);
 
             for (unsigned b=0;b<v_prox.size();b++) {
                 bbox.include(v_prox[b]->getPosition());
@@ -168,33 +194,38 @@ public:
                 cminbox[i] = floor((minbox[i] - m_Bmin[i])/m_cellSize[i]); //second m_Bmax was Bmin => bug ?
             }
 
-    //        const bool refine = d_refineBBox.getValue();
+            const bool refine = d_refineBBox.getValue();
 
-    //        for (int i=cminbox[0];i<cmaxbox[0];i++)
-    //        {
-    //            for (int j=cminbox[1];j<cmaxbox[1];j++)
-    //            {
-    //                for (int k=cminbox[2];k<cmaxbox[2];k++)
-    //                {
-    //                    if (refine) { // project the point on the element in order to know if the box is empty
-    //                        type::Vector3 P = m_Bmin + m_cellSize*0.5;
+            auto projectOp = Operations::Project::func(l_geometry.get());
 
-    //                        P[0] += i*m_cellSize[0];
-    //                        P[1] += j*m_cellSize[1];
-    //                        P[2] += k*m_cellSize[2];
+            for (int i=cminbox[0];i<cmaxbox[0];i++)
+            {
+                for (int j=cminbox[1];j<cmaxbox[1];j++)
+                {
+                    for (int k=cminbox[2];k<cmaxbox[2];k++)
+                    {
+                        if (refine) { // project the point on the element in order to know if the box is empty
+                            type::Vector3 P = m_Bmin + m_cellSize*0.5;
 
-    //                        type::Vector3 D = P - it->project(P)->getPosition();
+                            P[0] += i*m_cellSize[0];
+                            P[1] += j*m_cellSize[1];
+                            P[2] += k*m_cellSize[2];
 
-    //                        if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
-    //                            (fabs(D[1])<=m_cellSize[1]*0.5) &&
-    //                            (fabs(D[2])<=m_cellSize[2]*0.5))
-    //                            m_indexedElement[getKey(i,j,k)].insert(it->id());
-    //                    } else {
-    //                        m_indexedElement[getKey(i,j,k)].insert(it->id());
-    //                    }
-    //                }
-    //            }
-    //        }
+                            BaseProximity::SPtr prox = projectOp(P,elmt);
+                            if (prox == NULL) continue;
+
+                            type::Vector3 D = prox->getPosition();
+
+                            if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
+                                (fabs(D[1])<=m_cellSize[1]*0.5) &&
+                                (fabs(D[2])<=m_cellSize[2]*0.5))
+                                getIndexedElement(i,j,k)->insert(elmt);
+                        } else {
+                           getIndexedElement(i,j,k)->insert(elmt);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -324,25 +355,28 @@ public:
         return cbox;
     }
 
-    virtual void getElementSet(type::Vec3i c, std::set<Index> & selectElements) const {
-        auto it = m_indexedElement.find(getKey(c[0],c[1],c[2]));
-        if (it != m_indexedElement.end()) {
-            const std::set<Index> & elemntsID = it->second;
-            selectElements.insert(elemntsID.begin(),elemntsID.end());
+    virtual void recomputeNormals() {}
+
+    inline AABBBElement::SPtr getIndexedElement(size_t i,size_t j,size_t k) {
+        Index key = getKey(i,j,k);
+
+        auto it = m_indexedElement.find(key);
+        if (it == m_indexedElement.end()) {
+            AABBBElement::SPtr res = NULL;//AABBBElement::SPtr(new AABBBElement());
+            m_indexedElement[key] = res;
+            return res;
+        } else {
+            return it->second;
         }
     }
-
-    virtual void recomputeNormals() {}
 
 protected:
     type::Vector3 m_Bmin,m_Bmax,m_cellSize;
     type::Vec3i m_nbox;
     type::Vec<2, size_t> m_offset;
-    std::map<Index, std::set<Index> > m_indexedElement;
+    std::map<Index, AABBBElement::SPtr > m_indexedElement;
     bool m_staticInitDone;
 };
 
-
-}
 
 }

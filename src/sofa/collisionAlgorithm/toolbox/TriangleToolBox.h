@@ -16,13 +16,13 @@ public:
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    static BaseProximity::SPtr project(BaseProximity::SPtr P, BaseElement::SPtr elmt) {
+    static BaseProximity::SPtr project(type::Vector3 P, BaseElement::SPtr elmt) {
         auto tri = elmt->cast<TriangleElement>();
 
         const TriangleElement::TriangleInfo & tinfo = tri->getTriangleInfo();
 
         double fact_u,fact_v,fact_w;
-        projectOnTriangle(P->getPosition(),tinfo,fact_u,fact_v,fact_w);
+        projectOnTriangle(P,tinfo,fact_u,fact_v,fact_w);
 
         return tri->createProximity(fact_u,fact_v,fact_w);
     }
