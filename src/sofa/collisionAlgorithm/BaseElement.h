@@ -66,6 +66,8 @@ public:
 
     virtual void update() = 0;
 
+    virtual unsigned id() = 0;
+
     template<typename CAST>
     inline CAST * cast() {
         return (CAST*)this;
@@ -81,12 +83,17 @@ class TBaseElement : public BaseElement {
 public:
     typedef TProxCreatorFunc ProxCreatorFunc;
 
-    TBaseElement(TProxCreatorFunc f) : m_createProxFunc(f) {}
+    TBaseElement(unsigned id, TProxCreatorFunc f) : m_eid(id), m_createProxFunc(f) {}
 
     inline void setProximityCreator(ProxCreatorFunc f) { m_createProxFunc = f; }
 
+    unsigned id() override {
+        return m_eid;
+    }
+
 protected:
     ProxCreatorFunc m_createProxFunc;
+    unsigned m_eid;
 };
 
 }

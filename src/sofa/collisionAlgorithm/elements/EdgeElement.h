@@ -10,8 +10,8 @@ public:
     using Inherit = TBaseElement;
     typedef std::shared_ptr<EdgeElement> SPtr;
 
-    EdgeElement(unsigned p0,unsigned p1,Inherit::ProxCreatorFunc f)
-    : TBaseElement(f), m_p0(p0), m_p1(p1) {}
+    EdgeElement(unsigned eid, unsigned p0,unsigned p1,Inherit::ProxCreatorFunc f)
+    : TBaseElement(eid, f), m_p0(p0), m_p1(p1) {}
 
     void update() override {}
 
@@ -27,6 +27,8 @@ public:
         res.push_back(createProximity(1,0));
         res.push_back(createProximity(0,1));
     }
+
+
 
 private:
     unsigned m_p0,m_p1;

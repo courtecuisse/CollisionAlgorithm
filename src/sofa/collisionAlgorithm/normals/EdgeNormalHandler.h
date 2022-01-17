@@ -16,14 +16,14 @@ public:
     EdgeNormalHandler()
     : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
 
-    class DefaultEdgeProximity : public BaseEdgeProximity<DataTypes> {
+    class LinkEdgeProximity : public DefaultEdgeProximity<DataTypes> {
     public:
         typedef sofa::core::behavior::MechanicalState<DataTypes> State;
         typedef typename DataTypes::VecCoord VecCoord;
         typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
 
-        DefaultEdgeProximity(State * s, unsigned p0,unsigned p1,double f0,double f1)
-        : BaseEdgeProximity<DataTypes>(s,p0,p1,f0,f1) {}
+        LinkEdgeProximity(State * s, unsigned p0,unsigned p1,double f0,double f1)
+        : DefaultEdgeProximity<DataTypes>(s,p0,p1,f0,f1) {}
 
         sofa::type::Vector3 getNormal() const override {
             const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
@@ -36,7 +36,7 @@ public:
     void init() {
         l_geometry->setPoximityCreator(
             [=](const EdgeElement * elmt, double f0,double f1) -> BaseProximity::SPtr {
-                return BaseProximity::SPtr(new DefaultEdgeProximity(l_geometry->getState(),
+                return BaseProximity::SPtr(new LinkEdgeProximity(l_geometry->getState(),
                                                                       elmt->getP0(),elmt->getP1(),
                                                                       f0,f1));
             }

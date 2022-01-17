@@ -32,11 +32,12 @@ public:
 
         //default proximity creator
         auto f = [=](const PointElement * elmt) -> BaseProximity::SPtr {
-            return BaseProximity::SPtr(new BasePointProximity<DataTypes>(this->getState(),elmt->getP0()));
+            return BaseProximity::SPtr(new DefaultPointProximity<DataTypes>(this->getState(),elmt->getP0()));
         };
 
         for (unsigned i=0;i<pos.size();i++) {
-            m_elements.push_back(this->createElement(i,f));
+            PointElement::SPtr elmt = this->createElement(i,i,f);
+            m_elements.push_back(elmt);
         }
     }
 

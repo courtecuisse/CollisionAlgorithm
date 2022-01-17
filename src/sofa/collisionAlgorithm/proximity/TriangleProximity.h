@@ -5,7 +5,7 @@
 namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
-class BaseTriangleProximity : public TBaseProximity<DataTypes> {
+class DefaultTriangleProximity : public TBaseProximity<DataTypes> {
 public:
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
     typedef typename DataTypes::VecCoord VecCoord;
@@ -19,7 +19,7 @@ public:
     typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
 
-    BaseTriangleProximity(State * state, unsigned p0,unsigned p1, unsigned p2, double f0,double f1,double f2)
+    DefaultTriangleProximity(State * state, unsigned p0,unsigned p1, unsigned p2, double f0,double f1,double f2)
     : m_state(state), m_p0(p0), m_p1(p1), m_p2(p2), m_f0(f0), m_f1(f1), m_f2(f2){}
 
     State * getState() const {

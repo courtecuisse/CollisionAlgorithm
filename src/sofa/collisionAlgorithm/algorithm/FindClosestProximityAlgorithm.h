@@ -8,7 +8,7 @@
 
 namespace sofa::collisionAlgorithm {
 
-class FindClosestProximityAlgorithm_BroadPhase : public Operations::GenericOperation<std::function<BaseElement::Iterator(type::Vector3,BaseGeometry *) > > {
+class FindClosestProximityAlgorithm_BroadPhase : public Operations::GenericOperation<FindClosestProximityAlgorithm_BroadPhase,std::function<BaseElement::Iterator(type::Vector3,BaseGeometry *) > > {
 public:
 
     using Inherit = GenericOperation;

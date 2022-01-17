@@ -23,17 +23,24 @@ public:
 
 };
 
-class CollisionPipeline : public core::objectmodel::BaseObject {
+class CollisionAlgorithm : public core::objectmodel::BaseObject {
 public:
 
-    SOFA_ABSTRACT_CLASS(CollisionPipeline,core::objectmodel::BaseObject);
+    virtual void doDetection() = 0;
 
-    class UpdateCollisionVisitor : public simulation::Visitor {
+};
+
+class CollisionLoop : public core::objectmodel::BaseObject {
+public:
+
+    SOFA_ABSTRACT_CLASS(CollisionLoop,core::objectmodel::BaseObject);
+
+    class UpdateComponentVisitor : public simulation::Visitor {
     public:
-        UpdateCollisionVisitor() : Visitor(sofa::core::ExecParams::defaultInstance()) {}
+        UpdateComponentVisitor() : Visitor(sofa::core::ExecParams::defaultInstance()) {}
 
         Visitor::Result processNodeTopDown(simulation::Node* node) {
-            for_each(this, node, node->object, &UpdateCollisionVisitor::processObject);
+            for_each(this, node, node->object, &UpdateComponentVisitor::processObject);
             return Visitor::RESULT_CONTINUE;
         }
 
@@ -43,18 +50,40 @@ public:
             }
         }
 
-        virtual const char* getClassName() const {return "UpdateCollisionVisitor";}
+        virtual const char* getClassName() const {return "UpdateComponentVisitor";}
     };
 
-    CollisionPipeline() {
+
+    class UpdateAlgorithmVisitor : public simulation::Visitor {
+    public:
+        UpdateAlgorithmVisitor() : Visitor(sofa::core::ExecParams::defaultInstance()) {}
+
+        Visitor::Result processNodeTopDown(simulation::Node* node) {
+            for_each(this, node, node->object, &UpdateAlgorithmVisitor::processObject);
+            return Visitor::RESULT_CONTINUE;
+        }
+
+        void processObject(simulation::Node*, core::objectmodel::BaseObject* obj) {
+            if (CollisionAlgorithm * component = dynamic_cast<CollisionAlgorithm *>(obj)) {
+                component->doDetection();
+            }
+        }
+
+        virtual const char* getClassName() const {return "UpdateAlgorithmVisitor";}
+    };
+
+    CollisionLoop() {
         this->f_listening.setValue(true);
     }
 
     void handleEvent(sofa::core::objectmodel::Event *event) {
         if (! dynamic_cast<sofa::simulation::AnimateBeginEvent*>(event)) return;
 
-        UpdateCollisionVisitor v;
-        v.execute(this->getContext());
+        UpdateComponentVisitor v_comp;
+        v_comp.execute(this->getContext());
+
+        UpdateAlgorithmVisitor v_algo;
+        v_algo.execute(this->getContext());
     }
 
 };

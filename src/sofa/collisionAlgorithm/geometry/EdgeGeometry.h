@@ -30,7 +30,7 @@ public:
 
     void init() {
         auto f = [=](const EdgeElement * elmt, double f0,double f1) -> BaseProximity::SPtr {
-            return BaseProximity::SPtr(new BaseEdgeProximity<DataTypes>(this->getState(),
+            return BaseProximity::SPtr(new DefaultEdgeProximity<DataTypes>(this->getState(),
                                                                         elmt->getP0(),elmt->getP1(),
                                                                         f0,f1));
         };
@@ -38,7 +38,8 @@ public:
         for (unsigned i=0;i<this->l_topology->getNbEdges();i++) {
             auto edge = this->l_topology->getEdge(i);
 
-            m_elements.push_back(this->createElement(edge[0],edge[1],f));
+            EdgeElement::SPtr elmt = this->createElement(i,edge[0],edge[1],f);
+            m_elements.push_back(elmt);
         }
     }
 

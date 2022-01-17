@@ -20,14 +20,14 @@ public:
     GravityPointNormalHandler()
     : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
 
-    class GravityPointNormalProximity : public BasePointProximity<DataTypes> {
+    class GravityPointNormalProximity : public DefaultPointProximity<DataTypes> {
     public:
         typedef sofa::core::behavior::MechanicalState<DataTypes> State;
         typedef typename DataTypes::VecCoord VecCoord;
         typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
 
         GravityPointNormalProximity(State * s, unsigned p0, const type::Vector3 & G)
-        : BasePointProximity<DataTypes>(s,p0)
+        : DefaultPointProximity<DataTypes>(s,p0)
         , m_G(G){}
 
         sofa::type::Vector3 getNormal() const override {

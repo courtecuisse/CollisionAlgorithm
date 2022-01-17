@@ -16,12 +16,12 @@ public:
     GouraudTriangleNormalHandler()
     : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
 
-    class GouraudTriangleProximity : public BaseTriangleProximity<DataTypes> {
+    class GouraudTriangleProximity : public DefaultTriangleProximity<DataTypes> {
     public:
         typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
         GouraudTriangleProximity(State * state, unsigned p0,unsigned p1, unsigned p2, double f0,double f1,double f2,const type::Vector3 & N)
-        : BaseTriangleProximity<DataTypes>(state,p0,p1,p2,f0,f1,f2)
+        : DefaultTriangleProximity<DataTypes>(state,p0,p1,p2,f0,f1,f2)
         , m_N(N) {}
 
         virtual sofa::type::Vector3 getNormal() const override { return m_N; }

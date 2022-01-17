@@ -219,9 +219,9 @@ public:
                             if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
                                 (fabs(D[1])<=m_cellSize[1]*0.5) &&
                                 (fabs(D[2])<=m_cellSize[2]*0.5))
-                                getIndexedElement(i,j,k)->insert(elmt);
+                                m_indexedElement[getKey(i,j,k)].insert(elmt->id());
                         } else {
-                           getIndexedElement(i,j,k)->insert(elmt);
+                           m_indexedElement[getKey(i,j,k)].insert(elmt->id());
                         }
                     }
                 }
@@ -357,24 +357,12 @@ public:
 
     virtual void recomputeNormals() {}
 
-    inline AABBBElement::SPtr getIndexedElement(size_t i,size_t j,size_t k) {
-        Index key = getKey(i,j,k);
-
-        auto it = m_indexedElement.find(key);
-        if (it == m_indexedElement.end()) {
-            AABBBElement::SPtr res = NULL;//AABBBElement::SPtr(new AABBBElement());
-            m_indexedElement[key] = res;
-            return res;
-        } else {
-            return it->second;
-        }
-    }
-
 protected:
     type::Vector3 m_Bmin,m_Bmax,m_cellSize;
     type::Vec3i m_nbox;
     type::Vec<2, size_t> m_offset;
-    std::map<Index, AABBBElement::SPtr > m_indexedElement;
+    std::map<Index, std::set<Index> > m_indexedElement;
+    std::vector<AABBBElement::SPtr> m_elements;
     bool m_staticInitDone;
 };
 

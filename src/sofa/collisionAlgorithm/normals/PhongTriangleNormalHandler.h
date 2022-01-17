@@ -16,12 +16,12 @@ public:
     PhongTriangleNormalHandler()
     : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
 
-    class PhongTriangleProximity : public BaseTriangleProximity<DataTypes> {
+    class PhongTriangleProximity : public DefaultTriangleProximity<DataTypes> {
     public:
         typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
         PhongTriangleProximity(State * state, unsigned p0,unsigned p1, unsigned p2, double f0,double f1,double f2, type::vector<type::Vector3> & pn)
-        : BaseTriangleProximity<DataTypes>(state,p0,p1,p2,f0,f1,f2)
+        : DefaultTriangleProximity<DataTypes>(state,p0,p1,p2,f0,f1,f2)
         , m_pointNormals(pn) {}
 
         virtual sofa::type::Vector3 getNormal() const override {

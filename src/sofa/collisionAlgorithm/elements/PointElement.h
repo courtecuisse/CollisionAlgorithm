@@ -10,8 +10,8 @@ public:
     using Inherit = TBaseElement;
     typedef std::shared_ptr<PointElement> SPtr;
 
-    PointElement(unsigned p,Inherit::ProxCreatorFunc f)
-    : TBaseElement(f)
+    PointElement(unsigned eid, unsigned p,Inherit::ProxCreatorFunc f)
+    : TBaseElement(eid, f)
     , m_point(p) {}
 
     void update() override {}

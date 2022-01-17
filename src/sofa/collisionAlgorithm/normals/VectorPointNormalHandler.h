@@ -18,14 +18,14 @@ public:
     : d_normals(initData(&d_normals, "normals", "Vector of normals"))
     , l_geometry(initLink("geometry","Link to Geometry")){}
 
-    class VectorPointNormalProximity : public BasePointProximity<DataTypes> {
+    class VectorPointNormalProximity : public DefaultPointProximity<DataTypes> {
     public:
         typedef sofa::core::behavior::MechanicalState<DataTypes> State;
         typedef typename DataTypes::VecCoord VecCoord;
         typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
 
         VectorPointNormalProximity(State * s, unsigned p0, const type::vector<type::Vector3> & normals)
-        : BasePointProximity<DataTypes>(s,p0)
+        : DefaultPointProximity<DataTypes>(s,p0)
         , m_normals(normals){}
 
         sofa::type::Vector3 getNormal() const override {
