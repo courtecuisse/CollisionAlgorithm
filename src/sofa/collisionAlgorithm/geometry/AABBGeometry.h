@@ -4,6 +4,7 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/collisionAlgorithm/operations/Project.h>
+#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 
 namespace sofa::collisionAlgorithm {
 
@@ -12,26 +13,20 @@ public:
 
     typedef std::shared_ptr<AABBBElement> SPtr;
 
-    AABBBElement(unsigned  eid, unsigned i,unsigned j, unsigned k, std::vector<std::pair<unsigned,BaseProximity::SPtr> > & elmts)
+    AABBBElement(unsigned  eid, unsigned i,unsigned j, unsigned k, const std::vector<BaseProximity::SPtr> & elmts)
     : m_eid(eid)
     , m_i(i)
     , m_j(j)
-    , m_k(k) {
+    , m_k(k)
+    , m_projProx(elmts) {}
 
-    }
-
-//    using Inherit = TBaseElement;
 
     virtual unsigned id() override {
         return m_eid;
     }
 
     void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-//        res.push_back(createProximity());
-    }
-
-    void insert(BaseElement::SPtr elmt) {
-        m_elementId.insert(elmt);
+        res = m_projProx;
     }
 
     unsigned i() const {return m_i;}
@@ -41,8 +36,8 @@ public:
     unsigned k() const {return m_k;}
 
 private:
-    std::set<BaseElement::SPtr> m_elementId;
     unsigned m_eid,m_i,m_j,m_k;
+    std::vector<BaseProximity::SPtr> m_projProx;
 };
 
 class AABBGeometry : public BaseGeometry {
@@ -66,7 +61,7 @@ public:
     }
 
     virtual BaseElement::Iterator begin(Index eid = 0) const {
-        return BaseElement::ElementIterator::empty();
+        return BaseElement::Iterator(new TDefaultElementIterator(m_elements,eid));
     }
 
     virtual size_t getOperationsHash() const {
@@ -162,7 +157,7 @@ public:
     //    else
     //        m_nbox[2] = d_nbox.getValue()[2] + 1;
 
-        std::map<Index, std::vector<std::pair<unsigned,BaseProximity::SPtr> > > indexedElement;
+        std::map<Index, std::vector<BaseProximity::SPtr> > indexedElement;
         m_offset[0] = m_nbox[1]*m_nbox[2];
         m_offset[1] = m_nbox[2];
 
@@ -222,7 +217,7 @@ public:
                         if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
                             (fabs(D[1])<=m_cellSize[1]*0.5) &&
                             (fabs(D[2])<=m_cellSize[2]*0.5))
-                            indexedElement[key].push_back(std::pair<unsigned,BaseProximity::SPtr>(elmt->id(),prox));
+                            indexedElement[key].push_back(prox);
                     }
                 }
             }
