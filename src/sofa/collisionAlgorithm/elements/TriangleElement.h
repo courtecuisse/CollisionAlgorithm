@@ -27,7 +27,7 @@ public:
     TriangleElement(unsigned eid, unsigned p0,unsigned p1,unsigned p2,Inherit::ProxCreatorFunc f)
     : TBaseElement(eid, f), m_p0(p0), m_p1(p1), m_p2(p2) {}
 
-    void update() override {
+    void update() {
         m_tinfo.P0 = createProximity(1,0,0)->getPosition();
         m_tinfo.P1 = createProximity(0,1,0)->getPosition();
         m_tinfo.P2 = createProximity(0,0,1)->getPosition();

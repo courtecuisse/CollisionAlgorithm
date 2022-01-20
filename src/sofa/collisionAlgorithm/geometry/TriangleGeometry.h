@@ -40,6 +40,12 @@ public:
             TriangleElement::SPtr elmt = this->createElement(i,tri[0],tri[1],tri[2],f);
             m_elements.push_back(elmt);
         }
+
+        prepareDetection();
+    }
+
+    void prepareDetection() override {
+        for (unsigned i=0;i<m_elements.size();i++) m_elements[i]->update();
     }
 
     inline BaseElement::Iterator begin(Index eid = 0) const override {

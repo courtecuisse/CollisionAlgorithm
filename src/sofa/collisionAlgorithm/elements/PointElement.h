@@ -14,8 +14,6 @@ public:
     : TBaseElement(eid, f)
     , m_point(p) {}
 
-    void update() override {}
-
     inline BaseProximity::SPtr createProximity() const {
         return m_createProxFunc(this);
     }

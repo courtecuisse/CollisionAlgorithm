@@ -34,7 +34,7 @@ public:
     /// return proximiy position in a vector3
     sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
         const helper::ReadAccessor<DataVecCoord> & pos = m_state->read(v);
-        return pos[m_p0] * m_f0 + pos[m_p1] * m_f1 * 0.5;
+        return pos[m_p0] * m_f0 + pos[m_p1] * m_f1;
     }
 
 protected:

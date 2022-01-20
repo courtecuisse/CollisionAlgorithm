@@ -51,7 +51,7 @@ public:
         );
     }
 
-    void update() override {
+    void prepareDetection() override {
         m_gcenter = type::Vector3();
 
         const helper::ReadAccessor<DataVecCoord> & pos = this->l_geometry->getState()->read(core::VecCoordId::position());

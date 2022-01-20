@@ -24,6 +24,8 @@ public:
         double fact_u,fact_v,fact_w;
         projectOnTriangle(P,tinfo,fact_u,fact_v,fact_w);
 
+
+
         return tri->createProximity(fact_u,fact_v,fact_w);
     }
 

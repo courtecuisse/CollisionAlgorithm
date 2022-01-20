@@ -41,6 +41,8 @@ public:
         }
     }
 
+    void prepareDetection() override {}
+
     inline BaseElement::Iterator begin(Index eid = 0) const override {
         return BaseElement::Iterator(new TDefaultElementIterator(m_elements,eid));
     }

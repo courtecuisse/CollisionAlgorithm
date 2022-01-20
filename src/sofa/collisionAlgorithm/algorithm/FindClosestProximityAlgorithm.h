@@ -80,7 +80,10 @@ public:
                 BaseProximity::SPtr pdest = projectOp(pfrom->getPosition(),edest);
 
                 double d = m_distance(pfrom,pdest);
-                if (d < min_dist) min_pair = PairDetection(pfrom,pdest);
+                if (d < min_dist) {
+                    min_pair = PairDetection(pfrom,pdest);
+                    min_dist = d;
+                }
             }
 
             if (min_pair.first != nullptr && min_pair.second != nullptr) output.push_back(min_pair);

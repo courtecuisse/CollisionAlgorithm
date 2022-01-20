@@ -64,8 +64,6 @@ public:
 
     typedef ElementIterator::SPtr Iterator;
 
-    virtual void update() = 0;
-
     virtual unsigned id() = 0;
 
     template<typename CAST>

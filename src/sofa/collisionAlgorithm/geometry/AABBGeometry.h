@@ -7,65 +7,70 @@
 
 namespace sofa::collisionAlgorithm {
 
-/*!
- * \brief The AABBBroadPhaseGeometry class
- * Implementation of broad phase collision detection using bounding boxes
- */
-class AABBBroadPhaseGeometry : public BaseGeometry {
-    friend class AABBElement;
-
+class AABBBElement : public BaseElement {
 public:
 
+    typedef std::shared_ptr<AABBBElement> SPtr;
 
-    class AABBBElement : public TBaseElement<std::function<BaseProximity::SPtr(const AABBBElement *)> > {
-    public:
+    AABBBElement(unsigned  eid, unsigned i,unsigned j, unsigned k, std::vector<std::pair<unsigned,BaseProximity::SPtr> > & elmts)
+    : m_eid(eid)
+    , m_i(i)
+    , m_j(j)
+    , m_k(k) {
 
-        using Inherit = TBaseElement;
-        typedef std::shared_ptr<AABBBElement> SPtr;
+    }
 
+//    using Inherit = TBaseElement;
 
+    virtual unsigned id() override {
+        return m_eid;
+    }
 
-        void update() override {}
+    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
+//        res.push_back(createProximity());
+    }
 
-        inline BaseProximity::SPtr createProximity() const {
-            return m_createProxFunc(this);
-        }
+    void insert(BaseElement::SPtr elmt) {
+        m_elementId.insert(elmt);
+    }
 
-        void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-            res.push_back(createProximity());
-        }
+    unsigned i() const {return m_i;}
 
-        void insert(BaseElement::SPtr elmt) {
-            m_elementId.insert(elmt);
-        }
+    unsigned j() const {return m_j;}
 
-    private:
-        std::set<BaseElement::SPtr> m_elementId;
-    };
+    unsigned k() const {return m_k;}
 
-    SOFA_CLASS(AABBBroadPhaseGeometry,BaseGeometry);
+private:
+    std::set<BaseElement::SPtr> m_elementId;
+    unsigned m_eid,m_i,m_j,m_k;
+};
+
+class AABBGeometry : public BaseGeometry {
+public:
+
+    SOFA_CLASS(AABBGeometry,BaseGeometry);
 
     typedef BaseGeometry::BaseGeometry::Index Index;
 
     Data<type::Vec3i> d_nbox;
-    Data<bool> d_refineBBox;
     Data<bool> d_static;
 
-    core::objectmodel::SingleLink<AABBBroadPhaseGeometry, BaseGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+    core::objectmodel::SingleLink<AABBGeometry, BaseGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
-    AABBBroadPhaseGeometry()
+    AABBGeometry()
     : d_nbox(initData(&d_nbox, type::Vec3i(8,8,8),"nbox", "number of bbox"))
-    , d_refineBBox(initData(&d_refineBBox, false,"refine", "Optimization to project center of box in order to find the minimal set of intersecting boxes"))
     , d_static(initData(&d_static, false,"isStatic", "Optimization: object is not moving in the scene"))
     , m_staticInitDone(false)
-    {}
+    , l_geometry(initLink("geometry", "link to geometry")) {
+        l_geometry.setPath("@.");
+    }
 
     virtual BaseElement::Iterator begin(Index eid = 0) const {
-
+        return BaseElement::ElementIterator::empty();
     }
 
     virtual size_t getOperationsHash() const {
-        return typeid(AABBBroadPhaseGeometry).hash_code();
+        return typeid(AABBGeometry).hash_code();
 //        return l_geometry->getOperationsHash();
     }
 
@@ -81,15 +86,10 @@ public:
         prepareDetection();
     }
 
-    /*!
-     * \brief prepareDetection
-     * checks if bounding boxes collided
-     */
-    void prepareDetection() {
+    void prepareDetection() override {
         if (l_geometry == NULL) return;
 
-        if(d_static.getValue() && m_staticInitDone)
-            return;
+        if(d_static.getValue() && m_staticInitDone) return;
 
         m_staticInitDone = true;
 
@@ -162,13 +162,15 @@ public:
     //    else
     //        m_nbox[2] = d_nbox.getValue()[2] + 1;
 
-        m_indexedElement.clear();
+        std::map<Index, std::vector<std::pair<unsigned,BaseProximity::SPtr> > > indexedElement;
         m_offset[0] = m_nbox[1]*m_nbox[2];
         m_offset[1] = m_nbox[2];
 
         // center in -0.5 cellwidth
         m_Bmin -= m_cellSize * 0.5;
         m_Bmax -= m_cellSize * 0.5;
+
+        auto projectOp = Operations::Project::func(l_geometry.get());
 
         for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
         {
@@ -194,57 +196,121 @@ public:
                 cminbox[i] = floor((minbox[i] - m_Bmin[i])/m_cellSize[i]); //second m_Bmax was Bmin => bug ?
             }
 
-            const bool refine = d_refineBBox.getValue();
-
-            auto projectOp = Operations::Project::func(l_geometry.get());
-
             for (int i=cminbox[0];i<cmaxbox[0];i++)
             {
+                unsigned key_i = i*m_offset[0];
+
                 for (int j=cminbox[1];j<cmaxbox[1];j++)
                 {
+                    unsigned key_j = j*m_offset[1];
+
                     for (int k=cminbox[2];k<cmaxbox[2];k++)
                     {
-                        if (refine) { // project the point on the element in order to know if the box is empty
-                            type::Vector3 P = m_Bmin + m_cellSize*0.5;
+                        unsigned key = key_i + key_j + k;
 
-                            P[0] += i*m_cellSize[0];
-                            P[1] += j*m_cellSize[1];
-                            P[2] += k*m_cellSize[2];
+                        type::Vector3 P = m_Bmin + m_cellSize*0.5;
 
-                            BaseProximity::SPtr prox = projectOp(P,elmt);
-                            if (prox == NULL) continue;
+                        P[0] += i*m_cellSize[0];
+                        P[1] += j*m_cellSize[1];
+                        P[2] += k*m_cellSize[2];
 
-                            type::Vector3 D = prox->getPosition();
+                        BaseProximity::SPtr prox = projectOp(P,elmt);
+                        if (prox == NULL) continue;
 
-                            if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
-                                (fabs(D[1])<=m_cellSize[1]*0.5) &&
-                                (fabs(D[2])<=m_cellSize[2]*0.5))
-                                m_indexedElement[getKey(i,j,k)].insert(elmt->id());
-                        } else {
-                           m_indexedElement[getKey(i,j,k)].insert(elmt->id());
-                        }
+                        type::Vector3 D = prox->getPosition()-P;
+
+                        if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
+                            (fabs(D[1])<=m_cellSize[1]*0.5) &&
+                            (fabs(D[2])<=m_cellSize[2]*0.5))
+                            indexedElement[key].push_back(std::pair<unsigned,BaseProximity::SPtr>(elmt->id(),prox));
                     }
                 }
             }
         }
-    }
 
-    void draw(const core::visual::VisualParams * vparams) {
-        if (! vparams->displayFlags().getShowBoundingCollisionModels()) return;
 
-        if (this->l_geometry->d_color.getValue()[3] == 0.0)
-            return;
 
-        glDisable(GL_LIGHTING);
-
-        glColor4fv(this->l_geometry->d_color.getValue().data());
-
-        for (auto it = m_indexedElement.begin(); it != m_indexedElement.end(); it++) {
+        for (auto it = indexedElement.begin();it!=indexedElement.end();it++) {
             unsigned eid = it->first;
 
             unsigned i = (eid) / m_offset[0];
             unsigned j = (eid - i*m_offset[0]) / m_offset[1];
             unsigned k = (eid - i*m_offset[0] - j*m_offset[1]);
+
+            m_elements.push_back(AABBBElement::SPtr(new AABBBElement(eid,i,j,k,it->second)));
+        }
+    }
+
+    void draw(const core::visual::VisualParams * vparams) {
+//        auto projectOp = Operations::Project::func(l_geometry);
+//        for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
+//        {
+//            BaseElement::SPtr elmt = it->element();
+
+//            //std::cout << ++i << std::endl;
+//            type::BoundingBox bbox;
+//            std::vector<BaseProximity::SPtr> v_prox;
+//            elmt->getControlProximities(v_prox);
+
+//            for (unsigned b=0;b<v_prox.size();b++) {
+//                bbox.include(v_prox[b]->getPosition());
+//            }
+
+//            const type::Vector3 & minbox = bbox.minBBox();
+//            const type::Vector3 & maxbox = bbox.maxBBox();
+
+//            type::Vec3i cminbox(0,0,0);
+//            type::Vec3i cmaxbox(0,0,0);
+
+//            for (int i = 0 ; i < 3 ; i++) {
+//                cmaxbox[i] = ceil((maxbox[i] - m_Bmin[i])/m_cellSize[i]);
+//                cminbox[i] = floor((minbox[i] - m_Bmin[i])/m_cellSize[i]); //second m_Bmax was Bmin => bug ?
+//            }
+
+//            for (int i=cminbox[0];i<cmaxbox[0];i++)
+//            {
+//                for (int j=cminbox[1];j<cmaxbox[1];j++)
+//                {
+//                    for (int k=cminbox[2];k<cmaxbox[2];k++)
+//                    {
+//                        type::Vector3 P = m_Bmin + m_cellSize*0.5;
+
+//                        P[0] += i*m_cellSize[0];
+//                        P[1] += j*m_cellSize[1];
+//                        P[2] += k*m_cellSize[2];
+
+//                        BaseProximity::SPtr prox = projectOp(P,elmt);
+//                        if (prox == NULL) continue;
+
+//                        type::Vector3 D = prox->getPosition();
+
+//                        glBegin(GL_LINES);
+//                            glColor3f(1,0,0);
+//                            glVertex3dv(P.data());
+//                            glColor3f(0,1,0);
+//                            glVertex3dv(D.data());
+//                        glEnd();
+
+//                    }
+//                }
+//            }
+//        }
+
+
+        if (! vparams->displayFlags().getShowBoundingCollisionModels()) return;
+
+        if (l_geometry == NULL) return;
+
+        if (this->l_geometry->d_color.getValue().a() == 0.0) return;
+
+        glDisable(GL_LIGHTING);
+
+        glColor4fv(this->l_geometry->d_color.getValue().data());
+
+        for (unsigned e=0;e<m_elements.size();e++) {
+            unsigned i = m_elements[e]->i();
+            unsigned j = m_elements[e]->j();
+            unsigned k = m_elements[e]->k();
 
             type::Vector3 min = m_Bmin + type::Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
             type::Vector3 max = m_Bmin + type::Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
@@ -361,7 +427,6 @@ protected:
     type::Vector3 m_Bmin,m_Bmax,m_cellSize;
     type::Vec3i m_nbox;
     type::Vec<2, size_t> m_offset;
-    std::map<Index, std::set<Index> > m_indexedElement;
     std::vector<AABBBElement::SPtr> m_elements;
     bool m_staticInitDone;
 };

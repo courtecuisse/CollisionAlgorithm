@@ -37,13 +37,13 @@ public:
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
-    virtual void prepareDetection() {}
+//    virtual void prepareDetection() {}
 
-    void update() {
-        for (auto it = begin(); it != end(); it++) it->element()->update();
+//    void update() {
+//        for (auto it = begin(); it != end(); it++) it->element()->update();
 
-        prepareDetection();
-    }
+//        prepareDetection();
+//    }
 
 };
 

@@ -1,5 +1,5 @@
 #include <sofa/collisionAlgorithm/algorithm/FindClosestProximityAlgorithm.h>
-#include <sofa/collisionAlgorithm/geometry/AABBBroadPhaseGeometry.h>
+#include <sofa/collisionAlgorithm/geometry/AABBGeometry.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa {
@@ -136,7 +136,7 @@ static BaseElement::Iterator broadPhase(type::Vector3 P, BaseGeometry * geometry
 //    }
 }
 
-int register_FindClosestProximityAlgorithm_BroadPhase = FindClosestProximityAlgorithm_BroadPhase::register_func<AABBBroadPhaseGeometry>(&broadPhase);
+int register_FindClosestProximityAlgorithm_BroadPhase = FindClosestProximityAlgorithm_BroadPhase::register_func<AABBGeometry>(&broadPhase);
 
 }
 

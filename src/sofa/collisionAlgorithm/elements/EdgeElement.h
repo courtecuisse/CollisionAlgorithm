@@ -13,8 +13,6 @@ public:
     EdgeElement(unsigned eid, unsigned p0,unsigned p1,Inherit::ProxCreatorFunc f)
     : TBaseElement(eid, f), m_p0(p0), m_p1(p1) {}
 
-    void update() override {}
-
     inline BaseProximity::SPtr createProximity(double f0,double f1) const {
         return m_createProxFunc(this,f0,f1);
     }

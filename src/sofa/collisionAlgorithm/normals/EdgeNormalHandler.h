@@ -43,7 +43,7 @@ public:
         );
     }
 
-    void update() override {}
+    void prepareDetection() override {}
 
 };
 

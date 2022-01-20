@@ -19,7 +19,7 @@ namespace sofa ::collisionAlgorithm {
 class CollisionComponent : public core::objectmodel::BaseObject {
 public:
 
-    virtual void update() = 0;
+    virtual void prepareDetection() = 0;
 
 };
 
@@ -46,7 +46,8 @@ public:
 
         void processObject(simulation::Node*, core::objectmodel::BaseObject* obj) {
             if (CollisionComponent * component = dynamic_cast<CollisionComponent *>(obj)) {
-                component->update();
+                std::cout << "FOUND COLLISION OBJECT " << obj->getName() << std::endl;
+                component->prepareDetection();
             }
         }
 

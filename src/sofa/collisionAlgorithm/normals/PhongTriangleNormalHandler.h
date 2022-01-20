@@ -35,7 +35,7 @@ public:
     };
 
     void init() {
-        update();
+        prepareDetection();
 
         //change the behavior of elements
         l_geometry->setPoximityCreator(
@@ -48,7 +48,7 @@ public:
         );
     }
 
-    void update() override {
+    void prepareDetection() override {
         m_point_normals.resize(this->l_geometry->l_topology->getNbPoints());
 
         m_triangle_normals.clear();
