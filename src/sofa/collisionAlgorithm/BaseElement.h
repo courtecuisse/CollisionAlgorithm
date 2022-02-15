@@ -27,28 +27,24 @@ public:
 
 };
 
+class ElementCast {
+public:
+    ElementCast(BaseElement::SPtr e) : m_element(e) {}
+
+    template <typename CAST>
+    inline operator CAST * () {
+        return (CAST *) m_element.get();
+    }
+
+private:
+    BaseElement::SPtr m_element;
+};
 
 class ElementIterator {
     typedef BaseProximity::Index Index;
 public:
 
     typedef std::shared_ptr<ElementIterator> SPtr;
-
-//    ///defines a unique pointer iterator of baseElements
-//    class SPtr : public std::shared_ptr<ElementIterator> {
-//    public:
-//        SPtr(ElementIterator * ptr) : std::shared_ptr<ElementIterator>(ptr) {}
-
-//        //we take the geometry as parameter for std::iterator compatibility i.e. it != m_geo->end();
-//        bool operator != (const BaseGeometry * ) { return ! this->get()->end(); }
-
-//        //we take the geometry as parameter for std::iterator compatibility i.e. it != m_geo->end();
-//        bool operator== (const BaseGeometry * ) { return this->get()->end(); }
-
-//        void operator++() { this->get()->next(); }
-
-//        void operator++(int) { this->get()->next(); }
-//    };
 
     //This is necessary to have the correct behavior with the delete !
     virtual ~ElementIterator() = default;
@@ -61,9 +57,8 @@ public:
 
     virtual const std::shared_ptr<BaseElement> element() const = 0;
 
-    template<class CAST>
-    inline CAST * element_cast() {
-        return this->element()->cast<CAST>();
+    inline ElementCast element_cast() {
+        return ElementCast(element());
     }
 
     ///returns a new EmptyIterator
@@ -83,7 +78,6 @@ static inline void operator ++ (ElementIterator::SPtr it, int /*NB*/) {
 //    for (int i=0;i<NB;i++)
         it->next();
 }
-
 
 class EmptyIterator : public ElementIterator {
 public:

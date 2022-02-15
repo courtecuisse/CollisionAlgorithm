@@ -5,11 +5,11 @@
 
 namespace sofa::collisionAlgorithm::Operations {
 
-int register_CenterProximity_Point = CreateCenterProximity::register_func<PointElement>(&toolbox::PointToolBox::createCenterProximity);
+int register_CenterProximity_Point = CreateCenterProximityOperation::register_func<PointElement>(&toolbox::PointToolBox::createCenterProximity);
 
-int register_CenterProximity_Edge = CreateCenterProximity::register_func<EdgeElement>(&toolbox::EdgeToolBox::createCenterProximity);
+int register_CenterProximity_Edge = CreateCenterProximityOperation::register_func<EdgeElement>(&toolbox::EdgeToolBox::createCenterProximity);
 
-int register_CenterProximity_Triangle = CreateCenterProximity::register_func<TriangleElement>(&toolbox::TriangleToolBox::createCenterProximity);
+int register_CenterProximity_Triangle = CreateCenterProximityOperation::register_func<TriangleElement>(&toolbox::TriangleToolBox::createCenterProximity);
 
 }
 

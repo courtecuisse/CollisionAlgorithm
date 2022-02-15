@@ -6,7 +6,7 @@
 
 namespace sofa::collisionAlgorithm::Operations {
 
-class CreateCenterProximity : public GenericOperation<CreateCenterProximity,std::function<BaseProximity::SPtr(BaseElement::SPtr)> > {
+class CreateCenterProximityOperation : public GenericOperation<CreateCenterProximityOperation,std::function<BaseProximity::SPtr(BaseElement::SPtr)> > {
 public:
 
     using Inherit = GenericOperation;

@@ -43,10 +43,8 @@ public:
 
     void init() {
         for (auto it = l_geometry->begin();it != l_geometry->end(); it++) {
-            BaseElement::SPtr elmt = it->element();
-            auto elmt_cast = elmt->cast<ELEMENT>();
-
-            elmt_cast->setProximityCreator(
+            ELEMENT * elmt = it->element_cast();
+            elmt->setProximityCreator(
                 [=](const PointElement * elmt) -> BaseProximity::SPtr {
                     return BaseProximity::SPtr(new VectorPointNormalProximity(l_geometry->getState(),
                                                                               elmt->getP0(),

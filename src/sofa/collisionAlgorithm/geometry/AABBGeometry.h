@@ -55,8 +55,8 @@ public:
     AABBGeometry()
     : d_nbox(initData(&d_nbox, type::Vec3i(8,8,8),"nbox", "number of bbox"))
     , d_static(initData(&d_static, false,"isStatic", "Optimization: object is not moving in the scene"))
-    , m_staticInitDone(false)
-    , l_geometry(initLink("geometry", "link to geometry")) {
+    , l_geometry(initLink("geometry", "link to geometry"))
+    , m_staticInitDone(false) {
         l_geometry.setPath("@.");
     }
 
@@ -79,6 +79,14 @@ public:
 
     void init() {
         prepareDetection();
+    }
+
+    void getElementSet(type::Vec3i c, std::set<Index> & selectElements) const {
+//        auto it = m_indexedElement.find(getKey(c[0],c[1],c[2]));
+//        if (it != m_indexedElement.end()) {
+//            const std::set<Index> & elemntsID = it->second;
+//            selectElements.insert(elemntsID.begin(),elemntsID.end());
+//        }
     }
 
     void prepareDetection() override {
@@ -165,7 +173,7 @@ public:
         m_Bmin -= m_cellSize * 0.5;
         m_Bmax -= m_cellSize * 0.5;
 
-        auto projectOp = Operations::Project::func(l_geometry.get());
+        auto projectOp = Operations::ProjectOperation::func(l_geometry.get());
 
         for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
         {
@@ -419,11 +427,11 @@ public:
     virtual void recomputeNormals() {}
 
 protected:
+    bool m_staticInitDone;
     type::Vector3 m_Bmin,m_Bmax,m_cellSize;
     type::Vec3i m_nbox;
     type::Vec<2, size_t> m_offset;
     std::vector<AABBBElement::SPtr> m_elements;
-    bool m_staticInitDone;
 };
 
 

@@ -42,10 +42,8 @@ public:
 
         //change the behavior of elements
         for (auto it = l_geometry->begin();it != l_geometry->end(); it++) {
-            BaseElement::SPtr elmt = it->element();
-            auto elmt_cast = elmt->cast<ELEMENT>();
-
-            elmt_cast->setProximityCreator(
+            ELEMENT * elmt = it->element_cast();
+            elmt->setProximityCreator(
                 [=](const TriangleElement * elmt, double f0,double f1,double f2) -> BaseProximity::SPtr {
                     return BaseProximity::SPtr(new PhongTriangleProximity(l_geometry->getState(),
                                                                           elmt->getP0(),elmt->getP1(),elmt->getP2(),
@@ -61,9 +59,8 @@ public:
 
         m_triangle_normals.clear();
         for (auto it=l_geometry->begin();it!=l_geometry->end();it++) {
-            BaseElement::SPtr elmt = it->element();
-            auto telement = elmt->cast<TriangleElement>();
-            auto tinfo = telement->getTriangleInfo();
+            TriangleElement * elmt = it->element_cast();
+            auto tinfo = elmt->getTriangleInfo();
             m_triangle_normals.push_back(tinfo.N);
         }
 

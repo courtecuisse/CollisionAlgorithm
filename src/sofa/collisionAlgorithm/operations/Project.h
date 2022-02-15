@@ -6,7 +6,7 @@
 
 namespace sofa::collisionAlgorithm::Operations {
 
-class Project : public GenericOperation<Project, std::function<BaseProximity::SPtr(type::Vector3 , BaseElement::SPtr)> > {
+class ProjectOperation : public GenericOperation<ProjectOperation, std::function<BaseProximity::SPtr(type::Vector3 , BaseElement::SPtr)> > {
 public:
 
     using Inherit = GenericOperation;

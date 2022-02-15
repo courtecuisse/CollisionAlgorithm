@@ -8,18 +8,17 @@
 
 namespace sofa::collisionAlgorithm {
 
-class FindClosestProximityAlgorithm_BroadPhase : public Operations::GenericOperation<FindClosestProximityAlgorithm_BroadPhase,std::function<ElementIterator::SPtr(type::Vector3,BaseGeometry *) > > {
+//Specific operation to find the closest point on a geometry (the code is in the c++ class)
+class FindClosestProximityOperation : public Operations::GenericOperation<FindClosestProximityOperation,
+        std::function<BaseProximity::SPtr(BaseProximity::SPtr,
+                                          BaseGeometry *,
+                                          Operations::ProjectOperation::FUNC,
+                                          std::function<double(BaseProximity::SPtr,BaseProximity::SPtr)> ) > > {
 public:
 
     using Inherit = GenericOperation;
 
-    //By default no broadPhase so we loop over all elements
-    GenericOperation::FUNC getDefault() const override {
-        return [=](type::Vector3 , BaseGeometry * geo) -> ElementIterator::SPtr {
-            return geo->begin();
-        };
-    }
-
+    GenericOperation::FUNC getDefault() const override;
 };
 
 class FindClosestProximityAlgorithm : public BaseAlgorithm {
@@ -62,31 +61,18 @@ public:
         DetectionOutput & output = *d_output.beginEdit();
         output.clear();
 
-        auto createProximityOp = Operations::CreateCenterProximity::func(l_from);
-        auto projectOp = Operations::Project::func(l_dest);
-        auto broadPhaseOp = FindClosestProximityAlgorithm_BroadPhase::func(l_dest);
+        auto createProximityOp = Operations::CreateCenterProximityOperation::func(l_from);
+        auto projectOp = Operations::ProjectOperation::func(l_dest);
+        auto findClosestProxOp = FindClosestProximityOperation::func(l_dest);
 
         for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
             auto pfrom = createProximityOp(itfrom->element());
             if (pfrom == nullptr) continue;
 
-            double min_dist = std::numeric_limits<double>::max();
-            PairDetection min_pair;
+            auto pdest = findClosestProxOp(pfrom,l_dest.get(),projectOp,m_distance);
+            if (pdest == nullptr) continue;
 
-            for (auto itdest = broadPhaseOp(pfrom->getPosition(),l_dest);itdest!=l_dest->end();itdest++) {
-                auto edest = itdest->element();
-                if (edest == nullptr) continue;
-
-                BaseProximity::SPtr pdest = projectOp(pfrom->getPosition(),edest);
-
-                double d = m_distance(pfrom,pdest);
-                if (d < min_dist) {
-                    min_pair = PairDetection(pfrom,pdest);
-                    min_dist = d;
-                }
-            }
-
-            if (min_pair.first != nullptr && min_pair.second != nullptr) output.push_back(min_pair);
+            output.push_back(PairDetection(pfrom,pdest));
         }
 
         d_output.endEdit();

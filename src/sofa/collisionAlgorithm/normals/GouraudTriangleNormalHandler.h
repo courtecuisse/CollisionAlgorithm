@@ -35,11 +35,10 @@ public:
 
     void init() {
         for (auto it = l_geometry->begin();it != l_geometry->end(); it++) {
-            BaseElement::SPtr elmt = it->element();
-            auto elmt_cast = elmt->cast<ELEMENT>();
+            ELEMENT * elmt = it->element_cast();
 
             //change the behavior of elements
-            elmt_cast->setProximityCreator(
+            elmt->setProximityCreator(
                 [=](const TriangleElement * elmt, double f0,double f1,double f2) -> BaseProximity::SPtr {
                     return BaseProximity::SPtr(new GouraudTriangleProximity(l_geometry->getState(),
                                                                           elmt->getP0(),elmt->getP1(),elmt->getP2(),

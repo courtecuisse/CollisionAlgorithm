@@ -10,7 +10,7 @@ namespace collisionAlgorithm
 {
 
 //Internal iterator of elements
-class SubsetElementIterator : public BaseElement::ElementIterator {
+class SubsetElementIterator : public ElementIterator {
 public:
     typedef BaseProximity::Index Index;
 
@@ -28,13 +28,14 @@ public:
         return m_iterator==m_subsetElements.cend();
     }
 
-//    BaseProximity::SPtr createProximity(CONTROL_POINT pid = CONTROL_DEFAULT) const override {
-//        return m_container->begin(id())->createProximity(pid);
-//    }
+    virtual BaseElement::SPtr element() {
+        return m_container->begin(*m_iterator)->element();
+    }
 
-//    Index elementSize() const override {
-//        return m_container->begin(id())->elementSize();
-//    }
+    virtual const BaseElement::SPtr element() const {
+        return m_container->begin(*m_iterator)->element();
+    }
+
 
 private:
     BaseGeometry * m_container;
