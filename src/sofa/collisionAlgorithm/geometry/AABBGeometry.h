@@ -8,44 +8,64 @@
 
 namespace sofa::collisionAlgorithm {
 
-class AABBBElement : public BaseElement {
-public:
-
-    typedef std::shared_ptr<AABBBElement> SPtr;
-
-    AABBBElement(unsigned  eid, unsigned i,unsigned j, unsigned k, const std::vector<BaseProximity::SPtr> & elmts)
-    : m_eid(eid)
-    , m_i(i)
-    , m_j(j)
-    , m_k(k)
-    , m_projProx(elmts) {}
-
-
-    virtual unsigned id() override {
-        return m_eid;
-    }
-
-    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-        res = m_projProx;
-    }
-
-    unsigned i() const {return m_i;}
-
-    unsigned j() const {return m_j;}
-
-    unsigned k() const {return m_k;}
-
-private:
-    unsigned m_eid,m_i,m_j,m_k;
-    std::vector<BaseProximity::SPtr> m_projProx;
-};
-
 class AABBGeometry : public BaseGeometry {
 public:
 
-    SOFA_CLASS(AABBGeometry,BaseGeometry);
+    class AABBBElement : public BaseElement {
+    public:
 
-    typedef BaseGeometry::BaseGeometry::Index Index;
+        typedef std::shared_ptr<AABBBElement> SPtr;
+
+        AABBBElement(unsigned key) : m_key(key) {}
+
+
+        virtual unsigned id() override {
+            return m_key;
+        }
+
+        void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
+            res = m_projProx;
+        }
+
+        void insert(BaseProximity::SPtr prox, BaseElement::SPtr elmt) const {
+
+        }
+
+    private:
+        unsigned m_key;
+        std::vector<BaseProximity::SPtr> m_projProx;
+    };
+
+    class AABBBIterator : public ElementIterator {
+    public:
+
+        AABBBIterator(const AABBGeometry * geo)
+        : m_geometry(geo) {
+            m_iterator = geo->getElementsMap().cbegin();
+        }
+
+        bool end() const override {
+            return m_iterator == m_geometry->getElementsMap().cend();
+        }
+
+        void next() override {
+            m_iterator++;
+        }
+
+        std::shared_ptr<BaseElement> element() override {
+            return m_iterator->second;
+        }
+
+        const std::shared_ptr<BaseElement> element() const override {
+            return m_iterator->second;
+        }
+
+    private:
+        std::map<unsigned, AABBBElement::SPtr >::const_iterator m_iterator;
+        const AABBGeometry * m_geometry;
+    };
+
+    SOFA_CLASS(AABBGeometry,BaseGeometry);
 
     Data<type::Vec3i> d_nbox;
     Data<bool> d_static;
@@ -61,7 +81,7 @@ public:
     }
 
     ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new DefaultElementIterator(this));
+        return ElementIterator::SPtr(new AABBBIterator(this));
     }
 
     unsigned elementSize() const override {
@@ -80,6 +100,10 @@ public:
         return l_geometry->getState();
     }
 
+    const std::map<unsigned, AABBBElement::SPtr > & getElementsMap() const {
+        return m_indexedElement;
+    }
+
     type::BoundingBox getBBox() const {
         return type::BoundingBox(m_Bmin,m_Bmax);
     }
@@ -89,11 +113,12 @@ public:
     }
 
     void getElementSet(type::Vec3i c, std::set<Index> & selectElements) const {
-//        auto it = m_indexedElement.find(getKey(c[0],c[1],c[2]));
-//        if (it != m_indexedElement.end()) {
-//            const std::set<Index> & elemntsID = it->second;
+        auto it = m_indexedElement.find(getKey(c[0],c[1],c[2]));
+        if (it != m_indexedElement.end()) {
+            const AABBBElement::SPtr box = it->second;
 //            selectElements.insert(elemntsID.begin(),elemntsID.end());
-//        }
+//            for (auto it=box.elements().cbegin();)
+        }
     }
 
     void prepareDetection() override {
@@ -172,7 +197,8 @@ public:
     //    else
     //        m_nbox[2] = d_nbox.getValue()[2] + 1;
 
-        std::map<Index, std::vector<BaseProximity::SPtr> > indexedElement;
+        m_indexedElement.clear();
+
         m_offset[0] = m_nbox[1]*m_nbox[2];
         m_offset[1] = m_nbox[2];
 
@@ -231,8 +257,20 @@ public:
 
                         if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
                             (fabs(D[1])<=m_cellSize[1]*0.5) &&
-                            (fabs(D[2])<=m_cellSize[2]*0.5))
-                            indexedElement[key].push_back(prox);
+                            (fabs(D[2])<=m_cellSize[2]*0.5)) {
+
+                            auto it = m_indexedElement.find(key);
+                            AABBBElement::SPtr aabb_elmt = NULL;
+
+                            if (it == m_indexedElement.cend()) {
+                                aabb_elmt = AABBBElement::SPtr(new AABBBElement(key));
+                                m_indexedElement[key] = aabb_elmt;
+                            } else {
+                                aabb_elmt = it->second;
+                            }
+
+                            aabb_elmt->insert(prox,elmt);
+                        }
                     }
                 }
             }
@@ -438,7 +476,7 @@ protected:
     type::Vector3 m_Bmin,m_Bmax,m_cellSize;
     type::Vec3i m_nbox;
     type::Vec<2, size_t> m_offset;
-//    std::vector<AABBBElement::SPtr> m_elements;
+    std::map<unsigned, AABBBElement::SPtr > m_indexedElement;
 };
 
 
