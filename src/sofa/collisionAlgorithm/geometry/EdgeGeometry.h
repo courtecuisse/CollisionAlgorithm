@@ -31,8 +31,8 @@ public:
     void init() {
         auto f = [=](const EdgeElement * elmt, double f0,double f1) -> BaseProximity::SPtr {
             return BaseProximity::SPtr(new DefaultEdgeProximity<DataTypes>(this->getState(),
-                                                                        elmt->getP0(),elmt->getP1(),
-                                                                        f0,f1));
+                                                                           elmt->getP0(),elmt->getP1(),
+                                                                           f0,f1));
         };
 
         for (unsigned i=0;i<this->l_topology->getNbEdges();i++) {
@@ -45,8 +45,16 @@ public:
 
     void prepareDetection() override {}
 
-    inline ElementIterator::SPtr begin(Index eid = 0) const override {
-        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements,eid));
+    inline ElementIterator::SPtr begin() const override {
+        return ElementIterator::SPtr(new DefaultElementIterator(this));
+    }
+
+    unsigned elementSize() const override {
+        return m_elements.size();
+    }
+
+    BaseElement::SPtr getElement(unsigned i) const override {
+        return m_elements[i];
     }
 
 //    inline void draw(const core::visual::VisualParams * vparams) {

@@ -14,8 +14,8 @@ int FindClosestPointAlgorithmClass = core::RegisterObject("FindClosestProximityA
 
 
 static BaseProximity::SPtr doFindClosestProx(BaseProximity::SPtr prox, ElementIterator::SPtr itdest,
-                                            Operations::ProjectOperation::FUNC projectOp,
-                                            std::function<double(BaseProximity::SPtr,BaseProximity::SPtr)> distance) {
+                                             Operations::ProjectOperation::FUNC projectOp,
+                                             std::function<double(BaseProximity::SPtr,BaseProximity::SPtr)> distance) {
     double min_dist = std::numeric_limits<double>::max();
     BaseProximity::SPtr res = NULL;
 

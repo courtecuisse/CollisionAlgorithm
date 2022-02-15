@@ -60,13 +60,20 @@ public:
         l_geometry.setPath("@.");
     }
 
-    virtual ElementIterator::SPtr begin(Index eid = 0) const {
-        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements,eid));
+    ElementIterator::SPtr begin() const override {
+        return ElementIterator::SPtr(new DefaultElementIterator(this));
+    }
+
+    unsigned elementSize() const override {
+        return l_geometry->elementSize();
+    }
+
+    BaseElement::SPtr getElement(unsigned i) const override {
+        return l_geometry->getElement(i);
     }
 
     virtual size_t getOperationsHash() const {
         return typeid(AABBGeometry).hash_code();
-//        return l_geometry->getOperationsHash();
     }
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const {
@@ -233,15 +240,15 @@ public:
 
 
 
-        for (auto it = indexedElement.begin();it!=indexedElement.end();it++) {
-            unsigned eid = it->first;
+//        for (auto it = indexedElement.begin();it!=indexedElement.end();it++) {
+//            unsigned eid = it->first;
 
-            unsigned i = (eid) / m_offset[0];
-            unsigned j = (eid - i*m_offset[0]) / m_offset[1];
-            unsigned k = (eid - i*m_offset[0] - j*m_offset[1]);
+//            unsigned i = (eid) / m_offset[0];
+//            unsigned j = (eid - i*m_offset[0]) / m_offset[1];
+//            unsigned k = (eid - i*m_offset[0] - j*m_offset[1]);
 
-            m_elements.push_back(AABBBElement::SPtr(new AABBBElement(eid,i,j,k,it->second)));
-        }
+//            m_elements.push_back(AABBBElement::SPtr(new AABBBElement(eid,i,j,k,it->second)));
+//        }
     }
 
     void draw(const core::visual::VisualParams * vparams) {
@@ -310,67 +317,67 @@ public:
 
         glColor4fv(this->l_geometry->d_color.getValue().data());
 
-        for (unsigned e=0;e<m_elements.size();e++) {
-            unsigned i = m_elements[e]->i();
-            unsigned j = m_elements[e]->j();
-            unsigned k = m_elements[e]->k();
+//        for (unsigned e=0;e<m_elements.size();e++) {
+//            unsigned i = m_elements[e]->i();
+//            unsigned j = m_elements[e]->j();
+//            unsigned k = m_elements[e]->k();
 
-            type::Vector3 min = m_Bmin + type::Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
-            type::Vector3 max = m_Bmin + type::Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
-            type::BoundingBox bbox(min,max);
+//            type::Vector3 min = m_Bmin + type::Vector3((i  ) * m_cellSize[0],(j  ) * m_cellSize[1],(k  ) * m_cellSize[2]) ;
+//            type::Vector3 max = m_Bmin + type::Vector3((i+1) * m_cellSize[0],(j+1) * m_cellSize[1],(k+1) * m_cellSize[2]) ;
+//            type::BoundingBox bbox(min,max);
 
-            type::Vector3 points[8];
+//            type::Vector3 points[8];
 
-            points[0] = type::Vector3(bbox.minBBox()[0], bbox.minBBox()[1], bbox.minBBox()[2]);
-            points[1] = type::Vector3(bbox.maxBBox()[0], bbox.minBBox()[1], bbox.minBBox()[2]);
-            points[2] = type::Vector3(bbox.minBBox()[0], bbox.maxBBox()[1], bbox.minBBox()[2]);
-            points[3] = type::Vector3(bbox.maxBBox()[0], bbox.maxBBox()[1], bbox.minBBox()[2]);
-            points[4] = type::Vector3(bbox.minBBox()[0], bbox.minBBox()[1], bbox.maxBBox()[2]);
-            points[5] = type::Vector3(bbox.maxBBox()[0], bbox.minBBox()[1], bbox.maxBBox()[2]);
-            points[6] = type::Vector3(bbox.minBBox()[0], bbox.maxBBox()[1], bbox.maxBBox()[2]);
-            points[7] = type::Vector3(bbox.maxBBox()[0], bbox.maxBBox()[1], bbox.maxBBox()[2]);
+//            points[0] = type::Vector3(bbox.minBBox()[0], bbox.minBBox()[1], bbox.minBBox()[2]);
+//            points[1] = type::Vector3(bbox.maxBBox()[0], bbox.minBBox()[1], bbox.minBBox()[2]);
+//            points[2] = type::Vector3(bbox.minBBox()[0], bbox.maxBBox()[1], bbox.minBBox()[2]);
+//            points[3] = type::Vector3(bbox.maxBBox()[0], bbox.maxBBox()[1], bbox.minBBox()[2]);
+//            points[4] = type::Vector3(bbox.minBBox()[0], bbox.minBBox()[1], bbox.maxBBox()[2]);
+//            points[5] = type::Vector3(bbox.maxBBox()[0], bbox.minBBox()[1], bbox.maxBBox()[2]);
+//            points[6] = type::Vector3(bbox.minBBox()[0], bbox.maxBBox()[1], bbox.maxBBox()[2]);
+//            points[7] = type::Vector3(bbox.maxBBox()[0], bbox.maxBBox()[1], bbox.maxBBox()[2]);
 
 
-    //        if (vparams->displayFlags().getShowWireFrame()) {
-                glBegin(GL_LINES);
-                    glVertex3dv(points[0].data());glVertex3dv(points[1].data());
-                    glVertex3dv(points[3].data());glVertex3dv(points[2].data());
-                    glVertex3dv(points[7].data());glVertex3dv(points[6].data());
-                    glVertex3dv(points[4].data());glVertex3dv(points[5].data());
+//    //        if (vparams->displayFlags().getShowWireFrame()) {
+//                glBegin(GL_LINES);
+//                    glVertex3dv(points[0].data());glVertex3dv(points[1].data());
+//                    glVertex3dv(points[3].data());glVertex3dv(points[2].data());
+//                    glVertex3dv(points[7].data());glVertex3dv(points[6].data());
+//                    glVertex3dv(points[4].data());glVertex3dv(points[5].data());
 
-                    glVertex3dv(points[0].data());glVertex3dv(points[2].data());
-                    glVertex3dv(points[1].data());glVertex3dv(points[3].data());
-                    glVertex3dv(points[4].data());glVertex3dv(points[6].data());
-                    glVertex3dv(points[5].data());glVertex3dv(points[7].data());
+//                    glVertex3dv(points[0].data());glVertex3dv(points[2].data());
+//                    glVertex3dv(points[1].data());glVertex3dv(points[3].data());
+//                    glVertex3dv(points[4].data());glVertex3dv(points[6].data());
+//                    glVertex3dv(points[5].data());glVertex3dv(points[7].data());
 
-                    glVertex3dv(points[0].data());glVertex3dv(points[4].data());
-                    glVertex3dv(points[1].data());glVertex3dv(points[5].data());
-                    glVertex3dv(points[2].data());glVertex3dv(points[6].data());
-                    glVertex3dv(points[3].data());glVertex3dv(points[7].data());
-                glEnd();
-    //        } else {
-    //            glBegin(GL_QUADS);
-    //                glColor3dv((this->d_color.getValue()*0.8).data());
-    //                glVertex3dv(points[0].data());glVertex3dv(points[1].data());glVertex3dv(points[3].data());glVertex3dv(points[2].data());
+//                    glVertex3dv(points[0].data());glVertex3dv(points[4].data());
+//                    glVertex3dv(points[1].data());glVertex3dv(points[5].data());
+//                    glVertex3dv(points[2].data());glVertex3dv(points[6].data());
+//                    glVertex3dv(points[3].data());glVertex3dv(points[7].data());
+//                glEnd();
+//    //        } else {
+//    //            glBegin(GL_QUADS);
+//    //                glColor3dv((this->d_color.getValue()*0.8).data());
+//    //                glVertex3dv(points[0].data());glVertex3dv(points[1].data());glVertex3dv(points[3].data());glVertex3dv(points[2].data());
 
-    //                glColor3dv((this->d_color.getValue()*0.7).data());
-    //                glVertex3dv(points[4].data());glVertex3dv(points[5].data());glVertex3dv(points[7].data());glVertex3dv(points[6].data());
+//    //                glColor3dv((this->d_color.getValue()*0.7).data());
+//    //                glVertex3dv(points[4].data());glVertex3dv(points[5].data());glVertex3dv(points[7].data());glVertex3dv(points[6].data());
 
-    //                glColor3dv((this->d_color.getValue()*0.6).data());
-    //                glVertex3dv(points[2].data());glVertex3dv(points[3].data());glVertex3dv(points[7].data());glVertex3dv(points[6].data());
+//    //                glColor3dv((this->d_color.getValue()*0.6).data());
+//    //                glVertex3dv(points[2].data());glVertex3dv(points[3].data());glVertex3dv(points[7].data());glVertex3dv(points[6].data());
 
-    //                glColor3dv((this->d_color.getValue()*0.5).data());
-    //                glVertex3dv(points[0].data());glVertex3dv(points[1].data());glVertex3dv(points[5].data());glVertex3dv(points[4].data());
+//    //                glColor3dv((this->d_color.getValue()*0.5).data());
+//    //                glVertex3dv(points[0].data());glVertex3dv(points[1].data());glVertex3dv(points[5].data());glVertex3dv(points[4].data());
 
-    //                glColor3dv((this->d_color.getValue()*0.4).data());
-    //                glVertex3dv(points[3].data());glVertex3dv(points[1].data());glVertex3dv(points[5].data());glVertex3dv(points[7].data());
+//    //                glColor3dv((this->d_color.getValue()*0.4).data());
+//    //                glVertex3dv(points[3].data());glVertex3dv(points[1].data());glVertex3dv(points[5].data());glVertex3dv(points[7].data());
 
-    //                glColor3dv((this->d_color.getValue()*0.3).data());
-    //                glVertex3dv(points[2].data());glVertex3dv(points[0].data());glVertex3dv(points[4].data());glVertex3dv(points[6].data());
-    //            glEnd();
-    //        }
+//    //                glColor3dv((this->d_color.getValue()*0.3).data());
+//    //                glVertex3dv(points[2].data());glVertex3dv(points[0].data());glVertex3dv(points[4].data());glVertex3dv(points[6].data());
+//    //            glEnd();
+//    //        }
 
-        }
+//        }
     }
 
     inline Index getKey(size_t i,size_t j,size_t k) const {
@@ -431,7 +438,7 @@ protected:
     type::Vector3 m_Bmin,m_Bmax,m_cellSize;
     type::Vec3i m_nbox;
     type::Vec<2, size_t> m_offset;
-    std::vector<AABBBElement::SPtr> m_elements;
+//    std::vector<AABBBElement::SPtr> m_elements;
 };
 
 

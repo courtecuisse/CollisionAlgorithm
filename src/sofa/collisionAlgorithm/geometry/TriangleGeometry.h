@@ -48,8 +48,16 @@ public:
         for (unsigned i=0;i<m_elements.size();i++) m_elements[i]->update();
     }
 
-    inline ElementIterator::SPtr begin(Index eid = 0) const override {
-        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements,eid));
+    inline ElementIterator::SPtr begin() const override {
+        return ElementIterator::SPtr(new DefaultElementIterator(this));
+    }
+
+    unsigned elementSize() const override {
+        return m_elements.size();
+    }
+
+    BaseElement::SPtr getElement(unsigned i) const override {
+        return m_elements[i];
     }
 
 private:

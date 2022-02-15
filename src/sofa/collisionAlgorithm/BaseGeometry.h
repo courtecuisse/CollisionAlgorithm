@@ -29,7 +29,7 @@ public:
         this->f_listening.setValue(true);
     }
 
-    virtual ElementIterator::SPtr begin(Index eid = 0) const = 0;
+    virtual ElementIterator::SPtr begin() const = 0;
 
     virtual size_t getOperationsHash() const = 0;
 
@@ -37,13 +37,9 @@ public:
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
-//    virtual void prepareDetection() {}
+    virtual unsigned elementSize() const = 0;
 
-//    void update() {
-//        for (auto it = begin(); it != end(); it++) it->element()->update();
-
-//        prepareDetection();
-//    }
+    virtual BaseElement::SPtr getElement(unsigned i) const = 0;
 
 };
 

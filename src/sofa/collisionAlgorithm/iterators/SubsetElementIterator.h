@@ -15,7 +15,7 @@ public:
     typedef BaseProximity::Index Index;
 
     SubsetElementIterator(BaseGeometry * geo, const std::set<Index> & subsetElements)
-    : m_container(geo)
+    : m_geometry(geo)
     , m_subsetElements(subsetElements) {
         m_iterator = m_subsetElements.cbegin();
     }
@@ -29,16 +29,16 @@ public:
     }
 
     virtual BaseElement::SPtr element() {
-        return m_container->begin(*m_iterator)->element();
+        return m_geometry->getElement(*m_iterator);
     }
 
     virtual const BaseElement::SPtr element() const {
-        return m_container->begin(*m_iterator)->element();
+        return m_geometry->getElement(*m_iterator);
     }
 
 
 private:
-    BaseGeometry * m_container;
+    BaseGeometry * m_geometry;
     const std::set<Index> m_subsetElements;
     std::set<Index>::iterator m_iterator;
 };
