@@ -12,6 +12,10 @@ public:
     SOFA_CLASS(SOFA_TEMPLATE(VectorPointNormalHandler,DataTypes), CollisionComponent);
 
     Data<type::vector<type::Vector3>> d_normals;
+
+    typedef PointGeometry<DataTypes> GEOMETRY;
+    typedef typename GEOMETRY::ELEMENT ELEMENT;
+
     core::objectmodel::SingleLink<VectorPointNormalHandler<DataTypes>,PointGeometry<DataTypes>,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
     VectorPointNormalHandler()
@@ -38,13 +42,18 @@ public:
     };
 
     void init() {
-        l_geometry->setPoximityCreator(
-            [=](const PointElement * elmt) -> BaseProximity::SPtr {
-                return BaseProximity::SPtr(new VectorPointNormalProximity(l_geometry->getState(),
-                                                                          elmt->getP0(),
-                                                                          d_normals.getValue()));
-            }
-        );
+        for (auto it = l_geometry->begin();it != l_geometry->end(); it++) {
+            BaseElement::SPtr elmt = it->element();
+            auto elmt_cast = elmt->cast<ELEMENT>();
+
+            elmt_cast->setProximityCreator(
+                [=](const PointElement * elmt) -> BaseProximity::SPtr {
+                    return BaseProximity::SPtr(new VectorPointNormalProximity(l_geometry->getState(),
+                                                                              elmt->getP0(),
+                                                                              d_normals.getValue()));
+                }
+            );
+        }
     }
 
     void prepareDetection() override {}

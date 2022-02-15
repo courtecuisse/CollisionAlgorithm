@@ -11,7 +11,10 @@ public:
 
     SOFA_CLASS(SOFA_TEMPLATE(PhongTriangleNormalHandler,DataTypes), CollisionComponent);
 
-    core::objectmodel::SingleLink<PhongTriangleNormalHandler<DataTypes>,TriangleGeometry<DataTypes>,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+    typedef TriangleGeometry<DataTypes> GEOMETRY;
+    typedef typename GEOMETRY::ELEMENT ELEMENT;
+
+    core::objectmodel::SingleLink<PhongTriangleNormalHandler<DataTypes>,GEOMETRY,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
     PhongTriangleNormalHandler()
     : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
@@ -38,14 +41,19 @@ public:
         prepareDetection();
 
         //change the behavior of elements
-        l_geometry->setPoximityCreator(
-            [=](const TriangleElement * elmt, double f0,double f1,double f2) -> BaseProximity::SPtr {
-                return BaseProximity::SPtr(new PhongTriangleProximity(l_geometry->getState(),
-                                                                      elmt->getP0(),elmt->getP1(),elmt->getP2(),
-                                                                      f0,f1,f2,
-                                                                      m_point_normals));
-            }
-        );
+        for (auto it = l_geometry->begin();it != l_geometry->end(); it++) {
+            BaseElement::SPtr elmt = it->element();
+            auto elmt_cast = elmt->cast<ELEMENT>();
+
+            elmt_cast->setProximityCreator(
+                [=](const TriangleElement * elmt, double f0,double f1,double f2) -> BaseProximity::SPtr {
+                    return BaseProximity::SPtr(new PhongTriangleProximity(l_geometry->getState(),
+                                                                          elmt->getP0(),elmt->getP1(),elmt->getP2(),
+                                                                          f0,f1,f2,
+                                                                          m_point_normals));
+                }
+            );
+        }
     }
 
     void prepareDetection() override {

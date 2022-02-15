@@ -29,7 +29,7 @@ public:
         this->f_listening.setValue(true);
     }
 
-    virtual BaseElement::Iterator begin(Index eid = 0) const = 0;
+    virtual ElementIterator::SPtr begin(Index eid = 0) const = 0;
 
     virtual size_t getOperationsHash() const = 0;
 
@@ -136,12 +136,12 @@ public:
     }
 
 
-    void setPoximityCreator(typename ELEMENT::ProxCreatorFunc f) {
-        for (auto it = begin();it!=end();it++) {
-            auto telement = it->element()->cast<ELEMENT>();
-            telement->setProximityCreator(f);
-        }
-    }
+//    void setPoximityCreator(typename ELEMENT::ProxCreatorFunc f) {
+//        for (auto it = begin();it!=end();it++) {
+//            auto telement = it->element()->cast<ELEMENT>();
+//            telement->setProximityCreator(f);
+//        }
+//    }
 
 };
 

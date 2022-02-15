@@ -11,7 +11,7 @@ SOFA_DECL_CLASS(FindClosestProximityAlgorithm)
 int FindClosestPointAlgorithmClass = core::RegisterObject("FindClosestProximityAlgorithm")
 .add< FindClosestProximityAlgorithm >();
 
-static BaseElement::Iterator broadPhase(type::Vector3 P, BaseGeometry * geometry) {
+static ElementIterator::SPtr broadPhase(type::Vector3 P, BaseGeometry * geometry) {
 //    //old params : type::Vec3i cbox, std::set<BaseProximity::Index> & selectElements, int d
 //    type::Vec3i nbox = decorator->getBoxSize();
 

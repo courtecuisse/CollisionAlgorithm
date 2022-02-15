@@ -8,14 +8,14 @@
 
 namespace sofa::collisionAlgorithm {
 
-class FindClosestProximityAlgorithm_BroadPhase : public Operations::GenericOperation<FindClosestProximityAlgorithm_BroadPhase,std::function<BaseElement::Iterator(type::Vector3,BaseGeometry *) > > {
+class FindClosestProximityAlgorithm_BroadPhase : public Operations::GenericOperation<FindClosestProximityAlgorithm_BroadPhase,std::function<ElementIterator::SPtr(type::Vector3,BaseGeometry *) > > {
 public:
 
     using Inherit = GenericOperation;
 
     //By default no broadPhase so we loop over all elements
     GenericOperation::FUNC getDefault() const override {
-        return [=](type::Vector3 , BaseGeometry * geo) -> BaseElement::Iterator {
+        return [=](type::Vector3 , BaseGeometry * geo) -> ElementIterator::SPtr {
             return geo->begin();
         };
     }
@@ -74,7 +74,7 @@ public:
             PairDetection min_pair;
 
             for (auto itdest = broadPhaseOp(pfrom->getPosition(),l_dest);itdest!=l_dest->end();itdest++) {
-                auto edest = *itdest;
+                auto edest = itdest->element();
                 if (edest == nullptr) continue;
 
                 BaseProximity::SPtr pdest = projectOp(pfrom->getPosition(),edest);

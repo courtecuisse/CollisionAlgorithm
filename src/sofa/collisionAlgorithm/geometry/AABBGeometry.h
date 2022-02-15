@@ -60,8 +60,8 @@ public:
         l_geometry.setPath("@.");
     }
 
-    virtual BaseElement::Iterator begin(Index eid = 0) const {
-        return BaseElement::Iterator(new TDefaultElementIterator(m_elements,eid));
+    virtual ElementIterator::SPtr begin(Index eid = 0) const {
+        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements,eid));
     }
 
     virtual size_t getOperationsHash() const {

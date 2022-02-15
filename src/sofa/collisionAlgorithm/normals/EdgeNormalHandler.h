@@ -11,6 +11,9 @@ public:
 
     SOFA_CLASS(SOFA_TEMPLATE(EdgeNormalHandler,DataTypes), CollisionComponent);
 
+    typedef EdgeGeometry<DataTypes> GEOMETRY;
+    typedef typename GEOMETRY::ELEMENT ELEMENT;
+
     core::objectmodel::SingleLink<EdgeNormalHandler<DataTypes>,EdgeGeometry<DataTypes>,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
     EdgeNormalHandler()
@@ -34,13 +37,18 @@ public:
 
 
     void init() {
-        l_geometry->setPoximityCreator(
-            [=](const EdgeElement * elmt, double f0,double f1) -> BaseProximity::SPtr {
-                return BaseProximity::SPtr(new LinkEdgeProximity(l_geometry->getState(),
-                                                                      elmt->getP0(),elmt->getP1(),
-                                                                      f0,f1));
-            }
-        );
+        for (auto it = l_geometry->begin();it != l_geometry->end(); it++) {
+            BaseElement::SPtr elmt = it->element();
+            auto elmt_cast = elmt->cast<ELEMENT>();
+
+            elmt_cast->setProximityCreator(
+                [=](const EdgeElement * elmt, double f0,double f1) -> BaseProximity::SPtr {
+                    return BaseProximity::SPtr(new LinkEdgeProximity(l_geometry->getState(),
+                                                                          elmt->getP0(),elmt->getP1(),
+                                                                          f0,f1));
+                }
+            );
+        }
     }
 
     void prepareDetection() override {}

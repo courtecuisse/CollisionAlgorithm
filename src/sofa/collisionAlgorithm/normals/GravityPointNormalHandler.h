@@ -12,10 +12,12 @@ public:
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef PointGeometry<DataTypes> GEOMETRY;
+    typedef typename GEOMETRY::ELEMENT ELEMENT;
 
     SOFA_CLASS(SOFA_TEMPLATE(GravityPointNormalHandler,DataTypes), CollisionComponent);
 
-    core::objectmodel::SingleLink<GravityPointNormalHandler<DataTypes>,PointGeometry<DataTypes>,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+    core::objectmodel::SingleLink<GravityPointNormalHandler<DataTypes>,GEOMETRY,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
     GravityPointNormalHandler()
     : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
@@ -42,13 +44,16 @@ public:
 
 
     void init() {
-        l_geometry->setPoximityCreator(
-            [=](const PointElement * elmt) -> BaseProximity::SPtr {
-                return BaseProximity::SPtr(new GravityPointNormalProximity(l_geometry->getState(),
-                                                                           elmt->getP0(),
-                                                                           m_gcenter));
-            }
-        );
+        for (auto it = l_geometry->begin();it != l_geometry->end(); it++) {
+            BaseElement::SPtr elmt = it->element();
+            auto elmt_cast = elmt->cast<ELEMENT>();
+            elmt_cast->setProximityCreator(
+                [=](const PointElement * elmt) -> BaseProximity::SPtr {
+                    return BaseProximity::SPtr(new GravityPointNormalProximity(l_geometry->getState(),
+                                                                               elmt->getP0(),
+                                                                               m_gcenter));
+            });
+        }
     }
 
     void prepareDetection() override {

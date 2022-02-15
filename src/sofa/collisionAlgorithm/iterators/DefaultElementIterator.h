@@ -17,7 +17,7 @@ namespace collisionAlgorithm
  * \brief The BaseElement class is a basic abstract element container
  */
 template<class CONTAINER>
-class TDefaultElementIterator : public BaseElement::ElementIterator {
+class TDefaultElementIterator : public ElementIterator {
 public:
     typedef BaseGeometry::Index Index;
 
