@@ -25,6 +25,7 @@ public:
 
     virtual void getControlProximities(std::vector<BaseProximity::SPtr> & res) const = 0;
 
+    virtual void draw(const core::visual::VisualParams * vparams) = 0;
 };
 
 class ElementCast {

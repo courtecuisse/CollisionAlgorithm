@@ -12,7 +12,8 @@ public:
     using Inherit = GenericOperation;
 
     Inherit::FUNC getDefault() const override {
-        return [=](type::Vector3 , BaseElement::SPtr) -> BaseProximity::SPtr {
+        return [=](type::Vector3 , BaseElement::SPtr elmt) -> BaseProximity::SPtr {
+            std::cerr << "ERROR no ProjectOperation registered for "  << typeid(elmt.get()).name() << std::endl;
             return NULL;
         };
     }

@@ -3,6 +3,7 @@
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/collisionAlgorithm/BaseOperation.h>
 #include <sofa/collisionAlgorithm/elements/EdgeElement.h>
+#include <sofa/collisionAlgorithm/proximity/MultiProximity.h>
 
 namespace sofa::collisionAlgorithm::Operations {
 
@@ -11,11 +12,14 @@ public:
 
     using Inherit = GenericOperation;
 
-    Inherit::FUNC getDefault() const override {
-        return [=](BaseElement::SPtr) -> BaseProximity::SPtr {
-            return NULL;
-        };
+
+    static BaseProximity::SPtr defaultCreateCenterProximity(BaseElement::SPtr elmt){
+        std::vector<BaseProximity::SPtr> res;
+        elmt->getControlProximities(res);
+        return BaseProximity::SPtr(new MultiProximity(res));
     }
+
+    Inherit::FUNC getDefault() const override { return &CreateCenterProximityOperation::defaultCreateCenterProximity; }
 
 };
 

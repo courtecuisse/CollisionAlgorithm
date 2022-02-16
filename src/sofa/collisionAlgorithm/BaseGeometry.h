@@ -41,6 +41,36 @@ public:
 
     virtual BaseElement::SPtr getElement(unsigned i) const = 0;
 
+
+    void draw(const core::visual::VisualParams * vparams) override {
+        type::RGBAColor color = d_color.getValue();
+
+//        glDisable(GL_LIGHTING);
+        if (color[3] == 0.0) return;
+
+        glColor4f(color[0],color[1],color[2],color[3]);
+        for (auto it = begin();it != end(); it++) {
+            it->element()->draw(vparams);
+        }
+
+        if (! vparams->displayFlags().getShowNormals()) return;
+        double scale = d_drawScaleNormal.getValue();
+        if (scale == 0.0) return;
+        for (auto it = begin();it != end(); it++) {
+            std::vector<BaseProximity::SPtr> res;
+            it->element()->getControlProximities(res);
+            for (unsigned i=0;i<res.size();i++) {
+                BaseProximity::SPtr center = res[i];
+
+                vparams->drawTool()->drawArrow(
+                    center->getPosition(),
+                    center->getPosition() + center->getNormal() * scale,
+                    scale * 0.1,
+                    color);
+            }
+        }
+    }
+
 };
 
 template<class DataTypes, class ELEMENT>

@@ -26,7 +26,14 @@ public:
         res.push_back(createProximity(0,1));
     }
 
+    void draw(const core::visual::VisualParams * /*vparams*/) override {
+        type::Vector3 p0 = createProximity(1,0)->getPosition();
+        type::Vector3 p1 = createProximity(0,1)->getPosition();
 
+        glBegin(GL_LINES);
+            glVertex3dv(p0.data());glVertex3dv(p1.data());
+        glEnd();
+    }
 
 private:
     unsigned m_p0,m_p1;

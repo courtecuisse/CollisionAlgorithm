@@ -74,26 +74,6 @@ public:
         }
     }
 
-
-    void draw(const core::visual::VisualParams * vparams) override {
-
-        for (auto it = l_geometry->begin();it != l_geometry->end(); it++) {
-            std::vector<BaseProximity::SPtr> res;
-            it->element()->getControlProximities(res);
-            for (unsigned i=0;i<res.size();i++) {
-                BaseProximity::SPtr center = res[i];
-
-                double scale = 1.0;//d_drawScaleNormal.getValue()
-                type::RGBAColor color(1,0,0,1);
-                vparams->drawTool()->drawArrow(
-                    center->getPosition(),
-                    center->getPosition() + center->getNormal() * scale,
-                    scale * 0.1,
-                    color);
-            }
-        }
-    }
-
 protected:
     type::vector<type::Vector3> m_triangle_normals;
     type::vector<type::Vector3> m_point_normals;

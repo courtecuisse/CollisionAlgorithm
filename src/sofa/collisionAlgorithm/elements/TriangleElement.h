@@ -69,6 +69,27 @@ public:
         res.push_back(createProximity(0,0,1));
     }
 
+
+    void draw(const core::visual::VisualParams * vparams) override {
+        type::Vector3 p0 = createProximity(1,0,0)->getPosition();
+        type::Vector3 p1 = createProximity(0,1,0)->getPosition();
+        type::Vector3 p2 = createProximity(0,0,1)->getPosition();
+
+        if (vparams->displayFlags().getShowWireFrame()) {
+            glBegin(GL_LINES);
+                glVertex3dv(p0.data());glVertex3dv(p1.data());
+                glVertex3dv(p1.data());glVertex3dv(p2.data());
+                glVertex3dv(p2.data());glVertex3dv(p0.data());
+            glEnd();
+        } else {
+            glBegin(GL_TRIANGLES);
+                glVertex3dv(p0.data());
+                glVertex3dv(p1.data());
+                glVertex3dv(p2.data());
+            glEnd();
+        }
+    }
+
 private:
     unsigned m_p0,m_p1,m_p2;
     TriangleInfo m_tinfo;    

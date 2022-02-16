@@ -156,12 +156,15 @@ public:
     Data<bool> d_static;
 
     core::objectmodel::SingleLink<AABBGeometry, BaseGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+    core::objectmodel::DataCallback c_nbox;
 
     AABBGeometry()
     : d_nbox(initData(&d_nbox, type::Vec3i(8,8,8),"nbox", "number of bbox"))
     , d_static(initData(&d_static, false,"isStatic", "Optimization: object is not moving in the scene"))
     , l_geometry(initLink("geometry", "link to geometry"))
     , m_staticInitDone(false) {
+        c_nbox.addInputs({&d_nbox});
+        c_nbox.addCallback(std::bind(&AABBGeometry::prepareDetection,this));
         l_geometry.setPath("@.");
     }
 
@@ -364,93 +367,13 @@ public:
     }
 
     void draw(const core::visual::VisualParams * vparams) {
-//        auto projectOp = Operations::Project::func(l_geometry);
-//        for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
-//        {
-//            BaseElement::SPtr elmt = it->element();
-
-//            //std::cout << ++i << std::endl;
-//            type::BoundingBox bbox;
-//            std::vector<BaseProximity::SPtr> v_prox;
-//            elmt->getControlProximities(v_prox);
-
-//            for (unsigned b=0;b<v_prox.size();b++) {
-//                bbox.include(v_prox[b]->getPosition());
-//            }
-
-//            const type::Vector3 & minbox = bbox.minBBox();
-//            const type::Vector3 & maxbox = bbox.maxBBox();
-
-//            type::Vec3i cminbox(0,0,0);
-//            type::Vec3i cmaxbox(0,0,0);
-
-//            for (int i = 0 ; i < 3 ; i++) {
-//                cmaxbox[i] = ceil((maxbox[i] - m_Bmin[i])/m_cellSize[i]);
-//                cminbox[i] = floor((minbox[i] - m_Bmin[i])/m_cellSize[i]); //second m_Bmax was Bmin => bug ?
-//            }
-
-//            for (int i=cminbox[0];i<cmaxbox[0];i++)
-//            {
-//                for (int j=cminbox[1];j<cmaxbox[1];j++)
-//                {
-//                    for (int k=cminbox[2];k<cmaxbox[2];k++)
-//                    {
-//                        type::Vector3 P = m_Bmin + m_cellSize*0.5;
-
-//                        P[0] += i*m_cellSize[0];
-//                        P[1] += j*m_cellSize[1];
-//                        P[2] += k*m_cellSize[2];
-
-//                        BaseProximity::SPtr prox = projectOp(P,elmt);
-//                        if (prox == NULL) continue;
-
-//                        type::Vector3 D = prox->getPosition();
-
-//                        glBegin(GL_LINES);
-//                            glColor3f(1,0,0);
-//                            glVertex3dv(P.data());
-//                            glColor3f(0,1,0);
-//                            glVertex3dv(D.data());
-//                        glEnd();
-
-//                    }
-//                }
-//            }
-//        }
-
-
         if (! vparams->displayFlags().getShowBoundingCollisionModels()) return;
-
-        if (l_geometry == NULL) return;
-
-        if (this->l_geometry->d_color.getValue().a() == 0.0) return;
-
-        glDisable(GL_LIGHTING);
-
-        glColor4fv(this->l_geometry->d_color.getValue().data());
-
-        for (auto it = m_indexedElement.cbegin();it!=m_indexedElement.cend();it++) {
-            it->second->draw(vparams);
-        }
+        BaseGeometry::draw(vparams);
     }
 
     inline Index getKey(size_t i,size_t j,size_t k) const {
         return i*m_offset[0] + j * m_offset[1] + k;
     }
-
-//    inline type::Vec3i getCoord(const type::Vector3 & P) const {
-//        type::Vec3i cbox(floor(P[0]/m_cellSize[0]),
-//                         floor(P[1]/m_cellSize[1]),
-//                         floor(P[2]/m_cellSize[2]));
-
-////        for (int i = 0 ; i < 3 ; i++) {
-////            cbox[i] = floor(P[i]/m_cellSize[i]);
-////        }
-////        cbox[0] = floor(P[0]/m_cellSize[0]);
-////        cbox[1] = floor(P[1]/m_cellSize[1]);
-////        cbox[2] = floor(P[2]/m_cellSize[2]);
-//        return cbox;
-//    }
 
     inline const type::Vector3 & getMin() const {
         return m_Bmin;
