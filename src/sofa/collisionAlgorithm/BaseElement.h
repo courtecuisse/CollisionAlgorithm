@@ -67,7 +67,7 @@ public:
 };
 
 static inline bool operator != (ElementIterator::SPtr it, const BaseGeometry * /*geo*/) {
-    return it->end();
+    return ! it->end();
 }
 
 static inline void operator ++ (ElementIterator::SPtr it) {

@@ -54,12 +54,18 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
     BROADPHASE * broadphase = (BROADPHASE*) geo;
 
     //old params : type::Vec3i cbox, std::set<BaseProximity::Index> & selectElements, int d
-    type::Vec3i nbox = broadphase->getBoxSize();
+    type::Vec3i nbox = broadphase->d_nbox.getValue();
 
     //take the first broad phase...
     type::Vector3 P = prox->getPosition();
 
     type::Vec3i cbox = broadphase->getBoxCoord(P);
+
+    //project the box in the bounding box of the object
+    //search with the closest box in bbox
+    cbox[0] = std::max(0,std::min(nbox[0]-1,cbox[0]));
+    cbox[1] = std::max(0,std::min(nbox[1]-1,cbox[1]));
+    cbox[2] = std::max(0,std::min(nbox[2]-1,cbox[2]));
 
     int max = 0;
     for (int i = 0 ; i < 3 ; i++) {

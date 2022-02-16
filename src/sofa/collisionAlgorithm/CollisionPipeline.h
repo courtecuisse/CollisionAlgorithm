@@ -46,7 +46,6 @@ public:
 
         void processObject(simulation::Node*, core::objectmodel::BaseObject* obj) {
             if (CollisionComponent * component = dynamic_cast<CollisionComponent *>(obj)) {
-                std::cout << "FOUND COLLISION OBJECT " << obj->getName() << std::endl;
                 component->prepareDetection();
             }
         }
