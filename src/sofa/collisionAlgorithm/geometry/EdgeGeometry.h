@@ -46,15 +46,7 @@ public:
     void prepareDetection() override {}
 
     inline ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new DefaultElementIterator(this));
-    }
-
-    unsigned elementSize() const override {
-        return m_elements.size();
-    }
-
-    BaseElement::SPtr getElement(unsigned i) const override {
-        return m_elements[i];
+        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements));
     }
 
 //    inline void draw(const core::visual::VisualParams * vparams) {

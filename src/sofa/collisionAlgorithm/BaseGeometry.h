@@ -16,8 +16,6 @@ public:
 
     SOFA_ABSTRACT_CLASS(BaseGeometry,CollisionComponent);
 
-    typedef sofa::Index Index;
-
     Data<sofa::type::RGBAColor> d_color;
     Data<double> d_drawScaleNormal;
     Data<bool> d_draw;
@@ -36,11 +34,6 @@ public:
     inline const BaseGeometry * end() const { return this; }
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
-
-    virtual unsigned elementSize() const = 0;
-
-    virtual BaseElement::SPtr getElement(unsigned i) const = 0;
-
 
     void draw(const core::visual::VisualParams * vparams) override {
         type::RGBAColor color = d_color.getValue();

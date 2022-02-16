@@ -16,26 +16,23 @@ namespace collisionAlgorithm
 /*!
  * \brief The BaseElement class is a basic abstract element container
  */
-class DefaultElementIterator : public ElementIterator {
+template<class CONTAINER>
+class TDefaultElementIterator : public ElementIterator {
 public:
-    typedef BaseGeometry::Index Index;
-
-    DefaultElementIterator(const BaseGeometry * geo)
-    : m_geometry(geo)
+    TDefaultElementIterator(const CONTAINER & c)
+    : m_container(c)
     , m_it(0) {}
 
     void next() override { m_it++; }
 
-    bool end() const override { return m_it>=m_geometry->elementSize(); }
+    bool end() const override { return m_it>=m_container.size(); }
 
-    virtual BaseElement::SPtr element() {
-        return m_geometry->getElement(m_it);
-    }
+    virtual BaseElement::SPtr element() { return m_container[m_it]; }
 
-    virtual const BaseElement::SPtr element() const { return m_geometry->getElement(m_it); }
+    virtual const BaseElement::SPtr element() const { return m_container[m_it]; }
 
 private:
-    const BaseGeometry * m_geometry;
+    const CONTAINER & m_container;
     unsigned m_it;
 
 };

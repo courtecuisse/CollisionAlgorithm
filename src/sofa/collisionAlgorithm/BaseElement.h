@@ -42,7 +42,6 @@ private:
 };
 
 class ElementIterator {
-    typedef BaseProximity::Index Index;
 public:
 
     typedef std::shared_ptr<ElementIterator> SPtr;

@@ -52,7 +52,7 @@ public:
             m_projections.push_back(prox);
         }
 
-        void draw(const core::visual::VisualParams * /*vparams*/) {
+        void draw(const core::visual::VisualParams * vparams) {
             unsigned i = m_i;//getIKey(m_key);
             unsigned j = m_j;//getJKey(m_key);
             unsigned k = m_k;//getKKey(m_key);
@@ -73,7 +73,7 @@ public:
             points[7] = type::Vector3(bbox.maxBBox()[0], bbox.maxBBox()[1], bbox.maxBBox()[2]);
 
 
-    //        if (vparams->displayFlags().getShowWireFrame()) {
+            if (vparams->displayFlags().getShowWireFrame()) {
                 glBegin(GL_LINES);
                     glVertex3dv(points[0].data());glVertex3dv(points[1].data());
                     glVertex3dv(points[3].data());glVertex3dv(points[2].data());
@@ -90,27 +90,32 @@ public:
                     glVertex3dv(points[2].data());glVertex3dv(points[6].data());
                     glVertex3dv(points[3].data());glVertex3dv(points[7].data());
                 glEnd();
-    //        } else {
-    //            glBegin(GL_QUADS);
-    //                glColor3dv((this->d_color.getValue()*0.8).data());
-    //                glVertex3dv(points[0].data());glVertex3dv(points[1].data());glVertex3dv(points[3].data());glVertex3dv(points[2].data());
+            } else {
+                glBegin(GL_QUADS);
+                    glVertex3dv(points[0].data());glVertex3dv(points[1].data());
+                    glVertex3dv(points[3].data());glVertex3dv(points[2].data());
+                    glVertex3dv(points[7].data());glVertex3dv(points[6].data());
+                    glVertex3dv(points[4].data());glVertex3dv(points[5].data());
 
-    //                glColor3dv((this->d_color.getValue()*0.7).data());
-    //                glVertex3dv(points[4].data());glVertex3dv(points[5].data());glVertex3dv(points[7].data());glVertex3dv(points[6].data());
+                    glVertex3dv(points[0].data());glVertex3dv(points[2].data());
+                    glVertex3dv(points[1].data());glVertex3dv(points[3].data());
+                    glVertex3dv(points[4].data());glVertex3dv(points[6].data());
+                    glVertex3dv(points[5].data());glVertex3dv(points[7].data());
 
-    //                glColor3dv((this->d_color.getValue()*0.6).data());
-    //                glVertex3dv(points[2].data());glVertex3dv(points[3].data());glVertex3dv(points[7].data());glVertex3dv(points[6].data());
+                    glVertex3dv(points[0].data());glVertex3dv(points[4].data());
+                    glVertex3dv(points[1].data());glVertex3dv(points[5].data());
+                    glVertex3dv(points[2].data());glVertex3dv(points[6].data());
+                    glVertex3dv(points[3].data());glVertex3dv(points[7].data());
+                glEnd();
+            }
+        }
 
-    //                glColor3dv((this->d_color.getValue()*0.5).data());
-    //                glVertex3dv(points[0].data());glVertex3dv(points[1].data());glVertex3dv(points[5].data());glVertex3dv(points[4].data());
+        const std::set<unsigned> & getElementsId() {
+            return m_elementIds;
+        }
 
-    //                glColor3dv((this->d_color.getValue()*0.4).data());
-    //                glVertex3dv(points[3].data());glVertex3dv(points[1].data());glVertex3dv(points[5].data());glVertex3dv(points[7].data());
-
-    //                glColor3dv((this->d_color.getValue()*0.3).data());
-    //                glVertex3dv(points[2].data());glVertex3dv(points[0].data());glVertex3dv(points[4].data());glVertex3dv(points[6].data());
-    //            glEnd();
-    //        }
+        const std::vector<BaseElement::SPtr> & elements() {
+            return m_elements;
         }
 
     private:
@@ -172,14 +177,6 @@ public:
         return ElementIterator::SPtr(new AABBBIterator(this));
     }
 
-    unsigned elementSize() const override {
-        return l_geometry->elementSize();
-    }
-
-    BaseElement::SPtr getElement(unsigned i) const override {
-        return l_geometry->getElement(i);
-    }
-
     virtual size_t getOperationsHash() const {
         return typeid(AABBGeometry).hash_code();
     }
@@ -200,12 +197,14 @@ public:
         prepareDetection();
     }
 
-    void getElementSet(type::Vec3i c, std::set<Index> & selectElements) const {
-        auto it = m_indexedElement.find(getKey(c[0],c[1],c[2]));
-        if (it != m_indexedElement.end()) {
+    const std::vector<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const {
+        auto it = m_indexedElement.find(getKey(i,j,k));
+        if (it == m_indexedElement.end()) {
+            static std::vector<BaseElement::SPtr> empty;
+            return empty;
+        } else {
             const AABBBElement::SPtr box = it->second;
-//            selectElements.insert(elemntsID.begin(),elemntsID.end());
-//            for (auto it=box.elements().cbegin();)
+            return box->elements();
         }
     }
 
