@@ -1,7 +1,6 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 #include <sofa/collisionAlgorithm/toolbox/TriangleToolBox.h>
@@ -45,11 +44,12 @@ public:
     }
 
     void prepareDetection() override {
-        for (unsigned i=0;i<m_elements.size();i++) m_elements[i]->update();
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+        for (unsigned i=0;i<m_elements.size();i++) m_elements[i]->update(pos.ref());
     }
 
     inline ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements));
+        return ElementIterator::defaultIterator(m_elements);
     }
 
 private:

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 #include <sofa/collisionAlgorithm/elements/PointElement.h>
 #include <sofa/collisionAlgorithm/toolbox/PointToolBox.h>
@@ -44,7 +43,7 @@ public:
     void prepareDetection() override {}
 
     ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements));
+        return ElementIterator::defaultIterator(m_elements);
     }
 
 //    void draw(const core::visual::VisualParams *vparams) override {

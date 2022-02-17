@@ -27,10 +27,10 @@ public:
     TriangleElement(unsigned eid, unsigned p0,unsigned p1,unsigned p2,Inherit::ProxCreatorFunc f)
     : TBaseElement(eid, f), m_p0(p0), m_p1(p1), m_p2(p2) {}
 
-    void update() {
-        m_tinfo.P0 = createProximity(1,0,0)->getPosition();
-        m_tinfo.P1 = createProximity(0,1,0)->getPosition();
-        m_tinfo.P2 = createProximity(0,0,1)->getPosition();
+    void update(const std::vector<type::Vector3> & pos) {
+        m_tinfo.P0 = pos[m_p0];
+        m_tinfo.P1 = pos[m_p1];
+        m_tinfo.P2 = pos[m_p2];
 
         m_tinfo.v0 = m_tinfo.P1 - m_tinfo.P0;
         m_tinfo.v1 = m_tinfo.P2 - m_tinfo.P0;

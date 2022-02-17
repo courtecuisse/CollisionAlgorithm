@@ -9,13 +9,13 @@ class PointToolBox {
 public:
 
     static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
-        auto point = elmt->cast<PointElement>();
+        auto point = elmt->element_cast<PointElement>();
         return point->createProximity();
     }
 
 
     static BaseProximity::SPtr project(const type::Vector3 & /*P*/, BaseElement::SPtr elmt) {
-        auto point = elmt->cast<PointElement>();
+        auto point = elmt->element_cast<PointElement>();
         return point->createProximity();
     }
 

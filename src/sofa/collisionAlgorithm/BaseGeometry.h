@@ -3,6 +3,7 @@
 #include <sofa/collisionAlgorithm/CollisionPipeline.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
+#include <sofa/collisionAlgorithm/ElementIterator.h>
 #include <sofa/gl/gl.h>
 
 namespace sofa ::collisionAlgorithm {

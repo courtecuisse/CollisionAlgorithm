@@ -1,6 +1,5 @@
 #include <sofa/collisionAlgorithm/algorithm/FindClosestProximityAlgorithm.h>
 #include <sofa/collisionAlgorithm/geometry/AABBGeometry.h>
-#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/core/ObjectFactory.h>
 
 namespace sofa {

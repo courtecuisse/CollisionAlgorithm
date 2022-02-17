@@ -4,7 +4,6 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/collisionAlgorithm/operations/Project.h>
-#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 
 namespace sofa::collisionAlgorithm {
 

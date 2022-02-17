@@ -10,22 +10,17 @@ class TriangleToolBox {
 public:
 
     static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
-        TriangleElement * tri = elmt->cast<TriangleElement>();
+        TriangleElement * tri = elmt->element_cast<TriangleElement>();
         return tri->createProximity(1.0/3.0,1.0/3.0,1.0/3.0);
     }
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
     static BaseProximity::SPtr project(type::Vector3 P, BaseElement::SPtr elmt) {
-        auto tri = elmt->cast<TriangleElement>();
-
-        const TriangleElement::TriangleInfo & tinfo = tri->getTriangleInfo();
+        TriangleElement * tri = elmt->element_cast<TriangleElement>();
 
         double fact_u,fact_v,fact_w;
-        projectOnTriangle(P,tinfo,fact_u,fact_v,fact_w);
-
-
-
+        projectOnTriangle(P,tri,fact_u,fact_v,fact_w);
         return tri->createProximity(fact_u,fact_v,fact_w);
     }
 
@@ -42,7 +37,9 @@ public:
         fact_u = 1.0 - fact_v  - fact_w;
     }
 
-    static void projectOnTriangle(const type::Vec3d projectP, const TriangleElement::TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w) {
+    static void projectOnTriangle(const type::Vec3d projectP, const TriangleElement * tri, double & fact_u, double & fact_v, double & fact_w) {
+        const TriangleElement::TriangleInfo & tinfo = tri->getTriangleInfo();
+
         type::Vec3d x1x2 = projectP - tinfo.P0;
 
         //corrdinate on the plane
@@ -52,18 +49,13 @@ public:
 
         computeTriangleBaryCoords(proj_P, tinfo, fact_u,fact_v,fact_w);
 
-        if (fact_u<0)
-        {
+        if (fact_u<0) {
             EdgeToolBox::projectOnEdge(proj_P, tinfo.P1, tinfo.P2, fact_v, fact_w);
             fact_u=0;
-        }
-        else if (fact_v<0)
-        {
+        } else if (fact_v<0) {
             EdgeToolBox::projectOnEdge(proj_P, tinfo.P0, tinfo.P2, fact_u, fact_w);
             fact_v=0;
-        }
-        else if (fact_w<0)
-        {
+        } else if (fact_w<0) {
             EdgeToolBox::projectOnEdge(proj_P, tinfo.P0, tinfo.P1, fact_u, fact_v);
             fact_w=0;
         }
