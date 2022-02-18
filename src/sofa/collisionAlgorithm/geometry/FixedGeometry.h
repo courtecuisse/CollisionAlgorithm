@@ -49,9 +49,21 @@ public:
 
         glColor4f(color[0],color[1],color[2],color[3]);
 
-        for(auto it=this->begin();it != this->end();it++) {
+        int id = 0;
+        for(auto it=this->begin();it != this->end();it++,id++) {
             vparams->drawTool()->drawSphere(pos[it->id()],d_drawRadius.getValue());
+            if(d_normals.getValue().size()>id)
+            {
+                vparams->drawTool()->drawArrow(
+                    pos[it->id()],
+                    pos[it->id()] + d_normals.getValue()[id] * d_drawScaleNormal.getValue(),
+                    d_drawScaleNormal.getValue() * 0.1,
+                    color
+                );
+            }
         }
+
+
     }
 
     inline FixedProximity createProximity(Index eid, int /*pid*/ = -1) const {
