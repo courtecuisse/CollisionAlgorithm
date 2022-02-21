@@ -23,6 +23,10 @@ public:
 
     unsigned id() override { return m_point; }
 
+    size_t getOperationsHash() const override { return typeid(PointElement).hash_code(); }
+
+    std::string name() const override { return "PointElement"; }
+
     inline BaseProximity::SPtr createProximity() const {
         return m_parent->createProximity(this);
     }

@@ -12,34 +12,33 @@ int FindClosestPointAlgorithmClass = core::RegisterObject("FindClosestProximityA
 .add< FindClosestProximityAlgorithm >();
 
 
-static BaseProximity::SPtr doFindClosestProx(BaseProximity::SPtr prox, ElementIterator::SPtr itdest,
-                                             Operations::ProjectOperation::FUNC projectOp,
-                                             std::function<double(BaseProximity::SPtr,BaseProximity::SPtr)> distance) {
+static BaseProximity::SPtr doFindClosestProx(BaseProximity::SPtr prox, ElementIterator::SPtr itdest) {
     double min_dist = std::numeric_limits<double>::max();
     BaseProximity::SPtr res = NULL;
 
-    while (! itdest->end()) {
+    type::Vector3 P = prox->getPosition();
+    Operations::ProjectOperation::FUNC projectOp = Operations::ProjectOperation::func(itdest);
+
+    for (; ! itdest->end();itdest++) {
         auto edest = itdest->element();
         if (edest == nullptr) continue;
 
         BaseProximity::SPtr pdest = projectOp(prox->getPosition(),edest);
         if (pdest == NULL) continue;
 
-        double d = distance(prox,pdest);
+        double d = (P - pdest->getPosition()).norm();
         if (d < min_dist) {
             res = pdest;
             min_dist = d;
         }
-
-        itdest++;
     }
 
     return res;
 }
 
 //By default no broadPhase so we loop over all elements
-static BaseProximity::SPtr genericFindClosestPoint(BaseProximity::SPtr prox,BaseGeometry * geo,Operations::ProjectOperation::FUNC projectOp,std::function<double(BaseProximity::SPtr,BaseProximity::SPtr)> distance) {
-    return doFindClosestProx(prox,geo->begin(),projectOp,distance);
+static BaseProximity::SPtr genericFindClosestPoint(BaseProximity::SPtr prox,BaseGeometry * geo) {
+    return doFindClosestProx(prox,geo->begin());
 }
 
 //By default no broadPhase so we loop over all elements
@@ -48,9 +47,7 @@ FindClosestProximityOperation::GenericOperation::FUNC FindClosestProximityOperat
 }
 
 template<class BROADPHASE>
-static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::SPtr prox, BaseGeometry * geo,
-                                                                 Operations::ProjectOperation::FUNC /*projectOp*/,
-                                                                 std::function<double(BaseProximity::SPtr,BaseProximity::SPtr)> distance) {
+static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::SPtr prox, BaseGeometry * geo) {
     BROADPHASE * broadphase = (BROADPHASE*) geo;
 
     //old params : type::Vec3i cbox, std::set<BaseProximity::Index> & selectElements, int d
@@ -243,15 +240,10 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
         d++;// we look for boxed located at d+1
     }
 
-    auto projElmts = Operations::ProjectOperation::func(broadphase->l_geometry.get());
-
-    return doFindClosestProx(prox,
-                             ElementIterator::SPtr(new TDefaultElementIterator(selectedElements)),
-                             projElmts,
-                             distance);
+    return doFindClosestProx(prox,ElementIterator::SPtr(new TDefaultElementIterator(selectedElements)));
 }
 
-int register_FindClosestProximityOperationAABB = FindClosestProximityOperation::register_func<AABBGeometry>(&FindClosestProximityOperationWithAABB<AABBGeometry>);
+int register_FindClosestProximityOperationAABB = FindClosestProximityOperation::register_func<AABBGeometry::AABBBElement>(&FindClosestProximityOperationWithAABB<AABBGeometry>);
 
 }
 

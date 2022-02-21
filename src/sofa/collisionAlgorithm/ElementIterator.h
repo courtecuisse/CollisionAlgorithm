@@ -23,6 +23,8 @@ public:
 
     virtual const std::shared_ptr<BaseElement> element() const = 0;
 
+    virtual size_t getOperationsHash() const = 0;
+
     inline ElementCast element_cast() {
         return ElementCast(element());
     }
@@ -54,6 +56,10 @@ public:
     std::shared_ptr<BaseElement> element() override { return NULL; }
 
     const std::shared_ptr<BaseElement> element() const override { return NULL; }
+
+    size_t getOperationsHash() const override {
+        return typeid(EmptyIterator).hash_code();
+    }
 };
 
 template<class CONTAINER>
@@ -67,6 +73,11 @@ public:
     void next() override { m_it++; }
 
     bool end() const override { return m_it==m_end; }
+
+    size_t getOperationsHash() const override {
+        if (m_it == m_end) return typeid(EmptyIterator).hash_code();
+        else return (*m_it)->getOperationsHash();
+    }
 
     virtual BaseElement::SPtr element() { return *m_it; }
 

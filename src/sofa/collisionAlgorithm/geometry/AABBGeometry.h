@@ -38,6 +38,10 @@ public:
             return m_key;
         }
 
+        size_t getOperationsHash() const override { return typeid(AABBBElement).hash_code(); }
+
+        std::string name() const override { return "AABBBElement"; }
+
         void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
             res = m_projections;
         }
@@ -149,6 +153,8 @@ public:
             return m_iterator->second;
         }
 
+        size_t getOperationsHash() const override { return typeid(AABBBElement).hash_code(); }
+
     private:
         std::map<unsigned, AABBBElement::SPtr >::const_iterator m_iterator;
         const AABBGeometry * m_geometry;
@@ -190,10 +196,6 @@ public:
 
     type::BoundingBox getBBox() const {
         return type::BoundingBox(m_Bmin,m_Bmax);
-    }
-
-    void init() {
-        prepareDetection();
     }
 
     const std::vector<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const {
@@ -292,7 +294,7 @@ public:
         m_Bmin -= m_cellSize * 0.5;
         m_Bmax -= m_cellSize * 0.5;
 
-        auto projectOp = Operations::ProjectOperation::func(l_geometry.get());
+        auto projectOp = Operations::ProjectOperation::func(l_geometry->begin());
 
         for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
         {

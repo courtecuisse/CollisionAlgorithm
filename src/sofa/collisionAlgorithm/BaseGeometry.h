@@ -30,8 +30,6 @@ public:
 
     virtual ElementIterator::SPtr begin() const = 0;
 
-    virtual size_t getOperationsHash() const = 0;
-
     inline const BaseGeometry * end() const { return this; }
 
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
@@ -144,10 +142,6 @@ public:
 
     static std::string templateName(const TBaseGeometry<DataTypes,ELEMENT>* = NULL) {
         return DataTypes::Name();
-    }
-
-    size_t getOperationsHash() const override {
-        return typeid(ELEMENT).hash_code();
     }
 
     template<class... ARGS>

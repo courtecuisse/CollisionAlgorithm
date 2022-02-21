@@ -29,6 +29,11 @@ public:
     virtual void getControlProximities(std::vector<BaseProximity::SPtr> & res) const = 0;
 
     virtual void draw(const core::visual::VisualParams * vparams) = 0;
+
+    virtual size_t getOperationsHash() const = 0;
+
+    virtual std::string name() const = 0;
+
 };
 
 class ElementCast {

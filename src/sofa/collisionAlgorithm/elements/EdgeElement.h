@@ -26,6 +26,10 @@ public:
         return m_parent->createProximity(this,f0,f1);
     }
 
+    size_t getOperationsHash() const override { return typeid(EdgeElement).hash_code(); }
+
+    std::string name() const override { return "EdgeElement"; }
+
     inline unsigned getP0() const { return m_p0; }
 
     inline unsigned getP1() const { return m_p1; }

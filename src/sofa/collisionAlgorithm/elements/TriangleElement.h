@@ -36,6 +36,10 @@ public:
 
     unsigned id() override { return m_eid; }
 
+    size_t getOperationsHash() const override { return typeid(TriangleElement).hash_code(); }
+
+    std::string name() const override { return "TriangleElement"; }
+
     void update(const std::vector<type::Vector3> & pos) {
         m_tinfo.P0 = pos[m_p0];
         m_tinfo.P1 = pos[m_p1];

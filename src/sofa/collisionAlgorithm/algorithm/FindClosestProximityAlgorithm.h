@@ -10,10 +10,7 @@ namespace sofa::collisionAlgorithm {
 
 //Specific operation to find the closest point on a geometry (the code is in the c++ class)
 class FindClosestProximityOperation : public Operations::GenericOperation<FindClosestProximityOperation,
-        std::function<BaseProximity::SPtr(BaseProximity::SPtr,
-                                          BaseGeometry *,
-                                          Operations::ProjectOperation::FUNC,
-                                          std::function<double(BaseProximity::SPtr,BaseProximity::SPtr)> ) > > {
+        std::function<BaseProximity::SPtr(BaseProximity::SPtr,BaseGeometry *) > > {
 public:
 
     using Inherit = GenericOperation;
@@ -36,8 +33,7 @@ public:
     , l_dest(initLink("dest", "link to dest geometry"))
     , d_drawCollision (initData(&d_drawCollision, true, "drawcollision", "draw collision"))
     , d_output(initData(&d_output,"output", "output of the collision detection"))
-    , d_outputDist(initData(&d_outputDist,"outputDist", "Distance of the outpu pair of detections"))
-    , m_distance([=](BaseProximity::SPtr a,BaseProximity::SPtr b){ return (a->getPosition()-b->getPosition()).norm(); })
+    , d_outputDist(initData(&d_outputDist,"outputDist", "Distance of the outpu pair of detections"))    
     {}
 
     void draw(const core::visual::VisualParams* vparams) {
@@ -61,15 +57,14 @@ public:
         DetectionOutput & output = *d_output.beginEdit();
         output.clear();
 
-        auto createProximityOp = Operations::CreateCenterProximityOperation::func(l_from);
-        auto projectOp = Operations::ProjectOperation::func(l_dest);
-        auto findClosestProxOp = FindClosestProximityOperation::func(l_dest);
+        auto createProximityOp = Operations::CreateCenterProximityOperation::func(l_from->begin());
+        auto findClosestProxOp = FindClosestProximityOperation::func(l_dest->begin());
 
         for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
             auto pfrom = createProximityOp(itfrom->element());
             if (pfrom == nullptr) continue;
 
-            auto pdest = findClosestProxOp(pfrom,l_dest.get(),projectOp,m_distance);
+            auto pdest = findClosestProxOp(pfrom,l_dest.get());
             if (pdest == nullptr) continue;
 
             output.push_back(PairDetection(pfrom,pdest));
@@ -77,9 +72,6 @@ public:
 
         d_output.endEdit();
     }
-
-private:
-    std::function<double(BaseProximity::SPtr,BaseProximity::SPtr)> m_distance;
 
 };
 

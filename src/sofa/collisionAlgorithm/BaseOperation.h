@@ -12,8 +12,8 @@ public:
 
     typedef TFUNC FUNC;
 
-    static FUNC func(const BaseGeometry * geo) {
-        size_t id = geo->getOperationsHash();
+    static FUNC func(const ElementIterator::SPtr itelmt) {
+        size_t id = itelmt->getOperationsHash();
         auto it = getSingleton()->m_map.find(id);
         if (it == getSingleton()->m_map.end()) return getSingleton()->getDefault();
         return it->second;
