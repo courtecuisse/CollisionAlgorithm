@@ -30,9 +30,6 @@ public:
     ///returns a new EmptyIterator
     static inline ElementIterator::SPtr empty();
 
-    template<class T>
-    static inline ElementIterator::SPtr defaultIterator(const T & c);
-
 };
 
 static inline bool operator != (ElementIterator::SPtr it, const BaseGeometry * /*geo*/) {
@@ -82,12 +79,6 @@ private:
 
 ElementIterator::SPtr ElementIterator::empty(){
     return SPtr(new EmptyIterator());
-}
-
-
-template<class T>
-ElementIterator::SPtr defaultIterator(const T & c){
-    return SPtr(new TDefaultElementIterator<T>(c));
 }
 
 }

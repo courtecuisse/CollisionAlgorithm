@@ -4,6 +4,11 @@
 
 namespace sofa::collisionAlgorithm {
 
+class ProximityCreator {
+public:
+    virtual type::Vector3 getPosition(unsigned eid) = 0;
+};
+
 class BaseElement {
 public:
 
@@ -39,22 +44,22 @@ private:
     BaseElement::SPtr m_element;
 };
 
-template<class TProxCreatorFunc>
-class TBaseElement : public BaseElement {
-public:
-    typedef TProxCreatorFunc ProxCreatorFunc;
+//template<class TProxCreatorFunc>
+//class TBaseElement : public BaseElement {
+//public:
+//    typedef TProxCreatorFunc ProxCreatorFunc;
 
-    TBaseElement(unsigned id, TProxCreatorFunc f) : m_eid(id), m_createProxFunc(f) {}
+//    TBaseElement(unsigned id, TProxCreatorFunc f) : m_eid(id), m_createProxFunc(f) {}
 
-    inline void setProximityCreator(ProxCreatorFunc f) { m_createProxFunc = f; }
+//    inline void setProximityCreator(ProxCreatorFunc f) { m_createProxFunc = f; }
 
-    unsigned id() override {
-        return m_eid;
-    }
+//    unsigned id() override {
+//        return m_eid;
+//    }
 
-protected:
-    unsigned m_eid;
-    ProxCreatorFunc m_createProxFunc;
-};
+//protected:
+//    unsigned m_eid;
+//    ProxCreatorFunc m_createProxFunc;
+//};
 
 }

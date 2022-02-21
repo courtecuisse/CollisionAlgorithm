@@ -44,15 +44,12 @@ public:
 
 
     void init() {
-        for (auto it = l_geometry->begin();it != l_geometry->end(); it++) {
-            ELEMENT * elmt = it->element_cast();
-            elmt->setProximityCreator(
-                [=](const PointElement * elmt) -> BaseProximity::SPtr {
-                    return BaseProximity::SPtr(new GravityPointNormalProximity(l_geometry->getState(),
-                                                                               elmt->getP0(),
-                                                                               m_gcenter));
-            });
-        }
+        l_geometry->setCreateProximity(
+            [=](const PointElement * elmt) -> BaseProximity::SPtr {
+                return BaseProximity::SPtr(new GravityPointNormalProximity(l_geometry->getState(),
+                                                                           elmt->getP0(),
+                                                                           m_gcenter));
+        });
     }
 
     void prepareDetection() override {

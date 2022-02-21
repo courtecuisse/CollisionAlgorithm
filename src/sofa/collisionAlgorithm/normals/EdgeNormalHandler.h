@@ -37,17 +37,13 @@ public:
 
 
     void init() {
-        for (auto it = l_geometry->begin();it != l_geometry->end(); it++) {
-            ELEMENT * elmt = it->element_cast();
-
-            elmt->setProximityCreator(
-                [=](const EdgeElement * elmt, double f0,double f1) -> BaseProximity::SPtr {
-                    return BaseProximity::SPtr(new LinkEdgeProximity(l_geometry->getState(),
-                                                                          elmt->getP0(),elmt->getP1(),
-                                                                          f0,f1));
-                }
-            );
-        }
+        l_geometry->setCreateProximity(
+        [=](const EdgeElement * elmt, double f0,double f1) -> BaseProximity::SPtr {
+                return BaseProximity::SPtr(new LinkEdgeProximity(l_geometry->getState(),
+                                                                      elmt->getP0(),elmt->getP1(),
+                                                                      f0,f1));
+            }
+        );
     }
 
     void prepareDetection() override {}

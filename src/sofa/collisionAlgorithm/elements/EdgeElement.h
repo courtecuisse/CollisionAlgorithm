@@ -4,17 +4,26 @@
 
 namespace sofa::collisionAlgorithm {
 
-class EdgeElement : public TBaseElement<std::function<BaseProximity::SPtr(const EdgeElement *, double ,double )> > {
+class EdgeElement;
+
+class EdgeProximityCreator : public ProximityCreator {
+public:
+    virtual BaseProximity::SPtr createProximity(const EdgeElement * elmt,double f0,double f1) = 0;
+
+};
+
+class EdgeElement : public BaseElement {
 public:
 
-    using Inherit = TBaseElement;
     typedef std::shared_ptr<EdgeElement> SPtr;
 
-    EdgeElement(unsigned eid, unsigned p0,unsigned p1,Inherit::ProxCreatorFunc f)
-    : TBaseElement(eid, f), m_p0(p0), m_p1(p1) {}
+    EdgeElement(EdgeProximityCreator * parent, unsigned eid, unsigned p0,unsigned p1)
+    : m_parent(parent), m_eid(eid), m_p0(p0), m_p1(p1) {}
+
+    unsigned id() override { return m_eid; }
 
     inline BaseProximity::SPtr createProximity(double f0,double f1) const {
-        return m_createProxFunc(this,f0,f1);
+        return m_parent->createProximity(this,f0,f1);
     }
 
     inline unsigned getP0() const { return m_p0; }
@@ -27,8 +36,8 @@ public:
     }
 
     void draw(const core::visual::VisualParams * /*vparams*/) override {
-        type::Vector3 p0 = createProximity(1,0)->getPosition();
-        type::Vector3 p1 = createProximity(0,1)->getPosition();
+        type::Vector3 p0 = m_parent->getPosition(m_p0);
+        type::Vector3 p1 = m_parent->getPosition(m_p1);
 
         glBegin(GL_LINES);
             glVertex3dv(p0.data());glVertex3dv(p1.data());
@@ -36,7 +45,8 @@ public:
     }
 
 private:
-    unsigned m_p0,m_p1;
+    EdgeProximityCreator * m_parent;
+    unsigned m_eid, m_p0,m_p1;
 };
 
 }

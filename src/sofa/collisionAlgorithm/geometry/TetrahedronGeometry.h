@@ -8,7 +8,7 @@
 namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
-class TetrahedronGeometry : public TBaseGeometry<DataTypes,TetrahedronElement> {
+class TetrahedronGeometry : public TBaseGeometry<DataTypes,TetrahedronElement>, public TetrahedronProximityCreator {
 public:
     typedef DataTypes TDataTypes;
     typedef TetrahedronElement ELEMENT;
@@ -16,6 +16,7 @@ public:
     typedef TBaseGeometry<DataTypes,ELEMENT> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef std::function<BaseProximity::SPtr(const TetrahedronElement * elmt,double f0,double f1,double f2,double f3)> ProximityCreatorFunc;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
@@ -24,19 +25,24 @@ public:
     TetrahedronGeometry()
     : l_topology(initLink("topology", "link to topology")) {
         l_topology.setPath("@.");
-    }
 
-    void init() {
-        //default proximity creator
-        auto f = [=](const TetrahedronElement * elmt, double f0,double f1,double f2,double f3) -> BaseProximity::SPtr {
+        f_createProximity = [=](const TetrahedronElement * elmt,double f0,double f1,double f2,double f3) -> BaseProximity::SPtr {
             return BaseProximity::SPtr(new DefaultTetrahedronProximity<DataTypes>(this->getState(),
                                                                                   elmt->getP0(),elmt->getP1(),elmt->getP2(),elmt->getP3(),
                                                                                   f0,f1,f2,f3));
         };
+    }
 
+    type::Vector3 getPosition(unsigned pid) override {
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+        return pos[pid];
+    }
+
+    void init() {
+        //default proximity creator
         for (unsigned i=0;i<this->l_topology->getNbTetrahedra();i++) {
             auto tetra = this->l_topology->getTetrahedron(i);
-            TetrahedronElement::SPtr elmt = this->createElement(i,tetra[0],tetra[1],tetra[2],tetra[3],f);
+            TetrahedronElement::SPtr elmt = this->createElement(this,i,tetra[0],tetra[1],tetra[2],tetra[3]);
             m_elements.push_back(elmt);
         }
 
@@ -52,8 +58,17 @@ public:
         for (unsigned i=0;i<m_elements.size();i++) m_elements[i]->update(pos.ref());
     }
 
+    BaseProximity::SPtr createProximity(const TetrahedronElement * elmt,double f0,double f1,double f2,double f3) override {
+        return f_createProximity(elmt,f0,f1,f2,f3);
+    }
+
+    void setCreateProximity(ProximityCreatorFunc f) {
+        f_createProximity = f;
+    }
+
 private:
     std::vector<TetrahedronElement::SPtr> m_elements;
+    ProximityCreatorFunc f_createProximity;
 };
 
 }

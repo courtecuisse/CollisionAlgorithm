@@ -10,7 +10,7 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class PointGeometry : public TBaseGeometry<DataTypes,PointElement> {
+class PointGeometry : public TBaseGeometry<DataTypes,PointElement>, public PointProximityCreator {
 public:
     typedef DataTypes TDataTypes;
     typedef PointElement ELEMENT;
@@ -18,56 +18,48 @@ public:
     typedef TBaseGeometry<DataTypes,ELEMENT> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef std::function<BaseProximity::SPtr(const PointElement * elmt)> ProximityCreatorFunc;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
     Data<double> d_drawRadius;
 
     PointGeometry()
-    : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {}
+    : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {
+        f_createProximity = [=](const PointElement * elmt) -> BaseProximity::SPtr {
+            return BaseProximity::SPtr(new DefaultPointProximity<DataTypes>(this->getState(),elmt->getP0()));
+        };
+    }
+
+    type::Vector3 getPosition(unsigned pid) override {
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+        return pos[pid];
+    }
 
     void init() {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-
-        //default proximity creator
-        auto f = [=](const PointElement * elmt) -> BaseProximity::SPtr {
-            return BaseProximity::SPtr(new DefaultPointProximity<DataTypes>(this->getState(),elmt->getP0()));
-        };
-
         for (unsigned i=0;i<pos.size();i++) {
-            PointElement::SPtr elmt = this->createElement(i,i,f);
-            m_elements.push_back(elmt);
+            m_elements.push_back(this->createElement(this,i));
         }
+    }
+
+    BaseProximity::SPtr createProximity(const PointElement * elmt) override {
+        return f_createProximity(elmt);
     }
 
     void prepareDetection() override {}
 
     ElementIterator::SPtr begin() const override {
-        return ElementIterator::defaultIterator(m_elements);
+        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements));
     }
 
-//    void draw(const core::visual::VisualParams *vparams) override {
-//        if(!(this->d_draw.getValue())) return;
-////        this->drawNormals(vparams);
-////        if (! vparams->displayFlags().getShowCollisionModels()) return;
-//        if (! vparams->displayFlags().getShowCollisionModels()) {
-//            return ;
-//        }
-//        const sofa::type::RGBAColor & color = this->d_color.getValue();
-//        if (color[3] == 0.0) return;
-//        if (d_drawRadius.getValue() == 0.0) return;
-
-//        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-
-//        glColor4f(color[0],color[1],color[2],color[3]);
-
-//        for(auto it=this->begin();it != this->end();it++) {
-//            vparams->drawTool()->drawSphere(pos[it->id()],d_drawRadius.getValue());
-//        }
-//    }
+    void setCreateProximity(ProximityCreatorFunc f) {
+        f_createProximity = f;
+    }
 
 private:
     std::vector<PointElement::SPtr> m_elements;
+    ProximityCreatorFunc f_createProximity;
 };
 
 }

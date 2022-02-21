@@ -4,10 +4,17 @@
 
 namespace sofa::collisionAlgorithm {
 
-class TriangleElement : public TBaseElement<std::function<BaseProximity::SPtr(const TriangleElement *, double ,double , double )> > {
+class TriangleElement;
+
+class TriangleProximityCreator : public ProximityCreator {
+public:
+    virtual BaseProximity::SPtr createProximity(const TriangleElement * elmt,double f0,double f1,double f2) = 0;
+
+};
+
+class TriangleElement : public BaseElement {
 public:
 
-    using Inherit = TBaseElement;
     typedef std::shared_ptr<TriangleElement> SPtr;
 
     struct TriangleInfo
@@ -24,8 +31,10 @@ public:
         type::Vec3d N;
     };
 
-    TriangleElement(unsigned eid, unsigned p0,unsigned p1,unsigned p2,Inherit::ProxCreatorFunc f)
-    : TBaseElement(eid, f), m_p0(p0), m_p1(p1), m_p2(p2) {}
+    TriangleElement(TriangleProximityCreator * parent, unsigned eid, unsigned p0,unsigned p1,unsigned p2)
+    : m_parent(parent), m_eid(eid), m_p0(p0), m_p1(p1), m_p2(p2) {}
+
+    unsigned id() override { return m_eid; }
 
     void update(const std::vector<type::Vector3> & pos) {
         m_tinfo.P0 = pos[m_p0];
@@ -52,7 +61,7 @@ public:
     }
 
     inline BaseProximity::SPtr createProximity(double f0,double f1,double f2) const {
-        return m_createProxFunc(this,f0,f1,f2);
+        return m_parent->createProximity(this, f0,f1, f2);
     }
 
     inline const TriangleInfo & getTriangleInfo() const { return m_tinfo; }
@@ -71,9 +80,9 @@ public:
 
 
     void draw(const core::visual::VisualParams * vparams) override {
-        type::Vector3 p0 = createProximity(1,0,0)->getPosition();
-        type::Vector3 p1 = createProximity(0,1,0)->getPosition();
-        type::Vector3 p2 = createProximity(0,0,1)->getPosition();
+        type::Vector3 p0 = m_parent->getPosition(m_p0);
+        type::Vector3 p1 = m_parent->getPosition(m_p1);
+        type::Vector3 p2 = m_parent->getPosition(m_p2);
 
         if (vparams->displayFlags().getShowWireFrame()) {
             glBegin(GL_LINES);
@@ -91,8 +100,9 @@ public:
     }
 
 private:
-    unsigned m_p0,m_p1,m_p2;
-    TriangleInfo m_tinfo;    
+    TriangleProximityCreator * m_parent;
+    unsigned m_eid, m_p0,m_p1,m_p2;
+    TriangleInfo m_tinfo;
 };
 
 }
