@@ -16,7 +16,7 @@ public:
     static BaseProximity::SPtr defaultCreateCenterProximity(BaseElement::SPtr elmt){
         std::vector<BaseProximity::SPtr> res;
         elmt->getControlProximities(res);
-        return BaseProximity::SPtr(new MultiProximity(res));
+        return BaseProximity::create<MultiProximity>(res);
     }
 
     Inherit::FUNC getDefault() const override { return &CreateCenterProximityOperation::defaultCreateCenterProximity; }

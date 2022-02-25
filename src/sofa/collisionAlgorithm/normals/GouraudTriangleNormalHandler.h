@@ -36,10 +36,10 @@ public:
     void init() {
         l_geometry->setCreateProximity(
             [=](const TriangleElement * elmt, double f0,double f1,double f2) -> BaseProximity::SPtr {
-                return BaseProximity::SPtr(new GouraudTriangleProximity(l_geometry->getState(),
+                return BaseProximity::create<GouraudTriangleProximity>(l_geometry->getState(),
                                                                       elmt->getP0(),elmt->getP1(),elmt->getP2(),
                                                                       f0,f1,f2,
-                                                                      elmt->getTriangleInfo().N));
+                                                                      elmt->getTriangleInfo().N);
             }
         );
     }

@@ -8,12 +8,12 @@
 namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
-class TetrahedronGeometry : public TBaseGeometry<DataTypes,TetrahedronElement>, public TetrahedronProximityCreator {
+class TetrahedronGeometry : public TBaseGeometry<DataTypes>, public TetrahedronProximityCreator {
 public:
     typedef DataTypes TDataTypes;
     typedef TetrahedronElement ELEMENT;
     typedef TetrahedronGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes,ELEMENT> Inherit;
+    typedef TBaseGeometry<DataTypes> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef std::function<BaseProximity::SPtr(const TetrahedronElement * elmt,double f0,double f1,double f2,double f3)> ProximityCreatorFunc;
@@ -27,9 +27,9 @@ public:
         l_topology.setPath("@.");
 
         f_createProximity = [=](const TetrahedronElement * elmt,double f0,double f1,double f2,double f3) -> BaseProximity::SPtr {
-            return BaseProximity::SPtr(new DefaultTetrahedronProximity<DataTypes>(this->getState(),
+            return BaseProximity::create<DefaultTetrahedronProximity<DataTypes>>(this->getState(),
                                                                                   elmt->getP0(),elmt->getP1(),elmt->getP2(),elmt->getP3(),
-                                                                                  f0,f1,f2,f3));
+                                                                                  f0,f1,f2,f3);
         };
     }
 
@@ -42,7 +42,7 @@ public:
         //default proximity creator
         for (unsigned i=0;i<this->l_topology->getNbTetrahedra();i++) {
             auto tetra = this->l_topology->getTetrahedron(i);
-            TetrahedronElement::SPtr elmt = this->createElement(this,i,tetra[0],tetra[1],tetra[2],tetra[3]);
+            auto elmt = BaseElement::create<TetrahedronElement>(this,i,tetra[0],tetra[1],tetra[2],tetra[3]);
             m_elements.push_back(elmt);
         }
 

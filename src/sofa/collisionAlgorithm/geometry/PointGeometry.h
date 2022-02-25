@@ -10,12 +10,12 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class PointGeometry : public TBaseGeometry<DataTypes,PointElement>, public PointProximityCreator {
+class PointGeometry : public TBaseGeometry<DataTypes>, public PointProximityCreator {
 public:
     typedef DataTypes TDataTypes;
     typedef PointElement ELEMENT;
     typedef PointGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes,ELEMENT> Inherit;
+    typedef TBaseGeometry<DataTypes> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef std::function<BaseProximity::SPtr(const PointElement * elmt)> ProximityCreatorFunc;
@@ -27,7 +27,7 @@ public:
     PointGeometry()
     : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {
         f_createProximity = [=](const PointElement * elmt) -> BaseProximity::SPtr {
-            return BaseProximity::SPtr(new DefaultPointProximity<DataTypes>(this->getState(),elmt->getP0()));
+            return BaseProximity::create<DefaultPointProximity<DataTypes>>(this->getState(),elmt->getP0());
         };
     }
 
@@ -39,7 +39,8 @@ public:
     void init() {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
         for (unsigned i=0;i<pos.size();i++) {
-            m_elements.push_back(this->createElement(this,i));
+            auto elmt = BaseElement::create<PointElement>(this,i);
+            m_elements.push_back(elmt);
         }
     }
 

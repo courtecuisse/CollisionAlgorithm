@@ -34,6 +34,11 @@ public:
 
     virtual std::string name() const = 0;
 
+    template<class ELEMENT,class... ARGS>
+    static inline typename ELEMENT::SPtr create(ARGS... args) {
+        return typename ELEMENT::SPtr(new ELEMENT(args...));
+    }
+
 };
 
 class ElementCast {

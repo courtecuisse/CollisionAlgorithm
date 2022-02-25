@@ -8,12 +8,12 @@
 namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
-class TriangleGeometry : public TBaseGeometry<DataTypes,TriangleElement>, public TriangleProximityCreator {
+class TriangleGeometry : public TBaseGeometry<DataTypes>, public TriangleProximityCreator {
 public:
     typedef DataTypes TDataTypes;
     typedef TriangleElement ELEMENT;
     typedef TriangleGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes,ELEMENT> Inherit;
+    typedef TBaseGeometry<DataTypes> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef std::function<BaseProximity::SPtr(const TriangleElement * elmt, double f0,double f1,double f2)> ProximityCreatorFunc;
@@ -26,9 +26,9 @@ public:
     : l_topology(initLink("topology", "link to topology")) {
         l_topology.setPath("@.");
         f_createProximity = [=](const TriangleElement * elmt,double f0,double f1,double f2) -> BaseProximity::SPtr {
-            return BaseProximity::SPtr(new DefaultTriangleProximity<DataTypes>(this->getState(),
+            return BaseProximity::create<DefaultTriangleProximity<DataTypes>>(this->getState(),
                                                                                elmt->getP0(),elmt->getP1(),elmt->getP2(),
-                                                                               f0,f1,f2));
+                                                                               f0,f1,f2);
         };
     }
 
@@ -41,7 +41,7 @@ public:
         //default proximity creator
         for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
             auto tri = this->l_topology->getTriangle(i);
-            TriangleElement::SPtr elmt = this->createElement(this,i,tri[0],tri[1],tri[2]);
+            auto elmt = BaseElement::create<TriangleElement>(this,i,tri[0],tri[1],tri[2]);
             m_elements.push_back(elmt);
         }
 

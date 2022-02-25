@@ -42,10 +42,10 @@ public:
 
         l_geometry->setCreateProximity(
             [=](const TriangleElement * elmt, double f0,double f1,double f2) -> BaseProximity::SPtr {
-                return BaseProximity::SPtr(new PhongTriangleProximity(l_geometry->getState(),
+                return BaseProximity::create<PhongTriangleProximity>(l_geometry->getState(),
                                                                       elmt->getP0(),elmt->getP1(),elmt->getP2(),
                                                                       f0,f1,f2,
-                                                                      m_point_normals));
+                                                                      m_point_normals);
             }
         );
     }

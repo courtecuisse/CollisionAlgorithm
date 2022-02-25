@@ -65,7 +65,7 @@ public:
 
 };
 
-template<class DataTypes, class ELEMENT>
+template<class DataTypes>
 class TBaseGeometry : public BaseGeometry {
 public:
 
@@ -81,34 +81,14 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE2(TBaseGeometry,DataTypes,ELEMENT),BaseGeometry);
+    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(TBaseGeometry,DataTypes),BaseGeometry);
 
-    core::objectmodel::SingleLink<TBaseGeometry<DataTypes,ELEMENT>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
+    core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
 
     TBaseGeometry()
     : l_state(initLink("mstate", "link to state")) {
         l_state.setPath("@.");
     }
-
-//    inline void drawNormals(const core::visual::VisualParams *vparams) {
-//        if (! vparams->displayFlags().getShowNormals() || d_drawScaleNormal.getValue() == 0.0) return;
-
-//        sofa::type::RGBAColor color = d_color.getValue();
-//        color[3] = 1.0;
-
-//        auto createPorximityCenter = Operations::CreateCenterProximity::func(this);
-
-//        for (auto it=this->begin();it!=this->end();it++) {
-//            auto element = *it;
-//            BaseProximity::SPtr center = createPorximityCenter(element);
-//            vparams->drawTool()->drawArrow(
-//                center->getPosition(),
-//                center->getPosition() + center->getNormal() * d_drawScaleNormal.getValue(),
-//                d_drawScaleNormal.getValue() * 0.1,
-//                color
-//            );
-//        }
-//    }
 
     inline sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
@@ -140,22 +120,9 @@ public:
         return templateName(this);
     }
 
-    static std::string templateName(const TBaseGeometry<DataTypes,ELEMENT>* = NULL) {
+    static std::string templateName(const TBaseGeometry<DataTypes>* = NULL) {
         return DataTypes::Name();
     }
-
-    template<class... ARGS>
-    typename ELEMENT::SPtr createElement(ARGS... args) {
-        return typename ELEMENT::SPtr(new ELEMENT(args...));
-    }
-
-
-//    void setPoximityCreator(typename ELEMENT::ProxCreatorFunc f) {
-//        for (auto it = begin();it!=end();it++) {
-//            auto telement = it->element()->cast<ELEMENT>();
-//            telement->setProximityCreator(f);
-//        }
-//    }
 
 };
 

@@ -44,9 +44,9 @@ public:
     void init() {
         l_geometry->setCreateProximity(
                 [=](const PointElement * elmt) -> BaseProximity::SPtr {
-                    return BaseProximity::SPtr(new VectorPointNormalProximity(l_geometry->getState(),
+                    return BaseProximity::create<VectorPointNormalProximity>(l_geometry->getState(),
                                                                               elmt->getP0(),
-                                                                              d_normals.getValue()));
+                                                                              d_normals.getValue());
                 }
             );
     }

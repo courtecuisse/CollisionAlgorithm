@@ -46,9 +46,9 @@ public:
     void init() {
         l_geometry->setCreateProximity(
             [=](const PointElement * elmt) -> BaseProximity::SPtr {
-                return BaseProximity::SPtr(new GravityPointNormalProximity(l_geometry->getState(),
+                return BaseProximity::create<GravityPointNormalProximity>(l_geometry->getState(),
                                                                            elmt->getP0(),
-                                                                           m_gcenter));
+                                                                           m_gcenter);
         });
     }
 

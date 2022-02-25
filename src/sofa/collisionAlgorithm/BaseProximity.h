@@ -29,6 +29,12 @@ public:
     virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const = 0;
 
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const = 0;
+
+    template<class PROXIMITY,class... ARGS>
+    static inline typename PROXIMITY::SPtr create(ARGS... args) {
+        return typename PROXIMITY::SPtr(new PROXIMITY(args...));
+    }
+
 };
 
 /*!

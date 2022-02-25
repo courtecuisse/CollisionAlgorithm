@@ -7,12 +7,12 @@
 namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
-class EdgeGeometry : public TBaseGeometry<DataTypes,EdgeElement>, public EdgeProximityCreator {
+class EdgeGeometry : public TBaseGeometry<DataTypes>, public EdgeProximityCreator {
 public:
     typedef DataTypes TDataTypes;
     typedef EdgeElement ELEMENT;
     typedef EdgeGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes,ELEMENT> Inherit;
+    typedef TBaseGeometry<DataTypes> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef std::function<BaseProximity::SPtr(const EdgeElement * elmt,double f0,double f1)> ProximityCreatorFunc;
@@ -25,16 +25,14 @@ public:
     : l_topology(initLink("topology", "link to topology")) {
         l_topology.setPath("@.");
         f_createProximity = [=](const EdgeElement * elmt,double f0,double f1) -> BaseProximity::SPtr {
-            return BaseProximity::SPtr(new DefaultEdgeProximity<DataTypes>(this->getState(),
-                                                                           elmt->getP0(),elmt->getP1(),
-                                                                           f0,f1));
+            return BaseProximity::create<DefaultEdgeProximity<DataTypes>>(this->getState(),elmt->getP0(),elmt->getP1(),f0,f1);
         };
     }
 
     void init() {
         for (unsigned i=0;i<this->l_topology->getNbEdges();i++) {
             auto edge = this->l_topology->getEdge(i);
-            m_elements.push_back(this->createElement(this,i,edge[0],edge[1]));
+            m_elements.push_back(BaseElement::create<EdgeElement>(this,i,edge[0],edge[1]));
         }
     }
 
