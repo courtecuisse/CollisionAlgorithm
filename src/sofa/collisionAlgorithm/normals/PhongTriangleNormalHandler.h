@@ -23,9 +23,9 @@ public:
     public:
         typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-        PhongTriangleProximity(State * state, unsigned p0,unsigned p1, unsigned p2, double f0,double f1,double f2, type::vector<type::Vector3> & pn)
+        PhongTriangleProximity(State * state, unsigned p0,unsigned p1, unsigned p2, double f0,double f1,double f2, const type::vector<type::Vector3> * pn)
         : DefaultTriangleProximity<DataTypes>(state,p0,p1,p2,f0,f1,f2)
-        , m_pointNormals(pn) {}
+        , m_pointNormals(*pn) {}
 
         virtual sofa::type::Vector3 getNormal() const override {
             return m_pointNormals[this->m_p0] * this->m_f0 +
@@ -37,16 +37,18 @@ public:
         const type::vector<type::Vector3> & m_pointNormals;
     };
 
+    BaseProximity::SPtr createPhongProximity(const TriangleElement * elmt, double f0,double f1,double f2)  {
+        return BaseProximity::create<PhongTriangleProximity>(l_geometry->getState(),
+                                                              elmt->getP0(),elmt->getP1(),elmt->getP2(),
+                                                              f0,f1,f2,
+                                                              &m_point_normals);
+    }
+
     void init() {
         prepareDetection();
 
         l_geometry->setCreateProximity(
-            [=](const TriangleElement * elmt, double f0,double f1,double f2) -> BaseProximity::SPtr {
-                return BaseProximity::create<PhongTriangleProximity>(l_geometry->getState(),
-                                                                      elmt->getP0(),elmt->getP1(),elmt->getP2(),
-                                                                      f0,f1,f2,
-                                                                      m_point_normals);
-            }
+                std::bind(&PhongTriangleNormalHandler::createPhongProximity,this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4)
         );
     }
 
