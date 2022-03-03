@@ -18,6 +18,8 @@ class BaseProximity {
 public:
     typedef std::shared_ptr<BaseProximity> SPtr;
 
+    virtual ~BaseProximity() = default;
+
     /// return proximiy position in a vector3
     virtual sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
 

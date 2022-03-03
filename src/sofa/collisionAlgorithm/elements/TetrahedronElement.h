@@ -78,12 +78,17 @@ public:
                 glVertex3dv(p0.data());glVertex3dv(p1.data());
                 glVertex3dv(p1.data());glVertex3dv(p2.data());
                 glVertex3dv(p2.data());glVertex3dv(p0.data());
+
+                glVertex3dv(p0.data());glVertex3dv(p3.data());
+                glVertex3dv(p3.data());glVertex3dv(p1.data());
+                glVertex3dv(p3.data());glVertex3dv(p2.data());
+
             glEnd();
         } else {
             glBegin(GL_TRIANGLES);
-                glVertex3dv(p0.data());
-                glVertex3dv(p1.data());
-                glVertex3dv(p2.data());
+                glVertex3dv(p0.data());glVertex3dv(p1.data());glVertex3dv(p2.data());
+                glVertex3dv(p2.data());glVertex3dv(p1.data());glVertex3dv(p3.data());
+                glVertex3dv(p3.data());glVertex3dv(p0.data());glVertex3dv(p2.data());
             glEnd();
         }
     }
