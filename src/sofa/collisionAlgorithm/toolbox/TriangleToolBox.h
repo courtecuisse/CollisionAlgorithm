@@ -20,7 +20,7 @@ public:
         TriangleElement * tri = elmt->element_cast<TriangleElement>();
 
         double fact_u,fact_v,fact_w;
-        projectOnTriangle(P,tri,fact_u,fact_v,fact_w);
+        projectOnTriangle(P,tri->getTriangleInfo(),fact_u,fact_v,fact_w);
         return tri->createProximity(fact_u,fact_v,fact_w);
     }
 
@@ -37,9 +37,7 @@ public:
         fact_u = 1.0 - fact_v  - fact_w;
     }
 
-    static void projectOnTriangle(const type::Vec3d projectP, const TriangleElement * tri, double & fact_u, double & fact_v, double & fact_w) {
-        const TriangleElement::TriangleInfo & tinfo = tri->getTriangleInfo();
-
+    static void projectOnTriangle(const type::Vec3d projectP, const TriangleElement::TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w) {
         type::Vec3d x1x2 = projectP - tinfo.P0;
 
         //corrdinate on the plane

@@ -29,6 +29,30 @@ public:
         type::Vec3d ax1,ax2;
         type::Vec3d P0,P1,P2;
         type::Vec3d N;
+
+        void update(const type::Vec3d & e0, const type::Vec3d & e1,const type::Vec3d & e2) {
+            P0 = e0;
+            P1 = e1;
+            P2 = e2;
+
+            v0 = P1 - P0;
+            v1 = P2 - P0;
+            N=cross(v0,v1);
+            area = N.norm()/2;
+            N.normalize();
+
+            d00 = dot(v0,v0);
+            d01 = dot(v0,v1);
+            d11 = dot(v1,v1);
+
+            invDenom = 1.0 / (d00 * d11 - d01 * d01);
+
+            ax1 = v0;
+            ax2 = v0.cross(N);
+
+            ax1.normalize();
+            ax2.normalize();
+        }
     };
 
     TriangleElement(TriangleProximityCreator * parent, unsigned eid, unsigned p0,unsigned p1,unsigned p2)
@@ -41,27 +65,7 @@ public:
     std::string name() const override { return "TriangleElement"; }
 
     void update(const std::vector<type::Vector3> & pos) {
-        m_tinfo.P0 = pos[m_p0];
-        m_tinfo.P1 = pos[m_p1];
-        m_tinfo.P2 = pos[m_p2];
-
-        m_tinfo.v0 = m_tinfo.P1 - m_tinfo.P0;
-        m_tinfo.v1 = m_tinfo.P2 - m_tinfo.P0;
-        m_tinfo.N=cross(m_tinfo.v0,m_tinfo.v1);
-        m_tinfo.area = m_tinfo.N.norm()/2;
-        m_tinfo.N.normalize();
-
-        m_tinfo.d00 = dot(m_tinfo.v0,m_tinfo.v0);
-        m_tinfo.d01 = dot(m_tinfo.v0,m_tinfo.v1);
-        m_tinfo.d11 = dot(m_tinfo.v1,m_tinfo.v1);
-
-        m_tinfo.invDenom = 1.0 / (m_tinfo.d00 * m_tinfo.d11 - m_tinfo.d01 * m_tinfo.d01);
-
-        m_tinfo.ax1 = m_tinfo.v0;
-        m_tinfo.ax2 = m_tinfo.v0.cross(m_tinfo.N);
-
-        m_tinfo.ax1.normalize();
-        m_tinfo.ax2.normalize();
+        m_tinfo.update(pos[m_p0],pos[m_p1],pos[m_p2]);
     }
 
     inline BaseProximity::SPtr createProximity(double f0,double f1,double f2) const {

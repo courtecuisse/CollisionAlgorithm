@@ -20,29 +20,39 @@ public:
         TetrahedronElement * tetra = elmt->element_cast<TetrahedronElement>();
 
         double fact[4];
-        projectOnTetra(P, tetra,fact[0],fact[1],fact[2],fact[3]);
+        projectOnTetra(P, tetra->getTetrahedronInfo(),fact[0],fact[1],fact[2],fact[3]);
         return tetra->createProximity(fact[0],fact[1],fact[2],fact[3]);
     }
 
 
-    static void projectOnTetra(const type::Vec3d projectP, TetrahedronElement * tetra, double & fact_u, double & fact_v, double & fact_w,double & fact_x) {
-        const TetrahedronElement::TetraInfo & tinfo = tetra->getTetrahedronInfo();
+    static void projectOnTetra(const type::Vec3d projectP, const TetrahedronElement::TetraInfo & teinfo, double & fact_u, double & fact_v, double & fact_w,double & fact_x) {
+        computeTetraBaryCoords(projectP, teinfo, fact_u,fact_v,fact_w,fact_x);
 
-        computeTetraBaryCoords(projectP, tinfo, fact_u,fact_v,fact_w,fact_x);
+        if(fact_u<0) {
+            fact_u = 0;
+            TriangleElement::TriangleInfo tinfo;
+            tinfo.update(teinfo.P1,teinfo.P2,teinfo.P3);
 
-//        if(fact_u<0) {
-//            fact_u = 0;
-//            projectOnTriangle(projectP, computeTriangleInfo(tinfo.P1, tinfo.P2, tinfo.P3), fact_v,fact_w,fact_x);
-//        } else if(fact_v<0) {
-//            fact_v = 0;
-//            projectOnTriangle(projectP, computeTriangleInfo(tinfo.P0, tinfo.P2, tinfo.P3),fact_u,fact_w,fact_x);
-//        } else if(fact_w<0) {
-//            fact_w = 0;
-//            projectOnTriangle(projectP, computeTriangleInfo(tinfo.P0, tinfo.P1, tinfo.P3),fact_u,fact_v,fact_x);
-//        } else if(fact_x<0) {
-//            fact_x = 0;
-//            projectOnTriangle(projectP, computeTriangleInfo(tinfo.P0, tinfo.P1, tinfo.P2),fact_u,fact_v,fact_w);
-//        }
+            TriangleToolBox::projectOnTriangle(projectP, tinfo, fact_v,fact_w,fact_x);
+        } else if(fact_v<0) {
+            fact_v = 0;
+            TriangleElement::TriangleInfo tinfo;
+            tinfo.update(teinfo.P0,teinfo.P2,teinfo.P3);
+
+            TriangleToolBox::projectOnTriangle(projectP, tinfo,fact_u,fact_w,fact_x);
+        } else if(fact_w<0) {
+            fact_w = 0;
+            TriangleElement::TriangleInfo tinfo;
+            tinfo.update(teinfo.P0,teinfo.P1,teinfo.P3);
+
+            TriangleToolBox::projectOnTriangle(projectP, tinfo,fact_u,fact_v,fact_x);
+        } else if(fact_x<0) {
+            fact_x = 0;
+            TriangleElement::TriangleInfo tinfo;
+            tinfo.update(teinfo.P0,teinfo.P1,teinfo.P2);
+
+            TriangleToolBox::projectOnTriangle(projectP, tinfo,fact_u,fact_v,fact_w);
+        }
     }
 
     static void computeTetraBaryCoords(const type::Vec3d & P, const TetrahedronElement::TetraInfo & tinfo, double & fact_u,double & fact_v, double & fact_w, double & fact_x) {
