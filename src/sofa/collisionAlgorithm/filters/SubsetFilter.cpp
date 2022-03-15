@@ -1,12 +1,12 @@
-#include <sofa/collisionAlgorithm/filters/SubsetFilter.h>
-#include <sofa/core/ObjectFactory.h>
+//#include <sofa/collisionAlgorithm/filters/SubsetFilter.h>
+//#include <sofa/core/ObjectFactory.h>
 
-namespace sofa {
+//namespace sofa {
 
-namespace collisionAlgorithm {
+//namespace collisionAlgorithm {
 
-int SubsetFilterClass = core::RegisterObject("SubsetFilter")
-.add< SubsetFilter >();
-}
+//int SubsetFilterClass = core::RegisterObject("SubsetFilter")
+//.add< SubsetFilter >();
+//}
 
-}
+//}

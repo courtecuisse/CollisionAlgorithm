@@ -2,42 +2,46 @@
 
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 
-namespace sofa {
+namespace sofa::collisionAlgorithm {
 
-namespace collisionAlgorithm {
+template<class DataTypes>
+class DefaultEdgeProximity : public TBaseProximity<DataTypes> {
+public:
+    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef typename DataTypes::Coord Coord;
+    typedef typename DataTypes::Real Real;
+    typedef typename DataTypes::VecDeriv VecDeriv;
+    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
+    typedef typename DataTypes::Deriv Deriv1;
+    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
+    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
 
-class EdgeProximity {
-   public:
-    typedef sofa::core::topology::Topology::EdgeID Index;
+    DefaultEdgeProximity(State * s, unsigned p0,unsigned p1,double f0,double f1)
+    : m_state(s), m_p0(p0), m_p1(p1), m_f0(f0), m_f1(f1) {}
 
-    EdgeProximity(Index eid, Index p0, Index p1, double f0, double f1) : m_eid(eid), m_p0(p0), m_p1(p1), m_f0(f0), m_f1(f1) {}
-
-    static inline EdgeProximity create(Index eid, Index p0, Index p1, CONTROL_POINT c) {
-        if (c == CONTROL_0)
-            return EdgeProximity(eid, p0, p1, 1, 0);
-        else if (c == CONTROL_1)
-            return EdgeProximity(eid, p0, p1, 0, 1);
-
-        return EdgeProximity(eid, p0, p1, 0.5, 0.5);
+    State * getState() const {
+        return m_state;
     }
 
-    static inline EdgeProximity create(Index eid, const type::fixed_array<Index, 2>& edge, CONTROL_POINT c) { return create(eid, edge[0], edge[1], c); }
-
-    template <class MatrixDerivRowIterator>
-    inline void addContributions(MatrixDerivRowIterator& it, const sofa::type::Vector3& N) const {
-        it.addCol(m_p0, N * m_f0);
-        it.addCol(m_p1, N * m_f1);
+    void addContributions(MatrixDerivRowIterator & c_it, const sofa::type::Vector3 & N,double fact) const override {
+        c_it.addCol(m_p0, N * m_f0 * fact);
+        c_it.addCol(m_p1, N * m_f1 * fact);
     }
 
-    Index getElementId() const { return m_eid; }
+    /// return proximiy position in a vector3
+    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
+        const helper::ReadAccessor<DataVecCoord> & pos = m_state->read(v);
+        return pos[m_p0] * m_f0 + pos[m_p1] * m_f1;
+    }
 
-    constexpr static CONTROL_POINT nbControlPoints() { return CONTROL_2; }
+protected:
+    State * m_state;
+    unsigned m_p0, m_p1;
+    double m_f0,m_f1;
 
-    Index m_eid;
-    Index m_p0, m_p1;
-    double m_f0, m_f1;
 };
 
-}  // namespace collisionAlgorithm
-
-}  // namespace sofa
+}

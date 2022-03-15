@@ -3,6 +3,7 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/core/collision/Pipeline.h>
 #include <sofa/collisionAlgorithm/DataDetectionOutput.h>
+#include <sofa/collisionAlgorithm/CollisionPipeline.h>
 
 namespace sofa
 {
@@ -15,7 +16,7 @@ namespace collisionAlgorithm
  * \brief The BaseAlgorithm abstract class defines an interface of
  * algorithms to be wrapped in sofa components
  */
-class BaseAlgorithm : public sofa::core::objectmodel::BaseObject
+class BaseAlgorithm : public CollisionAlgorithm
 {
 public :
 
@@ -78,16 +79,8 @@ public :
         m_filters.push_back(f);
     }
 
-
 protected:
 
-    virtual void doDetection() = 0;
-
-    void handleEvent(sofa::core::objectmodel::Event *event) {
-        if (! dynamic_cast<sofa::simulation::CollisionBeginEvent*>(event)) return;
-
-        doDetection();
-    }
 
     sofa::type::vector<BaseFilter::SPtr> m_filters;
 };

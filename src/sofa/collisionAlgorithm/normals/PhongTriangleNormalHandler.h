@@ -1,37 +1,65 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseNormalHandler.h>
+#include <sofa/collisionAlgorithm/CollisionPipeline.h>
+#include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
 
-namespace sofa {
+namespace sofa::collisionAlgorithm {
 
-namespace collisionAlgorithm {
-
-
-template<class GEOMETRY>
-class PhongTriangleNormalHandler : public TBaseNormalHandler<GEOMETRY> {
+template<class DataTypes>
+class PhongTriangleNormalHandler : public CollisionComponent {
 public:
-    typedef typename GEOMETRY::VecCoord VecCoord;
-    typedef typename GEOMETRY::DataVecCoord DataVecCoord;
-    typedef typename GEOMETRY::PROXIMITYDATA PROXIMITYDATA;
-    typedef typename GEOMETRY::VecTriangles VecTriangles;
-    typedef TBaseNormalHandler<GEOMETRY> Inherit;
 
-    SOFA_CLASS(SOFA_TEMPLATE(PhongTriangleNormalHandler,GEOMETRY), Inherit);
+    SOFA_CLASS(SOFA_TEMPLATE(PhongTriangleNormalHandler,DataTypes), CollisionComponent);
 
-    type::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
-        return m_point_normals[data.m_p0] * data.m_f0 +
-               m_point_normals[data.m_p1] * data.m_f1 +
-               m_point_normals[data.m_p2] * data.m_f2;
+    typedef TriangleGeometry<DataTypes> GEOMETRY;
+    typedef typename GEOMETRY::ELEMENT ELEMENT;
+
+    core::objectmodel::SingleLink<PhongTriangleNormalHandler<DataTypes>,GEOMETRY,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+
+    PhongTriangleNormalHandler()
+    : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
+
+    class PhongTriangleProximity : public DefaultTriangleProximity<DataTypes> {
+    public:
+        typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+
+        PhongTriangleProximity(State * state, unsigned p0,unsigned p1, unsigned p2, double f0,double f1,double f2, const type::vector<type::Vector3> * pn)
+        : DefaultTriangleProximity<DataTypes>(state,p0,p1,p2,f0,f1,f2)
+        , m_pointNormals(*pn) {}
+
+        virtual sofa::type::Vector3 getNormal() const override {
+            return m_pointNormals[this->m_p0] * this->m_f0 +
+                   m_pointNormals[this->m_p1] * this->m_f1 +
+                   m_pointNormals[this->m_p2] * this->m_f2;
+        }
+
+    private:
+        const type::vector<type::Vector3> & m_pointNormals;
+    };
+
+    BaseProximity::SPtr createPhongProximity(const TriangleElement * elmt, double f0,double f1,double f2)  {
+        return BaseProximity::create<PhongTriangleProximity>(l_geometry->getState(),
+                                                              elmt->getP0(),elmt->getP1(),elmt->getP2(),
+                                                              f0,f1,f2,
+                                                              &m_point_normals);
     }
 
-    void updateNormals() override {
+    void init() {
+        prepareDetection();
+
+        l_geometry->setCreateProximity(
+                std::bind(&PhongTriangleNormalHandler::createPhongProximity,this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4)
+        );
+    }
+
+    void prepareDetection() override {
         m_point_normals.resize(this->l_geometry->l_topology->getNbPoints());
 
-        auto tvecinfo = this->l_geometry->getTriangleInfo();
-
         m_triangle_normals.clear();
-        for (size_t t=0;t<tvecinfo.size();t++) {
-            m_triangle_normals.push_back(cross(tvecinfo[t].ax2,tvecinfo[t].ax1));
+        for (auto it=l_geometry->begin();it!=l_geometry->end();it++) {
+            TriangleElement * elmt = it->element_cast();
+            auto tinfo = elmt->getTriangleInfo();
+            m_triangle_normals.push_back(tinfo.N);
         }
 
         for (size_t p=0;p<m_point_normals.size();p++) {
@@ -45,12 +73,9 @@ public:
     }
 
 protected:
-    sofa::type::vector<type::Vector3> m_triangle_normals;
-    sofa::type::vector<type::Vector3> m_point_normals;
+    type::vector<type::Vector3> m_triangle_normals;
+    type::vector<type::Vector3> m_point_normals;
 
 };
-
-
-}
 
 }

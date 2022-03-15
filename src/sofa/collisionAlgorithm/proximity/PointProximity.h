@@ -2,40 +2,44 @@
 
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 
-namespace sofa
-{
+namespace sofa::collisionAlgorithm {
 
-namespace collisionAlgorithm
-{
-
-
-class PointProximity {
+template<class DataTypes>
+class DefaultPointProximity : public TBaseProximity<DataTypes> {
 public:
-    typedef sofa::core::topology::Topology::PointID Index;
+    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef typename DataTypes::Coord Coord;
+    typedef typename DataTypes::Real Real;
+    typedef typename DataTypes::VecDeriv VecDeriv;
+    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
+    typedef typename DataTypes::Deriv Deriv1;
+    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
+    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
 
-    PointProximity(Index eid)
-    : m_eid(eid){}
+    DefaultPointProximity(State * s, unsigned pid)
+    : m_state(s), m_pid(pid) {}
 
-    static inline PointProximity create(Index eid,CONTROL_POINT c) {
-        return PointProximity(eid);
+    State * getState() const {
+        return m_state;
     }
 
-    template<class MatrixDerivRowIterator>
-    inline void addContributions(MatrixDerivRowIterator & it, const sofa::type::Vector3 & N) const {
-        it.addCol(m_eid, N);
+    void addContributions(MatrixDerivRowIterator & c_it, const sofa::type::Vector3 & N,double fact) const override {
+        c_it.addCol(m_pid, N * fact);
     }
 
-    Index getElementId() const {
-        return m_eid;
+    /// return proximiy position in a vector3
+    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
+        const helper::ReadAccessor<DataVecCoord> & pos = m_state->read(v);
+        return pos[m_pid];
     }
 
-    constexpr static CONTROL_POINT nbControlPoints() {
-        return CONTROL_1;
-    }
-
-    Index m_eid;
+protected:
+    State * m_state;
+    unsigned m_pid;
 };
 
 }
 
-}

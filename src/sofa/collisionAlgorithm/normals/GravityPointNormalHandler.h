@@ -1,46 +1,71 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseNormalHandler.h>
+#include <sofa/collisionAlgorithm/CollisionPipeline.h>
+#include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
 
-namespace sofa {
+namespace sofa::collisionAlgorithm {
 
-namespace collisionAlgorithm {
-
-template<class GEOMETRY>
-class GravityPointNormalHandler : public TBaseNormalHandler<GEOMETRY> {
+template<class DataTypes>
+class GravityPointNormalHandler : public CollisionComponent {
 public:
-    typedef typename GEOMETRY::VecCoord VecCoord;
-    typedef typename GEOMETRY::DataVecCoord DataVecCoord;
-    typedef typename GEOMETRY::PROXIMITYDATA PROXIMITYDATA;
-    typedef TBaseNormalHandler<GEOMETRY> Inherit;
 
-    SOFA_CLASS(SOFA_TEMPLATE(GravityPointNormalHandler,GEOMETRY), Inherit);
+    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+    typedef PointGeometry<DataTypes> GEOMETRY;
+    typedef typename GEOMETRY::ELEMENT ELEMENT;
 
-    GravityPointNormalHandler() {
-        this->f_listening.setValue(true);
-    }
+    SOFA_CLASS(SOFA_TEMPLATE(GravityPointNormalHandler,DataTypes), CollisionComponent);
 
-    virtual void updateNormals() override {
-        m_gcenter = type::Vector3();
-        unsigned size = 0;
-        for (auto it = this->l_geometry->begin();it!=this->l_geometry->end();it++) {
-            m_gcenter += it->createProximity()->getPosition();
-            size++;
+    core::objectmodel::SingleLink<GravityPointNormalHandler<DataTypes>,GEOMETRY,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+
+    GravityPointNormalHandler()
+    : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
+
+    class GravityPointNormalProximity : public DefaultPointProximity<DataTypes> {
+    public:
+        typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+        typedef typename DataTypes::VecCoord VecCoord;
+        typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+
+        GravityPointNormalProximity(State * s, unsigned p0, const type::Vector3 & G)
+        : DefaultPointProximity<DataTypes>(s,p0)
+        , m_G(G){}
+
+        sofa::type::Vector3 getNormal() const override {
+            const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+            return (pos[this->m_pid] - m_G).normalized();
         }
 
-        if (size != 0) m_gcenter*=1.0/size;
+    private:
+        const type::Vector3 & m_G;
+
+    };
+
+
+    void init() {
+        l_geometry->setCreateProximity(
+            [=](const PointElement * elmt) -> BaseProximity::SPtr {
+                return BaseProximity::create<GravityPointNormalProximity>(l_geometry->getState(),
+                                                                           elmt->getP0(),
+                                                                           m_gcenter);
+        });
     }
 
+    void prepareDetection() override {
+        m_gcenter = type::Vector3();
 
-    type::Vector3 computeNormal(const PointProximity & data) const override {
         const helper::ReadAccessor<DataVecCoord> & pos = this->l_geometry->getState()->read(core::VecCoordId::position());
-        return (pos[data.m_eid] - m_gcenter).normalized();
+
+        for (unsigned i=0;i<pos.size();i++) {
+            m_gcenter += pos[i];
+        }
+
+        if (pos.size()) m_gcenter*=1.0/pos.size();
     }
 
 private :
     type::Vector3 m_gcenter;
 };
-
-}
 
 }

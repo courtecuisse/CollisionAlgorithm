@@ -1,35 +1,40 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/algorithm/BaseClosestProximityAlgorithm.h>
+#include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <sofa/collisionAlgorithm/BaseOperation.h>
+#include <sofa/collisionAlgorithm/operations/CreateCenterProximity.h>
+#include <sofa/collisionAlgorithm/operations/Project.h>
 
-namespace sofa
-{
+namespace sofa::collisionAlgorithm {
 
-namespace collisionAlgorithm
-{
-
-class FindClosestProximityAlgorithm : public BaseClosestProximityAlgorithm
-{
+//Specific operation to find the closest point on a geometry (the code is in the c++ class)
+class FindClosestProximityOperation : public Operations::GenericOperation<FindClosestProximityOperation,
+        std::function<BaseProximity::SPtr(BaseProximity::SPtr,BaseGeometry *) > > {
 public:
-    SOFA_CLASS(FindClosestProximityAlgorithm, BaseClosestProximityAlgorithm);
+
+    using Inherit = GenericOperation;
+
+    GenericOperation::FUNC getDefault() const override;
+};
+
+class FindClosestProximityAlgorithm : public BaseAlgorithm {
+public:
+    SOFA_CLASS(FindClosestProximityAlgorithm, BaseAlgorithm);
 
     core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
     core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
     Data<bool> d_drawCollision ;
     Data<DetectionOutput> d_output;
     Data<sofa::type::vector<double> > d_outputDist;
-    Data<sofa::type::vector<unsigned>> d_matchIdFrom;
-    Data<sofa::type::vector<unsigned>> d_matchIdDest;
 
     FindClosestProximityAlgorithm()
     : l_from(initLink("from", "link to from geometry"))
     , l_dest(initLink("dest", "link to dest geometry"))
     , d_drawCollision (initData(&d_drawCollision, true, "drawcollision", "draw collision"))
     , d_output(initData(&d_output,"output", "output of the collision detection"))
-    , d_outputDist(initData(&d_outputDist,"outputDist", "Distance of the outpu pair of detections"))
-    , d_matchIdFrom(initData(&d_matchIdFrom,"matchIdFrom", "from marker ID"))
-    , d_matchIdDest(initData(&d_matchIdDest,"matchIdDest", "dest marker ID")) {}
+    , d_outputDist(initData(&d_outputDist,"outputDist", "Distance of the outpu pair of detections"))    
+    {}
 
     void draw(const core::visual::VisualParams* vparams) {
         if (! vparams->displayFlags().getShowCollisionModels() && ! d_drawCollision.getValue()) return;
@@ -51,33 +56,24 @@ public:
 
         DetectionOutput & output = *d_output.beginEdit();
         output.clear();
-        sofa::type::vector<double> & outputDist = *d_outputDist.beginEdit();
-        outputDist.clear();
 
-        sofa::type::vector<unsigned> & matchIdFrom = *d_matchIdFrom.beginEdit();
-        sofa::type::vector<unsigned> & matchIdDest = *d_matchIdDest.beginEdit();
+        auto createProximityOp = Operations::CreateCenterProximityOperation::func(l_from->begin());
+        auto findClosestProxOp = FindClosestProximityOperation::func(l_dest->begin());
 
         for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
-            PairDetection min_pair = findClosestPoint(*itfrom,l_dest.get());
-            if (min_pair.first == nullptr || min_pair.second == nullptr) {
-                continue;
-            }
+            auto pfrom = createProximityOp(itfrom->element());
+            if (pfrom == nullptr) continue;
 
-            output.add(min_pair.first,min_pair.second);
-            outputDist.push_back(m_distanceMethod(output.back()));
+            auto pdest = findClosestProxOp(pfrom,l_dest.get());
+            if (pdest == nullptr) continue;
 
-            matchIdFrom.push_back(min_pair.first->getElementId());
-            matchIdDest.push_back(min_pair.second->getElementId());
-
+            output.push_back(PairDetection(pfrom,pdest));
         }
+
         d_output.endEdit();
-        d_matchIdFrom.endEdit();
-        d_matchIdDest.endEdit();
     }
 
 };
 
-
 }
 
-}

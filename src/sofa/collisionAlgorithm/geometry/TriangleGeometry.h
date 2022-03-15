@@ -1,147 +1,74 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
-#include <sofa/collisionAlgorithm/toolBox/TriangleToolBox.h>
+#include <sofa/collisionAlgorithm/elements/TriangleElement.h>
+#include <sofa/collisionAlgorithm/toolbox/TriangleToolBox.h>
 
-namespace sofa {
-
-namespace collisionAlgorithm {
+namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
-class TriangleGeometry : public TBaseGeometry<DataTypes,TriangleProximity> {
+class TriangleGeometry : public TBaseGeometry<DataTypes>, public TriangleProximityCreator {
 public:
     typedef DataTypes TDataTypes;
+    typedef TriangleElement ELEMENT;
     typedef TriangleGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes,TriangleProximity> Inherit;
-    typedef BaseProximity::Index Index;
-    typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
+    typedef TBaseGeometry<DataTypes> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
-
-    typedef size_t TriangleID;
-    typedef sofa::topology::Triangle Triangle;
-    typedef sofa::type::vector<Triangle> VecTriangles;
+    typedef std::function<BaseProximity::SPtr(const TriangleElement * elmt, double f0,double f1,double f2)> ProximityCreatorFunc;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
     core::objectmodel::SingleLink<GEOMETRY,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
 
     TriangleGeometry()
-        : l_topology(initLink("topology", "link to topology")) {
+    : l_topology(initLink("topology", "link to topology")) {
         l_topology.setPath("@.");
+        f_createProximity = [=](const TriangleElement * elmt,double f0,double f1,double f2) -> BaseProximity::SPtr {
+            return BaseProximity::create<DefaultTriangleProximity<DataTypes>>(this->getState(),
+                                                                               elmt->getP0(),elmt->getP1(),elmt->getP2(),
+                                                                               f0,f1,f2);
+        };
     }
 
-    inline BaseElementIterator::UPtr begin(Index eid = 0) const override {
-        return DefaultElementIterator<PROXIMITYDATA>::create(this, this->l_topology->getTriangles(), eid);
-    }
-
-    void draw(const core::visual::VisualParams * vparams) {
-        if (! (this->d_draw.getValue())) return;
-        this->drawNormals(vparams);
-
-        if (! vparams->displayFlags().getShowCollisionModels()) return ;
-        const sofa::type::RGBAColor & color = this->d_color.getValue();
-        if (color[3] == 0.0) return;
-
-        glDisable(GL_LIGHTING);
-
-        double delta = 0.2;
+    type::Vector3 getPosition(unsigned pid) override {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+        return pos[pid];
+    }
 
-        if (! vparams->displayFlags().getShowWireFrame()) glBegin(GL_TRIANGLES);
-        else glBegin(GL_LINES);
-
-        for (auto it=this->begin();it != this->end(); it++) {
-            const Triangle& tri = this->l_topology->getTriangle(it->id());
-
-            glColor4f(fabs(color[0]-delta),color[1],color[2],color[3]);
-            glVertex3dv(pos[tri[0]].data());
-            if (vparams->displayFlags().getShowWireFrame()) glVertex3dv(pos[tri[1]].data());
-
-            glColor4f(color[0],fabs(color[1]-delta),color[2],color[3]);
-            glVertex3dv(pos[tri[1]].data());
-            if (vparams->displayFlags().getShowWireFrame()) glVertex3dv(pos[tri[2]].data());
-
-            glColor4f(color[0],color[1],fabs(color[2]-delta),color[3]);
-            glVertex3dv(pos[tri[2]].data());
-            if (vparams->displayFlags().getShowWireFrame()) glVertex3dv(pos[tri[0]].data());
+    void init() {
+        //default proximity creator
+        for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
+            auto tri = this->l_topology->getTriangle(i);
+            auto elmt = BaseElement::create<TriangleElement>(this,i,tri[0],tri[1],tri[2]);
+            m_elements.push_back(elmt);
         }
-        glEnd();
+
+        prepareDetection();
     }
 
-    virtual void prepareDetection() override {
-        m_triangle_info.clear();
+    void prepareDetection() override {
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+        for (unsigned i=0;i<m_elements.size();i++) m_elements[i]->update(pos.ref());
     }
 
-    inline const sofa::topology::Triangle getTriangle(Index eid) const {
-        return this->l_topology->getTriangle(eid);
+    inline ElementIterator::SPtr begin() const override {
+        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements));
     }
 
-    ////Bezier triangle are computed according to :
-    ////http://www.gamasutra.com/view/feature/131389/b%C3%A9zier_triangles_and_npatches.php?print=1
-    inline type::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v = core::VecCoordId::position()) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
-
-        return pos[data.m_p0] * data.m_f0 +
-                pos[data.m_p1] * data.m_f1 +
-                pos[data.m_p2] * data.m_f2;
+    BaseProximity::SPtr createProximity(const TriangleElement * elmt,double f0,double f1,double f2) override {
+        return f_createProximity(elmt,f0,f1,f2);
     }
 
-    PROXIMITYDATA createProximity(Index eid, CONTROL_POINT pid = CONTROL_DEFAULT) const {
-        return PROXIMITYDATA::create(eid,getTriangle(eid),pid);
+    void setCreateProximity(ProximityCreatorFunc f) {
+        f_createProximity = f;
     }
 
-    //Barycentric coordinates are computed according to
-    //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    inline PROXIMITYDATA project(const type::Vector3 & P, Index eid) const {
-        TriangleInfo  tinfo = getTriangleInfo()[eid];
-        auto triangle = getTriangle(eid);
-
-        double fact_u,fact_v,fact_w;
-        toolBox::projectOnTriangle(P,tinfo,fact_u,fact_v,fact_w);
-
-        return PROXIMITYDATA(eid, triangle[0], triangle[1], triangle[2],fact_u,fact_v,fact_w);
-    }
-
-    virtual type::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
-        auto tinfo = getTriangleInfo()[data.m_eid];
-        return cross(tinfo.ax2,tinfo.ax1);
-    }
-
-
-    inline const std::vector<TriangleInfo> & getTriangleInfo(core::VecCoordId v = core::VecCoordId::position()) const {
-        if (m_triangle_info[v.getIndex()].empty()) computeTriangleInfo(v);
-        return m_triangle_info[v.getIndex()];
-    }
-
-
-protected:
-    mutable std::map<int,std::vector<TriangleInfo> > m_triangle_info;
-
-    void computeTriangleInfo(core::VecCoordId v = core::VecCoordId::position()) const {
-        std::vector<TriangleInfo> & vecInfo = m_triangle_info[v.getIndex()];
-        const VecTriangles& triangles = this->l_topology->getTriangles();
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
-
-        vecInfo.clear();
-        for (size_t t=0 ; t<triangles.size() ; t++) {
-            const Triangle& tri = triangles[t];
-
-            //Compute Positions
-            const type::Vector3 & p0 = pos[tri[0]];
-            const type::Vector3 & p1 = pos[tri[1]];
-            const type::Vector3 & p2 = pos[tri[2]];
-
-            vecInfo.push_back(toolBox::computeTriangleInfo(p0, p1, p2));
-        }
-    }
+private:
+    std::vector<TriangleElement::SPtr> m_elements;
+    ProximityCreatorFunc f_createProximity;
 };
 
-
 }
 
-}

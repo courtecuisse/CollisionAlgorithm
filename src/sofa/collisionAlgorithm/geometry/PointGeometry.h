@@ -1,76 +1,66 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
-#include <sofa/collisionAlgorithm/iterators/DefaultElementIterator.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
+#include <sofa/collisionAlgorithm/elements/PointElement.h>
+#include <sofa/collisionAlgorithm/toolbox/PointToolBox.h>
 
 namespace sofa {
 
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class PointGeometry : public TBaseGeometry<DataTypes,PointProximity> {
+class PointGeometry : public TBaseGeometry<DataTypes>, public PointProximityCreator {
 public:
     typedef DataTypes TDataTypes;
+    typedef PointElement ELEMENT;
     typedef PointGeometry<DataTypes> GEOMETRY;
-    typedef TBaseGeometry<DataTypes,PointProximity> Inherit;
-    typedef BaseProximity::Index Index;
-    typedef typename Inherit::PROXIMITYDATA PROXIMITYDATA;
-    typedef typename DataTypes::Coord Coord;
+    typedef TBaseGeometry<DataTypes> Inherit;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
+    typedef std::function<BaseProximity::SPtr(const PointElement * elmt)> ProximityCreatorFunc;
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
     Data<double> d_drawRadius;
 
     PointGeometry()
-    : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {}
-
-    inline BaseElementIterator::UPtr begin(Index eid = 0) const override {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->l_state->read(core::VecCoordId::position());
-        return DefaultElementIterator<PROXIMITYDATA>::create(this, pos.ref(), eid);
+    : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {
+        f_createProximity = [=](const PointElement * elmt) -> BaseProximity::SPtr {
+            return BaseProximity::create<DefaultPointProximity<DataTypes>>(this->getState(),elmt->getP0());
+        };
     }
 
-    void draw(const core::visual::VisualParams *vparams) override {
-        if(!(this->d_draw.getValue())) return;
-        this->drawNormals(vparams);
-//        if (! vparams->displayFlags().getShowCollisionModels()) return;
-        if (! vparams->displayFlags().getShowCollisionModels()) {
-            return ;
-        }
-        const sofa::type::RGBAColor & color = this->d_color.getValue();
-        if (color[3] == 0.0) return;
-        if (d_drawRadius.getValue() == 0.0) return;
-
+    type::Vector3 getPosition(unsigned pid) override {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+        return pos[pid];
+    }
 
-        glColor4f(color[0],color[1],color[2],color[3]);
-
-        for(auto it=this->begin();it != this->end();it++) {
-            vparams->drawTool()->drawSphere(pos[it->id()],d_drawRadius.getValue());
+    void init() {
+        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+        for (unsigned i=0;i<pos.size();i++) {
+            auto elmt = BaseElement::create<PointElement>(this,i);
+            m_elements.push_back(elmt);
         }
     }
 
-    inline PROXIMITYDATA createProximity(Index eid, CONTROL_POINT pid = CONTROL_DEFAULT) const {
-        return PROXIMITYDATA::create(eid,pid);
+    BaseProximity::SPtr createProximity(const PointElement * elmt) override {
+        return f_createProximity(elmt);
     }
 
-    //do not change the dataProximity.
-    inline PROXIMITYDATA project(const type::Vector3 & /*Q*/, Index eid) const {
-        return PROXIMITYDATA(eid);
+    void prepareDetection() override {}
+
+    ElementIterator::SPtr begin() const override {
+        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements));
     }
 
-    inline type::Vector3 getPosition(const PROXIMITYDATA & data, core::VecCoordId v) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(v);
-        return pos[data.m_eid];
+    void setCreateProximity(ProximityCreatorFunc f) {
+        f_createProximity = f;
     }
 
-    virtual type::Vector3 computeNormal(const PROXIMITYDATA & data) const override {
-        return type::Vector3();
-    }
+private:
+    std::vector<PointElement::SPtr> m_elements;
+    ProximityCreatorFunc f_createProximity;
 };
 
 }

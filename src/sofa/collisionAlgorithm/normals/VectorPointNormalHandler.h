@@ -1,35 +1,58 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseNormalHandler.h>
+#include <sofa/collisionAlgorithm/CollisionPipeline.h>
+#include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
 
-namespace sofa {
+namespace sofa::collisionAlgorithm {
 
-namespace collisionAlgorithm {
-
-template<class GEOMETRY>
-class VectorPointNormalHandler : public TBaseNormalHandler<GEOMETRY> {
+template<class DataTypes>
+class VectorPointNormalHandler : public CollisionComponent {
 public:
-    typedef typename GEOMETRY::VecCoord VecCoord;
-    typedef typename GEOMETRY::DataVecCoord DataVecCoord;
-    typedef typename GEOMETRY::PROXIMITYDATA PROXIMITYDATA;
-    typedef TBaseNormalHandler<GEOMETRY> Inherit;
 
-    SOFA_CLASS(SOFA_TEMPLATE(VectorPointNormalHandler,GEOMETRY), Inherit);
+    SOFA_CLASS(SOFA_TEMPLATE(VectorPointNormalHandler,DataTypes), CollisionComponent);
 
-    Data<sofa::type::vector<type::Vector3>> d_normals;
+    Data<type::vector<type::Vector3>> d_normals;
+
+    typedef PointGeometry<DataTypes> GEOMETRY;
+    typedef typename GEOMETRY::ELEMENT ELEMENT;
+
+    core::objectmodel::SingleLink<VectorPointNormalHandler<DataTypes>,PointGeometry<DataTypes>,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
     VectorPointNormalHandler()
-    : d_normals(initData(&d_normals, "normals", "Vector of normals")) {}
+    : d_normals(initData(&d_normals, "normals", "Vector of normals"))
+    , l_geometry(initLink("geometry","Link to Geometry")){}
 
-    virtual type::Vector3 computeNormal(const PROXIMITYDATA & data) const {
-        if(data.m_eid < d_normals.getValue().size()) return d_normals.getValue()[data.m_eid];
-        if(d_normals.getValue().size()==1) return d_normals.getValue()[0];
-        return type::Vector3();
+    class VectorPointNormalProximity : public DefaultPointProximity<DataTypes> {
+    public:
+        typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+        typedef typename DataTypes::VecCoord VecCoord;
+        typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+
+        VectorPointNormalProximity(State * s, unsigned p0, const type::vector<type::Vector3> & normals)
+        : DefaultPointProximity<DataTypes>(s,p0)
+        , m_normals(normals){}
+
+        sofa::type::Vector3 getNormal() const override {
+            return m_normals[this->m_pid];
+        }
+
+    private:
+        const type::vector<type::Vector3> & m_normals;
+
+    };
+
+    void init() {
+        l_geometry->setCreateProximity(
+                [=](const PointElement * elmt) -> BaseProximity::SPtr {
+                    return BaseProximity::create<VectorPointNormalProximity>(l_geometry->getState(),
+                                                                              elmt->getP0(),
+                                                                              d_normals.getValue());
+                }
+            );
     }
 
-    virtual void updateNormals() override {}
-};
+    void prepareDetection() override {}
 
-}
+};
 
 }
