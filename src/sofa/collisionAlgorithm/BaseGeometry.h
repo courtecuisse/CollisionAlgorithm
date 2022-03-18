@@ -35,9 +35,10 @@ public:
     virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
 
     void draw(const core::visual::VisualParams * vparams) override {
+        if (! vparams->displayFlags().getShowCollisionModels()) return;
         type::RGBAColor color = d_color.getValue();
 
-//        glDisable(GL_LIGHTING);
+        glDisable(GL_LIGHTING);
         if (color[3] == 0.0) return;
 
         glColor4f(color[0],color[1],color[2],color[3]);

@@ -368,7 +368,16 @@ public:
 
     void draw(const core::visual::VisualParams * vparams) {
         if (! vparams->displayFlags().getShowBoundingCollisionModels()) return;
-        BaseGeometry::draw(vparams);
+
+        type::RGBAColor color = d_color.getValue();
+
+        glDisable(GL_LIGHTING);
+        if (color[3] == 0.0) return;
+
+        glColor4f(color[0],color[1],color[2],color[3]);
+        for (auto it = begin();it != end(); it++) {
+            it->element()->draw(vparams);
+        }
     }
 
     inline Index getKey(size_t i,size_t j,size_t k) const {
@@ -385,9 +394,9 @@ public:
 
     //compute the box where is P
     inline type::Vec3i getBoxCoord(const type::Vector3 & P) const {
-        return type::Vec3i(floor(P[0] - m_Bmin[0])/m_cellSize[0],
-                           floor(P[1] - m_Bmin[1])/m_cellSize[1],
-                           floor(P[2] - m_Bmin[2])/m_cellSize[2]);
+        return type::Vec3i((P[0] - m_Bmin[0])/m_cellSize[0],
+                           (P[1] - m_Bmin[1])/m_cellSize[1],
+                           (P[2] - m_Bmin[2])/m_cellSize[2]);
     }
 
     virtual void recomputeNormals() {}
