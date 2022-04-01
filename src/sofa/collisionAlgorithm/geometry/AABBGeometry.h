@@ -34,9 +34,9 @@ public:
         AABBBElement(const AABBGeometry * geo,unsigned key,unsigned i, unsigned j, unsigned k)
         : m_geometry(geo), m_key(key), m_i(i), m_j(j), m_k(k) {}
 
-        virtual unsigned id() override {
-            return m_key;
-        }
+//        virtual unsigned id() override {
+//            return m_key;
+//        }
 
         size_t getOperationsHash() const override { return typeid(AABBBElement).hash_code(); }
 
@@ -47,10 +47,6 @@ public:
         }
 
         void insert(BaseElement::SPtr elmt,BaseProximity::SPtr prox) {
-            unsigned eid = elmt->id();
-            auto it = m_elementIds.find(eid);
-            if (it != m_elementIds.end()) return; // already in the element list
-            m_elementIds.insert(eid);
             m_elements.push_back(elmt);
             m_projections.push_back(prox);
         }
@@ -113,10 +109,6 @@ public:
             }
         }
 
-        const std::set<unsigned> & getElementsId() {
-            return m_elementIds;
-        }
-
         const std::vector<BaseElement::SPtr> & elements() {
             return m_elements;
         }
@@ -124,7 +116,6 @@ public:
     private:
         const AABBGeometry * m_geometry;
         unsigned m_key,m_i,m_j,m_k;
-        std::set<unsigned> m_elementIds;
         std::vector<BaseElement::SPtr> m_elements;
         std::vector<BaseProximity::SPtr> m_projections;
     };

@@ -21,7 +21,7 @@ public:
     : m_point(eid)
     , m_parent(parent) {}
 
-    unsigned id() override { return m_point; }
+//    unsigned id() override { return m_point; }
 
     size_t getOperationsHash() const override { return typeid(PointElement).hash_code(); }
 

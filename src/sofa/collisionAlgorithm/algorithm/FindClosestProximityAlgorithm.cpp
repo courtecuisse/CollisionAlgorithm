@@ -71,7 +71,6 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
     }
 
     int d = 0;
-    std::set<unsigned> selectedElementsId;
     std::vector<BaseElement::SPtr> selectedElements;
 
     while (selectedElements.empty() && d<max) {
@@ -89,13 +88,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                             continue;
 
                         auto elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        for (unsigned e=0;e<elmts.size();e++) {
-                            unsigned eid=elmts[e]->id();
-                            if (selectedElementsId.find(eid)==selectedElementsId.cend()) {
-                                selectedElementsId.insert(eid);
-                                selectedElements.push_back(elmts[e]);
-                            }
-                        }
+                        for (unsigned e=0;e<elmts.size();e++) selectedElements.push_back(elmts[e]);
                     }
                 }
             }
@@ -116,13 +109,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                             continue;
 
                         auto elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        for (unsigned e=0;e<elmts.size();e++) {
-                            unsigned eid=elmts[e]->id();
-                            if (selectedElementsId.find(eid)==selectedElementsId.cend()) {
-                                selectedElementsId.insert(eid);
-                                selectedElements.push_back(elmts[e]);
-                            }
-                        }
+                        for (unsigned e=0;e<elmts.size();e++) selectedElements.push_back(elmts[e]);
                     }
                 }
             }
@@ -144,13 +131,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                             continue;
 
                         auto elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        for (unsigned e=0;e<elmts.size();e++) {
-                            unsigned eid=elmts[e]->id();
-                            if (selectedElementsId.find(eid)==selectedElementsId.cend()) {
-                                selectedElementsId.insert(eid);
-                                selectedElements.push_back(elmts[e]);
-                            }
-                        }
+                        for (unsigned e=0;e<elmts.size();e++) selectedElements.push_back(elmts[e]);
                     }
                 }
             }
@@ -171,13 +152,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                             continue;
 
                         auto elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        for (unsigned e=0;e<elmts.size();e++) {
-                            unsigned eid=elmts[e]->id();
-                            if (selectedElementsId.find(eid)==selectedElementsId.cend()) {
-                                selectedElementsId.insert(eid);
-                                selectedElements.push_back(elmts[e]);
-                            }
-                        }
+                        for (unsigned e=0;e<elmts.size();e++) selectedElements.push_back(elmts[e]);
                     }
                 }
             }
@@ -198,13 +173,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                             continue;
 
                         auto elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        for (unsigned e=0;e<elmts.size();e++) {
-                            unsigned eid=elmts[e]->id();
-                            if (selectedElementsId.find(eid)==selectedElementsId.cend()) {
-                                selectedElementsId.insert(eid);
-                                selectedElements.push_back(elmts[e]);
-                            }
-                        }
+                        for (unsigned e=0;e<elmts.size();e++) selectedElements.push_back(elmts[e]);
                     }
                 }
             }
@@ -225,13 +194,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                             continue;
 
                         auto elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        for (unsigned e=0;e<elmts.size();e++) {
-                            unsigned eid=elmts[e]->id();
-                            if (selectedElementsId.find(eid)==selectedElementsId.cend()) {
-                                selectedElementsId.insert(eid);
-                                selectedElements.push_back(elmts[e]);
-                            }
-                        }
+                        for (unsigned e=0;e<elmts.size();e++) selectedElements.push_back(elmts[e]);
                     }
                 }
             }

@@ -58,7 +58,7 @@ public:
     TriangleElement(TriangleProximityCreator * parent, unsigned eid, unsigned p0,unsigned p1,unsigned p2)
     : m_parent(parent), m_eid(eid), m_p0(p0), m_p1(p1), m_p2(p2) {}
 
-    unsigned id() override { return m_eid; }
+//    unsigned id() override { return m_eid; }
 
     size_t getOperationsHash() const override { return typeid(TriangleElement).hash_code(); }
 

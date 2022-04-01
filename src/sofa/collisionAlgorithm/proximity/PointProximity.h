@@ -36,6 +36,10 @@ public:
         return pos[m_pid];
     }
 
+    unsigned getPId() const {
+        return m_pid;
+    }
+
 protected:
     State * m_state;
     unsigned m_pid;

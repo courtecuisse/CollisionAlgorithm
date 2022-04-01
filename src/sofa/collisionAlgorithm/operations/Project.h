@@ -13,7 +13,7 @@ public:
 
     Inherit::FUNC getDefault() const override {
         return [=](type::Vector3 , BaseElement::SPtr elmt) -> BaseProximity::SPtr {
-            std::cerr << "ERROR no ProjectOperation registered for "  << elmt->id() << "  " << elmt->name() << std::endl;
+            std::cerr << "ERROR no ProjectOperation registered for "  << elmt->name() << std::endl;
             return NULL;
         };
     }

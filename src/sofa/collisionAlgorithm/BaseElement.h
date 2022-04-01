@@ -14,7 +14,7 @@ public:
 
     typedef std::shared_ptr<BaseElement> SPtr;
 
-    virtual unsigned id() = 0;
+//    virtual unsigned id() = 0;
 
     template<typename CAST>
     inline CAST * element_cast() {
