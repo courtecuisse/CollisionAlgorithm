@@ -4,6 +4,7 @@
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 #include <sofa/collisionAlgorithm/toolbox/TriangleToolBox.h>
+#include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
 
 namespace sofa::collisionAlgorithm {
 
@@ -26,22 +27,21 @@ public:
     : l_topology(initLink("topology", "link to topology")) {
         l_topology.setPath("@.");
         f_createProximity = [=](const TriangleElement * elmt,double f0,double f1,double f2) -> BaseProximity::SPtr {
-            return BaseProximity::create<DefaultTriangleProximity<DataTypes>>(this->getState(),
-                                                                               elmt->getP0(),elmt->getP1(),elmt->getP2(),
-                                                                               f0,f1,f2);
+            return BaseProximity::create<TriangleProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),
+                                                            f0,f1,f2);
         };
     }
 
-    type::Vector3 getPosition(unsigned pid) override {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-        return pos[pid];
-    }
+//    type::Vector3 getPosition(unsigned pid) override {
+//        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+//        return pos[pid];
+//    }
 
     void init() {
         //default proximity creator
         for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
             auto tri = this->l_topology->getTriangle(i);
-            auto elmt = BaseElement::create<TriangleElement>(this,i,tri[0],tri[1],tri[2]);
+            auto elmt = BaseElement::create<TriangleElement>(this,this->m_topoProx[tri[0]],this->m_topoProx[tri[1]],this->m_topoProx[tri[2]]);
             m_elements.push_back(elmt);
         }
 
@@ -54,7 +54,7 @@ public:
     }
 
     inline ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements));
+        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_elements));
     }
 
     BaseProximity::SPtr createProximity(const TriangleElement * elmt,double f0,double f1,double f2) override {
@@ -63,6 +63,10 @@ public:
 
     void setCreateProximity(ProximityCreatorFunc f) {
         f_createProximity = f;
+    }
+
+    inline std::vector<TriangleElement::SPtr> & getElements() {
+        return m_elements;
     }
 
 private:

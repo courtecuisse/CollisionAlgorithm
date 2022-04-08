@@ -7,13 +7,13 @@
 
 namespace sofa::collisionAlgorithm::Operations {
 
-class CreateCenterProximityOperation : public GenericOperation<CreateCenterProximityOperation,std::function<BaseProximity::SPtr(BaseElement::SPtr)> > {
+class CreateCenterProximityOperation : public GenericOperation<CreateCenterProximityOperation,std::function<BaseProximity::SPtr(BaseElement*)> > {
 public:
 
     using Inherit = GenericOperation;
 
 
-    static BaseProximity::SPtr defaultCreateCenterProximity(BaseElement::SPtr elmt){
+    static BaseProximity::SPtr defaultCreateCenterProximity(BaseElement* elmt){
         std::vector<BaseProximity::SPtr> res;
         elmt->getControlProximities(res);
         return BaseProximity::create<MultiProximity>(res);

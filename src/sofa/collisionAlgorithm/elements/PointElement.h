@@ -6,7 +6,7 @@ namespace sofa::collisionAlgorithm {
 
 class PointElement;
 
-class PointProximityCreator : public ProximityCreator {
+class PointProximityCreator {
 public:
     virtual BaseProximity::SPtr createProximity(const PointElement * elmt) = 0;
 
@@ -17,11 +17,9 @@ public:
 
     typedef std::shared_ptr<PointElement> SPtr;
 
-    PointElement(PointProximityCreator * parent, unsigned eid)
-    : m_point(eid)
+    PointElement(PointProximityCreator * parent, BaseProximity::SPtr prox)
+    : m_point(prox)
     , m_parent(parent) {}
-
-//    unsigned id() override { return m_point; }
 
     size_t getOperationsHash() const override { return typeid(PointElement).hash_code(); }
 
@@ -31,14 +29,14 @@ public:
         return m_parent->createProximity(this);
     }
 
-    inline unsigned getP0() const { return m_point; }
+    inline BaseProximity::SPtr getP0() const { return m_point; }
 
     void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
         res.push_back(createProximity());
     }
 
     void draw(const core::visual::VisualParams * /*vparams*/) override {
-        type::Vector3 p0 = m_parent->getPosition(m_point);
+        type::Vector3 p0 = m_point->getPosition();
 
         glBegin(GL_POINT);
             glVertex3dv(p0.data());
@@ -46,7 +44,7 @@ public:
     }
 
 private:
-    unsigned m_point;
+    BaseProximity::SPtr m_point;
     PointProximityCreator * m_parent;
 };
 

@@ -5,6 +5,8 @@
 
 namespace sofa::collisionAlgorithm {
 
+//#ifdef NOT_COMPILING
+
 template<class DataTypes>
 class EdgeNormalHandler : public CollisionComponent {
 public:
@@ -19,18 +21,20 @@ public:
     EdgeNormalHandler()
     : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
 
-    class LinkEdgeProximity : public DefaultEdgeProximity<DataTypes> {
+    class LinkEdgeProximity : public EdgeProximity {
     public:
         typedef sofa::core::behavior::MechanicalState<DataTypes> State;
         typedef typename DataTypes::VecCoord VecCoord;
         typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
 
-        LinkEdgeProximity(State * s, unsigned p0,unsigned p1,double f0,double f1)
-        : DefaultEdgeProximity<DataTypes>(s,p0,p1,f0,f1) {}
+        LinkEdgeProximity(/*unsigned*/ BaseProximity::SPtr p0,/*unsigned*/ BaseProximity::SPtr p1,double f0,double f1)
+        : EdgeProximity(p0,p1,f0,f1) {}
 
         sofa::type::Vector3 getNormal() const override {
-            const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-            return (pos[this->m_p1] - pos[this->m_p0]).normalized();
+//            const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+//            return (pos[this->m_p1] - pos[this->m_p0]).normalized();
+
+            return ((this->m_p1->getPosition() - this->m_p0->getPosition()).normalized());
         }
 
     };
@@ -39,9 +43,7 @@ public:
     void init() {
         l_geometry->setCreateProximity(
         [=](const EdgeElement * elmt, double f0,double f1) -> BaseProximity::SPtr {
-                return BaseProximity::create<LinkEdgeProximity>(l_geometry->getState(),
-                                                                      elmt->getP0(),elmt->getP1(),
-                                                                      f0,f1);
+                return BaseProximity::create<LinkEdgeProximity>(elmt->getP0(), elmt->getP1(), f0, f1);
             }
         );
     }
@@ -50,4 +52,5 @@ public:
 
 };
 
+//#endif
 }

@@ -8,12 +8,12 @@ namespace sofa::collisionAlgorithm::toolbox {
 class EdgeToolBox {
 public:
 
-    static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
+    static BaseProximity::SPtr createCenterProximity(BaseElement* elmt) {
         EdgeElement * edge = elmt->element_cast<EdgeElement>();
         return edge->createProximity(0.5,0.5);
     }
 
-    static BaseProximity::SPtr project(const type::Vector3 & P, BaseElement::SPtr elmt) {
+    static BaseProximity::SPtr project(const type::Vector3 & P, BaseElement* elmt) {
         EdgeElement * edge = elmt->element_cast<EdgeElement>();
 
         double fact_u,fact_v;

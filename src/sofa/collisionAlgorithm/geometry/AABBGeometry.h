@@ -46,8 +46,8 @@ public:
             res = m_projections;
         }
 
-        void insert(BaseElement::SPtr elmt,BaseProximity::SPtr prox) {
-            m_elements.push_back(elmt);
+        void insert(BaseElement* elmt,BaseProximity::SPtr prox) {
+            m_elements.insert(elmt);
             m_projections.push_back(prox);
         }
 
@@ -109,14 +109,14 @@ public:
             }
         }
 
-        const std::vector<BaseElement::SPtr> & elements() {
+        const std::set<BaseElement *> & elements() {
             return m_elements;
         }
 
     private:
         const AABBGeometry * m_geometry;
         unsigned m_key,m_i,m_j,m_k;
-        std::vector<BaseElement::SPtr> m_elements;
+        std::set<BaseElement *> m_elements;
         std::vector<BaseProximity::SPtr> m_projections;
     };
 
@@ -136,12 +136,12 @@ public:
             m_iterator++;
         }
 
-        std::shared_ptr<BaseElement> element() override {
-            return m_iterator->second;
+        BaseElement* element() override {
+            return m_iterator->second.get();
         }
 
-        const std::shared_ptr<BaseElement> element() const override {
-            return m_iterator->second;
+        const BaseElement* element() const override {
+            return m_iterator->second.get();
         }
 
         size_t getOperationsHash() const override { return typeid(AABBBElement).hash_code(); }
@@ -189,10 +189,10 @@ public:
         return type::BoundingBox(m_Bmin,m_Bmax);
     }
 
-    const std::vector<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const {
+    const std::set<BaseElement *> & getElementSet(unsigned i, unsigned j, unsigned k) const {
         auto it = m_indexedElement.find(getKey(i,j,k));
         if (it == m_indexedElement.end()) {
-            static std::vector<BaseElement::SPtr> empty;
+            static std::set<BaseElement *> empty;
             return empty;
         } else {
             const AABBBElement::SPtr box = it->second;
@@ -285,11 +285,11 @@ public:
         m_Bmin -= m_cellSize * 0.5;
         m_Bmax -= m_cellSize * 0.5;
 
-        auto projectOp = Operations::ProjectOperation::func(l_geometry->begin());
+        auto projectOp = Operations::ProjectOperation::get(l_geometry->begin()->getOperationsHash());
 
         for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
         {
-            BaseElement::SPtr elmt = it->element();
+            BaseElement* elmt = it->element();
 
             //std::cout << ++i << std::endl;
             type::BoundingBox bbox;

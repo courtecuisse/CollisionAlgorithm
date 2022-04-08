@@ -19,9 +19,9 @@ public:
 
     virtual void next() = 0;
 
-    virtual std::shared_ptr<BaseElement> element() = 0;
+    virtual BaseElement * element() = 0;
 
-    virtual const std::shared_ptr<BaseElement> element() const = 0;
+    virtual const BaseElement * element() const = 0;
 
     virtual size_t getOperationsHash() const = 0;
 
@@ -53,9 +53,9 @@ public:
 
     void next() override {}
 
-    std::shared_ptr<BaseElement> element() override { return NULL; }
+    BaseElement * element() override { return NULL; }
 
-    const std::shared_ptr<BaseElement> element() const override { return NULL; }
+    const BaseElement * element() const override { return NULL; }
 
     size_t getOperationsHash() const override {
         return typeid(EmptyIterator).hash_code();
@@ -63,9 +63,9 @@ public:
 };
 
 template<class CONTAINER>
-class TDefaultElementIterator : public ElementIterator {
+class TDefaultElementIteratorSPtr : public ElementIterator {
 public:
-    TDefaultElementIterator(const CONTAINER & c) {
+    TDefaultElementIteratorSPtr(const CONTAINER & c) {
         m_it = c.cbegin();
         m_end = c.cend();
     }
@@ -79,9 +79,36 @@ public:
         else return (*m_it)->getOperationsHash();
     }
 
-    virtual BaseElement::SPtr element() { return *m_it; }
+    virtual BaseElement* element() { return m_it->get(); }
 
-    virtual const BaseElement::SPtr element() const { return *m_it; }
+    virtual const BaseElement* element() const { return m_it->get(); }
+
+private:
+    typename CONTAINER::const_iterator m_it;
+    typename CONTAINER::const_iterator m_end;
+};
+
+
+template<class CONTAINER>
+class TDefaultElementIteratorPtr : public ElementIterator {
+public:
+    TDefaultElementIteratorPtr(const CONTAINER & c) {
+        m_it = c.cbegin();
+        m_end = c.cend();
+    }
+
+    void next() override { m_it++; }
+
+    bool end() const override { return m_it==m_end; }
+
+    size_t getOperationsHash() const override {
+        if (m_it == m_end) return typeid(EmptyIterator).hash_code();
+        else return (*m_it)->getOperationsHash();
+    }
+
+    virtual BaseElement * element() { return *m_it; }
+
+    virtual const BaseElement * element() const { return *m_it; }
 
 private:
     typename CONTAINER::const_iterator m_it;

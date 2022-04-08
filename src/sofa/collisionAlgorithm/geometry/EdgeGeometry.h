@@ -3,6 +3,7 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/toolbox/EdgeToolBox.h>
 #include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
+#include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
 
 namespace sofa::collisionAlgorithm {
 
@@ -25,26 +26,26 @@ public:
     : l_topology(initLink("topology", "link to topology")) {
         l_topology.setPath("@.");
         f_createProximity = [=](const EdgeElement * elmt,double f0,double f1) -> BaseProximity::SPtr {
-            return BaseProximity::create<DefaultEdgeProximity<DataTypes>>(this->getState(),elmt->getP0(),elmt->getP1(),f0,f1);
+            return BaseProximity::create<EdgeProximity>(elmt->getP0(),elmt->getP1(),f0,f1);
         };
     }
 
     void init() {
         for (unsigned i=0;i<this->l_topology->getNbEdges();i++) {
             auto edge = this->l_topology->getEdge(i);
-            m_elements.push_back(BaseElement::create<EdgeElement>(this,i,edge[0],edge[1]));
+            m_elements.push_back(BaseElement::create<EdgeElement>(this,this->m_topoProx[edge[0]],this->m_topoProx[edge[1]]));
         }
     }
 
-    type::Vector3 getPosition(unsigned pid) override {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-        return pos[pid];
-    }
+//    type::Vector3 getPosition(unsigned pid) override {
+//        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+//        return pos[pid];
+//    }
 
     void prepareDetection() override {}
 
     inline ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements));
+        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_elements));
     }
 
     BaseProximity::SPtr createProximity(const EdgeElement * elmt,double f0,double f1) override {

@@ -17,7 +17,7 @@ static BaseProximity::SPtr doFindClosestProx(BaseProximity::SPtr prox, ElementIt
     BaseProximity::SPtr res = NULL;
 
     type::Vector3 P = prox->getPosition();
-    Operations::ProjectOperation::FUNC projectOp = Operations::ProjectOperation::func(itdest);
+    Operations::ProjectOperation::FUNC projectOp = Operations::ProjectOperation::get(itdest->getOperationsHash());
 
     for (; ! itdest->end();itdest++) {
         auto edest = itdest->element();
@@ -71,7 +71,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
     }
 
     int d = 0;
-    std::vector<BaseElement::SPtr> selectedElements;
+    std::set<BaseElement * > selectedElements;
 
     while (selectedElements.empty() && d<max) {
         {            
@@ -87,8 +87,8 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                         if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                             continue;
 
-                        auto elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        for (unsigned e=0;e<elmts.size();e++) selectedElements.push_back(elmts[e]);
+                        std::set<BaseElement*> elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                        selectedElements.insert(elmts.cbegin(),elmts.cend());
                     }
                 }
             }
@@ -108,8 +108,8 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                         if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                             continue;
 
-                        auto elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        for (unsigned e=0;e<elmts.size();e++) selectedElements.push_back(elmts[e]);
+                        std::set<BaseElement*> elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                        selectedElements.insert(elmts.cbegin(),elmts.cend());
                     }
                 }
             }
@@ -130,8 +130,8 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                         if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                             continue;
 
-                        auto elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        for (unsigned e=0;e<elmts.size();e++) selectedElements.push_back(elmts[e]);
+                        std::set<BaseElement*> elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                        selectedElements.insert(elmts.cbegin(),elmts.cend());
                     }
                 }
             }
@@ -151,8 +151,8 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                         if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                             continue;
 
-                        auto elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        for (unsigned e=0;e<elmts.size();e++) selectedElements.push_back(elmts[e]);
+                        std::set<BaseElement*> elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                        selectedElements.insert(elmts.cbegin(),elmts.cend());
                     }
                 }
             }
@@ -172,8 +172,8 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                         if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
                             continue;
 
-                        auto elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        for (unsigned e=0;e<elmts.size();e++) selectedElements.push_back(elmts[e]);
+                        std::set<BaseElement*> elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                        selectedElements.insert(elmts.cbegin(),elmts.cend());
                     }
                 }
             }
@@ -193,8 +193,8 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                         if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
                             continue;
 
-                        auto elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                        for (unsigned e=0;e<elmts.size();e++) selectedElements.push_back(elmts[e]);
+                        std::set<BaseElement*> elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                        selectedElements.insert(elmts.cbegin(),elmts.cend());
                     }
                 }
             }
@@ -203,7 +203,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
         d++;// we look for boxed located at d+1
     }
 
-    return doFindClosestProx(prox,ElementIterator::SPtr(new TDefaultElementIterator(selectedElements)));
+    return doFindClosestProx(prox,ElementIterator::SPtr(new TDefaultElementIteratorPtr(selectedElements)));
 }
 
 int register_FindClosestProximityOperationAABB = FindClosestProximityOperation::register_func<AABBGeometry::AABBBElement>(&FindClosestProximityOperationWithAABB<AABBGeometry>);

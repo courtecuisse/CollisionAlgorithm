@@ -6,7 +6,7 @@ namespace sofa::collisionAlgorithm {
 
 class TriangleElement;
 
-class TriangleProximityCreator : public ProximityCreator {
+class TriangleProximityCreator{
 public:
     virtual BaseProximity::SPtr createProximity(const TriangleElement * elmt,double f0,double f1,double f2) = 0;
 
@@ -55,17 +55,15 @@ public:
         }
     };
 
-    TriangleElement(TriangleProximityCreator * parent, unsigned eid, unsigned p0,unsigned p1,unsigned p2)
-    : m_parent(parent), m_eid(eid), m_p0(p0), m_p1(p1), m_p2(p2) {}
-
-//    unsigned id() override { return m_eid; }
+    TriangleElement(TriangleProximityCreator * parent, BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2)
+    : m_parent(parent), m_p0(p0), m_p1(p1), m_p2(p2) {}
 
     size_t getOperationsHash() const override { return typeid(TriangleElement).hash_code(); }
 
     std::string name() const override { return "TriangleElement"; }
 
     void update(const std::vector<type::Vector3> & pos) {
-        m_tinfo.update(pos[m_p0],pos[m_p1],pos[m_p2]);
+        m_tinfo.update(m_p0->getPosition(), m_p0->getPosition(), m_p0->getPosition());
     }
 
     inline BaseProximity::SPtr createProximity(double f0,double f1,double f2) const {
@@ -74,11 +72,11 @@ public:
 
     inline const TriangleInfo & getTriangleInfo() const { return m_tinfo; }
 
-    inline unsigned getP0() const { return m_p0; }
+    inline BaseProximity::SPtr getP0() const { return m_p0; }
 
-    inline unsigned getP1() const { return m_p1; }
+    inline BaseProximity::SPtr getP1() const { return m_p1; }
 
-    inline unsigned getP2() const { return m_p2; }
+    inline BaseProximity::SPtr getP2() const { return m_p2; }
 
     void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
         res.push_back(createProximity(1,0,0));
@@ -88,9 +86,9 @@ public:
 
 
     void draw(const core::visual::VisualParams * vparams) override {
-        type::Vector3 p0 = m_parent->getPosition(m_p0);
-        type::Vector3 p1 = m_parent->getPosition(m_p1);
-        type::Vector3 p2 = m_parent->getPosition(m_p2);
+        type::Vector3 p0 = m_p0->getPosition();
+        type::Vector3 p1 = m_p1->getPosition();
+        type::Vector3 p2 = m_p2->getPosition();
 
         if (vparams->displayFlags().getShowWireFrame()) {
             glBegin(GL_LINES);
@@ -109,7 +107,7 @@ public:
 
 private:
     TriangleProximityCreator * m_parent;
-    unsigned m_eid, m_p0,m_p1,m_p2;
+    BaseProximity::SPtr m_p0,m_p1,m_p2;
     TriangleInfo m_tinfo;
 };
 

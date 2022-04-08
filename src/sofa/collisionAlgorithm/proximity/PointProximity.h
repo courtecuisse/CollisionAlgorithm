@@ -4,45 +4,39 @@
 
 namespace sofa::collisionAlgorithm {
 
-template<class DataTypes>
-class DefaultPointProximity : public TBaseProximity<DataTypes> {
+class PointProximity : public BaseProximity {
 public:
-    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef typename DataTypes::Coord Coord;
-    typedef typename DataTypes::Real Real;
-    typedef typename DataTypes::VecDeriv VecDeriv;
-    typedef typename DataTypes::MatrixDeriv MatrixDeriv;
-    typedef typename DataTypes::Deriv Deriv1;
-    typedef typename MatrixDeriv::RowIterator MatrixDerivRowIterator;
-    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-    typedef core::objectmodel::Data< VecDeriv >        DataVecDeriv;
-    typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
 
-    DefaultPointProximity(State * s, unsigned pid)
-    : m_state(s), m_pid(pid) {}
+    PointProximity(BaseProximity::SPtr prox)
+    : m_p0(prox) {}
 
-    State * getState() const {
-        return m_state;
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
+        m_p0->buildJacobianConstraint(cId,dir,fact,constraintId);
     }
 
-    void addContributions(MatrixDerivRowIterator & c_it, const sofa::type::Vector3 & N,double fact) const override {
-        c_it.addCol(m_pid, N * fact);
-    }
+//    void addContributions(MatrixDerivRowIterator & c_it, const sofa::type::Vector3 & N,double fact) const override {
+//        c_it.addCol(m_p0, N * fact);
+//    }
 
     /// return proximiy position in a vector3
     sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
-        const helper::ReadAccessor<DataVecCoord> & pos = m_state->read(v);
-        return pos[m_pid];
+        return m_p0->getPosition();
     }
 
-    unsigned getPId() const {
-        return m_pid;
+    BaseProximity::SPtr getProx() const {
+        return m_p0;
+    }
+
+    sofa::type::Vector3 getNormal() const override {
+        return m_p0->getNormal();
+    }
+
+    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const override {
+        m_p0->storeLambda(cParams,res,cid_global,cid_local,lambda);
     }
 
 protected:
-    State * m_state;
-    unsigned m_pid;
+    BaseProximity::SPtr m_p0;
 };
 
 }

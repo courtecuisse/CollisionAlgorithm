@@ -6,7 +6,7 @@ namespace sofa::collisionAlgorithm {
 
 class TetrahedronElement;
 
-class TetrahedronProximityCreator : public ProximityCreator {
+class TetrahedronProximityCreator{
 public:
     virtual BaseProximity::SPtr createProximity(const TetrahedronElement * elmt,double f1,double f2,double f3,double f4) = 0;
 
@@ -24,20 +24,18 @@ public:
         type::Vec3d ax1,ax2,ax3,ax2Cax3;
     };
 
-    TetrahedronElement(TetrahedronProximityCreator * parent, unsigned eid, unsigned p0,unsigned p1,unsigned p2,unsigned p3)
-    : m_parent(parent), m_eid(eid), m_p0(p0), m_p1(p1), m_p2(p2), m_p3(p3) {}
-
-//    unsigned id() override { return m_eid; }
+    TetrahedronElement(TetrahedronProximityCreator * parent, BaseProximity::SPtr p0,BaseProximity::SPtr p1,BaseProximity::SPtr p2,BaseProximity::SPtr p3)
+    : m_parent(parent), m_p0(p0), m_p1(p1), m_p2(p2), m_p3(p3) {}
 
     size_t getOperationsHash() const override { return typeid(TetrahedronElement).hash_code(); }
 
     std::string name() const override { return "TetrahedronElement"; }
 
     void update(const std::vector<type::Vector3> & pos) {
-        m_tinfo.P0 = pos[m_p0];
-        m_tinfo.P1 = pos[m_p1];
-        m_tinfo.P2 = pos[m_p2];
-        m_tinfo.P3 = pos[m_p3];
+        m_tinfo.P0 = m_p0->getPosition();
+        m_tinfo.P1 = m_p1->getPosition();
+        m_tinfo.P2 = m_p2->getPosition();
+        m_tinfo.P3 = m_p3->getPosition();
 
         m_tinfo.ax1 = m_tinfo.P1 - m_tinfo.P0;
         m_tinfo.ax2 = m_tinfo.P2 - m_tinfo.P0;
@@ -59,19 +57,19 @@ public:
 
     inline const TetraInfo & getTetrahedronInfo() const { return m_tinfo; }
 
-    inline unsigned getP0() const { return m_p0; }
+    inline BaseProximity::SPtr getP0() const { return m_p0; }
 
-    inline unsigned getP1() const { return m_p1; }
+    inline BaseProximity::SPtr getP1() const { return m_p1; }
 
-    inline unsigned getP2() const { return m_p2; }
+    inline BaseProximity::SPtr getP2() const { return m_p2; }
 
-    inline unsigned getP3() const { return m_p3; }
+    inline BaseProximity::SPtr getP3() const { return m_p3; }
 
     void draw(const core::visual::VisualParams * vparams) override {
-        type::Vector3 p0 = m_parent->getPosition(m_p0);
-        type::Vector3 p1 = m_parent->getPosition(m_p1);
-        type::Vector3 p2 = m_parent->getPosition(m_p2);
-        type::Vector3 p3 = m_parent->getPosition(m_p3);
+        type::Vector3 p0 = m_p0->getPosition();
+        type::Vector3 p1 = m_p1->getPosition();
+        type::Vector3 p2 = m_p2->getPosition();
+        type::Vector3 p3 = m_p3->getPosition();
 
         if (vparams->displayFlags().getShowWireFrame()) {
             glBegin(GL_LINES);
@@ -95,7 +93,7 @@ public:
 
 private:
     TetrahedronProximityCreator * m_parent;
-    unsigned m_eid, m_p0,m_p1,m_p2,m_p3;
+    BaseProximity::SPtr m_p0,m_p1,m_p2,m_p3;
     TetraInfo m_tinfo;
 };
 

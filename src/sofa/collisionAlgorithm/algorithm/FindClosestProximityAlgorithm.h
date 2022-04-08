@@ -57,8 +57,8 @@ public:
         DetectionOutput & output = *d_output.beginEdit();
         output.clear();
 
-        auto createProximityOp = Operations::CreateCenterProximityOperation::func(l_from->begin());
-        auto findClosestProxOp = FindClosestProximityOperation::func(l_dest->begin());
+        auto createProximityOp = Operations::CreateCenterProximityOperation::get(l_from->begin()->getOperationsHash());
+        auto findClosestProxOp = FindClosestProximityOperation::get(l_dest->begin()->getOperationsHash());
 
         for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
             auto pfrom = createProximityOp(itfrom->element());

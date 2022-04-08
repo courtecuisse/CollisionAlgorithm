@@ -3,6 +3,7 @@
 #include <sofa/collisionAlgorithm/CollisionPipeline.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
+#include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
 #include <sofa/collisionAlgorithm/ElementIterator.h>
 #include <sofa/gl/gl.h>
 
@@ -70,6 +71,7 @@ template<class DataTypes>
 class TBaseGeometry : public BaseGeometry {
 public:
 
+    typedef typename TopologyProximity<DataTypes>::SPtr PROXIMITY;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
@@ -89,10 +91,22 @@ public:
     TBaseGeometry()
     : l_state(initLink("mstate", "link to state")) {
         l_state.setPath("@.");
+        for (unsigned j=0; j<l_state->getSize(); j++) {
+            m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(l_state, j));
+//            m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
+        }
     }
 
     inline sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
+    }
+
+    inline std::vector<typename TopologyProximity<DataTypes>::SPtr> & getTopoProx(){
+        return m_topoProx;
+    }
+
+    inline typename TopologyProximity<DataTypes>::SPtr getTopoProxIdx(unsigned i){
+        return m_topoProx[i];
     }
 
     inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const {
@@ -124,6 +138,10 @@ public:
     static std::string templateName(const TBaseGeometry<DataTypes>* = NULL) {
         return DataTypes::Name();
     }
+
+
+protected:
+    std::vector<typename TopologyProximity<DataTypes>::SPtr> m_topoProx;
 
 };
 

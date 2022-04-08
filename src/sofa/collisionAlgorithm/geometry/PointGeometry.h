@@ -4,6 +4,7 @@
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 #include <sofa/collisionAlgorithm/elements/PointElement.h>
 #include <sofa/collisionAlgorithm/toolbox/PointToolBox.h>
+#include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
 
 namespace sofa {
 
@@ -27,19 +28,19 @@ public:
     PointGeometry()
     : d_drawRadius(initData(&d_drawRadius, (double) 1.0, "drawRadius", "radius of drawing")) {
         f_createProximity = [=](const PointElement * elmt) -> BaseProximity::SPtr {
-            return BaseProximity::create<DefaultPointProximity<DataTypes>>(this->getState(),elmt->getP0());
+            return BaseProximity::create<PointProximity>(elmt->getP0());
         };
     }
 
-    type::Vector3 getPosition(unsigned pid) override {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-        return pos[pid];
-    }
+//    type::Vector3 getPosition(unsigned pid) override {
+//        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+//        return pos[pid];
+//    }
 
     void init() {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
         for (unsigned i=0;i<pos.size();i++) {
-            auto elmt = BaseElement::create<PointElement>(this,i);
+            auto elmt = BaseElement::create<PointElement>(this,this->m_topoProx[i]);
             m_elements.push_back(elmt);
         }
     }
@@ -51,7 +52,7 @@ public:
     void prepareDetection() override {}
 
     ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements));
+        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_elements));
     }
 
     void setCreateProximity(ProximityCreatorFunc f) {

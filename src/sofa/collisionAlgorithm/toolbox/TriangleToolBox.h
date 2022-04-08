@@ -9,14 +9,14 @@ namespace sofa::collisionAlgorithm::toolbox {
 class TriangleToolBox {
 public:
 
-    static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
+    static BaseProximity::SPtr createCenterProximity(BaseElement* elmt) {
         TriangleElement * tri = elmt->element_cast<TriangleElement>();
         return tri->createProximity(1.0/3.0,1.0/3.0,1.0/3.0);
     }
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    static BaseProximity::SPtr project(type::Vector3 P, BaseElement::SPtr elmt) {
+    static BaseProximity::SPtr project(type::Vector3 P, BaseElement* elmt) {
         TriangleElement * tri = elmt->element_cast<TriangleElement>();
 
         double fact_u,fact_v,fact_w;

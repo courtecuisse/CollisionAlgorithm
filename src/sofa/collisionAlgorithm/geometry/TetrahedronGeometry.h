@@ -4,6 +4,7 @@
 #include <sofa/collisionAlgorithm/elements/TetrahedronElement.h>
 #include <sofa/collisionAlgorithm/proximity/TetrahedronProximity.h>
 #include <sofa/core/topology/BaseMeshTopology.h>
+#include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
 
 namespace sofa::collisionAlgorithm {
 
@@ -27,22 +28,21 @@ public:
         l_topology.setPath("@.");
 
         f_createProximity = [=](const TetrahedronElement * elmt,double f0,double f1,double f2,double f3) -> BaseProximity::SPtr {
-            return BaseProximity::create<DefaultTetrahedronProximity<DataTypes>>(this->getState(),
-                                                                                  elmt->getP0(),elmt->getP1(),elmt->getP2(),elmt->getP3(),
-                                                                                  f0,f1,f2,f3);
+            return BaseProximity::create<TetrahedronProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),elmt->getP3(),
+                                                               f0,f1,f2,f3);
         };
     }
 
-    type::Vector3 getPosition(unsigned pid) override {
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-        return pos[pid];
-    }
+//    type::Vector3 getPosition(unsigned pid) override {
+//        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+//        return pos[pid];
+//    }
 
     void init() {
         //default proximity creator
         for (unsigned i=0;i<this->l_topology->getNbTetrahedra();i++) {
             auto tetra = this->l_topology->getTetrahedron(i);
-            auto elmt = BaseElement::create<TetrahedronElement>(this,i,tetra[0],tetra[1],tetra[2],tetra[3]);
+            auto elmt = BaseElement::create<TetrahedronElement>(this,this->m_topoProx[tetra[0]],this->m_topoProx[tetra[1]],this->m_topoProx[tetra[2]],this->m_topoProx[tetra[3]]);
             m_elements.push_back(elmt);
         }
 
@@ -50,7 +50,7 @@ public:
     }
 
     ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new TDefaultElementIterator(m_elements));
+        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_elements));
     }
 
     virtual void prepareDetection() override {

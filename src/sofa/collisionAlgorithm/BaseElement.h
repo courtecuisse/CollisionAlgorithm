@@ -4,10 +4,10 @@
 
 namespace sofa::collisionAlgorithm {
 
-class ProximityCreator {
-public:
-    virtual type::Vector3 getPosition(unsigned eid) = 0;
-};
+//class ProximityCreator {
+//public:
+//    virtual type::Vector3 getPosition(unsigned eid) = 0;
+//};
 
 class BaseElement {
 public:
@@ -43,15 +43,15 @@ public:
 
 class ElementCast {
 public:
-    ElementCast(BaseElement::SPtr e) : m_element(e) {}
+    ElementCast(BaseElement* e) : m_element(e) {}
 
     template <typename CAST>
     inline operator CAST * () {
-        return (CAST *) m_element.get();
+        return (CAST *) m_element;
     }
 
 private:
-    BaseElement::SPtr m_element;
+    BaseElement* m_element;
 };
 
 //template<class TProxCreatorFunc>
