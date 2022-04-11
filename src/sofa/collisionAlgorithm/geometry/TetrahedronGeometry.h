@@ -39,6 +39,11 @@ public:
 //    }
 
     void init() {
+        for (unsigned j=0; j<this->getState()->getSize(); j++) {
+            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
+//            m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
+        }
+
         //default proximity creator
         for (unsigned i=0;i<this->l_topology->getNbTetrahedra();i++) {
             auto tetra = this->l_topology->getTetrahedron(i);

@@ -91,10 +91,10 @@ public:
     TBaseGeometry()
     : l_state(initLink("mstate", "link to state")) {
         l_state.setPath("@.");
-        for (unsigned j=0; j<l_state->getSize(); j++) {
-            m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(l_state, j));
-//            m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
-        }
+//        for (unsigned j=0; j<this->getState()->getSize(); j++) {
+//            m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(l_state, j));
+// //            m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
+//        }
     }
 
     inline sofa::core::behavior::MechanicalState<DataTypes> * getState() const {

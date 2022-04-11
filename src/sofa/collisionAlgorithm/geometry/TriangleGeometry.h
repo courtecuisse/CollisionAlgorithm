@@ -39,6 +39,11 @@ public:
 
     void init() {
         //default proximity creator
+        for (unsigned j=0; j<this->getState()->getSize(); j++) {
+            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
+//            m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
+        }
+
         for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
             auto tri = this->l_topology->getTriangle(i);
             auto elmt = BaseElement::create<TriangleElement>(this,this->m_topoProx[tri[0]],this->m_topoProx[tri[1]],this->m_topoProx[tri[2]]);
