@@ -38,6 +38,11 @@ public:
 //    }
 
     void init() {
+        for (unsigned j=0; j<this->getState()->getSize(); j++) {
+            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
+//            m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
+        }
+
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
         for (unsigned i=0;i<pos.size();i++) {
             auto elmt = BaseElement::create<PointElement>(this,this->m_topoProx[i]);

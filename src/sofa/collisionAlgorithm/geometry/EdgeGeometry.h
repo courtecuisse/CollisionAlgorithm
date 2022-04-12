@@ -31,6 +31,11 @@ public:
     }
 
     void init() {
+        for (unsigned j=0; j<this->getState()->getSize(); j++) {
+            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
+//            m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
+        }
+
         for (unsigned i=0;i<this->l_topology->getNbEdges();i++) {
             auto edge = this->l_topology->getEdge(i);
             m_elements.push_back(BaseElement::create<EdgeElement>(this,this->m_topoProx[edge[0]],this->m_topoProx[edge[1]]));

@@ -63,7 +63,7 @@ public:
     std::string name() const override { return "TriangleElement"; }
 
     void update(const std::vector<type::Vector3> & pos) {
-        m_tinfo.update(m_p0->getPosition(), m_p0->getPosition(), m_p0->getPosition());
+        m_tinfo.update(m_p0->getPosition(), m_p1->getPosition(), m_p2->getPosition());
     }
 
     inline BaseProximity::SPtr createProximity(double f0,double f1,double f2) const {

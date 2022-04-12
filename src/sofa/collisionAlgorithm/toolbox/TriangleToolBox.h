@@ -21,15 +21,15 @@ public:
 
         double fact_u,fact_v,fact_w;
         projectOnTriangle(P,tri->getTriangleInfo(),fact_u,fact_v,fact_w);
-        std::cout << "test coord bary après : " << fact_u << "  ||  " << fact_v << "  ||  " << fact_w << std::endl;
+//        std::cout << "test coord bary après : " << fact_u << "  ||  " << fact_v << "  ||  " << fact_w << std::endl;
         return tri->createProximity(fact_u,fact_v,fact_w);
     }
 
 
     static void computeTriangleBaryCoords(const type::Vec3d & proj_P, const TriangleElement::TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w)
     {
-        std::cout << "test tinfo1 : " << tinfo.P0 << "  ||  " << tinfo.v0 << "  ||  " << tinfo.v1 << std::endl;
-        std::cout << "test tinfo1 : " << tinfo.d11 << "  ||  " << tinfo.d01 << "  ||  " << tinfo.d00 << "  ||  " << tinfo.invDenom << std::endl;
+//        std::cout << "test tinfo1 : " << tinfo.P0 << "  ||  " << tinfo.v0 << "  ||  " << tinfo.v1 << std::endl;
+//        std::cout << "test tinfo1 : " << tinfo.d11 << "  ||  " << tinfo.d01 << "  ||  " << tinfo.d00 << "  ||  " << tinfo.invDenom << std::endl;
         type::Vec3d v2 = proj_P - tinfo.P0;
 
         double d20 = dot(v2,tinfo.v0);
