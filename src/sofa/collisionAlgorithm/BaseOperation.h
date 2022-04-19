@@ -53,9 +53,10 @@ public:
 
     typedef TFUNC FUNC;
 
-    static FUNC func(const ElementIterator::SPtr itelmt1,const ElementIterator::SPtr itelmt2) {
+    static FUNC get(size_t id1, size_t id2 /*const ElementIterator::SPtr itelmt1,const ElementIterator::SPtr itelmt2*/) {
 //        size_t id = (itelmt1->getOperationsHash()&(0xFFFFFFFF00000000)) | (itelmt2->getOperationsHash()&0x00000000FFFFFFFF);
-        size_t id = itelmt1->getOperationsHash() * itelmt1->getOperationsHash() + itelmt2->getOperationsHash();
+//        size_t id = itelmt1->getOperationsHash() * itelmt1->getOperationsHash() + itelmt2->getOperationsHash();
+        size_t id = id1 * id1 + id2;
         auto it = getSingleton()->m_map.find(id);
         if (it == getSingleton()->m_map.end()) return getSingleton()->getDefault();
         return it->second;

@@ -13,6 +13,9 @@ int register_Intersect_Tetra_Edge = IntersectOperation::register_func<Tetrahedro
 int register_Intersect_Edge_Triangle = IntersectOperation::register_func<EdgeElement,TriangleElement>(&toolbox::IntersectionToolBox::intersect_edge_triangle);
 int register_Intersect_Triangle_Edge = IntersectOperation::register_func<TriangleElement,EdgeElement>(&toolbox::IntersectionToolBox::intersect_triangle_edge);
 
+int register_Intersect_Edge_Point = IntersectOperation::register_func<EdgeElement,PointElement>(&toolbox::IntersectionToolBox::intersect_edge_point);
+int register_Intersect_Point_Edge = IntersectOperation::register_func<PointElement,EdgeElement>(&toolbox::IntersectionToolBox::intersect_point_edge);
+
 int register_Intersect_Edge_Edge = IntersectOperation::register_func<EdgeElement,EdgeElement>(&toolbox::IntersectionToolBox::intersect_edge_edge);
 
 }
