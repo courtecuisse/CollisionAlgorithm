@@ -7,6 +7,7 @@
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 #include <sofa/collisionAlgorithm/elements/TetrahedronElement.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
+#include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
 #include <sofa/collisionAlgorithm/toolbox/EdgeToolBox.h>
 // #include <sofa/component/topology/container/dynamic/EdgeSetTopologyModifier.h>
 //#include <EdgeSetTopologyModifier.h>
@@ -32,36 +33,97 @@ public:
 
   // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Based on https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection
+
     static BaseElement::SPtr intersect_edge_triangle(BaseElement* e1, BaseElement* e2) {
         auto edge = e1->element_cast<EdgeElement>();
         auto triangle = e2->element_cast<TriangleElement>();
 
-        // Compute the Plucker coefficient for the edges (--> in edgeToolbox ?)
-        double pluckerT0[6];
-        double pluckerT1[6];
-        double pluckerT2[6];
-        double pluckerEdge[6];
 
-        compute_plucker_coeffs(pluckerT0, triangle->getP0(), triangle->getP1());
-        compute_plucker_coeffs(pluckerT1, triangle->getP1(), triangle->getP2());
-        compute_plucker_coeffs(pluckerT2, triangle->getP2(), triangle->getP0());
-        compute_plucker_coeffs(pluckerEdge, edge->getP0(), edge->getP1());
+        type::Vector3 p0 = triangle->getP0()->getPosition();
+        type::Vector3 edgeTri1 = triangle->getP1()->getPosition() - triangle->getP0()->getPosition();
+        type::Vector3 edgeTri2 = triangle->getP2()->getPosition() - triangle->getP0()->getPosition();
+        type::Vector3 d = edge->getP1()->getPosition() - edge->getP0()->getPosition();
+
+        double cx = edge->getP0()->getPosition()[0];
+        double cy = edge->getP0()->getPosition()[1];
+        double cz = edge->getP0()->getPosition()[2];
+
+        type::Vector3 h = cross(d,edgeTri2);
+        double a = dot(edgeTri1,h);
+
+        //Parallel triangle
+        if (a == 0.0)  {
+
+//            type::Vector3 p1 = edgeTri1+p0;
+//            type::Vector3 p2 = edgeTri2+p0;
+            type::Vector3 p1 = triangle->getP1()->getPosition();
+            type::Vector3 p2 = triangle->getP2()->getPosition();
+
+            double alpha[3];
+
+//            alpha[0] = edgeIntersection(p0,p1,d,cx,cy,cz);
+//            alpha[1] = edgeIntersection(p1,p2,d,cx,cy,cz);
+//            alpha[2] = edgeIntersection(p2,p0,d,cx,cy,cz);
+
+//            createLayersOnParallelTriangle(obj,tid,tri0,tri1,tri2,p0,p1,p2,cx,cy,alpha);
+        }
+        else {
+            double f = 1.0/a;
+            bool dir = a>0;
+
+//            type::Vector3 s(cx*d_pixelSize.getValue()-p0[0],cy*d_pixelSize.getValue()-p0[1],cz*d_pixelSize.getValue()-p0[2]);
+            type::Vector3 s(cx-p0[0],cy-p0[1],cz-p0[2]);
+
+            double fact_u = f * dot(s,h);
+            if (fact_u<0 || fact_u>1) return nullptr;
+
+            type::Vector3 q = cross(s,edgeTri1);
+            double fact_v = f * dot(d,q);
+            if (fact_v<0 || fact_u + fact_v>1) return nullptr;
+
+//            double depth = cz*d_pixelSize.getValue() + f*dot(edgeTri2,q);
+            double depth = cz + f*dot(edgeTri2,q);
+            if (depth<0 || depth>1) return nullptr;
 
 
-        // Compute the side product related to the three edges of the triangle
-        double s0 = side_product(pluckerEdge,pluckerT0);
-        double s1 = side_product(pluckerEdge,pluckerT1);
-        double s2 = side_product(pluckerEdge,pluckerT2);
+            EdgeProximity::SPtr edgeProx = BaseProximity::create<EdgeProximity>(edge->getP0(),edge->getP1(),depth,1-depth);
+            PointProximityCreator* parent;
+            PointElement::SPtr pointIntersect = BaseElement::create<PointElement>(parent,edgeProx);
 
-        // Algorithm to compute the intersection --> calls the algo for 2D interection
+            return pointIntersect;
 
 
-        // Other approach
+
+//            m_layersZ.push_back(Layer(obj,tid,tri0,tri1,tri2,fact_u,fact_v,depth,dir,cx,cy,floor(depth/d_pixelSize.getValue())));
+        }
+
+
+//        // Compute the Plucker coefficient for the edges (--> in edgeToolbox ?)
+//        double pluckerT0[6];
+//        double pluckerT1[6];
+//        double pluckerT2[6];
+//        double pluckerEdge[6];
+
+//        compute_plucker_coeffs(pluckerT0, triangle->getP0(), triangle->getP1());
+//        compute_plucker_coeffs(pluckerT1, triangle->getP1(), triangle->getP2());
+//        compute_plucker_coeffs(pluckerT2, triangle->getP2(), triangle->getP0());
+//        compute_plucker_coeffs(pluckerEdge, edge->getP0(), edge->getP1());
+
+
+//        // Compute the side product related to the three edges of the triangle
+//        double s0 = side_product(pluckerEdge,pluckerT0);
+//        double s1 = side_product(pluckerEdge,pluckerT1);
+//        double s2 = side_product(pluckerEdge,pluckerT2);
+
+//        // Algorithm to compute the intersection --> calls the algo for 2D interection
+
+
+        // ////////////// Other approach ////////////// // Based on https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection
 //        sofa::type::Vector3 line =  edge->getP1()->getPosition() - edge->getP0()->getPosition();
 //        sofa::type::Vector3 T01 = triangle->getP1()->getPosition() - triangle->getP0()->getPosition();
 //        sofa::type::Vector3 T02 = triangle->getP2()->getPosition() - triangle->getP0()->getPosition();
 //        double determinant = -dot(line, T01.cross(T02));
+        // ////////////// ////////////// //////////////
 
 
 
