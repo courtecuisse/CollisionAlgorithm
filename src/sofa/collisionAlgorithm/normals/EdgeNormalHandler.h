@@ -5,8 +5,6 @@
 
 namespace sofa::collisionAlgorithm {
 
-//#ifdef NOT_COMPILING
-
 template<class DataTypes>
 class EdgeNormalHandler : public CollisionComponent {
 public:
@@ -27,13 +25,10 @@ public:
         typedef typename DataTypes::VecCoord VecCoord;
         typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
 
-        LinkEdgeProximity(/*unsigned*/ BaseProximity::SPtr p0,/*unsigned*/ BaseProximity::SPtr p1,double f0,double f1)
+        LinkEdgeProximity(BaseProximity::SPtr p0,BaseProximity::SPtr p1,double f0,double f1)
         : EdgeProximity(p0,p1,f0,f1) {}
 
         sofa::type::Vector3 getNormal() const override {
-//            const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-//            return (pos[this->m_p1] - pos[this->m_p0]).normalized();
-
             return ((this->m_p1->getPosition() - this->m_p0->getPosition()).normalized());
         }
 
@@ -52,5 +47,4 @@ public:
 
 };
 
-//#endif
 }

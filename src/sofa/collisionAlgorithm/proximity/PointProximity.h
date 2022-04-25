@@ -20,7 +20,7 @@ public:
 
     /// return proximiy position in a vector3
     sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
-        return m_p0->getPosition();
+        return m_p0->getPosition(v);
     }
 
     BaseProximity::SPtr getProx() const {

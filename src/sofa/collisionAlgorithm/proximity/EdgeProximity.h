@@ -23,8 +23,8 @@ public:
 
     /// return proximiy position in a vector3
     sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
-        return m_p0->getPosition() * m_f0 +
-               m_p1->getPosition() * m_f1;
+        return m_p0->getPosition(v) * m_f0 +
+               m_p1->getPosition(v) * m_f1;
     }
 
     sofa::type::Vector3 getNormal() const override {

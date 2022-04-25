@@ -298,7 +298,6 @@ public:
 
             for (unsigned b=0;b<v_prox.size();b++) {
                 bbox.include(v_prox[b]->getPosition());
-//                std::cout << " test prox position" << v_prox[b]->getPosition() << std::endl;
             }
 
             const type::Vector3 & minbox = bbox.minBBox();
@@ -334,14 +333,10 @@ public:
                         if (prox == NULL) continue;
 
                         type::Vector3 D = prox->getPosition()-P;
-//                        std::cout << "prox normal : " << prox->getNormal() << std::endl;
-//                        std::cout << "Distance between center of box and elem proximity : " << D << std::endl;
 
                         if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
                             (fabs(D[1])<=m_cellSize[1]*0.5) &&
                             (fabs(D[2])<=m_cellSize[2]*0.5)) {
-
-//                            std::cout << "Entering if" << std::endl;
 
                             auto it = m_indexedElement.find(key);
                             AABBBElement::SPtr aabb_elmt = NULL;
@@ -360,7 +355,6 @@ public:
                 }
             }
         }
-//        std::cout << "Nbr aabb elts : " << m_indexedElement.size() << std::endl;
     }
 
     void draw(const core::visual::VisualParams * vparams) {

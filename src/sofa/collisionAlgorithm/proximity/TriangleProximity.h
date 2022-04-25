@@ -21,6 +21,7 @@ public:
             N1.push_back(dir[i]*m_f1);
             N2.push_back(dir[i]*m_f2);
         }
+
         m_p0->buildJacobianConstraint(cId,N0,fact,constraintId);
         m_p1->buildJacobianConstraint(cId,N1,fact,constraintId);
         m_p2->buildJacobianConstraint(cId,N2,fact,constraintId);
@@ -35,9 +36,9 @@ public:
 
     /// return proximiy position in a vector3
     sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
-        return m_p0->getPosition() * m_f0 +
-               m_p1->getPosition() * m_f1 +
-               m_p2->getPosition() * m_f2;
+        return m_p0->getPosition(v) * m_f0 +
+               m_p1->getPosition(v) * m_f1 +
+               m_p2->getPosition(v) * m_f2;
     }
 
     sofa::type::Vector3 getNormal() const override {
