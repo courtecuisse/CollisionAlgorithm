@@ -1,21 +1,23 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 
 namespace sofa::collisionAlgorithm {
 
 class TriangleElement;
 
-class TriangleProximityCreator{
-public:
-    virtual BaseProximity::SPtr createProximity(const TriangleElement * elmt,double f0,double f1,double f2) = 0;
+//class TriangleProximityCreator{
+//public:
+//    virtual BaseProximity::SPtr createProximity(const TriangleElement * elmt,double f0,double f1,double f2) = 0;
 
-};
+//};
 
 class TriangleElement : public BaseElement {
 public:
 
     typedef std::shared_ptr<TriangleElement> SPtr;
+    typedef std::function<BaseProximity::SPtr(const TriangleElement * elmt, double f0,double f1,double f2)> ProximityCreatorFunc;
 
     struct TriangleInfo
     {
@@ -55,8 +57,13 @@ public:
         }
     };
 
-    TriangleElement(TriangleProximityCreator * parent, BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2)
-    : m_parent(parent), m_p0(p0), m_p1(p1), m_p2(p2) {}
+    TriangleElement(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2)
+    : m_p0(p0), m_p1(p1), m_p2(p2) {
+        f_createProximity = [=](const TriangleElement * elmt,double f0,double f1,double f2) -> BaseProximity::SPtr {
+            return BaseProximity::create<TriangleProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),
+                                                            f0,f1,f2);
+        };
+    }
 
     size_t getOperationsHash() const override { return typeid(TriangleElement).hash_code(); }
 
@@ -67,7 +74,7 @@ public:
     }
 
     inline BaseProximity::SPtr createProximity(double f0,double f1,double f2) const {
-        return m_parent->createProximity(this, f0,f1, f2);
+        return f_createProximity(this,f0,f1,f2);
     }
 
     inline const TriangleInfo & getTriangleInfo() const { return m_tinfo; }
@@ -105,10 +112,14 @@ public:
         }
     }
 
+    void setCreateProximity(ProximityCreatorFunc f) {
+        f_createProximity = f;
+    }
+
 private:
-    TriangleProximityCreator * m_parent;
     BaseProximity::SPtr m_p0,m_p1,m_p2;
     TriangleInfo m_tinfo;
+    ProximityCreatorFunc f_createProximity;
 };
 
 }

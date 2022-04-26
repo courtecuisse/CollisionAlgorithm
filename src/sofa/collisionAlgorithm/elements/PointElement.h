@@ -1,32 +1,37 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 
 namespace sofa::collisionAlgorithm {
 
 class PointElement;
 
-class PointProximityCreator {
-public:
-    virtual BaseProximity::SPtr createProximity(const PointElement * elmt) = 0;
+//class PointProximityCreator {
+//public:
+//    virtual BaseProximity::SPtr createProximity(const PointElement * elmt) = 0;
 
-};
+//};
 
 class PointElement : public BaseElement {
 public:
 
     typedef std::shared_ptr<PointElement> SPtr;
+    typedef std::function<BaseProximity::SPtr(const PointElement * elmt)> ProximityCreatorFunc;
 
-    PointElement(PointProximityCreator * parent, BaseProximity::SPtr prox)
-    : m_point(prox)
-    , m_parent(parent) {}
+    PointElement(BaseProximity::SPtr prox)
+    : m_point(prox){
+        f_createProximity = [=](const PointElement * elmt) -> BaseProximity::SPtr {
+            return BaseProximity::create<PointProximity>(elmt->getP0());
+        };
+    }
 
     size_t getOperationsHash() const override { return typeid(PointElement).hash_code(); }
 
     std::string name() const override { return "PointElement"; }
 
     inline BaseProximity::SPtr createProximity() const {
-        return m_parent->createProximity(this);
+        return f_createProximity(this);
     }
 
     inline BaseProximity::SPtr getP0() const { return m_point; }
@@ -43,9 +48,13 @@ public:
         glEnd();
     }
 
+    void setCreateProximity(ProximityCreatorFunc f) {
+        f_createProximity = f;
+    }
+
 private:
     BaseProximity::SPtr m_point;
-    PointProximityCreator * m_parent;
+    ProximityCreatorFunc f_createProximity;
 };
 
 

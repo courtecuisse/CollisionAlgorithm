@@ -9,6 +9,7 @@
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 #include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
 #include <sofa/collisionAlgorithm/toolbox/EdgeToolBox.h>
+#include <sofa/type/Mat.h>
 // #include <sofa/component/topology/container/dynamic/EdgeSetTopologyModifier.h>
 //#include <EdgeSetTopologyModifier.h>
 //#include <EdgeSetGeometryAlgorithm.h>
@@ -54,6 +55,9 @@ public:
         //Parallel triangle
         if (a == 0.0)  {
 
+//        ////// for the moment ///////
+            return nullptr;
+
 //            type::Vector3 p1 = edgeTri1+p0;
 //            type::Vector3 p2 = edgeTri2+p0;
             type::Vector3 p1 = triangle->getP1()->getPosition();
@@ -87,14 +91,9 @@ public:
 
 
             EdgeProximity::SPtr edgeProx = BaseProximity::create<EdgeProximity>(edge->getP0(),edge->getP1(),depth,1-depth);
-            PointProximityCreator* parent;
-            PointElement::SPtr pointIntersect = BaseElement::create<PointElement>(parent,edgeProx);
+            PointElement::SPtr pointIntersect = BaseElement::create<PointElement>(edgeProx);
 
             return pointIntersect;
-
-
-
-//            m_layersZ.push_back(Layer(obj,tid,tri0,tri1,tri2,fact_u,fact_v,depth,dir,cx,cy,floor(depth/d_pixelSize.getValue())));
         }
 
 
@@ -138,24 +137,28 @@ public:
 
 
 
-    static BaseElement::SPtr intersect_edge_point(BaseElement* e1, BaseElement* e2) {
-//        auto edge = e1->element_cast<EdgeElement>();
-//        auto point = e2->element_cast<PointElement>();
-
-//        return /// ;
-    }
-
-
-    static BaseElement::SPtr intersect_point_edge(BaseElement* e1, BaseElement* e2) {
-        intersect_edge_point(e2,e1);
-    }
-
-
-
 
     static BaseElement::SPtr intersect_edge_edge(BaseElement* e1, BaseElement* e2) {
 //        auto edge1 = e1->element_cast<EdgeElement>();
 //        auto edge2 = e2->element_cast<EdgeElement>();
+
+//        type::Vector3 v0 = edge1->getP0()->getPosition();
+//        type::Vector3 v1 = edge1->getP1()->getPosition();
+//        type::Vector3 P = v0 - v1;
+//        type::Vector3 O = edge2->getP0()->getPosition();
+//        type::Vector3 D = edge2->getP1()->getPosition() - edge2->getP0()->getPosition();
+//        type::Vector3 T = O - v1 + type::Vector3(1,1,1);
+
+//        sofa::type::Mat3x3d A(sofa::type::Mat3x3d::Line(-D[0], P[0], 1),
+//                              sofa::type::Mat3x3d::Line(-D[1], P[1], 1),
+//                              sofa::type::Mat3x3d::Line(-D[2], P[2], 1));
+
+//        auto det = sofa::type::determinant(A);
+
+//        if (det == 0) /*return nullptr*/; //   /!\ Depends on the rank of A and (A|b) (where b is such that Ax = b)
+
+
+
 
 
         // Compute intersection coordinates

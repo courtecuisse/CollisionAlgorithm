@@ -68,12 +68,12 @@ public:
                 auto intersection = IntersectOp(itfrom->element(),itdest->element());
                 if (intersection == nullptr) continue;
 
-                // creation of a proximity from the element of intersection ???
+
+                //  /////// Fill outputDetection !!! ///////   Be careful with the type of output
+//                output.push_back(intersection);
 
             }
         }
-
-//  /////// Fill outputDetection !!! ///////
 
         d_output.endEdit();
     }

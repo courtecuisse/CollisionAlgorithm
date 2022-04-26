@@ -1,28 +1,34 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
 #include <math.h>
 
 namespace sofa::collisionAlgorithm {
 
 class EdgeElement;
 
-class EdgeProximityCreator {
-public:
-    virtual BaseProximity::SPtr createProximity(const EdgeElement * elmt,double f0,double f1) = 0;
+//class EdgeProximityCreator {
+//public:
+//    virtual BaseProximity::SPtr createProximity(const EdgeElement * elmt,double f0,double f1) = 0;
 
-};
+//};
 
 class EdgeElement : public BaseElement {
 public:
 
     typedef std::shared_ptr<EdgeElement> SPtr;
+    typedef std::function<BaseProximity::SPtr(const EdgeElement * elmt,double f0,double f1)> ProximityCreatorFunc;
 
-    EdgeElement(EdgeProximityCreator * parent, BaseProximity::SPtr p0,BaseProximity::SPtr p1)
-    : m_parent(parent), m_p0(p0), m_p1(p1) {}
+    EdgeElement(BaseProximity::SPtr p0,BaseProximity::SPtr p1)
+    : m_p0(p0), m_p1(p1) {
+        f_createProximity = [=](const EdgeElement * elmt,double f0,double f1) -> BaseProximity::SPtr {
+            return BaseProximity::create<EdgeProximity>(elmt->getP0(),elmt->getP1(),f0,f1);
+        };
+    }
 
     inline BaseProximity::SPtr createProximity(double f0,double f1) const {
-        return m_parent->createProximity(this,f0,f1);
+        return f_createProximity(this,f0,f1);
     }
 
     size_t getOperationsHash() const override { return typeid(EdgeElement).hash_code(); }
@@ -47,6 +53,10 @@ public:
         glEnd();
     }
 
+    void setCreateProximity(ProximityCreatorFunc f) {
+        f_createProximity = f;
+    }
+
 
 
 //    //////////////////////
@@ -68,8 +78,8 @@ public:
 
 
 private:
-    EdgeProximityCreator * m_parent;
     BaseProximity::SPtr m_p0,m_p1;
+    ProximityCreatorFunc f_createProximity;
 };
 
 }

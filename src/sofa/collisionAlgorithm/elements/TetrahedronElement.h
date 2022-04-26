@@ -1,21 +1,23 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/proximity/TetrahedronProximity.h>
 
 namespace sofa::collisionAlgorithm {
 
 class TetrahedronElement;
 
-class TetrahedronProximityCreator{
-public:
-    virtual BaseProximity::SPtr createProximity(const TetrahedronElement * elmt,double f1,double f2,double f3,double f4) = 0;
+//class TetrahedronProximityCreator{
+//public:
+//    virtual BaseProximity::SPtr createProximity(const TetrahedronElement * elmt,double f1,double f2,double f3,double f4) = 0;
 
-};
+//};
 
 class TetrahedronElement : public BaseElement {
 public:
 
     typedef std::shared_ptr<TetrahedronElement> SPtr;
+    typedef std::function<BaseProximity::SPtr(const TetrahedronElement * elmt,double f0,double f1,double f2,double f3)> ProximityCreatorFunc;
 
     struct TetraInfo
     {
@@ -24,8 +26,13 @@ public:
         type::Vec3d ax1,ax2,ax3,ax2Cax3;
     };
 
-    TetrahedronElement(TetrahedronProximityCreator * parent, BaseProximity::SPtr p0,BaseProximity::SPtr p1,BaseProximity::SPtr p2,BaseProximity::SPtr p3)
-    : m_parent(parent), m_p0(p0), m_p1(p1), m_p2(p2), m_p3(p3) {}
+    TetrahedronElement(BaseProximity::SPtr p0,BaseProximity::SPtr p1,BaseProximity::SPtr p2,BaseProximity::SPtr p3)
+    : m_p0(p0), m_p1(p1), m_p2(p2), m_p3(p3) {
+        f_createProximity = [=](const TetrahedronElement * elmt,double f0,double f1,double f2,double f3) -> BaseProximity::SPtr {
+            return BaseProximity::create<TetrahedronProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),elmt->getP3(),
+                                                               f0,f1,f2,f3);
+        };
+    }
 
     size_t getOperationsHash() const override { return typeid(TetrahedronElement).hash_code(); }
 
@@ -45,7 +52,7 @@ public:
     }
 
     inline BaseProximity::SPtr createProximity(double f0,double f1,double f2, double f3) const {
-        return m_parent->createProximity(this, f0,f1, f2, f3);
+        return f_createProximity(this,f0,f1,f2,f3);
     }
 
     void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
@@ -91,10 +98,14 @@ public:
         }
     }
 
+    void setCreateProximity(ProximityCreatorFunc f) {
+        f_createProximity = f;
+    }
+
 private:
-    TetrahedronProximityCreator * m_parent;
     BaseProximity::SPtr m_p0,m_p1,m_p2,m_p3;
     TetraInfo m_tinfo;
+    ProximityCreatorFunc f_createProximity;
 };
 
 }
