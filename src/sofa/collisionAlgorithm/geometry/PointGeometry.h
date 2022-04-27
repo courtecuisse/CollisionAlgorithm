@@ -11,7 +11,7 @@ namespace sofa {
 namespace collisionAlgorithm {
 
 template<class DataTypes>
-class PointGeometry : public TBaseGeometry<DataTypes>/*, public PointProximityCreator*/ {
+class PointGeometry : public TBaseGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
     typedef PointElement ELEMENT;

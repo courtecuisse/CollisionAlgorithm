@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
 #include <sofa/collisionAlgorithm/toolbox/EdgeToolBox.h>
 #include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
 #include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
@@ -8,7 +8,7 @@
 namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
-class EdgeGeometry : public TBaseGeometry<DataTypes>/*, public EdgeProximityCreator*/ {
+class EdgeGeometry : public PointGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
     typedef EdgeElement ELEMENT;

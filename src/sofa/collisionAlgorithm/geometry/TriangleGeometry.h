@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <sofa/collisionAlgorithm/geometry/EdgeGeometry.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 #include <sofa/collisionAlgorithm/toolbox/TriangleToolBox.h>
@@ -9,7 +9,7 @@
 namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
-class TriangleGeometry : public TBaseGeometry<DataTypes>/*, public TriangleProximityCreator*/ {
+class TriangleGeometry : public EdgeGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
     typedef TriangleElement ELEMENT;

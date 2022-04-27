@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sofa/collisionAlgorithm/BaseGeometry.h>
+#include <sofa/collisionAlgorithm/geometry/TriangleGeometry.h>
 #include <sofa/collisionAlgorithm/elements/TetrahedronElement.h>
 #include <sofa/collisionAlgorithm/proximity/TetrahedronProximity.h>
 #include <sofa/core/topology/BaseMeshTopology.h>
@@ -9,7 +9,7 @@
 namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
-class TetrahedronGeometry : public TBaseGeometry<DataTypes> {
+class TetrahedronGeometry : public TriangleGeometry<DataTypes> {
 public:
     typedef DataTypes TDataTypes;
     typedef TetrahedronElement ELEMENT;
