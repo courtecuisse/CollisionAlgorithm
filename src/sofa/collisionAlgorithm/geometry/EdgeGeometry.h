@@ -25,9 +25,6 @@ public:
     EdgeGeometry()
     : l_topology(initLink("topology", "link to topology")) {
         l_topology.setPath("@.");
-//        f_createProximity = [=](const EdgeElement * elmt,double f0,double f1) -> BaseProximity::SPtr {
-//            return BaseProximity::create<EdgeProximity>(elmt->getP0(),elmt->getP1(),f0,f1);
-//        };
     }
 
     void init() {
@@ -39,7 +36,6 @@ public:
             auto edge = this->l_topology->getEdge(i);
             m_elements.push_back(BaseElement::create<EdgeElement>(this->m_topoProx[edge[0]],this->m_topoProx[edge[1]]));
         }
-        if (f_createProximity != NULL) setCreateProximity(f_createProximity);
     }
 
 //    type::Vector3 getPosition(unsigned pid) override {
@@ -53,9 +49,6 @@ public:
         return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_elements));
     }
 
-//    BaseProximity::SPtr createProximity(const EdgeElement * elmt,double f0,double f1) override {
-//        return f_createProximity(elmt,f0,f1);
-//    }
 
     void setCreateProximity(ProximityCreatorFunc f) {
         for (unsigned i = 0; i<m_elements.size(); i++) {
@@ -63,13 +56,9 @@ public:
         }
     }
 
-    void setCreateProxFunc(ProximityCreatorFunc f) {
-        f_createProximity = f;
-    }
 
 private:
     std::vector<EdgeElement::SPtr> m_elements;
-    ProximityCreatorFunc f_createProximity;
 };
 
 }

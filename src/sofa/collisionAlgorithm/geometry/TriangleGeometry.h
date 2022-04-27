@@ -26,10 +26,6 @@ public:
     TriangleGeometry()
     : l_topology(initLink("topology", "link to topology")) {
         l_topology.setPath("@.");
-//        f_createProximity = [=](const TriangleElement * elmt,double f0,double f1,double f2) -> BaseProximity::SPtr {
-//            return BaseProximity::create<TriangleProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),
-//                                                            f0,f1,f2);
-//        };
     }
 
 //    type::Vector3 getPosition(unsigned pid) override {
@@ -42,7 +38,6 @@ public:
         this->m_topoProx.clear();
         for (unsigned j=0; j<this->getState()->getSize(); j++) {
             this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
-//            m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
         }
 
         m_elements.clear();
@@ -51,7 +46,6 @@ public:
             auto elmt = BaseElement::create<TriangleElement>(this->m_topoProx[tri[0]],this->m_topoProx[tri[1]],this->m_topoProx[tri[2]]);
             m_elements.push_back(elmt);
         }
-        if (f_createProximity != NULL) setCreateProximity(f_createProximity);
 
         prepareDetection();
     }
@@ -65,9 +59,6 @@ public:
         return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_elements));
     }
 
-//    BaseProximity::SPtr createProximity(const TriangleElement * elmt,double f0,double f1,double f2) override {
-//        return f_createProximity(elmt,f0,f1,f2);
-//    }
 
     void setCreateProximity(ProximityCreatorFunc f) {
         for (unsigned i=0; i<m_elements.size(); i++) {
@@ -79,13 +70,9 @@ public:
         return m_elements;
     }
 
-    void setCreateProxFunc(ProximityCreatorFunc f) {
-        f_createProximity = f;
-    }
 
 private:
     std::vector<TriangleElement::SPtr> m_elements;
-    ProximityCreatorFunc f_createProximity;
 };
 
 }
