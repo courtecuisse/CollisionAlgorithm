@@ -26,7 +26,7 @@ public:
             type::Vector3 N(0,0,0);
             for (size_t t=0;t<tav.size();t++) {
                 unsigned eid = tav[t];
-                auto element = l_geometry->getElements()[eid];
+                auto element = l_geometry->getTriangleElements()[eid];
                 N += element->getTriangleInfo().N;
             }
             N.normalize();

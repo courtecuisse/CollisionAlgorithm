@@ -36,7 +36,7 @@ public:
 
 
     void init() {
-        l_geometry->setCreateProximity(
+        l_geometry->setCreateEdgeProximity(
         [=](const EdgeElement * elmt, double f0,double f1) -> BaseProximity::SPtr {
                 return BaseProximity::create<LinkEdgeProximity>(elmt->getP0(), elmt->getP1(), f0, f1);
             }

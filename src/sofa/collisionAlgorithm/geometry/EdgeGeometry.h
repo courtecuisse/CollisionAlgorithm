@@ -28,13 +28,17 @@ public:
     }
 
     void init() {
+        this->m_topoProx.clear();
         for (unsigned j=0; j<this->getState()->getSize(); j++) {
             this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
         }
 
+        PointGeometry<DataTypes>::init();
+
+        m_edgeElements.clear();
         for (unsigned i=0;i<this->l_topology->getNbEdges();i++) {
             auto edge = this->l_topology->getEdge(i);
-            m_elements.push_back(BaseElement::create<EdgeElement>(this->m_topoProx[edge[0]],this->m_topoProx[edge[1]]));
+            m_edgeElements.push_back(BaseElement::create<EdgeElement>(this->m_topoProx[edge[0]],this->m_topoProx[edge[1]]));
         }
     }
 
@@ -43,22 +47,30 @@ public:
 //        return pos[pid];
 //    }
 
-    void prepareDetection() override {}
+    void prepareDetection() override {PointGeometry<DataTypes>::prepareDetection();}
 
     inline ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_elements));
+        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_edgeElements));
+    }
+
+    inline ElementIterator::SPtr pointBegin() {
+        return PointGeometry<DataTypes>::begin();
     }
 
 
-    void setCreateProximity(ProximityCreatorFunc f) {
-        for (unsigned i = 0; i<m_elements.size(); i++) {
-            m_elements[i]->setCreateProximity(f);
+    void setCreateEdgeProximity(ProximityCreatorFunc f) {
+        for (unsigned i = 0; i<m_edgeElements.size(); i++) {
+            m_edgeElements[i]->setCreateProximity(f);
         }
+    }
+
+    inline std::vector<EdgeElement::SPtr> & getEdgeElements() {
+        return m_edgeElements;
     }
 
 
 private:
-    std::vector<EdgeElement::SPtr> m_elements;
+    std::vector<EdgeElement::SPtr> m_edgeElements;
 };
 
 }

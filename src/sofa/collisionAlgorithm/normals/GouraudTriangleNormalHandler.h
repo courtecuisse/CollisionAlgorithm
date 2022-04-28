@@ -34,7 +34,7 @@ public:
     };
 
     void init() {
-        l_geometry->setCreateProximity(
+        l_geometry->setCreateTriangleProximity(
             [=](const TriangleElement * elmt, double f0,double f1,double f2) -> BaseProximity::SPtr {
                 return BaseProximity::create<GouraudTriangleProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),
                                                                       f0,f1,f2,

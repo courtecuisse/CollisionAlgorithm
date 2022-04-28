@@ -34,39 +34,53 @@ public:
 //    }
 
     void init() {
+        this->m_topoProx.clear();
         for (unsigned j=0; j<this->getState()->getSize(); j++) {
             this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
         }
 
+        TriangleGeometry<DataTypes>::init();
+
         //default proximity creator
+        m_tetraElements.clear();
         for (unsigned i=0;i<this->l_topology->getNbTetrahedra();i++) {
             auto tetra = this->l_topology->getTetrahedron(i);
             auto elmt = BaseElement::create<TetrahedronElement>(this->m_topoProx[tetra[0]],this->m_topoProx[tetra[1]],this->m_topoProx[tetra[2]],this->m_topoProx[tetra[3]]);
-            m_elements.push_back(elmt);
+            m_tetraElements.push_back(elmt);
         }
 
         prepareDetection();
     }
 
     ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_elements));
+        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_tetraElements));
+    }
+
+    ElementIterator::SPtr triangleBegin() const {
+        return TriangleGeometry<DataTypes>::begin();
     }
 
     virtual void prepareDetection() override {
+        TriangleGeometry<DataTypes>::prepareDetection();
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-        for (unsigned i=0;i<m_elements.size();i++) m_elements[i]->update(pos.ref());
+        for (unsigned i=0;i<m_tetraElements.size();i++) m_tetraElements[i]->update(pos.ref());
     }
 
 
-    void setCreateProximity(ProximityCreatorFunc f) {
-        for (unsigned i=0; i<m_elements.size(); i++) {
-            m_elements[i]->setCreateProximity(f);
+    void setCreateTetraProximity(ProximityCreatorFunc f) {
+        for (unsigned i=0; i<m_tetraElements.size(); i++) {
+            m_tetraElements[i]->setCreateProximity(f);
         }
     }
 
+    inline std::vector<TetrahedronElement::SPtr> & getTetraElements() {
+        return m_tetraElements;
+    }
+
+
 
 private:
-    std::vector<TetrahedronElement::SPtr> m_elements;
+    std::vector<TetrahedronElement::SPtr> m_tetraElements;
 };
 
 }
