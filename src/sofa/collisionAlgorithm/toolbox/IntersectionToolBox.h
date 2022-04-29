@@ -20,12 +20,28 @@ class IntersectionToolBox {
 public:
 
 
-    static BaseElement::SPtr intersect_edge_tetra(BaseElement* e1, BaseElement* e2) {
-//        auto edge = e1->element_cast<EdgeElement>();
-//        auto tetra = e2->element_cast<TetrahedronElement>();
+    static BaseElement::SPtr intersect_edge_tetra(BaseElement* e1, BaseElement* e2) { std::cout << "intersect_edge_tetra" << std::endl;
+        auto edge = e1->element_cast<EdgeElement>();
+        auto tetra = e2->element_cast<TetrahedronElement>();
+
+        auto proxP0 = tetra->getP0();
+        auto proxP1 = tetra->getP1();
+        auto proxP2 = tetra->getP2();
+        auto proxP3 = tetra->getP3();
+
+        TriangleElement * triangle0 = new TriangleElement(proxP0, proxP1, proxP2);
+        TriangleElement * triangle1 = new TriangleElement(proxP1, proxP2, proxP3);
+        TriangleElement * triangle2 = new TriangleElement(proxP2, proxP3, proxP0);
+        TriangleElement * triangle3 = new TriangleElement(proxP3, proxP0, proxP1);
+
+        BaseElement::SPtr inter0 = intersect_edge_triangle(e1,triangle0);
+        BaseElement::SPtr inter1 = intersect_edge_triangle(e1,triangle1);
+        BaseElement::SPtr inter2 = intersect_edge_triangle(e1,triangle2);
+        BaseElement::SPtr inter3 = intersect_edge_triangle(e1,triangle3);
 
 
-//        return point->createProximity();
+
+        return nullptr;
     }
 
     static BaseElement::SPtr intersect_tetra_edge(BaseElement* e1, BaseElement* e2) {
@@ -35,7 +51,7 @@ public:
   // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    static BaseElement::SPtr intersect_edge_triangle(BaseElement* e1, BaseElement* e2) {
+    static BaseElement::SPtr intersect_edge_triangle(BaseElement* e1, BaseElement* e2) { std::cout << "intersect_edge_triangle" << std::endl;
         auto edge = e1->element_cast<EdgeElement>();
         auto triangle = e2->element_cast<TriangleElement>();
 
