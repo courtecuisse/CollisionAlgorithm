@@ -60,7 +60,7 @@ public:
         }
     }
 
-    inline std::vector<PointElement::SPtr> & getPointElements() {
+    inline std::vector<PointElement::SPtr> & getElements() {
         return m_pointElements;
     }
 

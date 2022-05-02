@@ -64,7 +64,7 @@ public:
         }
     }
 
-    inline std::vector<EdgeElement::SPtr> & getEdgeElements() {
+    inline std::vector<EdgeElement::SPtr> & getElements() {
         return m_edgeElements;
     }
 

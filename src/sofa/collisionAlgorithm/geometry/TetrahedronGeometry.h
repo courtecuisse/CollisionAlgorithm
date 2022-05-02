@@ -73,7 +73,7 @@ public:
         }
     }
 
-    inline std::vector<TetrahedronElement::SPtr> & getTetraElements() {
+    inline std::vector<TetrahedronElement::SPtr> & getElements() {
         return m_tetraElements;
     }
 

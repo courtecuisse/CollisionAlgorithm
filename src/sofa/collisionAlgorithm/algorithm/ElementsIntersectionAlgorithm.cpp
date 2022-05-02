@@ -4,6 +4,7 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/elements/TetrahedronElement.h>
 #include <sofa/collisionAlgorithm/geometry/TetrahedronGeometry.h>
+#include <sofa/collisionAlgorithm/geometry/AABBGeometry.h>
 
 namespace sofa::collisionAlgorithm {
 
@@ -24,7 +25,7 @@ static void doIntersection (BaseElement* elem, ElementIterator::SPtr itdest, std
         Operations::IntersectOperation::FUNC intersectionOp = Operations::IntersectOperation::get(elem->getOperationsHash() ,itdest->getOperationsHash());
 //        std::cout << "between get and intersectionOp" << std::endl;
         auto elemIntersection = intersectionOp(elem,edest);
-        std::cout << "after intersectionOp" << std::endl;
+//        std::cout << "test bool : " << (elemIntersection == nullptr) << std::endl;
         if (elemIntersection == NULL) continue;
 
         IntersectRes.push_back(elemIntersection); // Be careful with the case of an edge being parallel to a triangle: possibility of intersection on two edges
@@ -38,7 +39,7 @@ static void doIntersection (BaseElement* elem, ElementIterator::SPtr itdest, std
 
 //By default the elements of the geometry are considered
 static void genericIntersection(BaseElement* elem, BaseGeometry * geo, std::vector<BaseElement::SPtr> & IntersectRes) {std::cout << "genericIntersection" << std::endl;
-    doIntersection(elem,geo->begin(),IntersectRes);
+    return doIntersection(elem,geo->begin(),IntersectRes);
 }
 
 //By default the elements of the geometry are considered
@@ -51,13 +52,22 @@ IntersectWithGeometryOperation::GenericOperation::FUNC IntersectWithGeometryOper
 template<class TETRAGEOM>
 static void IntersectionWithTetraGeometry (BaseElement* elem, BaseGeometry * geo, std::vector<BaseElement::SPtr> & IntersectRes) { std::cout << "IntersectionWithTetraGeometry" << std::endl;
     TETRAGEOM * tetraGeo = (TETRAGEOM*) geo;
-    doIntersection(elem, tetraGeo->triangleBegin(), IntersectRes);
+    return doIntersection(elem, tetraGeo->triangleBegin(), IntersectRes);
+}
+
+//In case of an AABB geometry, the geometry to which AABB is linked in the scene is considered
+template<class AABBGEOM>
+static void IntersectionWithAABBGeometry (BaseElement* elem, BaseGeometry * geo, std::vector<BaseElement::SPtr> & IntersectRes) { std::cout << "IntersectionWithAABBGeometry" << std::endl;
+    AABBGEOM * aabbGeo = (AABBGEOM*) geo;
+    return doIntersection(elem, aabbGeo->l_geometry->begin(), IntersectRes);  // Could be great to handle the case aabbGeo->l_geometry=Tetra as well
 }
 
 
 
 template <typename DataTypes>
 int register_IntersectionOperationTetraGeometry = IntersectWithGeometryOperation::register_func<TetrahedronElement>(&IntersectionWithTetraGeometry<TetrahedronGeometry<DataTypes>>);
+
+int register_IntersectionOperationAABBGeometry = IntersectWithGeometryOperation::register_func<AABBGeometry::AABBBElement>(&IntersectionWithAABBGeometry<AABBGeometry>);
 
 } // namespace sofa::collisionAlgorithm
 

@@ -73,7 +73,7 @@ public:
         }
     }
 
-    inline std::vector<TriangleElement::SPtr> & getTriangleElements() {
+    inline std::vector<TriangleElement::SPtr> & getElements() {
         return m_triangleElements;
     }
 
