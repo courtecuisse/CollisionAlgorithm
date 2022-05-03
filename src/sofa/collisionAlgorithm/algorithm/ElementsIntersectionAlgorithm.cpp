@@ -49,23 +49,23 @@ IntersectWithGeometryOperation::GenericOperation::FUNC IntersectWithGeometryOper
 
 
 //In case of a tetrahedral geometry, the triangles are considered instead of the tetrahedra
-template<class TETRAGEOM>
+template<template <class> class TETRAGEOM, typename DataTypes>
 static void IntersectionWithTetraGeometry (BaseElement* elem, BaseGeometry * geo, std::vector<BaseElement::SPtr> & IntersectRes) { std::cout << "IntersectionWithTetraGeometry" << std::endl;
-    TETRAGEOM * tetraGeo = (TETRAGEOM*) geo;
-    return doIntersection(elem, tetraGeo->triangleBegin(), IntersectRes);
+    TETRAGEOM<DataTypes> * tetraGeo = (TETRAGEOM<DataTypes>*) geo;
+    doIntersection(elem, tetraGeo->triangleBegin(), IntersectRes);
 }
 
 //In case of an AABB geometry, the geometry to which AABB is linked in the scene is considered
 template<class AABBGEOM>
 static void IntersectionWithAABBGeometry (BaseElement* elem, BaseGeometry * geo, std::vector<BaseElement::SPtr> & IntersectRes) { std::cout << "IntersectionWithAABBGeometry" << std::endl;
     AABBGEOM * aabbGeo = (AABBGEOM*) geo;
-    return doIntersection(elem, aabbGeo->l_geometry->begin(), IntersectRes);  // Could be great to handle the case aabbGeo->l_geometry=Tetra as well
+    doIntersection(elem, aabbGeo->l_geometry->begin(), IntersectRes);  // Could be great to handle the case aabbGeo->l_geometry="TetrahedronGeometry" as well
 }
 
 
 
-template <typename DataTypes>
-int register_IntersectionOperationTetraGeometry = IntersectWithGeometryOperation::register_func<TetrahedronElement>(&IntersectionWithTetraGeometry<TetrahedronGeometry<DataTypes>>);
+template <class TetrahedronElement, template<class> class TetrahedronGeometry, typename DataTypes>
+int register_IntersectionOperationTetraGeometry = IntersectWithGeometryOperation::register_func<TetrahedronElement>(&IntersectionWithTetraGeometry<TetrahedronGeometry</*typename*/ DataTypes>>);
 
 int register_IntersectionOperationAABBGeometry = IntersectWithGeometryOperation::register_func<AABBGeometry::AABBBElement>(&IntersectionWithAABBGeometry<AABBGeometry>);
 

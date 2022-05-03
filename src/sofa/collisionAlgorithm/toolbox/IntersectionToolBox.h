@@ -9,6 +9,7 @@
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 #include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
 #include <sofa/collisionAlgorithm/toolbox/EdgeToolBox.h>
+#include <sofa/collisionAlgorithm/toolbox/TetrahedronToolBox.h>
 #include <sofa/type/Mat.h>
 // #include <sofa/component/topology/container/dynamic/EdgeSetTopologyModifier.h>
 //#include <EdgeSetTopologyModifier.h>
@@ -96,15 +97,39 @@ public:
         }
 
 
-//        if (count == 1) return point1;
-        /*else*/ if (count == 2) {
+        if (count == 1) {
             auto p1 = point1->element_cast<PointElement>();
-            auto p2 = point2->element_cast<PointElement>();
-            EdgeElement::SPtr edgeIntersect = BaseElement::create<EdgeElement>(p1->getP0(), p2->getP0());
-            return edgeIntersect;
+            BaseProximity::SPtr prox;
+            type::Vector3 eP0 = edge->getP0()->getPosition();
+            type::Vector3 eP1 = edge->getP1()->getPosition();
+            double fact0[4];
+            double fact1[4];
+            TetrahedronElement::TetraInfo tetraInfo = tetra->getTetrahedronInfo();
+
+            toolbox::TetrahedronToolBox::computeTetraBaryCoords(eP0, tetraInfo, fact0[0], fact0[1], fact0[2], fact0[3]);
+            if ((fact0[0]<0 || fact0[0]>1) || (fact0[1]<0 || fact0[1]>1) || (fact0[2]<0 || fact0[2]>1) || (fact0[3]<0 || fact0[3]>1)) {
+                toolbox::TetrahedronToolBox::computeTetraBaryCoords(eP1, tetraInfo, fact1[0], fact1[1], fact1[2], fact1[3]);
+                if ((fact1[0]<0 || fact1[0]>1) || (fact1[1]<0 || fact1[1]>1) || (fact1[2]<0 || fact1[2]>1) || (fact1[3]<0 || fact1[3]>1)) {
+                    std::cout << "point returned" << std::endl;
+                    return point1;
+                }
+                else prox = edge->getP1();
+            }
+            else prox = edge->getP0();
+
+            EdgeElement::SPtr edgeIntersect1 = BaseElement::create<EdgeElement>(p1->getP0(), prox);
+            std::cout << "edge with count == 1" << std::endl;
+            return edgeIntersect1;
         }
 
 
+        else if (count == 2) {
+            auto p1 = point1->element_cast<PointElement>();
+            auto p2 = point2->element_cast<PointElement>();
+            EdgeElement::SPtr edgeIntersect2 = BaseElement::create<EdgeElement>(p1->getP0(), p2->getP0());
+            std::cout << "edge with count == 2" << std::endl;
+            return edgeIntersect2;
+        }
 
 
         delete triangle0;
@@ -143,6 +168,7 @@ public:
         if (a == 0.0)  {
 
 //        ////// for the moment ///////
+//            std::cout << "edge parallel to triangle" << std::endl;
             return nullptr;
 
 //            type::Vector3 p1 = edgeTri1+p0;
