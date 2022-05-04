@@ -59,6 +59,13 @@ public:
         }
     }
 
+
+    static bool isInTriangle(const type::Vec3d & P, const TriangleElement::TriangleInfo & tinfo, double & fact_u, double & fact_v, double & fact_w) {
+        computeTriangleBaryCoords(P, tinfo, fact_u, fact_v, fact_w);
+        if ((fact_u<0 || fact_u>1) || (fact_v<0 || fact_v>1) || (fact_w<0 || fact_w>1)) return false;
+        return true;
+    }
+
 };
 
 

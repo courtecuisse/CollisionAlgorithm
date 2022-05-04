@@ -68,6 +68,13 @@ public:
         fact_u = 1.0 - (fact_v + fact_w + fact_x);
     }
 
+
+    static bool isInTetra(const type::Vec3d & P, const TetrahedronElement::TetraInfo & tinfo, double & fact_u,double & fact_v, double & fact_w, double & fact_x) {
+        computeTetraBaryCoords(P, tinfo, fact_u, fact_v, fact_w, fact_x);
+        if ((fact_u<0 || fact_u>1) || (fact_v<0 || fact_v>1) || (fact_w<0 || fact_w>1) || (fact_x<0 || fact_x>1)) return false;
+        return true;
+    }
+
 };
 
 

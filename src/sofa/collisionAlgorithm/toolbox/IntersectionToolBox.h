@@ -25,6 +25,22 @@ public:
         auto edge = e1->element_cast<EdgeElement>();
         auto tetra = e2->element_cast<TetrahedronElement>();
 
+        type::Vector3 eP0 = edge->getP0()->getPosition();
+        type::Vector3 eP1 = edge->getP1()->getPosition();
+        TetrahedronElement::TetraInfo tetraInfo = tetra->getTetrahedronInfo();
+        double factE0[4];
+        double factE1[4];
+
+
+        // If the edge is entirely included in the tetrahedron : the intersection is the edge itself
+        if (toolbox::TetrahedronToolBox::isInTetra(eP0, tetraInfo, factE0[0], factE0[1], factE0[2], factE0[3])
+         && toolbox::TetrahedronToolBox::isInTetra(eP1, tetraInfo, factE1[0], factE1[1], factE1[2], factE1[3])) {
+//            std::cout << "original edge returned" << std::endl;
+            EdgeElement::SPtr Edge = BaseElement::create<EdgeElement>(edge->getP0(), edge->getP1());
+            return Edge;
+        }
+
+
         auto proxP0 = tetra->getP0();
         auto proxP1 = tetra->getP1();
         auto proxP2 = tetra->getP2();
@@ -100,17 +116,12 @@ public:
         if (count == 1) {
             auto p1 = point1->element_cast<PointElement>();
             BaseProximity::SPtr prox;
-            type::Vector3 eP0 = edge->getP0()->getPosition();
-            type::Vector3 eP1 = edge->getP1()->getPosition();
             double fact0[4];
             double fact1[4];
-            TetrahedronElement::TetraInfo tetraInfo = tetra->getTetrahedronInfo();
 
-            toolbox::TetrahedronToolBox::computeTetraBaryCoords(eP0, tetraInfo, fact0[0], fact0[1], fact0[2], fact0[3]);
-            if ((fact0[0]<0 || fact0[0]>1) || (fact0[1]<0 || fact0[1]>1) || (fact0[2]<0 || fact0[2]>1) || (fact0[3]<0 || fact0[3]>1)) {
-                toolbox::TetrahedronToolBox::computeTetraBaryCoords(eP1, tetraInfo, fact1[0], fact1[1], fact1[2], fact1[3]);
-                if ((fact1[0]<0 || fact1[0]>1) || (fact1[1]<0 || fact1[1]>1) || (fact1[2]<0 || fact1[2]>1) || (fact1[3]<0 || fact1[3]>1)) {
-                    std::cout << "point returned" << std::endl;
+            if (!toolbox::TetrahedronToolBox::isInTetra(eP0, tetraInfo, fact0[0], fact0[1], fact0[2], fact0[3])) {
+                if (!toolbox::TetrahedronToolBox::isInTetra(eP1, tetraInfo, fact1[0], fact1[1], fact1[2], fact1[3])) {
+//                    std::cout << "point returned" << std::endl;
                     return point1;
                 }
                 else prox = edge->getP1();
@@ -118,7 +129,7 @@ public:
             else prox = edge->getP0();
 
             EdgeElement::SPtr edgeIntersect1 = BaseElement::create<EdgeElement>(p1->getP0(), prox);
-            std::cout << "edge with count == 1" << std::endl;
+//            std::cout << "edge with count == 1" << std::endl;
             return edgeIntersect1;
         }
 
@@ -127,7 +138,7 @@ public:
             auto p1 = point1->element_cast<PointElement>();
             auto p2 = point2->element_cast<PointElement>();
             EdgeElement::SPtr edgeIntersect2 = BaseElement::create<EdgeElement>(p1->getP0(), p2->getP0());
-            std::cout << "edge with count == 2" << std::endl;
+//            std::cout << "edge with count == 2" << std::endl;
             return edgeIntersect2;
         }
 
@@ -199,12 +210,12 @@ public:
             if (fact_v<0 || fact_u + fact_v>1) return nullptr;
 
 //            double depth = cz*d_pixelSize.getValue() + f*dot(edgeTri2,q);
-            double depth = cz + f*dot(edgeTri2,q);
+            double depth = f*dot(edgeTri2,q);
             if (depth<0 || depth>1) return nullptr;
 
 
-            EdgeProximity::SPtr edgeProx = BaseProximity::create<EdgeProximity>(edge->getP0(),edge->getP1(),depth,1-depth);
-            PointElement::SPtr pointIntersect = BaseElement::create<PointElement>(edgeProx);
+            TriangleProximity::SPtr triangleProx = BaseProximity::create<TriangleProximity>(triangle->getP0(),triangle->getP1(),triangle->getP2(),1-fact_u-fact_v,fact_u,fact_v);
+            PointElement::SPtr pointIntersect = BaseElement::create<PointElement>(triangleProx);
 
             return pointIntersect;
         }

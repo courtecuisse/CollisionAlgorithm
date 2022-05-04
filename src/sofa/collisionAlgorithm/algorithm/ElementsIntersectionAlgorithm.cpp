@@ -22,7 +22,7 @@ static void doIntersection (BaseElement* elem, ElementIterator::SPtr itdest, std
         if (edest == nullptr) continue;
 
 //        std::cout << "doIntersection" << std::endl;
-        Operations::IntersectOperation::FUNC intersectionOp = Operations::IntersectOperation::get(elem->getOperationsHash() ,itdest->getOperationsHash());
+        Operations::IntersectOperation::FUNC intersectionOp = Operations::IntersectOperation::get(elem->getOperationsHash() ,/*itdest*/edest->getOperationsHash());
 //        std::cout << "between get and intersectionOp" << std::endl;
         auto elemIntersection = intersectionOp(elem,edest);
 //        std::cout << "test bool : " << (elemIntersection == nullptr) << std::endl;
@@ -55,11 +55,12 @@ static void IntersectionWithTetraGeometry (BaseElement* elem, BaseGeometry * geo
     doIntersection(elem, tetraGeo->triangleBegin(), IntersectRes);
 }
 
-//In case of an AABB geometry, the geometry to which AABB is linked in the scene is considered
+//In case of an AABB geometry, the geometry to which AABB is linked in the scene is considered depending on its type
 template<class AABBGEOM>
 static void IntersectionWithAABBGeometry (BaseElement* elem, BaseGeometry * geo, std::vector<BaseElement::SPtr> & IntersectRes) { std::cout << "IntersectionWithAABBGeometry" << std::endl;
     AABBGEOM * aabbGeo = (AABBGEOM*) geo;
-    doIntersection(elem, aabbGeo->l_geometry->begin(), IntersectRes);  // Could be great to handle the case aabbGeo->l_geometry="TetrahedronGeometry" as well
+    auto IntersectOp = collisionAlgorithm::IntersectWithGeometryOperation::get(aabbGeo->l_geometry->begin()->getOperationsHash());
+    IntersectOp(elem, aabbGeo->l_geometry, IntersectRes);
 }
 
 
