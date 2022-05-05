@@ -74,7 +74,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
     std::set<BaseElement * > selectedElements;
 
     while (selectedElements.empty() && d<max) {
-        {            
+        {
             int i=-d;
             if (cbox[0]+i >= 0 && cbox[0]+i < nbox[0])
             {

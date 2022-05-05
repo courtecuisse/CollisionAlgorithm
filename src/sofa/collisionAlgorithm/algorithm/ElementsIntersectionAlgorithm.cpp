@@ -17,12 +17,13 @@ int ElementsIntersectionAlgorithmClass = core::RegisterObject("ElementsIntersect
 
 static void doIntersection (BaseElement* elem, ElementIterator::SPtr itdest, std::vector<BaseElement::SPtr> & IntersectRes) {
 
+    Operations::IntersectOperation::FUNC intersectionOp = Operations::IntersectOperation::get(elem->getOperationsHash() ,itdest->getOperationsHash());
+
     for (; ! itdest->end();itdest++) {
         auto edest = itdest->element();
         if (edest == nullptr) continue;
 
 //        std::cout << "doIntersection" << std::endl;
-        Operations::IntersectOperation::FUNC intersectionOp = Operations::IntersectOperation::get(elem->getOperationsHash() ,/*itdest*/edest->getOperationsHash());
 //        std::cout << "between get and intersectionOp" << std::endl;
         auto elemIntersection = intersectionOp(elem,edest);
 //        std::cout << "test bool : " << (elemIntersection == nullptr) << std::endl;
@@ -49,9 +50,9 @@ IntersectWithGeometryOperation::GenericOperation::FUNC IntersectWithGeometryOper
 
 
 //In case of a tetrahedral geometry, the triangles are considered instead of the tetrahedra
-template<template <class> class TETRAGEOM, typename DataTypes>
+template<class TETRAGEOM>
 static void IntersectionWithTetraGeometry (BaseElement* elem, BaseGeometry * geo, std::vector<BaseElement::SPtr> & IntersectRes) { std::cout << "IntersectionWithTetraGeometry" << std::endl;
-    TETRAGEOM<DataTypes> * tetraGeo = (TETRAGEOM<DataTypes>*) geo;
+    TETRAGEOM * tetraGeo = (TETRAGEOM*) geo;
     doIntersection(elem, tetraGeo->triangleBegin(), IntersectRes);
 }
 
@@ -65,8 +66,7 @@ static void IntersectionWithAABBGeometry (BaseElement* elem, BaseGeometry * geo,
 
 
 
-template <class TetrahedronElement, template<class> class TetrahedronGeometry, typename DataTypes>
-int register_IntersectionOperationTetraGeometry = IntersectWithGeometryOperation::register_func<TetrahedronElement>(&IntersectionWithTetraGeometry<TetrahedronGeometry</*typename*/ DataTypes>>);
+//int register_IntersectionOperationTetraGeometry = IntersectWithGeometryOperation::register_func</*TetrahedronGeometry<sofa::defaulttype::Vec3dTypes>*/ TetrahedronElement>(&IntersectionWithTetraGeometry<TetrahedronGeometry<sofa::defaulttype::Vec3dTypes>>);
 
 int register_IntersectionOperationAABBGeometry = IntersectWithGeometryOperation::register_func<AABBGeometry::AABBBElement>(&IntersectionWithAABBGeometry<AABBGeometry>);
 
