@@ -86,9 +86,9 @@ public:
     inline BaseProximity::SPtr getP2() const { return m_p2; }
 
     void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-        res.push_back(createProximity(1,0,0));
-        res.push_back(createProximity(0,1,0));
-        res.push_back(createProximity(0,0,1));
+        res.push_back(m_p0);
+        res.push_back(m_p1);
+        res.push_back(m_p2);
     }
 
 

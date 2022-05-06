@@ -37,7 +37,7 @@ public:
     inline BaseProximity::SPtr getP0() const { return m_point; }
 
     void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-        res.push_back(createProximity());
+        res.push_back(m_point);
     }
 
     void draw(const core::visual::VisualParams * /*vparams*/) override {

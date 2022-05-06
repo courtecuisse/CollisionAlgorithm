@@ -56,10 +56,10 @@ public:
     }
 
     void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-        res.push_back(createProximity(1,0,0,0));
-        res.push_back(createProximity(0,1,0,0));
-        res.push_back(createProximity(0,0,1,0));
-        res.push_back(createProximity(0,0,0,1));
+        res.push_back(m_p0);
+        res.push_back(m_p1);
+        res.push_back(m_p2);
+        res.push_back(m_p3);
     }
 
     inline const TetraInfo & getTetrahedronInfo() const { return m_tinfo; }
