@@ -34,7 +34,7 @@ public:
     : l_from(initLink("from", "link to from geometry"))
     , l_dest(initLink("dest", "link to dest geometry"))
     , d_drawCollision (initData(&d_drawCollision, true, "drawcollision", "draw collision"))/*
-    , d_output(initData(&d_output,"output", "output of the collision detection"))*/
+    , d_ou tput(initData(&d_output,"output", "output of the collision detection"))*/
     , d_outputDist(initData(&d_outputDist,"outputDist", "Distance of the outpu pair of detections"))
     {}
 
