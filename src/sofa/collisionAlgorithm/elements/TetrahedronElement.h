@@ -24,6 +24,20 @@ public:
         double V0;
         type::Vec3d P0,P1,P2,P3;
         type::Vec3d ax1,ax2,ax3,ax2Cax3;
+
+        void update(type::Vec3d p0,type::Vec3d p1,type::Vec3d p2,type::Vec3d p3)
+        {
+          P0 = p0;
+          P1 = p1;
+          P2 = p2;
+          P3 = p3;
+
+          ax1 = P1 - P0;
+          ax2 = P2 - P0;
+          ax3 = P3 - P0;
+          ax2Cax3 = ax2.cross(ax3);
+          V0 = 1.0/6.0 * dot(ax1,ax2Cax3);
+        }
     };
 
     TetrahedronElement(BaseProximity::SPtr p0,BaseProximity::SPtr p1,BaseProximity::SPtr p2,BaseProximity::SPtr p3)
@@ -39,17 +53,10 @@ public:
     std::string name() const override { return "TetrahedronElement"; }
 
     void update(const std::vector<type::Vector3> & pos) {
-        m_tinfo.P0 = m_p0->getPosition();
-        m_tinfo.P1 = m_p1->getPosition();
-        m_tinfo.P2 = m_p2->getPosition();
-        m_tinfo.P3 = m_p3->getPosition();
-
-        m_tinfo.ax1 = m_tinfo.P1 - m_tinfo.P0;
-        m_tinfo.ax2 = m_tinfo.P2 - m_tinfo.P0;
-        m_tinfo.ax3 = m_tinfo.P3 - m_tinfo.P0;
-        m_tinfo.ax2Cax3 = m_tinfo.ax2.cross(m_tinfo.ax3);
-        m_tinfo.V0 = 1.0/6.0 * dot(m_tinfo.ax1,m_tinfo.ax2Cax3);
+        m_tinfo.update( m_p0->getPosition(),m_p1->getPosition(),m_p2->getPosition(),m_p3->getPosition());
     }
+
+
 
     inline BaseProximity::SPtr createProximity(double f0,double f1,double f2, double f3) const {
         return f_createProximity(this,f0,f1,f2,f3);

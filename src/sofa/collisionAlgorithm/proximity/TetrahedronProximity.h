@@ -36,6 +36,10 @@ public:
 //        c_it.addCol(m_p3, N * m_f3 * fact);
 //    }
 
+    std::vector<BaseProximity::SPtr> getProx() const {
+      return {m_p0,m_p1,m_p2,m_p3};
+    }
+
     /// return proximiy position in a vector3
     sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
         return m_p0->getPosition(v) * m_f0 +
