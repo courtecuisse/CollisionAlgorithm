@@ -40,6 +40,10 @@ public:
       return {m_p0,m_p1,m_p2,m_p3};
     }
 
+	std::vector<double> getBaryCoord() const {
+		return {m_f0,m_f1,m_f2,m_f3};
+	}
+
     /// return proximiy position in a vector3
     sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
         return m_p0->getPosition(v) * m_f0 +
