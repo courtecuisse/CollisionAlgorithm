@@ -2,6 +2,7 @@
 
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
+#include <sofa/collisionAlgorithm/elements/EdgeElement.h>
 
 namespace sofa::collisionAlgorithm {
 
@@ -63,6 +64,18 @@ public:
             return BaseProximity::create<TriangleProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),
                                                             f0,f1,f2);
         };
+
+        m_edge0 = BaseElement::create<EdgeElement>(p0,p1);
+        m_edge1 = BaseElement::create<EdgeElement>(p1,p2);
+        m_edge2 = BaseElement::create<EdgeElement>(p2,p0);
+    }
+
+    TriangleElement(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2)
+        : m_edge0(edge0), m_edge1(edge1), m_edge2(edge2) {
+        f_createProximity = [=](const TriangleElement * elmt,double f0,double f1,double f2) -> BaseProximity::SPtr {
+            return BaseProximity::create<TriangleProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),
+                                                            f0,f1,f2);
+        };
     }
 
     size_t getOperationsHash() const override { return typeid(TriangleElement).hash_code(); }
@@ -120,6 +133,7 @@ private:
     BaseProximity::SPtr m_p0,m_p1,m_p2;
     TriangleInfo m_tinfo;
     ProximityCreatorFunc f_createProximity;
+    EdgeElement::SPtr m_edge0, m_edge1, m_edge2;
 };
 
 }

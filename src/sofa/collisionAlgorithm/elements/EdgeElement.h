@@ -2,6 +2,7 @@
 
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
+#include <sofa/collisionAlgorithm/elements/PointElement.h>
 #include <math.h>
 
 namespace sofa::collisionAlgorithm {
@@ -22,6 +23,16 @@ public:
 
     EdgeElement(BaseProximity::SPtr p0,BaseProximity::SPtr p1)
     : m_p0(p0), m_p1(p1) {
+        f_createProximity = [=](const EdgeElement * elmt,double f0,double f1) -> BaseProximity::SPtr {
+            return BaseProximity::create<EdgeProximity>(elmt->getP0(),elmt->getP1(),f0,f1);
+        };
+
+        m_point0 = BaseElement::create<PointElement>(p0);
+        m_point1 = BaseElement::create<PointElement>(p1);
+    }
+
+    EdgeElement(PointElement::SPtr point0, PointElement::SPtr point1)
+    : m_point0(point0), m_point1(point1), m_p0(point0->getP0()), m_p1(point1->getP0()) {
         f_createProximity = [=](const EdgeElement * elmt,double f0,double f1) -> BaseProximity::SPtr {
             return BaseProximity::create<EdgeProximity>(elmt->getP0(),elmt->getP1(),f0,f1);
         };
@@ -80,6 +91,7 @@ public:
 private:
     BaseProximity::SPtr m_p0,m_p1;
     ProximityCreatorFunc f_createProximity;
+    PointElement::SPtr m_point0, m_point1;
 };
 
 }

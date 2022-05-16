@@ -2,6 +2,7 @@
 
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/proximity/TetrahedronProximity.h>
+#include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 
 namespace sofa::collisionAlgorithm {
 
@@ -46,7 +47,21 @@ public:
             return BaseProximity::create<TetrahedronProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),elmt->getP3(),
                                                                f0,f1,f2,f3);
         };
+
+        m_triangle0 = BaseElement::create<TriangleElement>(p0,p1,p2);
+        m_triangle1 = BaseElement::create<TriangleElement>(p1,p2,p3);
+        m_triangle2 = BaseElement::create<TriangleElement>(p2,p3,p0);
+        m_triangle3 = BaseElement::create<TriangleElement>(p3,p0,p1);
     }
+
+
+   TetrahedronElement(TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3)
+   : m_triangle0(tri0), m_triangle1(tri1), m_triangle2(tri2), m_triangle3(tri3) {
+       f_createProximity = [=](const TetrahedronElement * elmt,double f0,double f1,double f2,double f3) -> BaseProximity::SPtr {
+           return BaseProximity::create<TetrahedronProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),elmt->getP3(),
+                                                              f0,f1,f2,f3);
+       };
+   }
 
     size_t getOperationsHash() const override { return typeid(TetrahedronElement).hash_code(); }
 
@@ -113,6 +128,7 @@ private:
     BaseProximity::SPtr m_p0,m_p1,m_p2,m_p3;
     TetraInfo m_tinfo;
     ProximityCreatorFunc f_createProximity;
+    TriangleElement::SPtr m_triangle0, m_triangle1, m_triangle2, m_triangle3;
 };
 
 }
