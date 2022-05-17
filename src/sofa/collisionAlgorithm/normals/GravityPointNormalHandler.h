@@ -38,6 +38,8 @@ public:
         }
 
         if (pos.size()) m_gcenter*=1.0/pos.size();
+
+		init();
     }
 
 private :
