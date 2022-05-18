@@ -50,8 +50,12 @@ public:
 
     void prepareDetection() override {}
 
-    ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_pointElements));
+    ElementIterator::SPtr begin(unsigned id = 0) const override {
+        return pointBegin(id);
+    }
+
+    inline ElementIterator::SPtr pointBegin(unsigned id = 0) const {
+        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_pointElements,id));
     }
 
     void setCreatePointProximity(ProximityCreatorFunc f) {

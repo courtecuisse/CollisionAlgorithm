@@ -52,6 +52,11 @@ public:
         m_triangle1 = BaseElement::create<TriangleElement>(p1,p2,p3);
         m_triangle2 = BaseElement::create<TriangleElement>(p2,p3,p0);
         m_triangle3 = BaseElement::create<TriangleElement>(p3,p0,p1);
+
+        getControlProximities().insert(p0);
+        getControlProximities().insert(p1);
+        getControlProximities().insert(p2);
+        getControlProximities().insert(p3);
     }
 
 
@@ -61,6 +66,18 @@ public:
            return BaseProximity::create<TetrahedronProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),elmt->getP3(),
                                                               f0,f1,f2,f3);
        };
+
+       getControlProximities().insert(m_triangle0->getControlProximities());
+       getControlProximities().insert(m_triangle1->getControlProximities());
+       getControlProximities().insert(m_triangle2->getControlProximities());
+       getControlProximities().insert(m_triangle3->getControlProximities());
+
+       std::cout << "size getControlProx tetra : " << getControlProximities().getProximities().size() << std::endl;
+
+       m_p0 = getControlProximities().getProximities()[0];
+       m_p1 = getControlProximities().getProximities()[1];
+       m_p2 = getControlProximities().getProximities()[2];
+       m_p3 = getControlProximities().getProximities()[3];
    }
 
     size_t getOperationsHash() const override { return typeid(TetrahedronElement).hash_code(); }
@@ -77,12 +94,14 @@ public:
         return f_createProximity(this,f0,f1,f2,f3);
     }
 
-    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-        res.push_back(m_p0);
-        res.push_back(m_p1);
-        res.push_back(m_p2);
-        res.push_back(m_p3);
-    }
+//    std::set<BaseProximity::SPtr> & getControlProximities() const override {
+
+//    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
+//        res.push_back(m_p0);
+//        res.push_back(m_p1);
+//        res.push_back(m_p2);
+//        res.push_back(m_p3);
+//    }
 
     inline const TetraInfo & getTetrahedronInfo() const { return m_tinfo; }
 
@@ -93,6 +112,16 @@ public:
     inline BaseProximity::SPtr getP2() const { return m_p2; }
 
     inline BaseProximity::SPtr getP3() const { return m_p3; }
+
+    inline TriangleElement::SPtr getTriangle0() const { return m_triangle0; }
+
+    inline TriangleElement::SPtr getTriangle1() const { return m_triangle1; }
+
+    inline TriangleElement::SPtr getTriangle2() const { return m_triangle2; }
+
+    inline TriangleElement::SPtr getTriangle3() const { return m_triangle3; }
+
+    std::vector<BaseElement::SPtr> getSubElements() const { return {m_triangle0,m_triangle1,m_triangle2,m_triangle3}; }
 
     void draw(const core::visual::VisualParams * vparams) override {
         type::Vector3 p0 = m_p0->getPosition();

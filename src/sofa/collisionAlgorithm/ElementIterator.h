@@ -65,9 +65,16 @@ public:
 template<class CONTAINER>
 class TDefaultElementIteratorSPtr : public ElementIterator {
 public:
-    TDefaultElementIteratorSPtr(const CONTAINER & c) {
-        m_it = c.cbegin();
+    TDefaultElementIteratorSPtr(const CONTAINER & c,unsigned id=0) {
+//        m_it = c.cbegin() + id;
         m_end = c.cend();
+
+        auto it = c.cbegin();
+        for (unsigned i=0; i<id; i++) {
+            if (it == m_end) break;
+            it++;
+        }
+        m_it = it;
     }
 
     void next() override { m_it++; }
@@ -92,9 +99,16 @@ private:
 template<class CONTAINER>
 class TDefaultElementIteratorPtr : public ElementIterator {
 public:
-    TDefaultElementIteratorPtr(const CONTAINER & c) {
-        m_it = c.cbegin();
+    TDefaultElementIteratorPtr(const CONTAINER & c,unsigned id=0) {
+//        m_it = c.cbegin() + id;
         m_end = c.cend();
+
+        auto it = c.cbegin();
+        for (unsigned i=0; i<id; i++) {
+            if (it == m_end) break;
+            it++;
+        }
+        m_it = it;
     }
 
     void next() override { m_it++; }

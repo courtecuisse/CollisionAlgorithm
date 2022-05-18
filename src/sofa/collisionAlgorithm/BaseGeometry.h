@@ -29,7 +29,7 @@ public:
         this->f_listening.setValue(true);
     }
 
-    virtual ElementIterator::SPtr begin() const = 0;
+    virtual ElementIterator::SPtr begin(unsigned id = 0) const = 0;
 
     inline const BaseGeometry * end() const { return this; }
 
@@ -51,8 +51,8 @@ public:
         double scale = d_drawScaleNormal.getValue();
         if (scale == 0.0) return;
         for (auto it = begin();it != end(); it++) {
-            std::vector<BaseProximity::SPtr> res;
-            it->element()->getControlProximities(res);
+            std::vector<BaseProximity::SPtr> res = it->element()->getControlProximities().getProximities();
+//            it->element()->getControlProximities(res);
             for (unsigned i=0;i<res.size();i++) {
                 BaseProximity::SPtr center = res[i];
 

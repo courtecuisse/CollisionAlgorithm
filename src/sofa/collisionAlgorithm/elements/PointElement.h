@@ -24,6 +24,8 @@ public:
         f_createProximity = [=](const PointElement * elmt) -> BaseProximity::SPtr {
             return BaseProximity::create<PointProximity>(elmt->getP0());
         };
+
+        getControlProximities().insert(prox);
     }
 
     size_t getOperationsHash() const override { return typeid(PointElement).hash_code(); }
@@ -36,9 +38,9 @@ public:
 
     inline BaseProximity::SPtr getP0() const { return m_point; }
 
-    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-        res.push_back(m_point);
-    }
+//    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
+//        res.push_back(m_point);
+//    }
 
     void draw(const core::visual::VisualParams * /*vparams*/) override {
         type::Vector3 p0 = m_point->getPosition();

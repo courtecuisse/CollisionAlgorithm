@@ -68,6 +68,10 @@ public:
         m_edge0 = BaseElement::create<EdgeElement>(p0,p1);
         m_edge1 = BaseElement::create<EdgeElement>(p1,p2);
         m_edge2 = BaseElement::create<EdgeElement>(p2,p0);
+
+        getControlProximities().insert(p0);
+        getControlProximities().insert(p1);
+        getControlProximities().insert(p2);
     }
 
     TriangleElement(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2)
@@ -76,6 +80,14 @@ public:
             return BaseProximity::create<TriangleProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),
                                                             f0,f1,f2);
         };
+
+        getControlProximities().insert(m_edge0->getControlProximities());
+        getControlProximities().insert(m_edge1->getControlProximities());
+        getControlProximities().insert(m_edge2->getControlProximities());
+
+        m_p0 = getControlProximities().getProximities()[0];
+        m_p1 = getControlProximities().getProximities()[1];
+        m_p2 = getControlProximities().getProximities()[2];
     }
 
     size_t getOperationsHash() const override { return typeid(TriangleElement).hash_code(); }
@@ -98,11 +110,19 @@ public:
 
     inline BaseProximity::SPtr getP2() const { return m_p2; }
 
-    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-        res.push_back(m_p0);
-        res.push_back(m_p1);
-        res.push_back(m_p2);
-    }
+    inline EdgeElement::SPtr getEdge0() const { return m_edge0; }
+
+    inline EdgeElement::SPtr getEdge1() const { return m_edge1; }
+
+    inline EdgeElement::SPtr getEdge2() const { return m_edge2; }
+
+    std::vector<BaseElement::SPtr> getSubElements() const { return {m_edge0,m_edge1,m_edge2}; }
+
+//    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
+//        res.push_back(m_p0);
+//        res.push_back(m_p1);
+//        res.push_back(m_p2);
+//    }
 
 
     void draw(const core::visual::VisualParams * vparams) override {

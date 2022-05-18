@@ -4,6 +4,7 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/collisionAlgorithm/operations/Project.h>
+#include <sofa/collisionAlgorithm/BaseElement.h>
 
 namespace sofa::collisionAlgorithm {
 
@@ -42,8 +43,12 @@ public:
 
         std::string name() const override { return "AABBBElement"; }
 
-        void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-            res = m_projections;
+//        void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
+//            res = m_projections;
+//        }
+
+        void  getControlProximities(ControlPoints & controlPoints) {
+            controlPoints.insert(m_projections);
         }
 
         void insert(BaseElement* elmt,BaseProximity::SPtr prox) {
@@ -123,9 +128,15 @@ public:
     class AABBBIterator : public ElementIterator {
     public:
 
-        AABBBIterator(const AABBGeometry * geo)
+        AABBBIterator(const AABBGeometry * geo, unsigned id=0)
         : m_geometry(geo) {
-            m_iterator = geo->getElementsMap().cbegin();
+//            m_iterator = geo->getElementsMap().cbegin();
+            auto it = geo->getElementsMap().cbegin();
+            for (unsigned i=0; i<id; i++) {
+                if (it == m_geometry->getElementsMap().cend()) break;
+                it++;
+            }
+            m_iterator = it;
         }
 
         bool end() const override {
@@ -169,8 +180,8 @@ public:
         l_geometry.setPath("@.");
     }
 
-    ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new AABBBIterator(this));
+    ElementIterator::SPtr begin(unsigned id=0) const override {
+        return ElementIterator::SPtr(new AABBBIterator(this,id));
     }
 
     virtual size_t getOperationsHash() const {
@@ -287,14 +298,18 @@ public:
 
         auto projectOp = Operations::ProjectOperation::get(l_geometry->begin()->getOperationsHash());
 
+        ControlPoints controlPoints;
+
         for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
         {
             BaseElement* elmt = it->element();
 
             //std::cout << ++i << std::endl;
             type::BoundingBox bbox;
-            std::vector<BaseProximity::SPtr> v_prox;
-            elmt->getControlProximities(v_prox);
+            std::vector<BaseProximity::SPtr> v_prox = elmt->getControlProximities().getProximities();
+//            elmt->getControlProximities(v_prox);
+
+//            std::cout << "size v_prox : " << v_prox.size() << std::endl;
 
             for (unsigned b=0;b<v_prox.size();b++) {
                 bbox.include(v_prox[b]->getPosition());

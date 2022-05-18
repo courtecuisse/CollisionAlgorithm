@@ -45,20 +45,29 @@ public:
         m_tetraElements.clear();
         for (unsigned i=0;i<this->l_topology->getNbTetrahedra();i++) {
             auto tetra = this->l_topology->getTetrahedron(i);
+
+            auto triId = this->l_topology->getTrianglesInTetrahedron(i);
+// //            auto triangle0 = TriangleGeometry<DataTypes>::triangleBegin(triId[0])->element();
+// //            auto triangle1 = TriangleGeometry<DataTypes>::triangleBegin(triId[1])->element();
+// //            auto triangle2 = TriangleGeometry<DataTypes>::triangleBegin(triId[2])->element();
+// //            auto triangle3 = TriangleGeometry<DataTypes>::triangleBegin(triId[3])->element();
+//            TriangleElement::SPtr triangle0 = TriangleGeometry<DataTypes>::getElements()[triId[0]];
+//            TriangleElement::SPtr triangle1 = TriangleGeometry<DataTypes>::getElements()[triId[1]];
+//            TriangleElement::SPtr triangle2 = TriangleGeometry<DataTypes>::getElements()[triId[2]];
+//            TriangleElement::SPtr triangle3 = TriangleGeometry<DataTypes>::getElements()[triId[3]];
+
             auto elmt = BaseElement::create<TetrahedronElement>(this->m_topoProx[tetra[0]],this->m_topoProx[tetra[1]],this->m_topoProx[tetra[2]],this->m_topoProx[tetra[3]]);
+//            auto elmt = BaseElement::create<TetrahedronElement>(triangle0, triangle1, triangle2, triangle3);
             m_tetraElements.push_back(elmt);
         }
 
         prepareDetection();
     }
 
-    ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_tetraElements));
+    ElementIterator::SPtr begin(unsigned id = 0) const override {
+        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_tetraElements,id));
     }
 
-    ElementIterator::SPtr triangleBegin() const {
-        return TriangleGeometry<DataTypes>::begin();
-    }
 
     virtual void prepareDetection() override {
         TriangleGeometry<DataTypes>::prepareDetection();

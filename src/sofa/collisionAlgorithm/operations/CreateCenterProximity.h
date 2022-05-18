@@ -14,8 +14,8 @@ public:
 
 
     static BaseProximity::SPtr defaultCreateCenterProximity(BaseElement* elmt){
-        std::vector<BaseProximity::SPtr> res;
-        elmt->getControlProximities(res);
+        std::vector<BaseProximity::SPtr> res = elmt->getControlProximities().getProximities();
+//        elmt->getControlProximities(res);
         return BaseProximity::create<MultiProximity>(res);
     }
 

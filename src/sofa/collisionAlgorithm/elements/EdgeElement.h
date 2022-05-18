@@ -29,6 +29,9 @@ public:
 
         m_point0 = BaseElement::create<PointElement>(p0);
         m_point1 = BaseElement::create<PointElement>(p1);
+
+        getControlProximities().insert(p0);
+        getControlProximities().insert(p1);
     }
 
     EdgeElement(PointElement::SPtr point0, PointElement::SPtr point1)
@@ -36,6 +39,12 @@ public:
         f_createProximity = [=](const EdgeElement * elmt,double f0,double f1) -> BaseProximity::SPtr {
             return BaseProximity::create<EdgeProximity>(elmt->getP0(),elmt->getP1(),f0,f1);
         };
+
+        getControlProximities().insert(m_point0->getControlProximities());
+        getControlProximities().insert(m_point1->getControlProximities());
+
+        m_p0 = getControlProximities().getProximities()[0];
+        m_p1 = getControlProximities().getProximities()[1];
     }
 
     inline BaseProximity::SPtr createProximity(double f0,double f1) const {
@@ -50,10 +59,16 @@ public:
 
     inline BaseProximity::SPtr getP1() const { return m_p1; }
 
-    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-        res.push_back(m_p0);
-        res.push_back(m_p1);
-    }
+    inline PointElement::SPtr getPoint0() const { return m_point0; }
+
+    inline PointElement::SPtr getPoint1() const { return m_point1; }
+
+    std::vector<BaseElement::SPtr> getSubElements() const { return {m_point0,m_point1}; }
+
+//    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
+//        res.push_back(m_p0);
+//        res.push_back(m_p1);
+//    }
 
     void draw(const core::visual::VisualParams * /*vparams*/) override {
         type::Vector3 p0 = m_p0->getPosition();

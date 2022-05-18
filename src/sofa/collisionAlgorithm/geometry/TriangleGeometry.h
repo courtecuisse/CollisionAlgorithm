@@ -45,7 +45,15 @@ public:
         m_triangleElements.clear();
         for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
             auto tri = this->l_topology->getTriangle(i);
+
+//            auto edgeId = this->l_topology->getEdgesInTriangle(i);
+
+//            EdgeElement::SPtr edge0 = EdgeGeometry<DataTypes>::getElements()[edgeId[0]];
+//            EdgeElement::SPtr edge1 = EdgeGeometry<DataTypes>::getElements()[edgeId[1]];
+//            EdgeElement::SPtr edge2 = EdgeGeometry<DataTypes>::getElements()[edgeId[2]];
+
             auto elmt = BaseElement::create<TriangleElement>(this->m_topoProx[tri[0]],this->m_topoProx[tri[1]],this->m_topoProx[tri[2]]);
+//            auto elmt = BaseElement::create<TriangleElement>(edge0, edge1, edge2);
             m_triangleElements.push_back(elmt);
         }
 
@@ -58,12 +66,13 @@ public:
         for (unsigned i=0;i<m_triangleElements.size();i++) m_triangleElements[i]->update(pos.ref());
     }
 
-    inline ElementIterator::SPtr begin() const override {
-        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_triangleElements));
+    inline ElementIterator::SPtr begin(unsigned id = 0) const override {
+        return triangleBegin(id);
     }
 
-    inline ElementIterator::SPtr edgeBegin() const {
-        return EdgeGeometry<DataTypes>::begin();
+
+    ElementIterator::SPtr triangleBegin(unsigned id = 0) const {
+        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_triangleElements,id));
     }
 
 
