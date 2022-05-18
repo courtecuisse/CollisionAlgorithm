@@ -13,6 +13,7 @@ public:
     SOFA_CLASS(SOFA_TEMPLATE(VectorPointNormalHandler,DataTypes), CollisionComponent);
 
     Data<type::vector<type::Vector3>> d_normals;
+	core::objectmodel::DataCallback c_callback;
 
     typedef PointGeometry<DataTypes> GEOMETRY;
     typedef typename GEOMETRY::ELEMENT ELEMENT;
@@ -24,16 +25,30 @@ public:
     , l_geometry(initLink("geometry","Link to Geometry")){}
 
 
-    void init() {
-
+    void init()
+	{
         for (unsigned i=0; i<d_normals.getValue().size(); i++)
         {
             l_geometry->getTopoProxIdx(i)->setNormal(d_normals.getValue()[i]);
         }
 
-    }
+		c_callback.addInputs({&d_normals});
+		c_callback.addCallback(std::bind(&VectorPointNormalHandler::makeDirty,this));
+	}
 
-    void prepareDetection() override {}
+	void makeDirty()
+	{
+		m_dirty = true;
+	}
+
+    void prepareDetection() override
+	{
+		if(m_dirty)
+			init();
+		m_dirty = false;
+	}
+
+	bool m_dirty;
 
 };
 
