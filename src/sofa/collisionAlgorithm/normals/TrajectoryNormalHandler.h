@@ -16,6 +16,9 @@ public:
 
     core::objectmodel::SingleLink<TrajectoryNormalHandler<DataTypes>,EdgeGeometry<DataTypes>,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
 
+    TrajectoryNormalHandler()
+    : l_geometry(initLink("geometry","Link to TriangleGeometry")){}
+
     void prepareDetection() override {
 
       for (unsigned i=0;i<l_geometry->getTopoProx().size();i++)
