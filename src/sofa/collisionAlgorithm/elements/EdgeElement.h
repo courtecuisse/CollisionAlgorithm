@@ -34,17 +34,20 @@ public:
         getControlProximities().insert(p1);
     }
 
-    EdgeElement(PointElement::SPtr point0, PointElement::SPtr point1)
-    : m_point0(point0), m_point1(point1), m_p0(point0->getP0()), m_p1(point1->getP0()) {
+    EdgeElement(PointElement::SPtr point0, PointElement::SPtr point1, BaseProximity::SPtr p0, BaseProximity::SPtr p1)
+    : m_point0(point0), m_point1(point1), m_p0(p0), m_p1(p1) {
         f_createProximity = [=](const EdgeElement * elmt,double f0,double f1) -> BaseProximity::SPtr {
             return BaseProximity::create<EdgeProximity>(elmt->getP0(),elmt->getP1(),f0,f1);
         };
 
-        getControlProximities().insert(m_point0->getControlProximities());
-        getControlProximities().insert(m_point1->getControlProximities());
+//        getControlProximities().insert(m_point0->getControlProximities());
+//        getControlProximities().insert(m_point1->getControlProximities());
 
-        m_p0 = getControlProximities().getProximities()[0];
-        m_p1 = getControlProximities().getProximities()[1];
+        getControlProximities().insert(p0);
+        getControlProximities().insert(p1);
+
+//        m_p0 = getControlProximities().getProximities()[0];
+//        m_p1 = getControlProximities().getProximities()[1];
     }
 
     inline BaseProximity::SPtr createProximity(double f0,double f1) const {

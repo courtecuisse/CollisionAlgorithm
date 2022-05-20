@@ -40,10 +40,10 @@ public:
         for (unsigned i=0;i<this->l_topology->getNbEdges();i++) {
             auto edge = this->l_topology->getEdge(i);
 
-//            PointElement::SPtr point0 = PointGeometry<DataTypes>::getElements()[edge[0]];
-//            PointElement::SPtr point1 = PointGeometry<DataTypes>::getElements()[edge[1]];
-//            m_edgeElements.push_back(BaseElement::create<EdgeElement>(point0, point1));
-            m_edgeElements.push_back(BaseElement::create<EdgeElement>(this->m_topoProx[edge[0]], this->m_topoProx[edge[1]]));
+            PointElement::SPtr point0 = PointGeometry<DataTypes>::getElements()[edge[0]];
+            PointElement::SPtr point1 = PointGeometry<DataTypes>::getElements()[edge[1]];
+            m_edgeElements.push_back(BaseElement::create<EdgeElement>(point0, point1,this->m_topoProx[edge[0]], this->m_topoProx[edge[1]]));
+//            m_edgeElements.push_back(BaseElement::create<EdgeElement>(this->m_topoProx[edge[0]], this->m_topoProx[edge[1]]));
         }
     }
 

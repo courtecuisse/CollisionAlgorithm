@@ -60,24 +60,29 @@ public:
     }
 
 
-   TetrahedronElement(TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3)
-   : m_triangle0(tri0), m_triangle1(tri1), m_triangle2(tri2), m_triangle3(tri3) {
+   TetrahedronElement(TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3,
+                      BaseProximity::SPtr p0,BaseProximity::SPtr p1,BaseProximity::SPtr p2,BaseProximity::SPtr p3)
+   : m_triangle0(tri0), m_triangle1(tri1), m_triangle2(tri2), m_triangle3(tri3)
+   , m_p0(p0), m_p1(p1), m_p2(p2), m_p3(p3){
        f_createProximity = [=](const TetrahedronElement * elmt,double f0,double f1,double f2,double f3) -> BaseProximity::SPtr {
            return BaseProximity::create<TetrahedronProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),elmt->getP3(),
                                                               f0,f1,f2,f3);
        };
 
-       getControlProximities().insert(m_triangle0->getControlProximities());
-       getControlProximities().insert(m_triangle1->getControlProximities());
-       getControlProximities().insert(m_triangle2->getControlProximities());
-       getControlProximities().insert(m_triangle3->getControlProximities());
+//       getControlProximities().insert(m_triangle0->getControlProximities());
+//       getControlProximities().insert(m_triangle1->getControlProximities());
+//       getControlProximities().insert(m_triangle2->getControlProximities());
+//       getControlProximities().insert(m_triangle3->getControlProximities());
 
-       std::cout << "size getControlProx tetra : " << getControlProximities().getProximities().size() << std::endl;
+       getControlProximities().insert(p0);
+       getControlProximities().insert(p1);
+       getControlProximities().insert(p2);
+       getControlProximities().insert(p3);
 
-       m_p0 = getControlProximities().getProximities()[0];
-       m_p1 = getControlProximities().getProximities()[1];
-       m_p2 = getControlProximities().getProximities()[2];
-       m_p3 = getControlProximities().getProximities()[3];
+//       m_p0 = getControlProximities().getProximities()[0];
+//       m_p1 = getControlProximities().getProximities()[1];
+//       m_p2 = getControlProximities().getProximities()[2];
+//       m_p3 = getControlProximities().getProximities()[3];
    }
 
     size_t getOperationsHash() const override { return typeid(TetrahedronElement).hash_code(); }

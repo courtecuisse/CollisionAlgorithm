@@ -45,15 +45,14 @@ public:
         m_triangleElements.clear();
         for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
             auto tri = this->l_topology->getTriangle(i);
+            auto edgeId = this->l_topology->getEdgesInTriangle(i);
 
-//            auto edgeId = this->l_topology->getEdgesInTriangle(i);
+            EdgeElement::SPtr edge0 = EdgeGeometry<DataTypes>::getElements()[edgeId[0]];
+            EdgeElement::SPtr edge1 = EdgeGeometry<DataTypes>::getElements()[edgeId[1]];
+            EdgeElement::SPtr edge2 = EdgeGeometry<DataTypes>::getElements()[edgeId[2]];
 
-//            EdgeElement::SPtr edge0 = EdgeGeometry<DataTypes>::getElements()[edgeId[0]];
-//            EdgeElement::SPtr edge1 = EdgeGeometry<DataTypes>::getElements()[edgeId[1]];
-//            EdgeElement::SPtr edge2 = EdgeGeometry<DataTypes>::getElements()[edgeId[2]];
-
-            auto elmt = BaseElement::create<TriangleElement>(this->m_topoProx[tri[0]],this->m_topoProx[tri[1]],this->m_topoProx[tri[2]]);
-//            auto elmt = BaseElement::create<TriangleElement>(edge0, edge1, edge2);
+//            auto elmt = BaseElement::create<TriangleElement>(this->m_topoProx[tri[0]],this->m_topoProx[tri[1]],this->m_topoProx[tri[2]]);
+            auto elmt = BaseElement::create<TriangleElement>(edge0, edge1, edge2,this->m_topoProx[tri[0]],this->m_topoProx[tri[1]],this->m_topoProx[tri[2]]);
             m_triangleElements.push_back(elmt);
         }
 

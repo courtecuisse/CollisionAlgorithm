@@ -74,20 +74,24 @@ public:
         getControlProximities().insert(p2);
     }
 
-    TriangleElement(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2)
-        : m_edge0(edge0), m_edge1(edge1), m_edge2(edge2) {
+    TriangleElement(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2, BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2)
+        : m_edge0(edge0), m_edge1(edge1), m_edge2(edge2), m_p0(p0), m_p1(p1), m_p2(p2) {
         f_createProximity = [=](const TriangleElement * elmt,double f0,double f1,double f2) -> BaseProximity::SPtr {
             return BaseProximity::create<TriangleProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),
                                                             f0,f1,f2);
         };
 
-        getControlProximities().insert(m_edge0->getControlProximities());
-        getControlProximities().insert(m_edge1->getControlProximities());
-        getControlProximities().insert(m_edge2->getControlProximities());
+//        getControlProximities().insert(m_edge0->getControlProximities());
+//        getControlProximities().insert(m_edge1->getControlProximities());
+//        getControlProximities().insert(m_edge2->getControlProximities());
 
-        m_p0 = getControlProximities().getProximities()[0];
-        m_p1 = getControlProximities().getProximities()[1];
-        m_p2 = getControlProximities().getProximities()[2];
+        getControlProximities().insert(p0);
+        getControlProximities().insert(p1);
+        getControlProximities().insert(p2);
+
+//        m_p0 = getControlProximities().getProximities()[0];
+//        m_p1 = getControlProximities().getProximities()[1];
+//        m_p2 = getControlProximities().getProximities()[2];
     }
 
     size_t getOperationsHash() const override { return typeid(TriangleElement).hash_code(); }
