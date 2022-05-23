@@ -97,6 +97,14 @@ public:
 //        }
     }
 
+    void init() {
+        this->m_topoProx.clear();
+        for (unsigned j=0; j<this->getState()->getSize(); j++) {
+//            m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(l_state, j));
+             m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
+        }
+    }
+
     inline sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
     }

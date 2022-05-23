@@ -34,10 +34,12 @@ public:
 //    }
 
     void init() {
-        this->m_topoProx.clear();
-        for (unsigned j=0; j<this->getState()->getSize(); j++) {
-            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
-        }
+//        this->m_topoProx.clear();
+//        for (unsigned j=0; j<this->getState()->getSize(); j++) {
+//            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
+//        }
+
+        TBaseGeometry<DataTypes>::init();
 
         m_pointElements.clear();
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());

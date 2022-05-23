@@ -38,6 +38,8 @@ public:
 
     inline BaseProximity::SPtr getP0() const { return m_point; }
 
+    void getSubElements(std::set<BaseElement::SPtr> & subElem) const override {}
+
 //    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
 //        res.push_back(m_point);
 //    }

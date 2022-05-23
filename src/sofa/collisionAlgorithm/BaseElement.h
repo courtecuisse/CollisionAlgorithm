@@ -83,6 +83,8 @@ public:
         return m_controlPoints;
     }
 
+    virtual void getSubElements(std::set<BaseElement::SPtr> & subElem) const = 0;
+
     virtual void draw(const core::visual::VisualParams * vparams) = 0;
 
     virtual size_t getOperationsHash() const = 0;

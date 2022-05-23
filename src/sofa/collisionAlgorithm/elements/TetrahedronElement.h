@@ -126,7 +126,12 @@ public:
 
     inline TriangleElement::SPtr getTriangle3() const { return m_triangle3; }
 
-    std::vector<BaseElement::SPtr> getSubElements() const { return {m_triangle0,m_triangle1,m_triangle2,m_triangle3}; }
+    void getSubElements(std::set<BaseElement::SPtr> & subElem) const override {
+        subElem.insert(m_triangle0);
+        subElem.insert(m_triangle1);
+        subElem.insert(m_triangle2);
+        subElem.insert(m_triangle3);
+    }
 
     void draw(const core::visual::VisualParams * vparams) override {
         type::Vector3 p0 = m_p0->getPosition();

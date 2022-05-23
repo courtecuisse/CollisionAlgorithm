@@ -120,7 +120,11 @@ public:
 
     inline EdgeElement::SPtr getEdge2() const { return m_edge2; }
 
-    std::vector<BaseElement::SPtr> getSubElements() const { return {m_edge0,m_edge1,m_edge2}; }
+    void getSubElements(std::set<BaseElement::SPtr> & subElem) const override {
+        subElem.insert(m_edge0);
+        subElem.insert(m_edge1);
+        subElem.insert(m_edge2);
+    }
 
 //    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
 //        res.push_back(m_p0);

@@ -118,6 +118,12 @@ public:
             return m_elements;
         }
 
+        void getSubElements(std::set<BaseElement::SPtr> & subElem) const override {
+            for (auto it = m_elements.begin(); it != m_elements.end(); it++) {
+                (*it)->getSubElements(subElem);
+            }
+        }
+
     private:
         const AABBGeometry * m_geometry;
         unsigned m_key,m_i,m_j,m_k;

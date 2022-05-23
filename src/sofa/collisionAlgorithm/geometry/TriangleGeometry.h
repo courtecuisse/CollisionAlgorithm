@@ -35,10 +35,10 @@ public:
 
     void init() {
         //default proximity creator
-        this->m_topoProx.clear();
-        for (unsigned j=0; j<this->getState()->getSize(); j++) {
-            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
-        }
+//        this->m_topoProx.clear();
+//        for (unsigned j=0; j<this->getState()->getSize(); j++) {
+//            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
+//        }
 
         EdgeGeometry<DataTypes>::init();
 

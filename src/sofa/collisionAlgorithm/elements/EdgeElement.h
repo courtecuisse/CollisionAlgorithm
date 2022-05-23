@@ -66,7 +66,10 @@ public:
 
     inline PointElement::SPtr getPoint1() const { return m_point1; }
 
-    std::vector<BaseElement::SPtr> getSubElements() const { return {m_point0,m_point1}; }
+    void getSubElements(std::set<BaseElement::SPtr> & subElem) const override {
+        subElem.insert(m_point0);
+        subElem.insert(m_point1);
+    }
 
 //    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
 //        res.push_back(m_p0);
