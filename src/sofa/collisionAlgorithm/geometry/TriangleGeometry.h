@@ -33,15 +33,33 @@ public:
 //        return pos[pid];
 //    }
 
-    void init() {
-        //default proximity creator
-//        this->m_topoProx.clear();
-//        for (unsigned j=0; j<this->getState()->getSize(); j++) {
-//            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
+//    void init() {
+//        //default proximity creator
+////        this->m_topoProx.clear();
+////        for (unsigned j=0; j<this->getState()->getSize(); j++) {
+////            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
+////        }
+
+//        EdgeGeometry<DataTypes>::init();
+
+//        m_triangleElements.clear();
+//        for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
+//            auto tri = this->l_topology->getTriangle(i);
+//            auto edgeId = this->l_topology->getEdgesInTriangle(i);
+
+//            EdgeElement::SPtr edge0 = EdgeGeometry<DataTypes>::getElements()[edgeId[0]];
+//            EdgeElement::SPtr edge1 = EdgeGeometry<DataTypes>::getElements()[edgeId[1]];
+//            EdgeElement::SPtr edge2 = EdgeGeometry<DataTypes>::getElements()[edgeId[2]];
+
+////            auto elmt = BaseElement::create<TriangleElement>(this->m_topoProx[tri[0]],this->m_topoProx[tri[1]],this->m_topoProx[tri[2]]);
+//            auto elmt = BaseElement::create<TriangleElement>(edge0, edge1, edge2,this->m_topoProx[tri[0]],this->m_topoProx[tri[1]],this->m_topoProx[tri[2]]);
+//            m_triangleElements.push_back(elmt);
 //        }
 
-        EdgeGeometry<DataTypes>::init();
+//        prepareDetection();
+//    }
 
+    void buildTriangleElements() override {
         m_triangleElements.clear();
         for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
             auto tri = this->l_topology->getTriangle(i);

@@ -99,12 +99,26 @@ public:
     }
 
     void init() {
+        buildTopologyProximity();
+        buildPointElements();
+        buildEdgeElements();
+        buildTriangleElements();
+        buildTetrahedronElements();
+    }
+
+    virtual void buildTopologyProximity() {
         this->m_topoProx.clear();
         for (unsigned j=0; j<this->getState()->getSize(); j++) {
 //            m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(l_state, j));
              m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
         }
     }
+
+    virtual void buildPointElements() {}
+    virtual void buildEdgeElements() {}
+    virtual void buildTriangleElements() {}
+    virtual void buildTetrahedronElements() {}
+
 
     inline sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();

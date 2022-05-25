@@ -31,14 +31,23 @@ public:
 //        return pos[pid];
 //    }
 
-    void init() {
-//        this->m_topoProx.clear();
-//        for (unsigned j=0; j<this->getState()->getSize(); j++) {
-//            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
+//    void init() {
+////        this->m_topoProx.clear();
+////        for (unsigned j=0; j<this->getState()->getSize(); j++) {
+////            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
+////        }
+
+//        TBaseGeometry<DataTypes>::init();
+
+//        m_pointElements.clear();
+//        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
+//        for (unsigned i=0;i<pos.size();i++) {
+//            auto elmt = BaseElement::create<PointElement>(this->m_topoProx[i]);
+//            m_pointElements.push_back(elmt);
 //        }
+//    }
 
-        TBaseGeometry<DataTypes>::init();
-
+    void buildPointElements() override {
         m_pointElements.clear();
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
         for (unsigned i=0;i<pos.size();i++) {

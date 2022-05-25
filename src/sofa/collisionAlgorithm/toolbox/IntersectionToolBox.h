@@ -21,7 +21,7 @@ class IntersectionToolBox {
 public:
 
 
-    static BaseElement::SPtr intersect_edge_tetra(BaseElement* e1, BaseElement* e2) { /*std::cout << "intersect_edge_tetra" << std::endl;*/
+    static std::pair<BaseElement::SPtr,BaseElement::SPtr> intersect_edge_tetra(BaseElement* e1, BaseElement* e2) { /*std::cout << "intersect_edge_tetra" << std::endl;*/
         auto edge = e1->element_cast<EdgeElement>();
         auto tetra = e2->element_cast<TetrahedronElement>();
 
@@ -37,7 +37,12 @@ public:
          && toolbox::TetrahedronToolBox::isInTetra(eP1, tetraInfo, factE1[0], factE1[1], factE1[2], factE1[3])) {
 //            std::cout << "original edge returned" << std::endl;
             EdgeElement::SPtr Edge = BaseElement::create<EdgeElement>(edge->getP0(), edge->getP1());
-            return Edge;
+
+            auto proxTetra1 = TetrahedronToolBox::project(edge->getP0()->getPosition(), tetra);
+            auto proxTetra2 = TetrahedronToolBox::project(edge->getP1()->getPosition(), tetra);
+            EdgeElement::SPtr EdgeFromTetra = BaseElement::create<EdgeElement>(proxTetra1, proxTetra2);
+
+            return std::pair<BaseElement::SPtr,BaseElement::SPtr>(Edge,EdgeFromTetra);
         }
 
 
@@ -82,17 +87,17 @@ public:
 
 //        ///////////////////////// Other method /////////////////////////
         int count = 0;
-        BaseElement::SPtr point1;
-        BaseElement::SPtr point2;
+        std::pair<BaseElement::SPtr,BaseElement::SPtr> point1;
+        std::pair<BaseElement::SPtr,BaseElement::SPtr> point2;
 
-        BaseElement::SPtr inter0 = intersect_edge_triangle(e1,triangle0);
-        if (inter0 != nullptr) {
+        std::pair<BaseElement::SPtr,BaseElement::SPtr> inter0 = intersect_edge_triangle(e1,triangle0);
+        if ((inter0.first != nullptr) && (inter0.first != nullptr)) {
             count ++;
             point1 = inter0;
         }
 
-        BaseElement::SPtr inter1 = intersect_edge_triangle(e1,triangle1);
-        if (inter1 != nullptr) {
+        std::pair<BaseElement::SPtr,BaseElement::SPtr> inter1 = intersect_edge_triangle(e1,triangle1);
+        if ((inter1.first != nullptr) && (inter1.first != nullptr)) {
             count ++;
             if (point1 == nullptr) point1 = inter1;
             else point2 = inter1;
@@ -151,14 +156,14 @@ public:
         return nullptr;
     }
 
-    static BaseElement::SPtr intersect_tetra_edge(BaseElement* e1, BaseElement* e2) {
+    static std::pair<BaseElement::SPtr,BaseElement::SPtr> intersect_tetra_edge(BaseElement* e1, BaseElement* e2) {
         intersect_edge_tetra(e2,e1);
     }
 
   // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    static BaseElement::SPtr intersect_edge_triangle(BaseElement* e1, BaseElement* e2) { /*std::cout << "intersect_edge_triangle" << std::endl;*/
+    static std::pair<BaseElement::SPtr,BaseElement::SPtr> intersect_edge_triangle(BaseElement* e1, BaseElement* e2) { /*std::cout << "intersect_edge_triangle" << std::endl;*/
         auto edge = e1->element_cast<EdgeElement>();
         auto triangle = e2->element_cast<TriangleElement>();
 
@@ -215,9 +220,11 @@ public:
 
 
             TriangleProximity::SPtr triangleProx = BaseProximity::create<TriangleProximity>(triangle->getP0(),triangle->getP1(),triangle->getP2(),1-fact_u-fact_v,fact_u,fact_v);
-            PointElement::SPtr pointIntersect = BaseElement::create<PointElement>(triangleProx);
+            EdgeProximity::SPtr edgeProx = BaseProximity::create<EdgeProximity>(edge->getP0(), edge->getP1(), 1-depth, depth);
+            PointElement::SPtr pointFromTriangle = BaseElement::create<PointElement>(triangleProx);
+            PointElement::SPtr pointFromEdge = BaseElement::create<PointElement>(edgeProx);
 
-            return pointIntersect;
+            return pointFromTriangle;
         }
 
 
@@ -253,7 +260,7 @@ public:
 //        return point->createProximity();
     }
 
-    static BaseElement::SPtr intersect_triangle_edge(BaseElement* e1, BaseElement* e2) {
+    static std::pair<BaseElement::SPtr,BaseElement::SPtr> intersect_triangle_edge(BaseElement* e1, BaseElement* e2) {
         intersect_edge_triangle(e2,e1);
     }
 
@@ -262,7 +269,7 @@ public:
 
 
 
-    static BaseElement::SPtr intersect_edge_edge(BaseElement* e1, BaseElement* e2) {
+    static std::pair<BaseElement::SPtr,BaseElement::SPtr> intersect_edge_edge(BaseElement* e1, BaseElement* e2) {
 //        auto edge1 = e1->element_cast<EdgeElement>();
 //        auto edge2 = e2->element_cast<EdgeElement>();
 

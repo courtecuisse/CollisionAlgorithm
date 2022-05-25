@@ -7,6 +7,24 @@
 
 namespace sofa::collisionAlgorithm {
 
+
+template<class DataTypes>
+class LinkEdgeProximity : public EdgeProximity {
+public:
+    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
+    typedef typename DataTypes::VecCoord VecCoord;
+    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
+
+    LinkEdgeProximity(BaseProximity::SPtr p0,BaseProximity::SPtr p1,double f0,double f1)
+    : EdgeProximity(p0,p1,f0,f1) {}
+
+    sofa::type::Vector3 getNormal() const override {
+        return ((this->m_p1->getPosition() - this->m_p0->getPosition()).normalized());
+    }
+
+};
+
+
 template<class DataTypes>
 class EdgeGeometry : public PointGeometry<DataTypes> {
 public:
@@ -27,15 +45,27 @@ public:
         l_topology.setPath("@.");
     }
 
-    void init() {
-//        this->m_topoProx.clear();
-//        for (unsigned j=0; j<this->getState()->getSize(); j++) {
-////            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
-//            this->m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(this->getState(), j));
+//    void init() {
+////        this->m_topoProx.clear();
+////        for (unsigned j=0; j<this->getState()->getSize(); j++) {
+//////            this->m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(this->getState(), j));
+////            this->m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(this->getState(), j));
+////        }
+
+//        PointGeometry<DataTypes>::init();
+
+//        m_edgeElements.clear();
+//        for (unsigned i=0;i<this->l_topology->getNbEdges();i++) {
+//            auto edge = this->l_topology->getEdge(i);
+
+//            PointElement::SPtr point0 = PointGeometry<DataTypes>::getElements()[edge[0]];
+//            PointElement::SPtr point1 = PointGeometry<DataTypes>::getElements()[edge[1]];
+//            m_edgeElements.push_back(BaseElement::create<EdgeElement>(point0, point1,this->m_topoProx[edge[0]], this->m_topoProx[edge[1]]));
+////            m_edgeElements.push_back(BaseElement::create<EdgeElement>(this->m_topoProx[edge[0]], this->m_topoProx[edge[1]]));
 //        }
+//    }
 
-        PointGeometry<DataTypes>::init();
-
+    void buildEdgeElements() override {
         m_edgeElements.clear();
         for (unsigned i=0;i<this->l_topology->getNbEdges();i++) {
             auto edge = this->l_topology->getEdge(i);
@@ -43,7 +73,6 @@ public:
             PointElement::SPtr point0 = PointGeometry<DataTypes>::getElements()[edge[0]];
             PointElement::SPtr point1 = PointGeometry<DataTypes>::getElements()[edge[1]];
             m_edgeElements.push_back(BaseElement::create<EdgeElement>(point0, point1,this->m_topoProx[edge[0]], this->m_topoProx[edge[1]]));
-//            m_edgeElements.push_back(BaseElement::create<EdgeElement>(this->m_topoProx[edge[0]], this->m_topoProx[edge[1]]));
         }
     }
 
