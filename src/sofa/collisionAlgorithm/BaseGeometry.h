@@ -37,6 +37,7 @@ public:
 
     void draw(const core::visual::VisualParams * vparams) override {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
+        if (! d_draw.getValue()) return;
         type::RGBAColor color = d_color.getValue();
 
         glDisable(GL_LIGHTING);
@@ -117,6 +118,8 @@ public:
         return m_topoProx[i];
     }
 
+//	inline std::vector<BaseElement::SPtr > getBaseElements() = 0;
+
     inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const {
         auto res = sofa::helper::write(*resId[this->getState()].write());
         const typename DataTypes::MatrixDeriv& j = cParams->readJ(this->getState())->getValue();
@@ -146,6 +149,8 @@ public:
     static std::string templateName(const TBaseGeometry<DataTypes>* = NULL) {
         return DataTypes::Name();
     }
+
+
 
 
 protected:

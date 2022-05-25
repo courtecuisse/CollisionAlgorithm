@@ -67,7 +67,8 @@ public:
             auto pdest = findClosestProxOp(pfrom,l_dest.get());
             if (pdest == nullptr) continue;
 
-            output.push_back(PairDetection(pfrom,pdest));
+			if(acceptFilter(PairDetection(pfrom,pdest)))
+            	output.push_back(PairDetection(pfrom,pdest));
         }
 
         d_output.endEdit();

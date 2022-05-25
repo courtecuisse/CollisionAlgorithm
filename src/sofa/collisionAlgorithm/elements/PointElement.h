@@ -44,7 +44,8 @@ public:
 //        res.push_back(m_point);
 //    }
 
-    void draw(const core::visual::VisualParams * /*vparams*/) override {
+    void draw(const core::visual::VisualParams * /*vparams*/) override
+	{
         type::Vector3 p0 = m_point->getPosition();
 
         glBegin(GL_POINT);
