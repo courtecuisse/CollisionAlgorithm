@@ -10,7 +10,7 @@ namespace sofa::collisionAlgorithm {
 
  //Specific operation to find the intersection of an element with a geometry (the code is in the c++ class)
 class IntersectWithGeometryOperation : public Operations::GenericOperation<IntersectWithGeometryOperation,
-        std::function<void (BaseElement* , BaseGeometry *, std::vector<BaseElement::SPtr> &) > > {
+        std::function<void (BaseElement::SPtr , BaseGeometry *, std::vector<BaseElement::SPtr> &) > > {
 public:
 
     using Inherit = GenericOperation;

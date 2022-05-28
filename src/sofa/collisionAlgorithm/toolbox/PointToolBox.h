@@ -8,14 +8,14 @@ namespace sofa::collisionAlgorithm::toolbox {
 class PointToolBox {
 public:
 
-    static BaseProximity::SPtr createCenterProximity(BaseElement* elmt) {
-        auto point = elmt->element_cast<PointElement>();
+    static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
+        auto point = elmt->pointElements()[0];
         return point->createProximity();
     }
 
 
-    static BaseProximity::SPtr project(const type::Vector3 & /*P*/, BaseElement* elmt) {
-        auto point = elmt->element_cast<PointElement>();
+    static BaseProximity::SPtr project(const type::Vector3 & /*P*/, BaseElement::SPtr elmt) {
+        auto point = elmt->pointElements()[0];
         return point->createProximity();
     }
 

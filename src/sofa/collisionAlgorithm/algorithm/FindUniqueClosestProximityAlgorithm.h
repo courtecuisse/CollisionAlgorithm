@@ -33,7 +33,7 @@ public:
 	typedef struct
 	{
 		BaseProximity::SPtr prox;
-		BaseElement * elem;
+        BaseElement::SPtr elem;
 	} proxiWithElem;
 
 	typedef std::pair<proxiWithElem,proxiWithElem> pairDetectionWithElem;
@@ -52,8 +52,8 @@ public:
         // always take the pair presenting the minimum distance if the second element hasn't been taken yet.
         // when a from object has been taken, forget its list.
 
-        std::map<BaseElement * , std::list<std::pair<double,pairDetectionWithElem> > > potentialPairForEachFromElem;
-        std::map<BaseElement *, bool> destPointTaken;
+        std::map<BaseElement::SPtr, std::list<std::pair<double,pairDetectionWithElem> > > potentialPairForEachFromElem;
+        std::map<BaseElement::SPtr, bool> destPointTaken;
 
         std::list<collisionAlgorithm::PairDetection> uniqueCouple;
 

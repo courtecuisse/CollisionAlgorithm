@@ -71,7 +71,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
     }
 
     int d = 0;
-    std::set<BaseElement * > selectedElements;
+    std::set<BaseElement::SPtr> selectedElements;
 
     while (selectedElements.empty() && d<max) {
         {
@@ -87,7 +87,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                         if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                             continue;
 
-                        std::set<BaseElement*> elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                        const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
                         selectedElements.insert(elmts.cbegin(),elmts.cend());
                     }
                 }
@@ -108,7 +108,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                         if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                             continue;
 
-                        std::set<BaseElement*> elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                        const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
                         selectedElements.insert(elmts.cbegin(),elmts.cend());
                     }
                 }
@@ -130,7 +130,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                         if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                             continue;
 
-                        std::set<BaseElement*> elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                        const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
                         selectedElements.insert(elmts.cbegin(),elmts.cend());
                     }
                 }
@@ -151,7 +151,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                         if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
                             continue;
 
-                        std::set<BaseElement*> elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                        const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
                         selectedElements.insert(elmts.cbegin(),elmts.cend());
                     }
                 }
@@ -172,7 +172,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                         if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
                             continue;
 
-                        std::set<BaseElement*> elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                        const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
                         selectedElements.insert(elmts.cbegin(),elmts.cend());
                     }
                 }
@@ -193,7 +193,7 @@ static BaseProximity::SPtr FindClosestProximityOperationWithAABB(BaseProximity::
                         if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
                             continue;
 
-                        std::set<BaseElement*> elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
+                        const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
                         selectedElements.insert(elmts.cbegin(),elmts.cend());
                     }
                 }

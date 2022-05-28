@@ -1,3 +1,5 @@
+#if 0
+
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
@@ -29,3 +31,5 @@ public:
 }
 
 }
+
+#endif

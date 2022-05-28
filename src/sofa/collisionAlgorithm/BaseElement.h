@@ -1,89 +1,27 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseProximity.h>
+#include <sofa/core/visual/VisualParams.h>
 
 namespace sofa::collisionAlgorithm {
 
-//class ProximityCreator {
-//public:
-//    virtual type::Vector3 getPosition(unsigned eid) = 0;
-//};
-
-class ControlPoints {
-public:
-
-    void insert(const ControlPoints & cp) {
-        if ((m_points.size()==0) && (cp.m_points.size()>0)) m_points.push_back(cp.m_points[0]);
-
-        for (unsigned i=0;i<cp.m_points.size();i++) {
-            unsigned count = 0;
-            for (unsigned j=0;j<m_points.size();j++) {
-                if (m_points[j] == cp.m_points[i]) /*return*/ count++;
-            }
-            if (count > 0) continue;
-
-            m_points.push_back(cp.m_points[i]);
-        }
-    }
-
-    void insert(BaseProximity::SPtr prox) {
-        for (unsigned i=0; i<m_points.size(); i++) {
-            if (m_points[i] == prox) return;
-
-            m_points.push_back(prox);
-        }
-        if (m_points.size()==0) m_points.push_back(prox);
-    }
-
-    void insert(std::vector<BaseProximity::SPtr> points) {
-        if ((m_points.size()==0) && (points.size()>0)) m_points.push_back(points[0]);
-
-        for (unsigned i=0; i<points.size(); i++) {
-            unsigned count = 0;
-            for (unsigned j=0; j<m_points.size(); j++) {
-                if (m_points[j] == points[i]) /*return*/ count++;
-            }
-            if (count > 0) continue;
-            m_points.push_back(points[i]);
-        }
-    }
-
-    BaseProximity::SPtr operator[] (int i) const {
-        return m_points[i];
-    }
-
-    std::vector<BaseProximity::SPtr> & getProximities() {
-        return m_points;
-    }
-
-private:
-    std::vector<BaseProximity::SPtr> m_points;
-};
-
-
+class PointElement;
+class EdgeElement;
+class TriangleElement;
+class TetrahedronElement;
 
 class BaseElement {
 public:
 
     typedef std::shared_ptr<BaseElement> SPtr;
 
-//    virtual unsigned id() = 0;
+    const std::vector<std::shared_ptr<PointElement> > & pointElements() const { return m_pointElements; }
 
-    template<typename CAST>
-    inline CAST * element_cast() {
-        return (CAST*)this;
-    }
+    const std::vector<std::shared_ptr<EdgeElement> > & edgeElements() const { return m_edgeElements; }
 
-    template<typename CAST>
-    inline const CAST * element_cast() const {
-        return (CAST*)this;
-    }
+    const std::vector<std::shared_ptr<TriangleElement> > & triangleElements() const { return m_triangleElements; }
 
-    /*virtual*/ ControlPoints & getControlProximities() {
-        return m_controlPoints;
-    }
-
-    virtual void getSubElements(std::set<BaseElement::SPtr> & subElem) const = 0;
+    const std::vector<std::shared_ptr<TetrahedronElement> > & tetrahedronElements() const { return m_tetrahedronElements; }
 
     virtual void draw(const core::visual::VisualParams * vparams) = 0;
 
@@ -91,45 +29,51 @@ public:
 
     virtual std::string name() const = 0;
 
-    template<class ELEMENT,class... ARGS>
-    static inline typename ELEMENT::SPtr create(ARGS... args) {
-        return typename ELEMENT::SPtr(new ELEMENT(args...));
+    virtual void update() = 0;
+
+protected:
+
+    template<class ELMT>
+    inline void insertElement(const ELMT * e) {
+        std::vector<typename ELMT::SPtr> & v = elementVector<ELMT>();
+
+        for (unsigned i=0;i<v.size();i++)
+            if (e == v[i].get()) return;
+
+        v.push_back(e->sptr());
+    }
+
+    template<class ELMT>
+    inline void insertElement(typename ELMT::SPtr e) {
+        std::vector<typename ELMT::SPtr> & v = elementVector<ELMT>();
+
+        for (unsigned i=0;i<v.size();i++)
+            if (e == v[i]) return;
+
+        v.push_back(e);
     }
 
 private:
-    ControlPoints m_controlPoints;
+    std::vector<std::shared_ptr<PointElement> > m_pointElements;
+    std::vector<std::shared_ptr<EdgeElement> > m_edgeElements;
+    std::vector<std::shared_ptr<TriangleElement> > m_triangleElements;
+    std::vector<std::shared_ptr<TetrahedronElement> > m_tetrahedronElements;
 
+    template<class ELMT>
+    inline std::vector<std::shared_ptr<ELMT> > & elementVector();
 };
 
-class ElementCast {
-public:
-    ElementCast(BaseElement* e) : m_element(e) {}
 
-    template <typename CAST>
-    inline operator CAST * () {
-        return (CAST *) m_element;
-    }
+template<>
+inline std::vector<std::shared_ptr<PointElement> > & BaseElement::elementVector<PointElement>() { return m_pointElements; }
 
-private:
-    BaseElement* m_element;
-};
+template<>
+inline std::vector<std::shared_ptr<EdgeElement> > & BaseElement::elementVector<EdgeElement>() { return m_edgeElements; }
 
-//template<class TProxCreatorFunc>
-//class TBaseElement : public BaseElement {
-//public:
-//    typedef TProxCreatorFunc ProxCreatorFunc;
+template<>
+inline std::vector<std::shared_ptr<TriangleElement> > & BaseElement::elementVector<TriangleElement>() { return m_triangleElements; }
 
-//    TBaseElement(unsigned id, TProxCreatorFunc f) : m_eid(id), m_createProxFunc(f) {}
-
-//    inline void setProximityCreator(ProxCreatorFunc f) { m_createProxFunc = f; }
-
-//    unsigned id() override {
-//        return m_eid;
-//    }
-
-//protected:
-//    unsigned m_eid;
-//    ProxCreatorFunc m_createProxFunc;
-//};
+template<>
+inline std::vector<std::shared_ptr<TetrahedronElement> > & BaseElement::elementVector<TetrahedronElement>() { return m_tetrahedronElements; }
 
 }

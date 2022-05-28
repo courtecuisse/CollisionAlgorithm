@@ -15,11 +15,12 @@ int ElementsIntersectionAlgorithmClass = core::RegisterObject("ElementsIntersect
 
 
 
-static void doIntersection (BaseElement* elem, ElementIterator::SPtr itdest, std::vector<BaseElement::SPtr> & IntersectRes) {
+static void doIntersection (BaseElement::SPtr elem, ElementIterator::SPtr itdest, std::vector<BaseElement::SPtr> & IntersectRes) {
 
     Operations::IntersectOperation::FUNC intersectionOp = Operations::IntersectOperation::get(elem->getOperationsHash() ,itdest->getOperationsHash());
 
     for (; ! itdest->end();itdest++) {
+#ifdef PAIR_ELMTS
         auto edest = itdest->element();
         if (edest == nullptr) continue;
 
@@ -33,13 +34,14 @@ static void doIntersection (BaseElement* elem, ElementIterator::SPtr itdest, std
                                                   // Those edges may belong to different triangles, only one shoud be considered
                                                   // OR : before filling outputDetection, delete intersection elements being at the same location for example
                                                   // IMPORTANT CASE TO HANDLE !!
+#endif
     }
 
 }
 
 
 //By default the elements of the geometry are considered
-static void genericIntersection(BaseElement* elem, BaseGeometry * geo, std::vector<BaseElement::SPtr> & IntersectRes) {std::cout << "genericIntersection" << std::endl;
+static void genericIntersection(BaseElement::SPtr elem, BaseGeometry * geo, std::vector<BaseElement::SPtr> & IntersectRes) {std::cout << "genericIntersection" << std::endl;
     return doIntersection(elem,geo->begin(),IntersectRes);
 }
 
@@ -51,14 +53,14 @@ IntersectWithGeometryOperation::GenericOperation::FUNC IntersectWithGeometryOper
 
 //In case of a tetrahedral geometry, the triangles are considered instead of the tetrahedra
 template<class TETRAGEOM>
-static void IntersectionWithTetraGeometry (BaseElement* elem, BaseGeometry * geo, std::vector<BaseElement::SPtr> & IntersectRes) { std::cout << "IntersectionWithTetraGeometry" << std::endl;
+static void IntersectionWithTetraGeometry (BaseElement::SPtr elem, BaseGeometry * geo, std::vector<BaseElement::SPtr> & IntersectRes) { std::cout << "IntersectionWithTetraGeometry" << std::endl;
     TETRAGEOM * tetraGeo = (TETRAGEOM*) geo;
     doIntersection(elem, tetraGeo->triangleBegin(), IntersectRes);
 }
 
 //In case of an AABB geometry, the geometry to which AABB is linked in the scene is considered depending on its type
 template<class AABBGEOM>
-static void IntersectionWithAABBGeometry (BaseElement* elem, BaseGeometry * geo, std::vector<BaseElement::SPtr> & IntersectRes) { std::cout << "IntersectionWithAABBGeometry" << std::endl;
+static void IntersectionWithAABBGeometry (BaseElement::SPtr elem, BaseGeometry * geo, std::vector<BaseElement::SPtr> & IntersectRes) { std::cout << "IntersectionWithAABBGeometry" << std::endl;
     AABBGEOM * aabbGeo = (AABBGEOM*) geo;
     auto IntersectOp = collisionAlgorithm::IntersectWithGeometryOperation::get(aabbGeo->l_geometry->begin()->getOperationsHash());
     IntersectOp(elem, aabbGeo->l_geometry, IntersectRes);

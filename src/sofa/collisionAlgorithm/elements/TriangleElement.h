@@ -1,24 +1,14 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/BaseElement.h>
-#include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 #include <sofa/collisionAlgorithm/elements/EdgeElement.h>
 
 namespace sofa::collisionAlgorithm {
-
-class TriangleElement;
-
-//class TriangleProximityCreator{
-//public:
-//    virtual BaseProximity::SPtr createProximity(const TriangleElement * elmt,double f0,double f1,double f2) = 0;
-
-//};
 
 class TriangleElement : public BaseElement {
 public:
 
     typedef std::shared_ptr<TriangleElement> SPtr;
-    typedef std::function<BaseProximity::SPtr(const TriangleElement * elmt, double f0,double f1,double f2)> ProximityCreatorFunc;
 
     struct TriangleInfo
     {
@@ -58,85 +48,61 @@ public:
         }
     };
 
-    TriangleElement(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2)
-    : m_p0(p0), m_p1(p1), m_p2(p2) {
-        f_createProximity = [=](const TriangleElement * elmt,double f0,double f1,double f2) -> BaseProximity::SPtr {
-            return BaseProximity::create<TriangleProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),
-                                                            f0,f1,f2);
-        };
+    TriangleElement(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2) {
+        m_sptr = new SPtr(this);
 
-        m_edge0 = BaseElement::create<EdgeElement>(p0,p1);
-        m_edge1 = BaseElement::create<EdgeElement>(p1,p2);
-        m_edge2 = BaseElement::create<EdgeElement>(p2,p0);
+        insertElement<PointElement>(new PointElement(p0));
+        insertElement<PointElement>(new PointElement(p1));
+        insertElement<PointElement>(new PointElement(p2));
 
-        getControlProximities().insert(p0);
-        getControlProximities().insert(p1);
-        getControlProximities().insert(p2);
+        insertElement<EdgeElement>(new EdgeElement(p0,p1));
+        insertElement<EdgeElement>(new EdgeElement(p1,p2));
+        insertElement<EdgeElement>(new EdgeElement(p2,p0));
+
+        insertElement<TriangleElement>(this);
     }
 
-    TriangleElement(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2, BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2)
-        : m_edge0(edge0), m_edge1(edge1), m_edge2(edge2), m_p0(p0), m_p1(p1), m_p2(p2) {
-        f_createProximity = [=](const TriangleElement * elmt,double f0,double f1,double f2) -> BaseProximity::SPtr {
-            return BaseProximity::create<TriangleProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),
-                                                            f0,f1,f2);
-        };
+    TriangleElement(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2) {
+        m_sptr = new SPtr(this);
 
-//        getControlProximities().insert(m_edge0->getControlProximities());
-//        getControlProximities().insert(m_edge1->getControlProximities());
-//        getControlProximities().insert(m_edge2->getControlProximities());
+        insertElement<PointElement>(edge0->pointElements()[0]);
+        insertElement<PointElement>(edge0->pointElements()[1]);
+        insertElement<PointElement>(edge1->pointElements()[0]);
+        insertElement<PointElement>(edge1->pointElements()[1]);
 
-        getControlProximities().insert(p0);
-        getControlProximities().insert(p1);
-        getControlProximities().insert(p2);
+        insertElement<EdgeElement>(edge0);
+        insertElement<EdgeElement>(edge1);
+        insertElement<EdgeElement>(edge2);
 
-//        m_p0 = getControlProximities().getProximities()[0];
-//        m_p1 = getControlProximities().getProximities()[1];
-//        m_p2 = getControlProximities().getProximities()[2];
+        insertElement<TriangleElement>(this);
     }
+
+    inline SPtr sptr() const { return *((SPtr*) m_sptr); }
 
     size_t getOperationsHash() const override { return typeid(TriangleElement).hash_code(); }
 
     std::string name() const override { return "TriangleElement"; }
 
-    void update(const std::vector<type::Vector3> & pos) {
-        m_tinfo.update(m_p0->getPosition(), m_p1->getPosition(), m_p2->getPosition());
+    void update() override {
+        m_tinfo.update(getP0()->getPosition(),
+                       getP1()->getPosition(),
+                       getP2()->getPosition());
     }
 
-    inline BaseProximity::SPtr createProximity(double f0,double f1,double f2) const {
-        return f_createProximity(this,f0,f1,f2);
-    }
+    BaseProximity::SPtr createProximity(double f0,double f1,double f2) const;
 
     inline const TriangleInfo & getTriangleInfo() const { return m_tinfo; }
 
-    inline BaseProximity::SPtr getP0() const { return m_p0; }
+    inline BaseProximity::SPtr getP0() const { return this->pointElements()[0]->getP0(); }
 
-    inline BaseProximity::SPtr getP1() const { return m_p1; }
+    inline BaseProximity::SPtr getP1() const { return this->pointElements()[1]->getP0(); }
 
-    inline BaseProximity::SPtr getP2() const { return m_p2; }
-
-    inline EdgeElement::SPtr getEdge0() const { return m_edge0; }
-
-    inline EdgeElement::SPtr getEdge1() const { return m_edge1; }
-
-    inline EdgeElement::SPtr getEdge2() const { return m_edge2; }
-
-    void getSubElements(std::set<BaseElement::SPtr> & subElem) const override {
-        subElem.insert(m_edge0);
-        subElem.insert(m_edge1);
-        subElem.insert(m_edge2);
-    }
-
-//    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-//        res.push_back(m_p0);
-//        res.push_back(m_p1);
-//        res.push_back(m_p2);
-//    }
-
+    inline BaseProximity::SPtr getP2() const { return this->pointElements()[2]->getP0(); }
 
     void draw(const core::visual::VisualParams * vparams) override {
-        type::Vector3 p0 = m_p0->getPosition();
-        type::Vector3 p1 = m_p1->getPosition();
-        type::Vector3 p2 = m_p2->getPosition();
+        type::Vector3 p0 = getP0()->getPosition();
+        type::Vector3 p1 = getP1()->getPosition();
+        type::Vector3 p2 = getP2()->getPosition();
 
         if (vparams->displayFlags().getShowWireFrame()) {
             glBegin(GL_LINES);
@@ -153,15 +119,9 @@ public:
         }
     }
 
-    void setCreateProximity(ProximityCreatorFunc f) {
-        f_createProximity = f;
-    }
-
 private:
-    BaseProximity::SPtr m_p0,m_p1,m_p2;
     TriangleInfo m_tinfo;
-    ProximityCreatorFunc f_createProximity;
-    EdgeElement::SPtr m_edge0, m_edge1, m_edge2;
+    SPtr * m_sptr;
 };
 
 }

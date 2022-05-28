@@ -1,3 +1,5 @@
+#if 0
+
 #include <sofa/collisionAlgorithm/filters/NormalFilter.h>
 #include <sofa/core/ObjectFactory.h>
 
@@ -12,3 +14,4 @@ int NormalFilterClass = core::RegisterObject("NormalFilter")
 
 }
 
+#endif

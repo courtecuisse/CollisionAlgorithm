@@ -29,12 +29,6 @@ public:
         }
     }
 
-    virtual sofa::type::Vector3 getNormal() const {
-        sofa::type::Vector3 N(0,0,0);
-        for (unsigned i=0;i<m_proximities.size();i++) N+=m_proximities[i]->getNormal();
-        return N*1.0/m_proximities.size();
-    }
-
 protected:
     std::vector<BaseProximity::SPtr> m_proximities;
 };

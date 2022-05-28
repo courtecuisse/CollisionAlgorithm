@@ -23,9 +23,6 @@ public:
     /// return proximiy position in a vector3
     virtual sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
 
-    /// return normal in a vector3
-    virtual sofa::type::Vector3 getNormal() const = 0;
-
     virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const = 0;
 
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const = 0;

@@ -39,19 +39,13 @@ public:
 //            return m_key;
 //        }
 
+        void update() override {}
+
         size_t getOperationsHash() const override { return typeid(AABBBElement).hash_code(); }
 
         std::string name() const override { return "AABBBElement"; }
 
-//        void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-//            res = m_projections;
-//        }
-
-        void  getControlProximities(ControlPoints & controlPoints) {
-            controlPoints.insert(m_projections);
-        }
-
-        void insert(BaseElement* elmt,BaseProximity::SPtr prox) {
+        void insert(BaseElement::SPtr elmt,BaseProximity::SPtr prox) {
             m_elements.insert(elmt);
             m_projections.push_back(prox);
         }
@@ -114,20 +108,14 @@ public:
             }
         }
 
-        const std::set<BaseElement *> & elements() {
+        const std::set<BaseElement::SPtr> & elements() {
             return m_elements;
-        }
-
-        void getSubElements(std::set<BaseElement::SPtr> & subElem) const override {
-            for (auto it = m_elements.begin(); it != m_elements.end(); it++) {
-                (*it)->getSubElements(subElem);
-            }
         }
 
     private:
         const AABBGeometry * m_geometry;
         unsigned m_key,m_i,m_j,m_k;
-        std::set<BaseElement *> m_elements;
+        std::set<BaseElement::SPtr> m_elements;
         std::vector<BaseProximity::SPtr> m_projections;
     };
 
@@ -153,12 +141,12 @@ public:
             m_iterator++;
         }
 
-        BaseElement* element() override {
-            return m_iterator->second.get();
+        BaseElement::SPtr element() override {
+            return m_iterator->second;
         }
 
-        const BaseElement* element() const override {
-            return m_iterator->second.get();
+        const BaseElement::SPtr element() const override {
+            return m_iterator->second;
         }
 
         size_t getOperationsHash() const override { return typeid(AABBBElement).hash_code(); }
@@ -206,10 +194,10 @@ public:
         return type::BoundingBox(m_Bmin,m_Bmax);
     }
 
-    const std::set<BaseElement *> & getElementSet(unsigned i, unsigned j, unsigned k) const {
+    const std::set<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const {
         auto it = m_indexedElement.find(getKey(i,j,k));
         if (it == m_indexedElement.end()) {
-            static std::set<BaseElement *> empty;
+            static std::set<BaseElement::SPtr> empty;
             return empty;
         } else {
             const AABBBElement::SPtr box = it->second;
@@ -304,21 +292,16 @@ public:
 
         auto projectOp = Operations::ProjectOperation::get(l_geometry->begin()->getOperationsHash());
 
-        ControlPoints controlPoints;
-
         for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
         {
-            BaseElement* elmt = it->element();
+            BaseElement::SPtr elmt = it->element();
 
             //std::cout << ++i << std::endl;
             type::BoundingBox bbox;
-            std::vector<BaseProximity::SPtr> v_prox = elmt->getControlProximities().getProximities();
-//            elmt->getControlProximities(v_prox);
-
 //            std::cout << "size v_prox : " << v_prox.size() << std::endl;
 
-            for (unsigned b=0;b<v_prox.size();b++) {
-                bbox.include(v_prox[b]->getPosition());
+            for (unsigned b=0;b<elmt->pointElements().size();b++) {
+                bbox.include(elmt->pointElements()[b]->getP0()->getPosition());
             }
 
             const type::Vector3 & minbox = bbox.minBBox();

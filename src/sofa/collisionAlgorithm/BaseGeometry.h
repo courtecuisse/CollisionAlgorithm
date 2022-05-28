@@ -2,6 +2,10 @@
 
 #include <sofa/collisionAlgorithm/CollisionPipeline.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
+#include <sofa/collisionAlgorithm/elements/PointElement.h>
+#include <sofa/collisionAlgorithm/elements/EdgeElement.h>
+#include <sofa/collisionAlgorithm/elements/TriangleElement.h>
+#include <sofa/collisionAlgorithm/elements/TetrahedronElement.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
 #include <sofa/collisionAlgorithm/ElementIterator.h>
@@ -29,6 +33,37 @@ public:
         this->f_listening.setValue(true);
     }
 
+    void init() {
+        buildPointElements();
+        buildEdgeElements();
+        buildTriangleElements();
+        buildTetrahedronElements();
+        prepareDetection();
+    }
+
+    virtual void buildPointElements() {}
+
+    virtual void buildEdgeElements() {}
+
+    virtual void buildTriangleElements() {}
+
+    virtual void buildTetrahedronElements() {}
+
+    virtual void prepareDetection() {
+        for (unsigned i=0;i<m_pointElements.size();i++) m_pointElements[i]->update();
+        for (unsigned i=0;i<m_edgeElements.size();i++) m_edgeElements[i]->update();
+        for (unsigned i=0;i<m_triangleElements.size();i++) m_triangleElements[i]->update();
+        for (unsigned i=0;i<m_tetrahedronElements.size();i++) m_tetrahedronElements[i]->update();
+    }
+
+    virtual const std::vector<PointElement::SPtr> & pointElements() const { return m_pointElements; }
+
+    virtual const std::vector<EdgeElement::SPtr> & edgeElements() const { return m_edgeElements; }
+
+    virtual const std::vector<TriangleElement::SPtr> & triangleElements() const { return m_triangleElements; }
+
+    virtual const std::vector<TetrahedronElement::SPtr> & tetrahedronElements() const { return m_tetrahedronElements; }
+
     virtual ElementIterator::SPtr begin(unsigned id = 0) const = 0;
 
     inline const BaseGeometry * end() const { return this; }
@@ -46,27 +81,44 @@ public:
         glColor4f(color[0],color[1],color[2],color[3]);
         for (auto it = begin();it != end(); it++) {
             it->element()->draw(vparams);
-        }
-
-        if (! vparams->displayFlags().getShowNormals()) return;
-        double scale = d_drawScaleNormal.getValue();
-        if (scale == 0.0) return;
-        for (auto it = begin();it != end(); it++) {
-            std::vector<BaseProximity::SPtr> res = it->element()->getControlProximities().getProximities();
-//            it->element()->getControlProximities(res);
-            for (unsigned i=0;i<res.size();i++) {
-                BaseProximity::SPtr center = res[i];
-
-                vparams->drawTool()->drawArrow(
-                    center->getPosition(),
-                    center->getPosition() + center->getNormal() * scale,
-                    scale * 0.1,
-                    color);
-            }
-        }
+        }        
     }
 
+protected:
+
+    template<class ELMT>
+    inline void insert(const ELMT * e) {
+        std::vector<typename ELMT::SPtr> & v = elementVector<ELMT>();
+
+        for (unsigned i=0;i<v.size();i++)
+            if (e == v[i].get()) return;
+
+        v.push_back(e->sptr());
+    }
+
+private:
+
+    template<class ELMT>
+    inline std::vector<std::shared_ptr<ELMT> > & elementVector();
+
+    std::vector<PointElement::SPtr> m_pointElements;
+    std::vector<EdgeElement::SPtr> m_edgeElements;
+    std::vector<TriangleElement::SPtr> m_triangleElements;
+    std::vector<TetrahedronElement::SPtr> m_tetrahedronElements;
 };
+
+template<>
+inline std::vector<PointElement::SPtr > & BaseGeometry::elementVector<PointElement>() { return m_pointElements; }
+
+template<>
+inline std::vector<EdgeElement::SPtr > & BaseGeometry::elementVector<EdgeElement>() { return m_edgeElements; }
+
+template<>
+inline std::vector<TriangleElement::SPtr > & BaseGeometry::elementVector<TriangleElement>() { return m_triangleElements; }
+
+template<>
+inline std::vector<TetrahedronElement::SPtr > & BaseGeometry::elementVector<TetrahedronElement>() { return m_tetrahedronElements; }
+
 
 template<class DataTypes>
 class TBaseGeometry : public BaseGeometry {
@@ -98,39 +150,30 @@ public:
 //        }
     }
 
-    void init() {
-        buildTopologyProximity();
-        buildPointElements();
-        buildEdgeElements();
-        buildTriangleElements();
-        buildTetrahedronElements();
-    }
 
-    virtual void buildTopologyProximity() {
-        this->m_topoProx.clear();
-        for (unsigned j=0; j<this->getState()->getSize(); j++) {
-//            m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(l_state, j));
-             m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
-        }
-    }
 
-    virtual void buildPointElements() {}
-    virtual void buildEdgeElements() {}
-    virtual void buildTriangleElements() {}
-    virtual void buildTetrahedronElements() {}
+//    virtual void buildTopologyProximity() {
+//        this->m_topoProx.clear();
+//        for (unsigned j=0; j<this->getState()->getSize(); j++) {
+////            m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(l_state, j));
+//             m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
+//        }
+//    }
+
+
 
 
     inline sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
     }
 
-    inline std::vector<typename TopologyProximity<DataTypes>::SPtr> & getTopoProx(){
-        return m_topoProx;
-    }
+//    inline std::vector<typename TopologyProximity<DataTypes>::SPtr> & getTopoProx(){
+//        return m_topoProx;
+//    }
 
-    inline typename TopologyProximity<DataTypes>::SPtr getTopoProxIdx(unsigned i){
-        return m_topoProx[i];
-    }
+//    inline typename TopologyProximity<DataTypes>::SPtr getTopoProxIdx(unsigned i){
+//        return m_topoProx[i];
+//    }
 
 //	inline std::vector<BaseElement::SPtr > getBaseElements() = 0;
 
@@ -163,12 +206,6 @@ public:
     static std::string templateName(const TBaseGeometry<DataTypes>* = NULL) {
         return DataTypes::Name();
     }
-
-
-
-
-protected:
-    std::vector<typename TopologyProximity<DataTypes>::SPtr> m_topoProx;
 
 };
 

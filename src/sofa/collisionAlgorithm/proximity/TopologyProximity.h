@@ -66,10 +66,6 @@ public:
         return m_pid;
     }
 
-    sofa::type::Vector3 getNormal() const override {
-        return m_normal;
-    }
-
     void setNormal(sofa::type::Vector3 normal) {
         m_normal = normal;
     }

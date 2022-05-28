@@ -66,50 +66,22 @@ public:
 
 
     void buildTetrahedronElements() override {
-        m_tetraElements.clear();
         for (unsigned i=0;i<this->l_topology->getNbTetrahedra();i++) {
-            auto tetra = this->l_topology->getTetrahedron(i);
             auto triId = this->l_topology->getTrianglesInTetrahedron(i);
 
-            TriangleElement::SPtr triangle0 = TriangleGeometry<DataTypes>::getElements()[triId[0]];
-            TriangleElement::SPtr triangle1 = TriangleGeometry<DataTypes>::getElements()[triId[1]];
-            TriangleElement::SPtr triangle2 = TriangleGeometry<DataTypes>::getElements()[triId[2]];
-            TriangleElement::SPtr triangle3 = TriangleGeometry<DataTypes>::getElements()[triId[3]];
+            TriangleElement::SPtr triangle0 = this->triangleElements()[triId[0]];
+            TriangleElement::SPtr triangle1 = this->triangleElements()[triId[1]];
+            TriangleElement::SPtr triangle2 = this->triangleElements()[triId[2]];
+            TriangleElement::SPtr triangle3 = this->triangleElements()[triId[3]];
 
-//            auto elmt = BaseElement::create<TetrahedronElement>(this->m_topoProx[tetra[0]],this->m_topoProx[tetra[1]],this->m_topoProx[tetra[2]],this->m_topoProx[tetra[3]]);
-            auto elmt = BaseElement::create<TetrahedronElement>(triangle0, triangle1, triangle2, triangle3, this->m_topoProx[tetra[0]],this->m_topoProx[tetra[1]],this->m_topoProx[tetra[2]],this->m_topoProx[tetra[3]]);
-            m_tetraElements.push_back(elmt);
+            this->insert(new TetrahedronElement(triangle0, triangle1, triangle2, triangle3));
         }
-
-        prepareDetection();
     }
 
     ElementIterator::SPtr begin(unsigned id = 0) const override {
-        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(m_tetraElements,id));
+        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(this->tetrahedronElements(),id));
     }
 
-
-    virtual void prepareDetection() override {
-        TriangleGeometry<DataTypes>::prepareDetection();
-        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
-        for (unsigned i=0;i<m_tetraElements.size();i++) m_tetraElements[i]->update(pos.ref());
-    }
-
-
-    void setCreateTetraProximity(ProximityCreatorFunc f) {
-        for (unsigned i=0; i<m_tetraElements.size(); i++) {
-            m_tetraElements[i]->setCreateProximity(f);
-        }
-    }
-
-    inline std::vector<TetrahedronElement::SPtr> & getElements() {
-        return m_tetraElements;
-    }
-
-
-
-private:
-    std::vector<TetrahedronElement::SPtr> m_tetraElements;
 };
 
 }

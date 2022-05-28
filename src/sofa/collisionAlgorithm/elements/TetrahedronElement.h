@@ -1,24 +1,14 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/BaseElement.h>
-#include <sofa/collisionAlgorithm/proximity/TetrahedronProximity.h>
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 
 namespace sofa::collisionAlgorithm {
-
-class TetrahedronElement;
-
-//class TetrahedronProximityCreator{
-//public:
-//    virtual BaseProximity::SPtr createProximity(const TetrahedronElement * elmt,double f1,double f2,double f3,double f4) = 0;
-
-//};
 
 class TetrahedronElement : public BaseElement {
 public:
 
     typedef std::shared_ptr<TetrahedronElement> SPtr;
-    typedef std::function<BaseProximity::SPtr(const TetrahedronElement * elmt,double f0,double f1,double f2,double f3)> ProximityCreatorFunc;
 
     struct TetraInfo
     {
@@ -41,103 +31,86 @@ public:
         }
     };
 
-    TetrahedronElement(BaseProximity::SPtr p0,BaseProximity::SPtr p1,BaseProximity::SPtr p2,BaseProximity::SPtr p3)
-    : m_p0(p0), m_p1(p1), m_p2(p2), m_p3(p3) {
-        f_createProximity = [=](const TetrahedronElement * elmt,double f0,double f1,double f2,double f3) -> BaseProximity::SPtr {
-            return BaseProximity::create<TetrahedronProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),elmt->getP3(),
-                                                               f0,f1,f2,f3);
-        };
+    TetrahedronElement(BaseProximity::SPtr p0,BaseProximity::SPtr p1,BaseProximity::SPtr p2,BaseProximity::SPtr p3) {
+        m_sptr = new SPtr(this);
 
-        m_triangle0 = BaseElement::create<TriangleElement>(p0,p1,p2);
-        m_triangle1 = BaseElement::create<TriangleElement>(p1,p2,p3);
-        m_triangle2 = BaseElement::create<TriangleElement>(p2,p3,p0);
-        m_triangle3 = BaseElement::create<TriangleElement>(p3,p0,p1);
+        insertElement<PointElement>(new PointElement(p0));
+        insertElement<PointElement>(new PointElement(p1));
+        insertElement<PointElement>(new PointElement(p2));
+        insertElement<PointElement>(new PointElement(p3));
 
-        getControlProximities().insert(p0);
-        getControlProximities().insert(p1);
-        getControlProximities().insert(p2);
-        getControlProximities().insert(p3);
+        insertElement<EdgeElement>(new EdgeElement(p0,p1));
+        insertElement<EdgeElement>(new EdgeElement(p1,p2));
+        insertElement<EdgeElement>(new EdgeElement(p2,p0));
+
+        insertElement<EdgeElement>(new EdgeElement(p3,p0));
+        insertElement<EdgeElement>(new EdgeElement(p3,p1));
+        insertElement<EdgeElement>(new EdgeElement(p3,p2));
+
+        insertElement<TriangleElement>(new TriangleElement(p0,p1,p2));
+        insertElement<TriangleElement>(new TriangleElement(p1,p1,p3));
+        insertElement<TriangleElement>(new TriangleElement(p1,p2,p3));
+        insertElement<TriangleElement>(new TriangleElement(p2,p0,p3));
+
+        insertElement<TetrahedronElement>(this);
     }
 
 
-   TetrahedronElement(TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3,
-                      BaseProximity::SPtr p0,BaseProximity::SPtr p1,BaseProximity::SPtr p2,BaseProximity::SPtr p3)
-   : m_triangle0(tri0), m_triangle1(tri1), m_triangle2(tri2), m_triangle3(tri3)
-   , m_p0(p0), m_p1(p1), m_p2(p2), m_p3(p3){
-       f_createProximity = [=](const TetrahedronElement * elmt,double f0,double f1,double f2,double f3) -> BaseProximity::SPtr {
-           return BaseProximity::create<TetrahedronProximity>(elmt->getP0(),elmt->getP1(),elmt->getP2(),elmt->getP3(),
-                                                              f0,f1,f2,f3);
-       };
+   TetrahedronElement(TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3) {
+       m_sptr = new SPtr(this);
 
-//       getControlProximities().insert(m_triangle0->getControlProximities());
-//       getControlProximities().insert(m_triangle1->getControlProximities());
-//       getControlProximities().insert(m_triangle2->getControlProximities());
-//       getControlProximities().insert(m_triangle3->getControlProximities());
+       insertElement<PointElement>(tri0->pointElements()[0]);
+       insertElement<PointElement>(tri0->pointElements()[1]);
+       insertElement<PointElement>(tri0->pointElements()[2]);
+       insertElement<PointElement>(tri1->pointElements()[0]);
+       insertElement<PointElement>(tri1->pointElements()[1]);
+       insertElement<PointElement>(tri1->pointElements()[2]);
 
-       getControlProximities().insert(p0);
-       getControlProximities().insert(p1);
-       getControlProximities().insert(p2);
-       getControlProximities().insert(p3);
+       insertElement<EdgeElement>(tri0->edgeElements()[0]);
+       insertElement<EdgeElement>(tri0->edgeElements()[1]);
+       insertElement<EdgeElement>(tri0->edgeElements()[2]);
+       insertElement<EdgeElement>(tri1->edgeElements()[0]);
+       insertElement<EdgeElement>(tri1->edgeElements()[1]);
+       insertElement<EdgeElement>(tri1->edgeElements()[2]);
 
-//       m_p0 = getControlProximities().getProximities()[0];
-//       m_p1 = getControlProximities().getProximities()[1];
-//       m_p2 = getControlProximities().getProximities()[2];
-//       m_p3 = getControlProximities().getProximities()[3];
+       insertElement<TriangleElement>(tri0);
+       insertElement<TriangleElement>(tri1);
+       insertElement<TriangleElement>(tri2);
+       insertElement<TriangleElement>(tri3);
+
+       insertElement<TetrahedronElement>(this);
    }
+
+   inline SPtr sptr() const { return *m_sptr; }
 
     size_t getOperationsHash() const override { return typeid(TetrahedronElement).hash_code(); }
 
     std::string name() const override { return "TetrahedronElement"; }
 
-    void update(const std::vector<type::Vector3> & pos) {
-        m_tinfo.update( m_p0->getPosition(),m_p1->getPosition(),m_p2->getPosition(),m_p3->getPosition());
+    void update() override {
+        m_tinfo.update(getP0()->getPosition(),
+                       getP1()->getPosition(),
+                       getP2()->getPosition(),
+                       getP3()->getPosition());
     }
 
-
-
-    inline BaseProximity::SPtr createProximity(double f0,double f1,double f2, double f3) const {
-        return f_createProximity(this,f0,f1,f2,f3);
-    }
-
-//    std::set<BaseProximity::SPtr> & getControlProximities() const override {
-
-//    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-//        res.push_back(m_p0);
-//        res.push_back(m_p1);
-//        res.push_back(m_p2);
-//        res.push_back(m_p3);
-//    }
+    BaseProximity::SPtr createProximity(double f0,double f1,double f2, double f3) const;
 
     inline const TetraInfo & getTetrahedronInfo() const { return m_tinfo; }
 
-    inline BaseProximity::SPtr getP0() const { return m_p0; }
+    inline BaseProximity::SPtr getP0() const { return this->pointElements()[0]->getP0(); }
 
-    inline BaseProximity::SPtr getP1() const { return m_p1; }
+    inline BaseProximity::SPtr getP1() const { return this->pointElements()[1]->getP0(); }
 
-    inline BaseProximity::SPtr getP2() const { return m_p2; }
+    inline BaseProximity::SPtr getP2() const { return this->pointElements()[2]->getP0(); }
 
-    inline BaseProximity::SPtr getP3() const { return m_p3; }
-
-    inline TriangleElement::SPtr getTriangle0() const { return m_triangle0; }
-
-    inline TriangleElement::SPtr getTriangle1() const { return m_triangle1; }
-
-    inline TriangleElement::SPtr getTriangle2() const { return m_triangle2; }
-
-    inline TriangleElement::SPtr getTriangle3() const { return m_triangle3; }
-
-    void getSubElements(std::set<BaseElement::SPtr> & subElem) const override {
-        subElem.insert(m_triangle0);
-        subElem.insert(m_triangle1);
-        subElem.insert(m_triangle2);
-        subElem.insert(m_triangle3);
-    }
+    inline BaseProximity::SPtr getP3() const { return this->pointElements()[3]->getP0(); }
 
     void draw(const core::visual::VisualParams * vparams) override {
-        type::Vector3 p0 = m_p0->getPosition();
-        type::Vector3 p1 = m_p1->getPosition();
-        type::Vector3 p2 = m_p2->getPosition();
-        type::Vector3 p3 = m_p3->getPosition();
+        type::Vector3 p0 = getP0()->getPosition();
+        type::Vector3 p1 = getP1()->getPosition();
+        type::Vector3 p2 = getP2()->getPosition();
+        type::Vector3 p3 = getP3()->getPosition();
 
         if (vparams->displayFlags().getShowWireFrame()) {
             glBegin(GL_LINES);
@@ -159,15 +132,9 @@ public:
         }
     }
 
-    void setCreateProximity(ProximityCreatorFunc f) {
-        f_createProximity = f;
-    }
-
 private:
-    BaseProximity::SPtr m_p0,m_p1,m_p2,m_p3;
     TetraInfo m_tinfo;
-    ProximityCreatorFunc f_createProximity;
-    TriangleElement::SPtr m_triangle0, m_triangle1, m_triangle2, m_triangle3;
+    SPtr * m_sptr;
 };
 
 }

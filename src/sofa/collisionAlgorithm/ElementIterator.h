@@ -19,15 +19,11 @@ public:
 
     virtual void next() = 0;
 
-    virtual BaseElement * element() = 0;
+    virtual BaseElement::SPtr element() = 0;
 
-    virtual const BaseElement * element() const = 0;
+    virtual const BaseElement::SPtr element() const = 0;
 
     virtual size_t getOperationsHash() const = 0;
-
-    inline ElementCast element_cast() {
-        return ElementCast(element());
-    }
 
     ///returns a new EmptyIterator
     static inline ElementIterator::SPtr empty();
@@ -53,9 +49,9 @@ public:
 
     void next() override {}
 
-    BaseElement * element() override { return NULL; }
+    BaseElement::SPtr element() override { return NULL; }
 
-    const BaseElement * element() const override { return NULL; }
+    const BaseElement::SPtr element() const override { return NULL; }
 
     size_t getOperationsHash() const override {
         return typeid(EmptyIterator).hash_code();
@@ -86,9 +82,9 @@ public:
         else return (*m_it)->getOperationsHash();
     }
 
-    virtual BaseElement* element() { return m_it->get(); }
+    virtual BaseElement::SPtr element() { return *m_it; }
 
-    virtual const BaseElement* element() const { return m_it->get(); }
+    virtual const BaseElement::SPtr element() const { return *m_it; }
 
 private:
     typename CONTAINER::const_iterator m_it;
@@ -120,9 +116,9 @@ public:
         else return (*m_it)->getOperationsHash();
     }
 
-    virtual BaseElement * element() { return *m_it; }
+    virtual BaseElement::SPtr element() { return *m_it; }
 
-    virtual const BaseElement * element() const { return *m_it; }
+    virtual const BaseElement::SPtr element() const { return *m_it; }
 
 private:
     typename CONTAINER::const_iterator m_it;
