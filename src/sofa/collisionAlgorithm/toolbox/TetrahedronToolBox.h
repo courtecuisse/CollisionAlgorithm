@@ -11,7 +11,7 @@ public:
 
     static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
         TetrahedronElement::SPtr tetra = elmt->tetrahedronElements()[0];
-        return tetra->createProximity(1.0/4.0,1.0/4.0,1.0/4.0,1.0/4.0);
+        return tetra.createProximity(1.0/4.0,1.0/4.0,1.0/4.0,1.0/4.0);
     }
 
     //Barycentric coordinates are computed according to
@@ -21,7 +21,7 @@ public:
 
         double fact[4];
         projectOnTetra(P, tetra->getTetrahedronInfo(),fact[0],fact[1],fact[2],fact[3]);
-        return tetra->createProximity(fact[0],fact[1],fact[2],fact[3]);
+        return tetra.createProximity(fact[0],fact[1],fact[2],fact[3]);
     }
 
 

@@ -5,25 +5,24 @@
 
 namespace sofa::collisionAlgorithm {
 
+class PointElementSPtr : public std::shared_ptr<PointElement> {
+public:
+
+    PointElementSPtr(BaseProximity::SPtr prox);
+
+    BaseProximity::SPtr createProximity() const;
+};
+
 class PointElement : public BaseElement {
 public:
 
-    typedef std::shared_ptr<PointElement> SPtr;
+    friend class PointElementSPtr;
 
-    PointElement(BaseProximity::SPtr prox)
-    : m_point(prox) {
-        m_sptr = new SPtr(this);
-
-        this->insertElement<PointElement>(this);
-    }
-
-    inline SPtr sptr() const { return *m_sptr; }
+    typedef PointElementSPtr SPtr;
 
     size_t getOperationsHash() const override { return typeid(PointElement).hash_code(); }
 
     std::string name() const override { return "PointElement"; }
-
-    inline BaseProximity::SPtr createProximity() const { return m_point; }
 
     inline BaseProximity::SPtr getP0() const { return m_point; }
 
@@ -39,7 +38,9 @@ public:
 
 private:
     BaseProximity::SPtr m_point;
-    SPtr * m_sptr;
+
+    PointElement(BaseProximity::SPtr prox) : m_point(prox) {}
+
 };
 
 

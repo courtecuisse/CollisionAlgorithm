@@ -2,7 +2,6 @@
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
-#include <sofa/collisionAlgorithm/elements/PointElement.h>
 #include <sofa/collisionAlgorithm/toolbox/PointToolBox.h>
 #include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
 

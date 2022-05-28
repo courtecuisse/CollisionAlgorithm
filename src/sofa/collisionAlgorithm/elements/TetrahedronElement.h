@@ -5,10 +5,21 @@
 
 namespace sofa::collisionAlgorithm {
 
-class TetrahedronElement : public BaseElement {
+class TetrahedronElementSPtr : public std::shared_ptr<TetrahedronElement> {
 public:
 
-    typedef std::shared_ptr<TetrahedronElement> SPtr;
+    TetrahedronElementSPtr(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2,BaseProximity::SPtr p3);
+
+    TetrahedronElementSPtr(TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3);
+
+    BaseProximity::SPtr createProximity(double f0,double f1,double f2,double f3) const;
+};
+
+class TetrahedronElement : public BaseElement {
+public:
+    friend class TetrahedronElementSPtr;
+
+    typedef TetrahedronElementSPtr SPtr;
 
     struct TetraInfo
     {
@@ -31,58 +42,6 @@ public:
         }
     };
 
-    TetrahedronElement(BaseProximity::SPtr p0,BaseProximity::SPtr p1,BaseProximity::SPtr p2,BaseProximity::SPtr p3) {
-        m_sptr = new SPtr(this);
-
-        insertElement<PointElement>(new PointElement(p0));
-        insertElement<PointElement>(new PointElement(p1));
-        insertElement<PointElement>(new PointElement(p2));
-        insertElement<PointElement>(new PointElement(p3));
-
-        insertElement<EdgeElement>(new EdgeElement(p0,p1));
-        insertElement<EdgeElement>(new EdgeElement(p1,p2));
-        insertElement<EdgeElement>(new EdgeElement(p2,p0));
-
-        insertElement<EdgeElement>(new EdgeElement(p3,p0));
-        insertElement<EdgeElement>(new EdgeElement(p3,p1));
-        insertElement<EdgeElement>(new EdgeElement(p3,p2));
-
-        insertElement<TriangleElement>(new TriangleElement(p0,p1,p2));
-        insertElement<TriangleElement>(new TriangleElement(p1,p1,p3));
-        insertElement<TriangleElement>(new TriangleElement(p1,p2,p3));
-        insertElement<TriangleElement>(new TriangleElement(p2,p0,p3));
-
-        insertElement<TetrahedronElement>(this);
-    }
-
-
-   TetrahedronElement(TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3) {
-       m_sptr = new SPtr(this);
-
-       insertElement<PointElement>(tri0->pointElements()[0]);
-       insertElement<PointElement>(tri0->pointElements()[1]);
-       insertElement<PointElement>(tri0->pointElements()[2]);
-       insertElement<PointElement>(tri1->pointElements()[0]);
-       insertElement<PointElement>(tri1->pointElements()[1]);
-       insertElement<PointElement>(tri1->pointElements()[2]);
-
-       insertElement<EdgeElement>(tri0->edgeElements()[0]);
-       insertElement<EdgeElement>(tri0->edgeElements()[1]);
-       insertElement<EdgeElement>(tri0->edgeElements()[2]);
-       insertElement<EdgeElement>(tri1->edgeElements()[0]);
-       insertElement<EdgeElement>(tri1->edgeElements()[1]);
-       insertElement<EdgeElement>(tri1->edgeElements()[2]);
-
-       insertElement<TriangleElement>(tri0);
-       insertElement<TriangleElement>(tri1);
-       insertElement<TriangleElement>(tri2);
-       insertElement<TriangleElement>(tri3);
-
-       insertElement<TetrahedronElement>(this);
-   }
-
-   inline SPtr sptr() const { return *m_sptr; }
-
     size_t getOperationsHash() const override { return typeid(TetrahedronElement).hash_code(); }
 
     std::string name() const override { return "TetrahedronElement"; }
@@ -93,8 +52,6 @@ public:
                        getP2()->getPosition(),
                        getP3()->getPosition());
     }
-
-    BaseProximity::SPtr createProximity(double f0,double f1,double f2, double f3) const;
 
     inline const TetraInfo & getTetrahedronInfo() const { return m_tinfo; }
 
@@ -134,7 +91,8 @@ public:
 
 private:
     TetraInfo m_tinfo;
-    SPtr * m_sptr;
+    TetrahedronElement() {}
+
 };
 
 }

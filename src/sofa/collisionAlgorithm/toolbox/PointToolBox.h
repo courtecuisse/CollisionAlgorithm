@@ -10,13 +10,13 @@ public:
 
     static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
         auto point = elmt->pointElements()[0];
-        return point->createProximity();
+        return point.createProximity();
     }
 
 
     static BaseProximity::SPtr project(const type::Vector3 & /*P*/, BaseElement::SPtr elmt) {
         auto point = elmt->pointElements()[0];
-        return point->createProximity();
+        return point.createProximity();
     }
 
 

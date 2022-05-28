@@ -11,7 +11,7 @@ public:
 
     static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
         TriangleElement::SPtr tri = elmt->triangleElements()[0];
-        return tri->createProximity(1.0/3.0,1.0/3.0,1.0/3.0);
+        return tri.createProximity(1.0/3.0,1.0/3.0,1.0/3.0);
     }
 
     //Barycentric coordinates are computed according to
@@ -21,7 +21,7 @@ public:
 
         double fact_u,fact_v,fact_w;
         projectOnTriangle(P,tri->getTriangleInfo(),fact_u,fact_v,fact_w);
-        return tri->createProximity(fact_u,fact_v,fact_w);
+        return tri.createProximity(fact_u,fact_v,fact_w);
     }
 
 

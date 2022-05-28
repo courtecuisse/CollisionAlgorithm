@@ -39,7 +39,7 @@ public:
 
 //            auto elmt = BaseElement::create<TriangleElement>(this->m_topoProx[tri[0]],this->m_topoProx[tri[1]],this->m_topoProx[tri[2]]);
 
-            this->insert(new TriangleElement(edge0, edge1, edge2));
+            this->insert(TriangleElement::SPtr(edge0, edge1, edge2));
         }
     }
 

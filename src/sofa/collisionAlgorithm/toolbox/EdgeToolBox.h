@@ -10,19 +10,19 @@ public:
 
     static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
         EdgeElement::SPtr edge = elmt->edgeElements()[0];
-        return edge->createProximity(0.5,0.5);
+        return edge.createProximity(0.5,0.5);
     }
 
     static BaseProximity::SPtr project(const type::Vector3 & P, BaseElement::SPtr elmt) {
         EdgeElement::SPtr edge = elmt->edgeElements()[0];
 
         double fact_u,fact_v;
-        const type::Vector3 P0 = edge->createProximity(1,0)->getPosition();
-        const type::Vector3 P1 = edge->createProximity(0,1)->getPosition();
+        const type::Vector3 P0 = edge.createProximity(1,0)->getPosition();
+        const type::Vector3 P1 = edge.createProximity(0,1)->getPosition();
 
         projectOnEdge(P,P0,P1,fact_u,fact_v);
 
-        return edge->createProximity(fact_u,fact_v);
+        return edge.createProximity(fact_u,fact_v);
     }
 
     static void projectOnEdge(const type::Vec3d & projP, const type::Vec3d & e1, const type::Vec3d & e2, double & fact_u, double & fact_v) {

@@ -2,34 +2,24 @@
 
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/elements/PointElement.h>
-#include <math.h>
 
 namespace sofa::collisionAlgorithm {
 
-class EdgeElement : public BaseElement {
+class EdgeElementSPtr : public std::shared_ptr<EdgeElement> {
 public:
 
-    typedef std::shared_ptr<EdgeElement> SPtr;
+    EdgeElementSPtr(BaseProximity::SPtr p0,BaseProximity::SPtr p1);
 
-    EdgeElement(BaseProximity::SPtr p0,BaseProximity::SPtr p1) {
-        m_sptr = new SPtr(this);
-
-        insertElement<PointElement>(new PointElement(p0));
-        insertElement<PointElement>(new PointElement(p1));
-        insertElement<EdgeElement>(this);
-    }
-
-    EdgeElement(PointElement::SPtr point0, PointElement::SPtr point1) {
-        m_sptr = new SPtr(this);
-
-        insertElement<PointElement>(point0);
-        insertElement<PointElement>(point1);
-        insertElement<EdgeElement>(this);
-    }
-
-    inline SPtr sptr() const { return *m_sptr; }
+    EdgeElementSPtr(PointElement::SPtr point0, PointElement::SPtr point1);
 
     BaseProximity::SPtr createProximity(double f0,double f1) const;
+};
+
+class EdgeElement : public BaseElement {
+public:
+    friend class EdgeElementSPtr;
+
+    typedef EdgeElementSPtr SPtr;
 
     inline BaseProximity::SPtr getP0() const { return pointElements()[0]->getP0(); }
 
@@ -53,7 +43,7 @@ public:
     }
 
 private:
-    SPtr * m_sptr;
+    EdgeElement() {}
 };
 
 }

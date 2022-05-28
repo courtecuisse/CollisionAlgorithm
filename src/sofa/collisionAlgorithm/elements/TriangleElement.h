@@ -5,10 +5,22 @@
 
 namespace sofa::collisionAlgorithm {
 
-class TriangleElement : public BaseElement {
+class TriangleElementSPtr : public std::shared_ptr<TriangleElement> {
 public:
 
-    typedef std::shared_ptr<TriangleElement> SPtr;
+    TriangleElementSPtr(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2);
+
+    TriangleElementSPtr(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2);
+
+    BaseProximity::SPtr createProximity(double f0,double f1,double f2) const;
+};
+
+
+class TriangleElement : public BaseElement {
+public:
+    friend class TriangleElementSPtr;
+
+    typedef TriangleElementSPtr SPtr;
 
     struct TriangleInfo
     {
@@ -48,37 +60,6 @@ public:
         }
     };
 
-    TriangleElement(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2) {
-        m_sptr = new SPtr(this);
-
-        insertElement<PointElement>(new PointElement(p0));
-        insertElement<PointElement>(new PointElement(p1));
-        insertElement<PointElement>(new PointElement(p2));
-
-        insertElement<EdgeElement>(new EdgeElement(p0,p1));
-        insertElement<EdgeElement>(new EdgeElement(p1,p2));
-        insertElement<EdgeElement>(new EdgeElement(p2,p0));
-
-        insertElement<TriangleElement>(this);
-    }
-
-    TriangleElement(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2) {
-        m_sptr = new SPtr(this);
-
-        insertElement<PointElement>(edge0->pointElements()[0]);
-        insertElement<PointElement>(edge0->pointElements()[1]);
-        insertElement<PointElement>(edge1->pointElements()[0]);
-        insertElement<PointElement>(edge1->pointElements()[1]);
-
-        insertElement<EdgeElement>(edge0);
-        insertElement<EdgeElement>(edge1);
-        insertElement<EdgeElement>(edge2);
-
-        insertElement<TriangleElement>(this);
-    }
-
-    inline SPtr sptr() const { return *((SPtr*) m_sptr); }
-
     size_t getOperationsHash() const override { return typeid(TriangleElement).hash_code(); }
 
     std::string name() const override { return "TriangleElement"; }
@@ -88,8 +69,6 @@ public:
                        getP1()->getPosition(),
                        getP2()->getPosition());
     }
-
-    BaseProximity::SPtr createProximity(double f0,double f1,double f2) const;
 
     inline const TriangleInfo & getTriangleInfo() const { return m_tinfo; }
 
@@ -121,7 +100,7 @@ public:
 
 private:
     TriangleInfo m_tinfo;
-    SPtr * m_sptr;
+    TriangleElement() {}
 };
 
 }

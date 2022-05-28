@@ -10,18 +10,26 @@ class EdgeElement;
 class TriangleElement;
 class TetrahedronElement;
 
+class PointElementSPtr;
+class EdgeElementSPtr;
+class TriangleElementSPtr;
+class TetrahedronElementSPtr;
+
 class BaseElement {
 public:
 
     typedef std::shared_ptr<BaseElement> SPtr;
 
-    const std::vector<std::shared_ptr<PointElement> > & pointElements() const { return m_pointElements; }
+    const std::vector<PointElementSPtr > & pointElements() const { return m_pointElements; }
 
-    const std::vector<std::shared_ptr<EdgeElement> > & edgeElements() const { return m_edgeElements; }
+    const std::vector<EdgeElementSPtr > & edgeElements() const { return m_edgeElements; }
 
-    const std::vector<std::shared_ptr<TriangleElement> > & triangleElements() const { return m_triangleElements; }
+    const std::vector<TriangleElementSPtr > & triangleElements() const { return m_triangleElements; }
 
-    const std::vector<std::shared_ptr<TetrahedronElement> > & tetrahedronElements() const { return m_tetrahedronElements; }
+    const std::vector<TetrahedronElementSPtr > & tetrahedronElements() const { return m_tetrahedronElements; }
+
+    template<class ELMT>
+    const std::vector<typename ELMT::SPtr > & elements() const;
 
     virtual void draw(const core::visual::VisualParams * vparams) = 0;
 
@@ -33,19 +41,9 @@ public:
 
 protected:
 
-    template<class ELMT>
-    inline void insertElement(const ELMT * e) {
-        std::vector<typename ELMT::SPtr> & v = elementVector<ELMT>();
-
-        for (unsigned i=0;i<v.size();i++)
-            if (e == v[i].get()) return;
-
-        v.push_back(e->sptr());
-    }
-
-    template<class ELMT>
-    inline void insertElement(typename ELMT::SPtr e) {
-        std::vector<typename ELMT::SPtr> & v = elementVector<ELMT>();
+    template<class ELMTSPtr>
+    inline void insertElement(const ELMTSPtr & e) {
+        std::vector<ELMTSPtr> & v = elementVector<ELMTSPtr>();
 
         for (unsigned i=0;i<v.size();i++)
             if (e == v[i]) return;
@@ -54,26 +52,26 @@ protected:
     }
 
 private:
-    std::vector<std::shared_ptr<PointElement> > m_pointElements;
-    std::vector<std::shared_ptr<EdgeElement> > m_edgeElements;
-    std::vector<std::shared_ptr<TriangleElement> > m_triangleElements;
-    std::vector<std::shared_ptr<TetrahedronElement> > m_tetrahedronElements;
+    std::vector<PointElementSPtr > m_pointElements;
+    std::vector<EdgeElementSPtr > m_edgeElements;
+    std::vector<TriangleElementSPtr > m_triangleElements;
+    std::vector<TetrahedronElementSPtr > m_tetrahedronElements;
 
-    template<class ELMT>
-    inline std::vector<std::shared_ptr<ELMT> > & elementVector();
+    template<class ELMTSPtr>
+    inline std::vector<ELMTSPtr> & elementVector();
 };
 
 
 template<>
-inline std::vector<std::shared_ptr<PointElement> > & BaseElement::elementVector<PointElement>() { return m_pointElements; }
+inline std::vector<PointElementSPtr > & BaseElement::elementVector<PointElementSPtr>() { return m_pointElements; }
 
 template<>
-inline std::vector<std::shared_ptr<EdgeElement> > & BaseElement::elementVector<EdgeElement>() { return m_edgeElements; }
+inline std::vector<EdgeElementSPtr > & BaseElement::elementVector<EdgeElementSPtr>() { return m_edgeElements; }
 
 template<>
-inline std::vector<std::shared_ptr<TriangleElement> > & BaseElement::elementVector<TriangleElement>() { return m_triangleElements; }
+inline std::vector<TriangleElementSPtr > & BaseElement::elementVector<TriangleElementSPtr>() { return m_triangleElements; }
 
 template<>
-inline std::vector<std::shared_ptr<TetrahedronElement> > & BaseElement::elementVector<TetrahedronElement>() { return m_tetrahedronElements; }
+inline std::vector<TetrahedronElementSPtr > & BaseElement::elementVector<TetrahedronElementSPtr>() { return m_tetrahedronElements; }
 
 }

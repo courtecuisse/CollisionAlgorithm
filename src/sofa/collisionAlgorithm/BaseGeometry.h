@@ -2,14 +2,14 @@
 
 #include <sofa/collisionAlgorithm/CollisionPipeline.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
-#include <sofa/collisionAlgorithm/elements/PointElement.h>
-#include <sofa/collisionAlgorithm/elements/EdgeElement.h>
-#include <sofa/collisionAlgorithm/elements/TriangleElement.h>
-#include <sofa/collisionAlgorithm/elements/TetrahedronElement.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
 #include <sofa/collisionAlgorithm/ElementIterator.h>
 #include <sofa/gl/gl.h>
+#include <sofa/collisionAlgorithm/elements/PointElement.h>
+#include <sofa/collisionAlgorithm/elements/EdgeElement.h>
+#include <sofa/collisionAlgorithm/elements/TriangleElement.h>
+#include <sofa/collisionAlgorithm/elements/TetrahedronElement.h>
 
 namespace sofa ::collisionAlgorithm {
 
@@ -86,20 +86,20 @@ public:
 
 protected:
 
-    template<class ELMT>
-    inline void insert(const ELMT * e) {
-        std::vector<typename ELMT::SPtr> & v = elementVector<ELMT>();
+    template<class ELMTSPtr>
+    inline void insert(const ELMTSPtr e) {
+        std::vector<ELMTSPtr> & v = elementVector<ELMTSPtr>();
 
         for (unsigned i=0;i<v.size();i++)
-            if (e == v[i].get()) return;
+            if (e == v[i]) return;
 
-        v.push_back(e->sptr());
+        v.push_back(e);
     }
 
 private:
 
-    template<class ELMT>
-    inline std::vector<std::shared_ptr<ELMT> > & elementVector();
+    template<class ELMTSPtr>
+    inline std::vector<ELMTSPtr > & elementVector();
 
     std::vector<PointElement::SPtr> m_pointElements;
     std::vector<EdgeElement::SPtr> m_edgeElements;
@@ -108,16 +108,16 @@ private:
 };
 
 template<>
-inline std::vector<PointElement::SPtr > & BaseGeometry::elementVector<PointElement>() { return m_pointElements; }
+inline std::vector<PointElementSPtr > & BaseGeometry::elementVector<PointElementSPtr>() { return m_pointElements; }
 
 template<>
-inline std::vector<EdgeElement::SPtr > & BaseGeometry::elementVector<EdgeElement>() { return m_edgeElements; }
+inline std::vector<EdgeElementSPtr > & BaseGeometry::elementVector<EdgeElementSPtr>() { return m_edgeElements; }
 
 template<>
-inline std::vector<TriangleElement::SPtr > & BaseGeometry::elementVector<TriangleElement>() { return m_triangleElements; }
+inline std::vector<TriangleElementSPtr > & BaseGeometry::elementVector<TriangleElementSPtr>() { return m_triangleElements; }
 
 template<>
-inline std::vector<TetrahedronElement::SPtr > & BaseGeometry::elementVector<TetrahedronElement>() { return m_tetrahedronElements; }
+inline std::vector<TetrahedronElementSPtr > & BaseGeometry::elementVector<TetrahedronElementSPtr>() { return m_tetrahedronElements; }
 
 
 template<class DataTypes>
