@@ -56,13 +56,8 @@ public:
         }
     }
 
-    inline ElementIterator::SPtr begin(unsigned id = 0) const override {
-        return edgeBegin(id);
-    }
+    inline ElementIterator::SPtr begin(unsigned id = 0) const override { return this->edgeBegin(id); }
 
-    inline ElementIterator::SPtr edgeBegin(unsigned id = 0) const {
-        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(this->edgeElements(),id));
-    }
 
 };
 

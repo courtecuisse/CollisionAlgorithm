@@ -34,13 +34,7 @@ public:
         }
     }
 
-    ElementIterator::SPtr begin(unsigned id = 0) const override {
-        return pointBegin(id);
-    }
-
-    inline ElementIterator::SPtr pointBegin(unsigned id = 0) const {
-        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(this->pointElements(),id));
-    }
+    ElementIterator::SPtr begin(unsigned id = 0) const override { return this->pointBegin(id); }
 
 };
 

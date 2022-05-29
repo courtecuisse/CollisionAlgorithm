@@ -34,6 +34,11 @@ public:
     }
 
     void init() {
+        m_pointElements.clear();
+        m_edgeElements.clear();
+        m_triangleElements.clear();
+        m_tetrahedronElements.clear();
+
         buildPointElements();
         buildEdgeElements();
         buildTriangleElements();
@@ -82,6 +87,22 @@ public:
         for (auto it = begin();it != end(); it++) {
             it->element()->draw(vparams);
         }        
+    }
+
+    inline ElementIterator::SPtr pointBegin(unsigned id = 0) const {
+        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_pointElements,id));
+    }
+
+    inline ElementIterator::SPtr edgeBegin(unsigned id = 0) const {
+        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_edgeElements,id));
+    }
+
+    inline ElementIterator::SPtr triangleBegin(unsigned id = 0) const {
+        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_triangleElements,id));
+    }
+
+    inline ElementIterator::SPtr tetrahedronBegin(unsigned id = 0) const {
+        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_tetrahedronElements,id));
     }
 
 protected:

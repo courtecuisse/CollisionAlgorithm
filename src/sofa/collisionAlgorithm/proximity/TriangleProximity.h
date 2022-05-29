@@ -8,6 +8,8 @@ namespace sofa::collisionAlgorithm {
 class TriangleProximity : public BaseProximity{
 public:
 
+    typedef std::shared_ptr<TriangleProximity> SPtr;
+
     TriangleProximity(TriangleElement::SPtr elmt, double f0,double f1,double f2)
     : m_elmt(elmt), m_f0(f0), m_f1(f1), m_f2(f2){}
 
@@ -41,6 +43,8 @@ public:
         m_elmt->getP1()->storeLambda(cParams,res,cid_global,cid_local,lambda);
         m_elmt->getP2()->storeLambda(cParams,res,cid_global,cid_local,lambda);
     }
+
+    TriangleElement::SPtr element() { return m_elmt; }
 
 protected:
     TriangleElement::SPtr m_elmt;

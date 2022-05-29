@@ -30,22 +30,17 @@ public:
 
     void buildTriangleElements() override {
         for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
-//            auto tri = this->l_topology->getTriangle(i);
             auto edgeId = this->l_topology->getEdgesInTriangle(i);
 
             EdgeElement::SPtr edge0 = this->edgeElements()[edgeId[0]];
             EdgeElement::SPtr edge1 = this->edgeElements()[edgeId[1]];
             EdgeElement::SPtr edge2 = this->edgeElements()[edgeId[2]];
 
-//            auto elmt = BaseElement::create<TriangleElement>(this->m_topoProx[tri[0]],this->m_topoProx[tri[1]],this->m_topoProx[tri[2]]);
-
             this->insert(TriangleElement::SPtr(edge0, edge1, edge2));
         }
     }
 
-    inline ElementIterator::SPtr begin(unsigned id = 0) const override {
-        return ElementIterator::SPtr(new TDefaultElementIteratorSPtr(this->triangleElements(),id));
-    }
+    inline ElementIterator::SPtr begin(unsigned id = 0) const override { return this->triangleBegin(id); }
 
 };
 
