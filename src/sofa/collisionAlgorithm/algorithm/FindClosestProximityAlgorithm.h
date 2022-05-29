@@ -15,7 +15,36 @@ public:
 
     using Inherit = GenericOperation;
 
-    GenericOperation::FUNC getDefault() const override;
+    static BaseProximity::SPtr doFindClosestProx(BaseProximity::SPtr prox, ElementIterator::SPtr itdest) {
+        double min_dist = std::numeric_limits<double>::max();
+        BaseProximity::SPtr res = NULL;
+
+        type::Vector3 P = prox->getPosition();
+        Operations::ProjectOperation::FUNC projectOp = Operations::ProjectOperation::get(itdest->getOperationsHash());
+
+        for (; ! itdest->end();itdest++) {
+            auto edest = itdest->element();
+            if (edest == nullptr) continue;
+
+            BaseProximity::SPtr pdest = projectOp(prox->getPosition(),edest);
+            if (pdest == NULL) continue;
+
+            double d = (P - pdest->getPosition()).norm();
+            if (d < min_dist) {
+                res = pdest;
+                min_dist = d;
+            }
+        }
+
+        return res;
+    }
+
+    //By default no broadPhase so we loop over all elements
+    FUNC getDefault() const override {
+    return [=](BaseProximity::SPtr prox,BaseGeometry * geo) -> BaseProximity::SPtr {
+                return doFindClosestProx(prox,geo->begin());
+           };
+    }
 };
 
 class FindClosestProximityAlgorithm : public BaseAlgorithm {

@@ -32,12 +32,12 @@ TetrahedronElementSPtr::TetrahedronElementSPtr(BaseProximity::SPtr p0, BaseProxi
 TetrahedronElementSPtr::TetrahedronElementSPtr(TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3)
 : std::shared_ptr<TetrahedronElement>(new TetrahedronElement()) {
 
-    get()->insertElement(tri0->elements<PointElement>()[0]);
-    get()->insertElement(tri0->elements<PointElement>()[1]);
-    get()->insertElement(tri0->elements<PointElement>()[2]);
-    get()->insertElement(tri1->elements<PointElement>()[0]);
-    get()->insertElement(tri1->elements<PointElement>()[1]);
-    get()->insertElement(tri1->elements<PointElement>()[2]);
+    get()->insertElement(tri0->pointElements()[0]);
+    get()->insertElement(tri0->pointElements()[1]);
+    get()->insertElement(tri0->pointElements()[2]);
+    get()->insertElement(tri1->pointElements()[0]);
+    get()->insertElement(tri1->pointElements()[1]);
+    get()->insertElement(tri1->pointElements()[2]);
 
     get()->insertElement(tri0->edgeElements()[0]);
     get()->insertElement(tri0->edgeElements()[1]);

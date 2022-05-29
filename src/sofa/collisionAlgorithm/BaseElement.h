@@ -28,9 +28,6 @@ public:
 
     const std::vector<TetrahedronElementSPtr > & tetrahedronElements() const { return m_tetrahedronElements; }
 
-    template<class ELMT>
-    const std::vector<typename ELMT::SPtr > & elements() const;
-
     virtual void draw(const core::visual::VisualParams * vparams) = 0;
 
     virtual size_t getOperationsHash() const = 0;
