@@ -30,7 +30,7 @@ public:
                m_elmt->getP1()->getPosition(v) * m_f1;
     }
 
-    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const override {
+    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::linearalgebra::BaseVector* lambda) const override {
         m_elmt->getP0()->storeLambda(cParams,res,cid_global,cid_local,lambda);
         m_elmt->getP1()->storeLambda(cParams,res,cid_global,cid_local,lambda);
     }

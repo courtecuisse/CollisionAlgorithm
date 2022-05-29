@@ -80,7 +80,7 @@ public:
         auto createProximityFrom = Operations::CreateCenterProximityOperation::get(l_from->begin()->getOperationsHash());
         auto createProximityDest = Operations::CreateCenterProximityOperation::get(l_dest->begin()->getOperationsHash());
 
-        for (int i = 0; i<d_bindDest.getValue().size(); i++)
+        for (unsigned i = 0; i<d_bindDest.getValue().size(); i++)
 		{
 			auto fromIt = l_from->begin();
 			auto destIt = l_dest->begin();

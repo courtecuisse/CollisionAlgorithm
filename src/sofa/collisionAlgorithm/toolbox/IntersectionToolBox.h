@@ -157,7 +157,7 @@ public:
     }
 
     static std::pair<BaseElement::SPtr,BaseElement::SPtr> intersect_tetra_edge(BaseElement::SPtr e1, BaseElement::SPtr e2) {
-        intersect_edge_tetra(e2,e1);
+        return intersect_edge_tetra(e2,e1);
     }
 
   // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
