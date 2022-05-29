@@ -8,6 +8,8 @@ namespace sofa::collisionAlgorithm {
 class EdgeProximity : public BaseProximity {
 public:
 
+    typedef std::shared_ptr<EdgeProximity> SPtr;
+
     EdgeProximity(EdgeElement::SPtr elmt,double f0,double f1)
     : m_elmt(elmt), m_f0(f0), m_f1(f1) {}
 
@@ -32,6 +34,8 @@ public:
         m_elmt->getP0()->storeLambda(cParams,res,cid_global,cid_local,lambda);
         m_elmt->getP1()->storeLambda(cParams,res,cid_global,cid_local,lambda);
     }
+
+    EdgeElement::SPtr element() { return m_elmt; }
 
 protected:
     EdgeElement::SPtr m_elmt;

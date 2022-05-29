@@ -46,6 +46,12 @@ public:
 
     TriangleElement::SPtr element() { return m_elmt; }
 
+    double f0() { return m_f0; }
+
+    double f1() { return m_f1; }
+
+    double f2() { return m_f2; }
+
 protected:
     TriangleElement::SPtr m_elmt;
     double m_f0,m_f1,m_f2;

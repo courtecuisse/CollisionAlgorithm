@@ -4,7 +4,6 @@
 #include <sofa/collisionAlgorithm/elements/TetrahedronElement.h>
 #include <sofa/collisionAlgorithm/proximity/TetrahedronProximity.h>
 #include <sofa/core/topology/BaseMeshTopology.h>
-#include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
 
 namespace sofa::collisionAlgorithm {
 

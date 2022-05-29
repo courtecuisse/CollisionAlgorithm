@@ -5,10 +5,10 @@
 namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
-class TopologyProximity : public TBaseProximity<DataTypes> {
+class MechanicalProximity : public TBaseProximity<DataTypes> {
 public:
 
-    typedef std::shared_ptr<TopologyProximity<DataTypes> > SPtr;
+    typedef std::shared_ptr<MechanicalProximity<DataTypes> > SPtr;
 
     typedef TBaseProximity<DataTypes> PROXIMITY;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
@@ -24,32 +24,14 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
 
 
-    TopologyProximity(State * state, unsigned pid)
+    MechanicalProximity(State * state,  unsigned pid)
     : m_state(state)
-    , m_pid(pid)
-    {
-        m_normal = type::Vector3();
-    }
+    , m_pid(pid) {}
 
 
     State * getState() const {
-           return m_state;
-       }
-
-//    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
-//        DataMatrixDeriv & c1_d = *cId[getState()].write();
-//        MatrixDeriv & c1 = *c1_d.beginEdit();
-
-//        for (Index j=0;j<dir.size();j++) {
-//            MatrixDerivRowIterator c_it = c1.writeLine(constraintId+j);
-//            addContributions(c_it,dir[j],fact);
-//        }
-
-//        c1_d.endEdit();
-
-
-
-//    }
+        return m_state;
+    }
 
     void addContributions(MatrixDerivRowIterator & c_it, const sofa::type::Vector3 & N,double fact) const override {
         c_it.addCol(m_pid, N * fact);
@@ -66,9 +48,6 @@ public:
         return m_pid;
     }
 
-    void setNormal(sofa::type::Vector3 normal) {
-        m_normal = normal;
-    }
 
 //    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const override {
 //        auto res = sofa::helper::getWriteAccessor(*resId[getState()].write());
@@ -86,7 +65,6 @@ public:
 protected:
     State * m_state;
     unsigned m_pid;
-    sofa::type::Vector3 m_normal;
 };
 
 }

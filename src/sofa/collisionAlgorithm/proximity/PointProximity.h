@@ -7,6 +7,8 @@ namespace sofa::collisionAlgorithm {
 class PointProximity : public BaseProximity {
 public:
 
+    typedef std::shared_ptr<PointProximity> SPtr;
+
     PointProximity(PointElement::SPtr elmt)
     : m_elmt(elmt) {}
 
@@ -22,6 +24,8 @@ public:
     void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const override {
         m_elmt->getP0()->storeLambda(cParams,res,cid_global,cid_local,lambda);
     }
+
+    PointElement::SPtr element() { return m_elmt; }
 
 protected:
     PointElement::SPtr m_elmt;

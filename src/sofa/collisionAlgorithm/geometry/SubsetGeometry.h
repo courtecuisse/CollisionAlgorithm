@@ -3,11 +3,8 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 #include <sofa/collisionAlgorithm/toolbox/PointToolBox.h>
-#include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
 
-namespace sofa {
-
-namespace collisionAlgorithm {
+namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
 class SubsetGeometry : public TBaseGeometry<DataTypes> {
@@ -69,7 +66,5 @@ public:
 private:
     std::vector<BaseElement::SPtr> m_elements;
 };
-
-}
 
 }

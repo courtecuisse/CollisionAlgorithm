@@ -4,7 +4,6 @@
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 #include <sofa/collisionAlgorithm/elements/PointElement.h>
 #include <sofa/collisionAlgorithm/toolbox/PointToolBox.h>
-#include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
 
 namespace sofa {
 
@@ -29,7 +28,7 @@ public:
     void buildPointElements() override {
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
         for (unsigned i=0;i<pos.size();i++) {
-            auto prox = BaseProximity::SPtr(new TopologyProximity(this->getState(),i));
+            auto prox = BaseProximity::SPtr(new MechanicalProximity(this->getState(),i));
             this->pointElements().insert(PointElement::create(prox));
         }
     }

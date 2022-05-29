@@ -6,6 +6,9 @@ namespace sofa::collisionAlgorithm {
 
 class MultiProximity : public BaseProximity {
 public:
+
+    typedef std::shared_ptr<MultiProximity> SPtr;
+
     MultiProximity(std::vector<BaseProximity::SPtr> & prox)
     : m_proximities(prox){}
 

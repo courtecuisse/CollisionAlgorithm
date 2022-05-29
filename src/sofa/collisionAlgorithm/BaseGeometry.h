@@ -3,7 +3,7 @@
 #include <sofa/collisionAlgorithm/CollisionPipeline.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
-#include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
+#include <sofa/collisionAlgorithm/proximity/MechanicalProximity.h>
 #include <sofa/collisionAlgorithm/ElementIterator.h>
 #include <sofa/gl/gl.h>
 #include <sofa/collisionAlgorithm/elements/PointElement.h>
@@ -119,7 +119,6 @@ template<class DataTypes>
 class TBaseGeometry : public BaseGeometry {
 public:
 
-    typedef typename TopologyProximity<DataTypes>::SPtr PROXIMITY;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;

@@ -3,27 +3,8 @@
 #include <sofa/collisionAlgorithm/geometry/PointGeometry.h>
 #include <sofa/collisionAlgorithm/toolbox/EdgeToolBox.h>
 #include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
-#include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
 
 namespace sofa::collisionAlgorithm {
-
-
-template<class DataTypes>
-class LinkEdgeProximity : public EdgeProximity {
-public:
-    typedef sofa::core::behavior::MechanicalState<DataTypes> State;
-    typedef typename DataTypes::VecCoord VecCoord;
-    typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
-
-    LinkEdgeProximity(BaseProximity::SPtr p0,BaseProximity::SPtr p1,double f0,double f1)
-    : EdgeProximity(p0,p1,f0,f1) {}
-
-    sofa::type::Vector3 getNormal() const override {
-        return ((this->m_p1->getPosition() - this->m_p0->getPosition()).normalized());
-    }
-
-};
-
 
 template<class DataTypes>
 class EdgeGeometry : public PointGeometry<DataTypes> {

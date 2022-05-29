@@ -7,6 +7,8 @@ namespace sofa::collisionAlgorithm {
 class TetrahedronProximity : public BaseProximity {
 public:
 
+    typedef std::shared_ptr<TetrahedronProximity> SPtr;
+
     TetrahedronProximity(TetrahedronElement::SPtr elmt, double f0,double f1,double f2,double f3)
     : m_elmt(elmt), m_f0(f0), m_f1(f1), m_f2(f2), m_f3(f3){}
 
@@ -52,6 +54,8 @@ public:
         m_elmt->getP2()->storeLambda(cParams,res,cid_global,cid_local,lambda);
         m_elmt->getP3()->storeLambda(cParams,res,cid_global,cid_local,lambda);
     }
+
+    TetrahedronElement::SPtr element() { return m_elmt; }
 
 protected:
     TetrahedronElement::SPtr m_elmt;

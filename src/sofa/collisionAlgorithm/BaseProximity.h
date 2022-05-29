@@ -14,6 +14,8 @@ namespace sofa::collisionAlgorithm {
 /*!
  * \brief The BaseProximity class is the basic abstract proximity class
  */
+class BaseElement;
+
 class BaseProximity {
 public:
     typedef std::shared_ptr<BaseProximity> SPtr;
