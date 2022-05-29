@@ -300,8 +300,8 @@ public:
             type::BoundingBox bbox;
 //            std::cout << "size v_prox : " << v_prox.size() << std::endl;
 
-            for (unsigned b=0;b<elmt->pointElements().size();b++) {
-                bbox.include(elmt->pointElements()[b]->getP0()->getPosition());
+            for (auto it = elmt->pointElements().cbegin(); it!= elmt->pointElements().cend(); it++) {
+                bbox.include((*it)->getP0()->getPosition());
             }
 
             const type::Vector3 & minbox = bbox.minBBox();

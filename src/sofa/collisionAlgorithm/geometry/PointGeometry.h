@@ -30,7 +30,7 @@ public:
         const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
         for (unsigned i=0;i<pos.size();i++) {
             auto prox = BaseProximity::SPtr(new TopologyProximity(this->getState(),i));
-            this->insert(PointElement::SPtr(prox));
+            this->pointElements().insert(PointElement::create(prox));
         }
     }
 

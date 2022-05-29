@@ -7,12 +7,12 @@ namespace sofa::collisionAlgorithm {
 
 class TriangleElementSPtr : public std::shared_ptr<TriangleElement> {
 public:
-
-    TriangleElementSPtr(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2);
-
-    TriangleElementSPtr(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2);
+    friend class TriangleElement;
 
     BaseProximity::SPtr createProximity(double f0,double f1,double f2) const;
+
+private:
+    TriangleElementSPtr(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2);
 };
 
 
@@ -98,6 +98,9 @@ public:
         }
     }
 
+    static TriangleElementSPtr create(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2);
+
+    static TriangleElementSPtr create(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2);
 private:
     TriangleInfo m_tinfo;
     TriangleElement() {}

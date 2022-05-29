@@ -7,12 +7,12 @@ namespace sofa::collisionAlgorithm {
 
 class TetrahedronElementSPtr : public std::shared_ptr<TetrahedronElement> {
 public:
-
-    TetrahedronElementSPtr(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2,BaseProximity::SPtr p3);
-
-    TetrahedronElementSPtr(TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3);
+    friend class TetrahedronElement;
 
     BaseProximity::SPtr createProximity(double f0,double f1,double f2,double f3) const;
+
+private:
+    TetrahedronElementSPtr(TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3);
 };
 
 class TetrahedronElement : public BaseElement {
@@ -88,6 +88,10 @@ public:
             glEnd();
         }
     }
+
+    static SPtr create(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2,BaseProximity::SPtr p3);
+
+    static SPtr create(TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3);
 
 private:
     TetraInfo m_tinfo;

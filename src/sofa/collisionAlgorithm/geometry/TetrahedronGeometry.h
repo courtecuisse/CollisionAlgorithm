@@ -37,7 +37,7 @@ public:
             TriangleElement::SPtr triangle2 = this->triangleElements()[triId[2]];
             TriangleElement::SPtr triangle3 = this->triangleElements()[triId[3]];
 
-            this->insert(TetrahedronElement::SPtr(triangle0, triangle1, triangle2, triangle3));
+            this->tetrahedronElements().insert(TetrahedronElement::create(triangle0, triangle1, triangle2, triangle3));
         }
     }
 

@@ -52,7 +52,7 @@ public:
             PointElement::SPtr point0 = this->pointElements()[edge[0]];
             PointElement::SPtr point1 = this->pointElements()[edge[1]];
 
-            this->insert(EdgeElement::SPtr(point0,point1));
+            this->edgeElements().insert(EdgeElement::create(point0,point1));
         }
     }
 

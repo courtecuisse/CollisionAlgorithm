@@ -61,14 +61,6 @@ public:
         for (unsigned i=0;i<m_tetrahedronElements.size();i++) m_tetrahedronElements[i]->update();
     }
 
-    virtual const std::vector<PointElement::SPtr> & pointElements() const { return m_pointElements; }
-
-    virtual const std::vector<EdgeElement::SPtr> & edgeElements() const { return m_edgeElements; }
-
-    virtual const std::vector<TriangleElement::SPtr> & triangleElements() const { return m_triangleElements; }
-
-    virtual const std::vector<TetrahedronElement::SPtr> & tetrahedronElements() const { return m_tetrahedronElements; }
-
     virtual ElementIterator::SPtr begin(unsigned id = 0) const = 0;
 
     inline const BaseGeometry * end() const { return this; }
@@ -107,39 +99,21 @@ public:
 
 protected:
 
-    template<class ELMTSPtr>
-    inline void insert(const ELMTSPtr e) {
-        std::vector<ELMTSPtr> & v = elementVector<ELMTSPtr>();
+    virtual ElementContainer<PointElement::SPtr> & pointElements() { return m_pointElements; }
 
-        for (unsigned i=0;i<v.size();i++)
-            if (e == v[i]) return;
+    virtual ElementContainer<EdgeElement::SPtr> & edgeElements() { return m_edgeElements; }
 
-        v.push_back(e);
-    }
+    virtual ElementContainer<TriangleElement::SPtr> & triangleElements() { return m_triangleElements; }
+
+    virtual ElementContainer<TetrahedronElement::SPtr> & tetrahedronElements() { return m_tetrahedronElements; }
 
 private:
 
-    template<class ELMTSPtr>
-    inline std::vector<ELMTSPtr > & elementVector();
-
-    std::vector<PointElement::SPtr> m_pointElements;
-    std::vector<EdgeElement::SPtr> m_edgeElements;
-    std::vector<TriangleElement::SPtr> m_triangleElements;
-    std::vector<TetrahedronElement::SPtr> m_tetrahedronElements;
+    ElementContainer<PointElement::SPtr> m_pointElements;
+    ElementContainer<EdgeElement::SPtr> m_edgeElements;
+    ElementContainer<TriangleElement::SPtr> m_triangleElements;
+    ElementContainer<TetrahedronElement::SPtr> m_tetrahedronElements;
 };
-
-template<>
-inline std::vector<PointElementSPtr > & BaseGeometry::elementVector<PointElementSPtr>() { return m_pointElements; }
-
-template<>
-inline std::vector<EdgeElementSPtr > & BaseGeometry::elementVector<EdgeElementSPtr>() { return m_edgeElements; }
-
-template<>
-inline std::vector<TriangleElementSPtr > & BaseGeometry::elementVector<TriangleElementSPtr>() { return m_triangleElements; }
-
-template<>
-inline std::vector<TetrahedronElementSPtr > & BaseGeometry::elementVector<TetrahedronElementSPtr>() { return m_tetrahedronElements; }
-
 
 template<class DataTypes>
 class TBaseGeometry : public BaseGeometry {

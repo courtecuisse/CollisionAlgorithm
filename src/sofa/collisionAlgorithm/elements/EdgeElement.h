@@ -7,12 +7,12 @@ namespace sofa::collisionAlgorithm {
 
 class EdgeElementSPtr : public std::shared_ptr<EdgeElement> {
 public:
-
-    EdgeElementSPtr(BaseProximity::SPtr p0,BaseProximity::SPtr p1);
-
-    EdgeElementSPtr(PointElement::SPtr point0, PointElement::SPtr point1);
+    friend class EdgeElement;
 
     BaseProximity::SPtr createProximity(double f0,double f1) const;
+
+private:
+    EdgeElementSPtr(PointElement::SPtr point0, PointElement::SPtr point1);
 };
 
 class EdgeElement : public BaseElement {
@@ -41,6 +41,10 @@ public:
             glVertex3dv(p1.data());
         glEnd();
     }
+
+    static SPtr create(PointElement::SPtr point0, PointElement::SPtr point1);
+
+    static SPtr create(BaseProximity::SPtr p0,BaseProximity::SPtr p1);
 
 private:
     EdgeElement() {}

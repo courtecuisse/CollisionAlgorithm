@@ -7,10 +7,12 @@ namespace sofa::collisionAlgorithm {
 
 class PointElementSPtr : public std::shared_ptr<PointElement> {
 public:
-
-    PointElementSPtr(BaseProximity::SPtr prox);
+    friend class PointElement;
 
     BaseProximity::SPtr createProximity() const;
+
+private:
+    PointElementSPtr(BaseProximity::SPtr prox);
 };
 
 class PointElement : public BaseElement {
@@ -36,8 +38,13 @@ public:
         glEnd();
     }
 
+    ElementContainer<TriangleElementSPtr > & triangleAround() { return m_triangleAround; }
+
+    static SPtr create(BaseProximity::SPtr prox);
+
 private:
     BaseProximity::SPtr m_point;
+    ElementContainer<TriangleElementSPtr > m_triangleAround;
 
     PointElement(BaseProximity::SPtr prox) : m_point(prox) {}
 

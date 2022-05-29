@@ -36,7 +36,7 @@ public:
             EdgeElement::SPtr edge1 = this->edgeElements()[edgeId[1]];
             EdgeElement::SPtr edge2 = this->edgeElements()[edgeId[2]];
 
-            this->insert(TriangleElement::SPtr(edge0, edge1, edge2));
+            this->triangleElements().insert(TriangleElement::create(edge0, edge1, edge2));
         }
     }
 

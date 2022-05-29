@@ -36,11 +36,11 @@ public:
         if (toolbox::TetrahedronToolBox::isInTetra(eP0, tetraInfo, factE0[0], factE0[1], factE0[2], factE0[3])
          && toolbox::TetrahedronToolBox::isInTetra(eP1, tetraInfo, factE1[0], factE1[1], factE1[2], factE1[3])) {
 //            std::cout << "original edge returned" << std::endl;
-            EdgeElement::SPtr edge = EdgeElement::SPtr(edge->getP0(), edge->getP1());
+            EdgeElement::SPtr edge = EdgeElement::create(edge->getP0(), edge->getP1());
 
             auto proxTetra1 = TetrahedronToolBox::project(edge->getP0()->getPosition(), tetra);
             auto proxTetra2 = TetrahedronToolBox::project(edge->getP1()->getPosition(), tetra);
-            EdgeElement::SPtr edgeFromTetra = EdgeElement::SPtr(proxTetra1, proxTetra2);
+            EdgeElement::SPtr edgeFromTetra = EdgeElement::create(proxTetra1, proxTetra2);
 
             return std::pair<BaseElement::SPtr,BaseElement::SPtr>(edge,edgeFromTetra);
         }
@@ -51,10 +51,10 @@ public:
         auto proxP2 = tetra->getP2();
         auto proxP3 = tetra->getP3();
 
-        TriangleElement::SPtr triangle0(proxP0, proxP1, proxP2);
-        TriangleElement::SPtr triangle1(proxP1, proxP2, proxP3);
-        TriangleElement::SPtr triangle2(proxP2, proxP3, proxP0);
-        TriangleElement::SPtr triangle3(proxP3, proxP0, proxP1);
+        auto  triangle0 = TriangleElement::create(proxP0, proxP1, proxP2);
+        auto  triangle1 = TriangleElement::create(proxP1, proxP2, proxP3);
+        auto  triangle2 = TriangleElement::create(proxP2, proxP3, proxP0);
+        auto  triangle3 = TriangleElement::create(proxP3, proxP0, proxP1);
 
 //        std::vector<BaseElement::SPtr> intersections;
 

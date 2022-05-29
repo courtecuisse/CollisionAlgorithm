@@ -15,18 +15,47 @@ class EdgeElementSPtr;
 class TriangleElementSPtr;
 class TetrahedronElementSPtr;
 
+template<class ELMTSPtr>
+class ElementContainer {
+public:
+
+    typedef typename std::vector<ELMTSPtr>::const_iterator const_iterator;
+
+    void insert(const ELMTSPtr & e) {
+        for (unsigned i=0;i<m_data.size();i++)
+            if (e == m_data[i]) return;
+
+        m_data.push_back(e);
+    }
+
+    ELMTSPtr operator[](unsigned i) { return m_data[i]; }
+
+    const ELMTSPtr operator[](unsigned i) const { return m_data[i]; }
+
+    void clear() { m_data.clear(); }
+
+    unsigned size() const { return m_data.size(); }
+
+    const_iterator cbegin() const { return m_data.cbegin(); }
+
+    const_iterator cend() const { return m_data.cend(); }
+
+private:
+    std::vector<ELMTSPtr> m_data;
+};
+
 class BaseElement {
 public:
 
     typedef std::shared_ptr<BaseElement> SPtr;
 
-    const std::vector<PointElementSPtr > & pointElements() const { return m_pointElements; }
+    const ElementContainer<PointElementSPtr > & pointElements() const { return m_pointElements; }
 
-    const std::vector<EdgeElementSPtr > & edgeElements() const { return m_edgeElements; }
+    const ElementContainer<EdgeElementSPtr > & edgeElements() const { return m_edgeElements; }
 
-    const std::vector<TriangleElementSPtr > & triangleElements() const { return m_triangleElements; }
+    const ElementContainer<TriangleElementSPtr > & triangleElements() const { return m_triangleElements; }
 
-    const std::vector<TetrahedronElementSPtr > & tetrahedronElements() const { return m_tetrahedronElements; }
+    const ElementContainer<TetrahedronElementSPtr > & tetrahedronElements() const { return m_tetrahedronElements; }
 
     virtual void draw(const core::visual::VisualParams * vparams) = 0;
 
@@ -38,37 +67,20 @@ public:
 
 protected:
 
-    template<class ELMTSPtr>
-    inline void insertElement(const ELMTSPtr & e) {
-        std::vector<ELMTSPtr> & v = elementVector<ELMTSPtr>();
+    ElementContainer<PointElementSPtr > & _pointElements() { return m_pointElements; }
 
-        for (unsigned i=0;i<v.size();i++)
-            if (e == v[i]) return;
+    ElementContainer<EdgeElementSPtr > & _edgeElements() { return m_edgeElements; }
 
-        v.push_back(e);
-    }
+    ElementContainer<TriangleElementSPtr > & _triangleElements() { return m_triangleElements; }
+
+    ElementContainer<TetrahedronElementSPtr > & _tetrahedronElements() { return m_tetrahedronElements; }
 
 private:
-    std::vector<PointElementSPtr > m_pointElements;
-    std::vector<EdgeElementSPtr > m_edgeElements;
-    std::vector<TriangleElementSPtr > m_triangleElements;
-    std::vector<TetrahedronElementSPtr > m_tetrahedronElements;
-
-    template<class ELMTSPtr>
-    inline std::vector<ELMTSPtr> & elementVector();
+    ElementContainer<PointElementSPtr > m_pointElements;
+    ElementContainer<EdgeElementSPtr > m_edgeElements;
+    ElementContainer<TriangleElementSPtr > m_triangleElements;
+    ElementContainer<TetrahedronElementSPtr > m_tetrahedronElements;
 };
 
-
-template<>
-inline std::vector<PointElementSPtr > & BaseElement::elementVector<PointElementSPtr>() { return m_pointElements; }
-
-template<>
-inline std::vector<EdgeElementSPtr > & BaseElement::elementVector<EdgeElementSPtr>() { return m_edgeElements; }
-
-template<>
-inline std::vector<TriangleElementSPtr > & BaseElement::elementVector<TriangleElementSPtr>() { return m_triangleElements; }
-
-template<>
-inline std::vector<TetrahedronElementSPtr > & BaseElement::elementVector<TetrahedronElementSPtr>() { return m_tetrahedronElements; }
 
 }
