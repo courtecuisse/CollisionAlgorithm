@@ -13,7 +13,7 @@ public:
     typedef TFUNC FUNC;
 
     template<class T>
-    static inline FUNC get(T * obj) { return get(obj->getOperationHash()); }
+    static inline FUNC get(T * obj) { return get(obj->getOperationsHash()); }
 
     static FUNC get(size_t id/*const ElementIterator::SPtr itelmt*/) {
         //size_t id = itelmt->getOperationsHash();

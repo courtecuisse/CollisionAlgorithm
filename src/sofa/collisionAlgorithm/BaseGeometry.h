@@ -225,9 +225,19 @@ public:
     }
 
     void init() {
-        if (l_geometry != NULL) l_geometry->m_broadPhase = this;
+        if (l_geometry != NULL) {
+            l_geometry->m_broadPhase = this;
+            l_geometry->addSlave(this);
+        }
     }
 
+    virtual type::Vec3i getNbox() = 0;
+
+    virtual type::Vec3i getBoxCoord(const type::Vector3 & P) const = 0;
+
+    virtual const std::set<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const = 0;
+
+    size_t getOperationsHash() const { return l_geometry->getOperationsHash(); }
 
 };
 

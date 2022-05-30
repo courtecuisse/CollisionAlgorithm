@@ -48,13 +48,13 @@ public:
         output.clear();
 
         Operations::CreateCenterProximityOperation::FUNC createProximityOp = Operations::CreateCenterProximityOperation::get(l_from.get());
-        Operations::ProjectOperation::FUNC projectOp = Operations::ProjectOperation::get((l_dest->getBroadPhase()) ? l_dest->getBroadPhase(), l_dest.get());
+        Operations::ProjectOperation::FUNC projectOp = (l_dest->getBroadPhase()) ? Operations::ProjectOperation::get(l_dest->getBroadPhase()) : Operations::ProjectOperation::get(l_dest.get());
 
         for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
             auto pfrom = createProximityOp(itfrom->element());
             if (pfrom == nullptr) continue;
 
-            ElementIterator::SPtr itdest = (l_dest->getBroadPhase()) ? broadPhaseIterator(itfrom, l_dest->getBroadPhase()) : l_dest->begin();
+            ElementIterator::SPtr itdest = (l_dest->getBroadPhase()) ? broadPhaseIterator(pfrom, l_dest->getBroadPhase()) : l_dest->begin();
 
             auto pdest = doFindClosestProx(pfrom,itdest,projectOp);
             if (pdest == nullptr) continue;
@@ -91,7 +91,7 @@ public:
 
     static ElementIterator::SPtr broadPhaseIterator(BaseProximity::SPtr prox, BroadPhase * broadphase) {
         //old params : type::Vec3i cbox, std::set<BaseProximity::Index> & selectElements, int d
-        type::Vec3i nbox = broadphase->d_nbox.getValue();
+        type::Vec3i nbox = broadphase->getNbox();
 
         //take the first broad phase...
         type::Vector3 P = prox->getPosition();

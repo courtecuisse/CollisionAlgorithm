@@ -11,7 +11,7 @@ namespace sofa::collisionAlgorithm {
 class AABBBroadPhase : public BroadPhase {
 public:
 
-    SOFA_CLASS(AABBBroadPhase,BaseGeometry);
+    SOFA_CLASS(AABBBroadPhase,BroadPhase);
 
     Data<type::Vec3i> d_nbox;
     Data<bool> d_static;
@@ -28,13 +28,11 @@ public:
         l_geometry.setPath("@.");
     }
 
-    size_t getOperationsHash() const { return l_geometry->getOperationsHash(); }
-
     type::BoundingBox getBBox() const {
         return type::BoundingBox(m_Bmin,m_Bmax);
     }
 
-    const std::set<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const {
+    const std::set<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const override {
         auto it = m_indexedElement.find(getKey(i,j,k));
         if (it == m_indexedElement.end()) {
             static std::set<BaseElement::SPtr> empty;
@@ -272,13 +270,11 @@ public:
     }
 
     //compute the box where is P
-    inline type::Vec3i getBoxCoord(const type::Vector3 & P) const {
+    type::Vec3i getBoxCoord(const type::Vector3 & P) const override {
         return type::Vec3i((P[0] - m_Bmin[0])/m_cellSize[0],
                            (P[1] - m_Bmin[1])/m_cellSize[1],
                            (P[2] - m_Bmin[2])/m_cellSize[2]);
     }
-
-    virtual void recomputeNormals() {}
 
     inline unsigned getIKey(unsigned key) {
 //        return key - ((key/m_offset[0])*m_offset[0]);
@@ -290,6 +286,10 @@ public:
 
     inline unsigned getKKey(unsigned key) {
 
+    }
+
+    type::Vec3i getNbox() override {
+        return d_nbox.getValue();
     }
 
 protected:
