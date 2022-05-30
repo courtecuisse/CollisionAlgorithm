@@ -87,7 +87,8 @@ public:
 
     static TriangleElement::SPtr create(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2);
 
-    static TriangleElement::SPtr create(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2);
+    static TriangleElement::SPtr create(PointElement::SPtr p0, PointElement::SPtr p1, PointElement::SPtr p2,
+                                        EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2);
 
     const ElementContainer<PointElement> & pointElements() const override { return m_pointElements; }
 

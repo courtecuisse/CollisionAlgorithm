@@ -20,14 +20,15 @@ public:
 
     void buildTetrahedronElements() override {
         for (unsigned i=0;i<this->l_topology->getNbTetrahedra();i++) {
-            auto triId = this->l_topology->getTrianglesInTetrahedron(i);
+            auto tetra = this->l_topology->getTetrahedron(i);
 
-            TriangleElement::SPtr triangle0 = this->triangleElements()[triId[0]];
-            TriangleElement::SPtr triangle1 = this->triangleElements()[triId[1]];
-            TriangleElement::SPtr triangle2 = this->triangleElements()[triId[2]];
-            TriangleElement::SPtr triangle3 = this->triangleElements()[triId[3]];
+            auto eit = this->l_topology->getEdgesInTetrahedron(i);
+            auto tit = this->l_topology->getTrianglesInTetrahedron(i);
 
-            this->tetrahedronElements().insert(TetrahedronElement::create(triangle0, triangle1, triangle2, triangle3));
+            this->tetrahedronElements().insert(TetrahedronElement::create(
+                                                   this->pointElements()[tetra[0]],this->pointElements()[tetra[1]],this->pointElements()[tetra[2]],this->pointElements()[tetra[3]],
+                                                   this->edgeElements()[eit[0]],this->edgeElements()[eit[1]],this->edgeElements()[eit[2]],this->edgeElements()[eit[3]],this->edgeElements()[eit[4]],this->edgeElements()[eit[5]],
+                                                   this->triangleElements()[tit[0]],this->triangleElements()[tit[1]],this->triangleElements()[tit[2]],this->triangleElements()[tit[3]]));
         }
     }
 

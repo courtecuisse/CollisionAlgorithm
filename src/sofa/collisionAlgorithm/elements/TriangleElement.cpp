@@ -15,24 +15,24 @@ TriangleElement::SPtr TriangleElement::create(BaseProximity::SPtr prox0, BasePro
     EdgeElement::SPtr e1 = EdgeElement::create(p1,p2);
     EdgeElement::SPtr e2 = EdgeElement::create(p2,p0);
 
-    return TriangleElement::create(e0,e1,e2);
+    return TriangleElement::create(p0,p1,p2,e0,e1,e2);
 }
 
-TriangleElement::SPtr TriangleElement::create(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2) {
+TriangleElement::SPtr TriangleElement::create(PointElement::SPtr p0, PointElement::SPtr p1, PointElement::SPtr p2,
+                                              EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2) {
     auto res = std::shared_ptr<TriangleElement>(new TriangleElement());
 
-    res->m_pointElements.insert(edge0->pointElements()[0]);
-    res->m_pointElements.insert(edge0->pointElements()[1]);
-    res->m_pointElements.insert(edge1->pointElements()[0]);
-    res->m_pointElements.insert(edge1->pointElements()[1]);
+    res->m_pointElements.insert(p0);
+    res->m_pointElements.insert(p1);
+    res->m_pointElements.insert(p2);
 
     res->m_edgeElements.insert(edge0);
     res->m_edgeElements.insert(edge1);
     res->m_edgeElements.insert(edge2);
 
-    res->m_pointElements[0]->triangleAround().insert(res);
-    res->m_pointElements[1]->triangleAround().insert(res);
-    res->m_pointElements[2]->triangleAround().insert(res);
+    p0->triangleAround().insert(res);
+    p1->triangleAround().insert(res);
+    p2->triangleAround().insert(res);
 
 //    res->m_triangleElements.insert(res.get());
 

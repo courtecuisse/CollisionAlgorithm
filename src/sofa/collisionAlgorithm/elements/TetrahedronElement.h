@@ -79,7 +79,9 @@ public:
 
     static SPtr create(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2,BaseProximity::SPtr p3);
 
-    static SPtr create(TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3);
+    static SPtr create(PointElement::SPtr p0,PointElement::SPtr p1,PointElement::SPtr p2,PointElement::SPtr p3,
+                       EdgeElement::SPtr e0, EdgeElement::SPtr e1, EdgeElement::SPtr e2, EdgeElement::SPtr e3,EdgeElement::SPtr e4,EdgeElement::SPtr e5,
+                       TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3);
 
     const ElementContainer<PointElement> & pointElements() const override { return m_pointElements; }
 
