@@ -13,7 +13,7 @@
         <GenericConstraintSolver maxIterations="200" tolerance="0.0001" />
 
         <CollisionLoop />
-        <FindClosestProximityAlgorithm name="algo" dest="@Liver/Collision/Geometry" from="@Plane/Geometry" />
+        <FindClosestProximityAlgorithm name="algo" from="@Liver/Collision/Points" dest="@Plane/Geometry" />
 
 		<Node name="Liver">
                 <EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
@@ -33,6 +33,7 @@
                         <Tetra2TriangleTopologicalMapping input="@../Topology" output="@Container" flipNormals="false"/>
                         <MechanicalObject name="state" />
 
+                        <PointGeometry name="Points" color="0 1 0 1" />
                         <TriangleGeometry name="Geometry" color="0 1 0 1" />
                         <AABBBroadPhase name="AABB" geometry="@Geometry" nbox="8 8 8" />
 
@@ -54,6 +55,7 @@
                 <MeshTopology name="Topology1" triangles="@loader.triangles" />
                 <MechanicalObject name="State3D1" dy="1" position="@loader.position" />
                 <OglModel name="OglModel" color="1 1 1 0.8"/>
+                
                 <TriangleGeometry name="Geometry" color="1 1 1 0.6" />
         </Node>
 

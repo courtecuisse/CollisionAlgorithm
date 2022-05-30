@@ -5,21 +5,9 @@
 
 namespace sofa::collisionAlgorithm {
 
-class EdgeElementSPtr : public std::shared_ptr<EdgeElement> {
-public:
-    friend class EdgeElement;
-
-    BaseProximity::SPtr createProximity(double f0,double f1) const;
-
-private:
-    EdgeElementSPtr(PointElement::SPtr point0, PointElement::SPtr point1);
-};
-
 class EdgeElement : public BaseElement {
 public:
-    friend class EdgeElementSPtr;
-
-    typedef EdgeElementSPtr SPtr;
+    typedef std::shared_ptr<EdgeElement> SPtr;
 
     inline BaseProximity::SPtr getP0() const { return pointElements()[0]->getP0(); }
 
@@ -46,8 +34,19 @@ public:
 
     static SPtr create(BaseProximity::SPtr p0,BaseProximity::SPtr p1);
 
+    const ElementContainer<PointElement> & pointElements() const override { return m_pointElements; }
+
+    const ElementContainer<EdgeElement> & edgeElements() const override { return ElementContainer<EdgeElement>::empty(); }
+
+    const ElementContainer<TriangleElement> & triangleElements() const override { return ElementContainer<TriangleElement>::empty(); }
+
+    const ElementContainer<TetrahedronElement> & tetrahedronElements() const override { return ElementContainer<TetrahedronElement>::empty(); }
+
 private:
     EdgeElement() {}
+
+    ElementContainer<PointElement> m_pointElements;
+//    ElementContainer<EdgeElement> m_edgeElements;
 };
 
 }

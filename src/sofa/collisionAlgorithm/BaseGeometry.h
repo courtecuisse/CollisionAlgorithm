@@ -107,20 +107,21 @@ public:
 
 protected:
 
-    virtual ElementContainer<PointElement::SPtr> & pointElements() { return m_pointElements; }
+    virtual ElementContainer<PointElement> & pointElements() { return m_pointElements; }
 
-    virtual ElementContainer<EdgeElement::SPtr> & edgeElements() { return m_edgeElements; }
+    virtual ElementContainer<EdgeElement> & edgeElements() { return m_edgeElements; }
 
-    virtual ElementContainer<TriangleElement::SPtr> & triangleElements() { return m_triangleElements; }
+    virtual ElementContainer<TriangleElement> & triangleElements() { return m_triangleElements; }
 
-    virtual ElementContainer<TetrahedronElement::SPtr> & tetrahedronElements() { return m_tetrahedronElements; }
+    virtual ElementContainer<TetrahedronElement> & tetrahedronElements() { return m_tetrahedronElements; }
 
 private:
 
-    ElementContainer<PointElement::SPtr> m_pointElements;
-    ElementContainer<EdgeElement::SPtr> m_edgeElements;
-    ElementContainer<TriangleElement::SPtr> m_triangleElements;
-    ElementContainer<TetrahedronElement::SPtr> m_tetrahedronElements;
+    ElementContainer<PointElement> m_pointElements;
+    ElementContainer<EdgeElement> m_edgeElements;
+    ElementContainer<TriangleElement> m_triangleElements;
+    ElementContainer<TetrahedronElement> m_tetrahedronElements;
+
     BroadPhase * m_broadPhase;
 };
 

@@ -27,6 +27,10 @@ public:
 
     PointElement::SPtr element() { return m_elmt; }
 
+    static BaseProximity::SPtr create(const PointElement::SPtr & p) {
+        return p->getP0();
+    }
+
 protected:
     PointElement::SPtr m_elmt;
 };

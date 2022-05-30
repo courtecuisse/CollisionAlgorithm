@@ -37,6 +37,10 @@ public:
 
     EdgeElement::SPtr element() { return m_elmt; }
 
+    static EdgeProximity::SPtr create(EdgeElement::SPtr sptr, double f0,double f1) {
+        return EdgeProximity::SPtr(new EdgeProximity(sptr,f0,f1));
+    }
+
 protected:
     EdgeElement::SPtr m_elmt;
     double m_f0,m_f1;

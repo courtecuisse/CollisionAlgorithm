@@ -47,6 +47,10 @@ public:
         updateBroadPhase();
     }
 
+    void init() {
+        updateBroadPhase();
+    }
+
     void updateBroadPhase() {
         sofa::core::behavior::BaseMechanicalState * mstate = l_geometry->getState();
 
@@ -274,15 +278,15 @@ public:
     }
 
     inline unsigned getIKey(unsigned key) {
-//        return key - ((key/m_offset[0])*m_offset[0]);
+        return key/m_offset[0];
     }
 
     inline unsigned getJKey(unsigned key) {
-//        return key - (key/m_offset[0]/m_offset;
+        return (key - getIKey(key) * m_offset[0])/m_offset[1];
     }
 
     inline unsigned getKKey(unsigned key) {
-
+        return key - getIKey(key) * m_offset[0] - getJKey(key) * m_offset[1];
     }
 
     type::Vec3i getNbox() override {

@@ -10,53 +10,53 @@ class EdgeElement;
 class TriangleElement;
 class TetrahedronElement;
 
-class PointElementSPtr;
-class EdgeElementSPtr;
-class TriangleElementSPtr;
-class TetrahedronElementSPtr;
-
-template<class ELMTSPtr>
+template<class ELMT>
 class ElementContainer {
 public:
+    typedef typename std::shared_ptr<ELMT> SPtr;
 
-    typedef typename std::vector<ELMTSPtr>::const_iterator const_iterator;
+    typedef typename std::vector<SPtr>::const_iterator const_iterator;
 
-    void insert(const ELMTSPtr & e) {
+    void insert(SPtr e) {
         for (unsigned i=0;i<m_data.size();i++)
             if (e == m_data[i]) return;
 
         m_data.push_back(e);
     }
 
-    ELMTSPtr operator[](unsigned i) { return m_data[i]; }
+    inline SPtr operator[](unsigned i) { return m_data[i]; }
 
-    const ELMTSPtr operator[](unsigned i) const { return m_data[i]; }
+    inline const SPtr operator[](unsigned i) const { return m_data[i]; }
 
-    void clear() { m_data.clear(); }
+    inline void clear() { m_data.clear(); }
 
-    unsigned size() const { return m_data.size(); }
+    inline unsigned size() const { return m_data.size(); }
 
-    const_iterator cbegin() const { return m_data.cbegin(); }
+    inline const_iterator cbegin() const { return m_data.cbegin(); }
 
-    const_iterator cend() const { return m_data.cend(); }
+    inline const_iterator cend() const { return m_data.cend(); }
+
+    static inline const ElementContainer & empty() {
+        static ElementContainer s_empty;
+        return s_empty;
+    }
 
 private:
-    std::vector<ELMTSPtr> m_data;
+    std::vector<SPtr> m_data;
 };
 
-//: public std::enable_shared_from_this<BaseElement>
-class BaseElement  {
+class BaseElement {
 public:
 
     typedef std::shared_ptr<BaseElement> SPtr;
 
-    const ElementContainer<PointElementSPtr > & pointElements() const { return m_pointElements; }
+    virtual const ElementContainer<PointElement> & pointElements() const = 0;//{ return m_pointElements; }
 
-    const ElementContainer<EdgeElementSPtr > & edgeElements() const { return m_edgeElements; }
+    virtual const ElementContainer<EdgeElement> & edgeElements() const = 0;//{ return m_edgeElements; }
 
-    const ElementContainer<TriangleElementSPtr > & triangleElements() const { return m_triangleElements; }
+    virtual const ElementContainer<TriangleElement> & triangleElements() const = 0;//{ return m_triangleElements; }
 
-    const ElementContainer<TetrahedronElementSPtr > & tetrahedronElements() const { return m_tetrahedronElements; }
+    virtual const ElementContainer<TetrahedronElement> & tetrahedronElements() const = 0;//{ return m_tetrahedronElements; }
 
     virtual void draw(const core::visual::VisualParams * vparams) = 0;
 
@@ -66,21 +66,6 @@ public:
 
     virtual void update() = 0;
 
-protected:
-
-    ElementContainer<PointElementSPtr > & _pointElements() { return m_pointElements; }
-
-    ElementContainer<EdgeElementSPtr > & _edgeElements() { return m_edgeElements; }
-
-    ElementContainer<TriangleElementSPtr > & _triangleElements() { return m_triangleElements; }
-
-    ElementContainer<TetrahedronElementSPtr > & _tetrahedronElements() { return m_tetrahedronElements; }
-
-private:
-    ElementContainer<PointElementSPtr > m_pointElements;
-    ElementContainer<EdgeElementSPtr > m_edgeElements;
-    ElementContainer<TriangleElementSPtr > m_triangleElements;
-    ElementContainer<TetrahedronElementSPtr > m_tetrahedronElements;
 };
 
 

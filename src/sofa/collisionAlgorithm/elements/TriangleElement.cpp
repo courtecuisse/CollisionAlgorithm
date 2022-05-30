@@ -6,45 +6,39 @@
 
 namespace sofa::collisionAlgorithm {
 
-TriangleElementSPtr::TriangleElementSPtr(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2)
-: std::shared_ptr<TriangleElement>(new TriangleElement()) {
-    get()->_pointElements().insert(edge0->pointElements()[0]);
-    get()->_pointElements().insert(edge0->pointElements()[1]);
-    get()->_pointElements().insert(edge1->pointElements()[0]);
-    get()->_pointElements().insert(edge1->pointElements()[1]);
-
-    get()->_edgeElements().insert(edge0);
-    get()->_edgeElements().insert(edge1);
-    get()->_edgeElements().insert(edge2);
-
-    get()->_triangleElements().insert(*this);
-
-
-
-
-
-    get()->_pointElements()[0]->triangleAround().insert(*this);
-    get()->_pointElements()[1]->triangleAround().insert(*this);
-    get()->_pointElements()[2]->triangleAround().insert(*this);
-
-}
-
-TriangleElementSPtr TriangleElement::create(BaseProximity::SPtr prox0, BaseProximity::SPtr prox1,BaseProximity::SPtr prox2) {
+TriangleElement::SPtr TriangleElement::create(BaseProximity::SPtr prox0, BaseProximity::SPtr prox1,BaseProximity::SPtr prox2) {
     PointElement::SPtr p0 = PointElement::create(prox0);
     PointElement::SPtr p1 = PointElement::create(prox1);
     PointElement::SPtr p2 = PointElement::create(prox2);
 
-    return TriangleElementSPtr(EdgeElement::create(p0,p1),
-                               EdgeElement::create(p1,p2),
-                               EdgeElement::create(p2,p0));
+    EdgeElement::SPtr e0 = EdgeElement::create(p0,p1);
+    EdgeElement::SPtr e1 = EdgeElement::create(p1,p2);
+    EdgeElement::SPtr e2 = EdgeElement::create(p2,p0);
+
+    return TriangleElement::create(e0,e1,e2);
 }
 
-TriangleElementSPtr TriangleElement::create(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2) {
-    return TriangleElementSPtr(edge0,edge1,edge2);
+TriangleElement::SPtr TriangleElement::create(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2) {
+    auto res = std::shared_ptr<TriangleElement>(new TriangleElement());
+
+    res->m_pointElements.insert(edge0->pointElements()[0]);
+    res->m_pointElements.insert(edge0->pointElements()[1]);
+    res->m_pointElements.insert(edge1->pointElements()[0]);
+    res->m_pointElements.insert(edge1->pointElements()[1]);
+
+    res->m_edgeElements.insert(edge0);
+    res->m_edgeElements.insert(edge1);
+    res->m_edgeElements.insert(edge2);
+
+    res->m_pointElements[0]->triangleAround().insert(res);
+    res->m_pointElements[1]->triangleAround().insert(res);
+    res->m_pointElements[2]->triangleAround().insert(res);
+
+//    res->m_triangleElements.insert(res.get());
+
+    return res;
 }
 
-BaseProximity::SPtr TriangleElementSPtr::createProximity(double f0,double f1,double f2) const {
-    return TriangleProximity::SPtr(new TriangleProximity(*this,f0,f1,f2));
-}
+
 
 }

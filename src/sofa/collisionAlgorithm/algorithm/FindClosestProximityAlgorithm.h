@@ -79,6 +79,7 @@ public:
             if (pdest == NULL) continue;
 
             double d = (P - pdest->getPosition()).norm();
+
             if (d < min_dist) {
                 if (! acceptFilter(prox,pdest)) continue;
 
@@ -244,6 +245,7 @@ public:
             }
         }
 
+        std::cout << "SELECTED = " << selectedElements.size() << std::endl;
         return ElementIterator::SPtr(new TDefaultElementIteratorPtr(selectedElements));
     }
 };

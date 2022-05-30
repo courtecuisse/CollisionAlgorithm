@@ -52,6 +52,10 @@ public:
 
     double f2() { return m_f2; }
 
+    static BaseProximity::SPtr create(TriangleElement::SPtr & tri, double f0,double f1,double f2) {
+        return TriangleProximity::SPtr(new TriangleProximity(tri,f0,f1,f2));
+    }
+
 protected:
     TriangleElement::SPtr m_elmt;
     double m_f0,m_f1,m_f2;

@@ -5,22 +5,9 @@
 
 namespace sofa::collisionAlgorithm {
 
-class TriangleElementSPtr : public std::shared_ptr<TriangleElement> {
-public:
-    friend class TriangleElement;
-
-    BaseProximity::SPtr createProximity(double f0,double f1,double f2) const;
-
-private:
-    TriangleElementSPtr(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2);
-};
-
-
 class TriangleElement : public BaseElement {
 public:
-    friend class TriangleElementSPtr;
-
-    typedef TriangleElementSPtr SPtr;
+    typedef std::shared_ptr<TriangleElement> SPtr;
 
     struct TriangleInfo
     {
@@ -98,12 +85,26 @@ public:
         }
     }
 
-    static TriangleElementSPtr create(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2);
+    static TriangleElement::SPtr create(BaseProximity::SPtr p0, BaseProximity::SPtr p1,BaseProximity::SPtr p2);
 
-    static TriangleElementSPtr create(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2);
+    static TriangleElement::SPtr create(EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2);
+
+    const ElementContainer<PointElement> & pointElements() const override { return m_pointElements; }
+
+    const ElementContainer<EdgeElement> & edgeElements() const override { return m_edgeElements; }
+
+    const ElementContainer<TriangleElement> & triangleElements() const override { return ElementContainer<TriangleElement>::empty(); }
+
+    const ElementContainer<TetrahedronElement> & tetrahedronElements() const override { return ElementContainer<TetrahedronElement>::empty(); }
+
 private:
-    TriangleInfo m_tinfo;
     TriangleElement() {}
+
+    TriangleInfo m_tinfo;
+
+    ElementContainer<PointElement> m_pointElements;
+    ElementContainer<EdgeElement> m_edgeElements;
+//    ElementContainer<TriangleElement> m_triangleElements;
 };
 
 }

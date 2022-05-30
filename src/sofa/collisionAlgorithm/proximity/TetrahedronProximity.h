@@ -57,6 +57,12 @@ public:
 
     TetrahedronElement::SPtr element() { return m_elmt; }
 
+
+    static BaseProximity::SPtr create(TetrahedronElement::SPtr & tetra, double f0,double f1,double f2,double f3) {
+        return TetrahedronProximity::SPtr(new TetrahedronProximity(tetra,f0,f1,f2,f3));
+    }
+
+
 protected:
     TetrahedronElement::SPtr m_elmt;
     double m_f0,m_f1,m_f2,m_f3;
