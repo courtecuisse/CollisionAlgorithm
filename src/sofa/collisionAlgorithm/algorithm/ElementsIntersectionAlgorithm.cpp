@@ -4,7 +4,6 @@
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/elements/TetrahedronElement.h>
 #include <sofa/collisionAlgorithm/geometry/TetrahedronGeometry.h>
-#include <sofa/collisionAlgorithm/geometry/AABBGeometry.h>
 
 namespace sofa::collisionAlgorithm {
 
@@ -12,7 +11,6 @@ SOFA_DECL_CLASS(FindClosestProximityAlgorithm)
 
 int ElementsIntersectionAlgorithmClass = core::RegisterObject("ElementsIntersectionAlgorithm")
 .add< ElementsIntersectionAlgorithm >();
-
 
 
 static void doIntersection (BaseElement::SPtr elem, ElementIterator::SPtr itdest, std::vector<BaseElement::SPtr> & IntersectRes) {
@@ -70,7 +68,7 @@ static void IntersectionWithAABBGeometry (BaseElement::SPtr elem, BaseGeometry *
 
 //int register_IntersectionOperationTetraGeometry = IntersectWithGeometryOperation::register_func</*TetrahedronGeometry<sofa::defaulttype::Vec3dTypes>*/ TetrahedronElement>(&IntersectionWithTetraGeometry<TetrahedronGeometry<sofa::defaulttype::Vec3dTypes>>);
 
-int register_IntersectionOperationAABBGeometry = IntersectWithGeometryOperation::register_func<AABBGeometry::AABBBElement>(&IntersectionWithAABBGeometry<AABBGeometry>);
+//int register_IntersectionOperationAABBGeometry = IntersectWithGeometryOperation::register_func<AABBGeometry::AABBBElement>(&IntersectionWithAABBGeometry<AABBGeometry>);
 
 } // namespace sofa::collisionAlgorithm
 

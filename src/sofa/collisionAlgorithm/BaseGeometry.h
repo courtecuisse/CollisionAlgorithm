@@ -13,12 +13,15 @@
 
 namespace sofa ::collisionAlgorithm {
 
+class BroadPhase;
+
 /*!
  * \brief The BaseGeometry class is an abstract class defining a basic geometry
  * iterates through Proximity elements and draws them
  */
 class BaseGeometry : public CollisionComponent {
 public:
+    friend class BroadPhase;
 
     SOFA_ABSTRACT_CLASS(BaseGeometry,CollisionComponent);
 
@@ -29,7 +32,8 @@ public:
     BaseGeometry()
     : d_color(initData(&d_color, sofa::type::RGBAColor(1,0,1,1), "color", "Color of the collision model"))
     , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model"))
-    , d_draw(initData(&d_draw, true, "draw", "draw")) {
+    , d_draw(initData(&d_draw, true, "draw", "draw"))
+    , m_broadPhase(NULL) {
         this->f_listening.setValue(true);
     }
 
@@ -62,6 +66,10 @@ public:
     }
 
     virtual ElementIterator::SPtr begin(unsigned id = 0) const = 0;
+
+    inline unsigned getOperationsHash() const { return begin()->getOperationsHash(); }
+
+    BroadPhase * getBroadPhase() { return m_broadPhase; }
 
     inline const BaseGeometry * end() const { return this; }
 
@@ -113,6 +121,7 @@ private:
     ElementContainer<EdgeElement::SPtr> m_edgeElements;
     ElementContainer<TriangleElement::SPtr> m_triangleElements;
     ElementContainer<TetrahedronElement::SPtr> m_tetrahedronElements;
+    BroadPhase * m_broadPhase;
 };
 
 template<class DataTypes>
@@ -131,7 +140,7 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    SOFA_CLASS(SOFA_TEMPLATE(TBaseGeometry,DataTypes),BaseGeometry);
+    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(TBaseGeometry,DataTypes),BaseGeometry);
 
     core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
 
@@ -200,6 +209,25 @@ public:
     static std::string templateName(const TBaseGeometry<DataTypes>* = NULL) {
         return DataTypes::Name();
     }
+
+};
+
+class BroadPhase : public CollisionComponent {
+public:
+
+    SOFA_ABSTRACT_CLASS(BroadPhase,CollisionComponent);
+
+    core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+
+    BroadPhase()
+    : l_geometry(initLink("geometry", "link to geometry")) {
+        l_geometry.setPath("@.");
+    }
+
+    void init() {
+        if (l_geometry != NULL) l_geometry->m_broadPhase = this;
+    }
+
 
 };
 
