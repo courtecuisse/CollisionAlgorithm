@@ -20,13 +20,6 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    core::objectmodel::SingleLink<GEOMETRY,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
-
-    TriangleGeometry()
-    : l_topology(initLink("topology", "link to topology")) {
-        l_topology.setPath("@.");
-    }
-
     void buildTriangleElements() override {
         for (unsigned i=0;i<this->l_topology->getNbTriangles();i++) {
             auto edgeId = this->l_topology->getEdgesInTriangle(i);

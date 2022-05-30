@@ -18,15 +18,6 @@ public:
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef std::function<BaseProximity::SPtr(const TetrahedronElement * elmt,double f0,double f1,double f2,double f3)> ProximityCreatorFunc;
 
-    SOFA_CLASS(GEOMETRY,Inherit);
-
-    core::objectmodel::SingleLink<GEOMETRY,core::topology::BaseMeshTopology,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_topology;
-
-    TetrahedronGeometry()
-    : l_topology(initLink("topology", "link to topology")) {
-        l_topology.setPath("@.");
-    }
-
     void buildTetrahedronElements() override {
         for (unsigned i=0;i<this->l_topology->getNbTetrahedra();i++) {
             auto triId = this->l_topology->getTrianglesInTetrahedron(i);

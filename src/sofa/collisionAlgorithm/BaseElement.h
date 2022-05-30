@@ -44,7 +44,8 @@ private:
     std::vector<ELMTSPtr> m_data;
 };
 
-class BaseElement {
+//: public std::enable_shared_from_this<BaseElement>
+class BaseElement  {
 public:
 
     typedef std::shared_ptr<BaseElement> SPtr;

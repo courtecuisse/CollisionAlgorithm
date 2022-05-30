@@ -2,9 +2,7 @@
 
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 
-namespace sofa {
-
-namespace collisionAlgorithm {
+namespace sofa::collisionAlgorithm {
 
 /*!
  * \brief The DistanceFilter class
@@ -23,7 +21,5 @@ public:
         return (p1->getPosition()-p2->getPosition()).norm()<d_distance.getValue();
     }
 };
-
-}
 
 }

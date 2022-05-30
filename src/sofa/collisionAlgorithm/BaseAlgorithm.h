@@ -68,9 +68,9 @@ public :
      * \param pdest : destination proximity
      * \return True if all filters accept proximities, otherwise False
      */
-    bool acceptFilter(const PairDetection & d) const {
+    bool acceptFilter(BaseProximity::SPtr p1,BaseProximity::SPtr p2) const {
         for (unsigned i=0;i<m_filters.size();i++) {
-            if (! m_filters[i]->accept(d.first,d.second)) return false;
+            if (! m_filters[i]->accept(p1,p2)) return false;
         }
         return true;
     }

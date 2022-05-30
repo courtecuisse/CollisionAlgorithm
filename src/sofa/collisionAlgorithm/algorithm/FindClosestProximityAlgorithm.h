@@ -59,14 +59,13 @@ public:
             auto pdest = doFindClosestProx(pfrom,itdest,projectOp);
             if (pdest == nullptr) continue;
 
-			if(acceptFilter(PairDetection(pfrom,pdest)))
-            	output.push_back(PairDetection(pfrom,pdest));
+            output.push_back(PairDetection(pfrom,pdest));
         }
 
         d_output.endEdit();
     }
 
-    static BaseProximity::SPtr doFindClosestProx(BaseProximity::SPtr prox, ElementIterator::SPtr itdest, Operations::ProjectOperation::FUNC projectOp) {
+    BaseProximity::SPtr doFindClosestProx(BaseProximity::SPtr prox, ElementIterator::SPtr itdest, Operations::ProjectOperation::FUNC projectOp) {
         double min_dist = std::numeric_limits<double>::max();
         BaseProximity::SPtr res = NULL;
 
@@ -81,6 +80,8 @@ public:
 
             double d = (P - pdest->getPosition()).norm();
             if (d < min_dist) {
+                if (! acceptFilter(prox,pdest)) continue;
+
                 res = pdest;
                 min_dist = d;
             }
@@ -110,10 +111,9 @@ public:
             max = std::max (max, nbox[i]-cbox[i]) ;
         }
 
-        int d = 0;
         std::set<BaseElement::SPtr> selectedElements;
 
-        while (selectedElements.empty() && d<max) {
+        for (int d=0; selectedElements.empty() && d<max;d++) {
             {
                 int i=-d;
                 if (cbox[0]+i >= 0 && cbox[0]+i < nbox[0])
@@ -128,7 +128,6 @@ public:
                                 continue;
 
                             const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                            std::cout << "C0 " << cbox[0] + i << " , " << cbox[1] + j << " , " << cbox[2] + k << " :" << elmts.size() << std::endl;
                             selectedElements.insert(elmts.cbegin(),elmts.cend());
                         }
                     }
@@ -153,7 +152,6 @@ public:
                                 continue;
 
                             const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                            std::cout << "C1 : " << elmts.size() << std::endl;
                             selectedElements.insert(elmts.cbegin(),elmts.cend());
                         }
                     }
@@ -176,7 +174,6 @@ public:
                                 continue;
 
                             const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                            std::cout << "C2 : " << elmts.size() << std::endl;
                             selectedElements.insert(elmts.cbegin(),elmts.cend());
                         }
                     }
@@ -198,7 +195,6 @@ public:
                                 continue;
 
                             const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                            std::cout << "C3 : " << elmts.size() << std::endl;
                             selectedElements.insert(elmts.cbegin(),elmts.cend());
                         }
                     }
@@ -220,7 +216,6 @@ public:
                                 continue;
 
                             const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                            std::cout << "C4 : " << elmts.size() << std::endl;
                             selectedElements.insert(elmts.cbegin(),elmts.cend());
                         }
                     }
@@ -242,14 +237,11 @@ public:
                                 continue;
 
                             const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
-                            std::cout << "C5 : " << elmts.size() << std::endl;
                             selectedElements.insert(elmts.cbegin(),elmts.cend());
                         }
                     }
                 }
             }
-
-            d++;// we look for boxed located at d+1
         }
 
         return ElementIterator::SPtr(new TDefaultElementIteratorPtr(selectedElements));

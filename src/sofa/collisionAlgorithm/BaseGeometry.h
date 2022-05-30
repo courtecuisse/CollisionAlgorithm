@@ -67,7 +67,7 @@ public:
 
     virtual ElementIterator::SPtr begin(unsigned id = 0) const = 0;
 
-    inline unsigned getOperationsHash() const { return begin()->getOperationsHash(); }
+    inline size_t getOperationsHash() const { return begin()->getOperationsHash(); }
 
     BroadPhase * getBroadPhase() { return m_broadPhase; }
 

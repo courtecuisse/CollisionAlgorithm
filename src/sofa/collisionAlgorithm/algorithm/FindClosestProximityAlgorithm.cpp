@@ -5,6 +5,10 @@ namespace sofa::collisionAlgorithm {
 
 SOFA_DECL_CLASS(FindClosestProximityAlgorithm)
 
+int FindClosestProximityAlgorithmClass = core::RegisterObject("FindClosestProximityAlgorithm")
+.add< FindClosestProximityAlgorithm >();
+
+
 }
 
 

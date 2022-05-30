@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Node name="Root" gravity="0 -15 0" dt="0.05">
-        <RequiredPlugin pluginName="CollisionAlgorithm"/>
+        <RequiredPlugin name="CollisionAlgorithm"/>
         <RequiredPlugin name='SofaConstraint'/>  
 		<RequiredPlugin name='SofaSparseSolver'/>
 		<RequiredPlugin name='SofaGeneralLoader'/>
@@ -13,7 +13,7 @@
         <GenericConstraintSolver maxIterations="200" tolerance="0.0001" />
 
         <CollisionLoop />
-        <FindClosestProximityAlgorithm name="algo" from="@Liver/Collision/Geometry" dest="@Plane/Geometry" />
+        <FindClosestProximityAlgorithm name="algo" dest="@Liver/Collision/Geometry" from="@Plane/Geometry" />
 
 		<Node name="Liver">
                 <EulerImplicit name="EulerImplicit" rayleighMass="0.1" rayleighStiffness="0.1" />
@@ -34,7 +34,7 @@
                         <MechanicalObject name="state" />
 
                         <TriangleGeometry name="Geometry" color="0 1 0 1" />
-                        <AABBGeometry name="AABB" geometry="@Geometry" nbox="8 8 8" />
+                        <AABBBroadPhase name="AABB" geometry="@Geometry" nbox="8 8 8" />
 
                         <BarycentricMapping name="BarycentricMapping"/>
                 </Node>
@@ -55,7 +55,6 @@
                 <MechanicalObject name="State3D1" dy="1" position="@loader.position" />
                 <OglModel name="OglModel" color="1 1 1 0.8"/>
                 <TriangleGeometry name="Geometry" color="1 1 1 0.6" />
-                <AABBGeometry name="AABB" geometry="@Geometry" nbox="8 8 8" color="1 0 0 0.3" />
         </Node>
 
 

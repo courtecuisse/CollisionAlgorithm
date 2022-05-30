@@ -16,16 +16,13 @@ public:
     Data<type::Vec3i> d_nbox;
     Data<bool> d_static;
 
-    core::objectmodel::SingleLink<AABBBroadPhase, BaseGeometry, BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
     core::objectmodel::DataCallback c_nbox;
 
     AABBBroadPhase()
     : d_nbox(initData(&d_nbox, type::Vec3i(8,8,8),"nbox", "number of bbox"))
-    , d_static(initData(&d_static, false,"isStatic", "Optimization: object is not moving in the scene"))
-    , l_geometry(initLink("geometry", "link to geometry")) {
+    , d_static(initData(&d_static, false,"isStatic", "Optimization: object is not moving in the scene")) {
         c_nbox.addInputs({&d_nbox});
         c_nbox.addCallback(std::bind(&AABBBroadPhase::updateBroadPhase,this));
-        l_geometry.setPath("@.");
     }
 
     type::BoundingBox getBBox() const {
