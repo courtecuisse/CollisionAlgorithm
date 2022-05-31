@@ -23,22 +23,22 @@ public:
 
     virtual const BaseElement::SPtr element() const = 0;
 
-    virtual size_t getOperationsHash() const = 0;
+    virtual const std::type_info& getTypeInfo() const = 0;
 
     ///returns a new EmptyIterator
     static inline ElementIterator::SPtr empty();
 
 };
 
-static inline bool operator != (ElementIterator::SPtr it, const BaseGeometry * /*geo*/) {
+static inline bool operator != (ElementIterator::SPtr & it, const BaseGeometry * /*geo*/) {
     return ! it->end();
 }
 
-static inline void operator ++ (ElementIterator::SPtr it) {
+static inline void operator ++ (ElementIterator::SPtr & it) {
     return it->next();
 }
 
-static inline void operator ++ (ElementIterator::SPtr it, int /*NB*/) {
+static inline void operator ++ (ElementIterator::SPtr & it, int /*NB*/) {
 //    for (int i=0;i<NB;i++)
         it->next();
 }
@@ -53,8 +53,8 @@ public:
 
     const BaseElement::SPtr element() const override { return NULL; }
 
-    size_t getOperationsHash() const override {
-        return typeid(EmptyIterator).hash_code();
+    const std::type_info& getTypeInfo() const override {
+        return typeid(EmptyIterator);
     }
 };
 
@@ -77,9 +77,9 @@ public:
 
     bool end() const override { return m_it==m_end; }
 
-    size_t getOperationsHash() const override {
+    size_t getTypeInfo() const override {
         if (m_it == m_end) return typeid(EmptyIterator).hash_code();
-        else return (*m_it)->getOperationsHash();
+        else return (*m_it)->getTypeInfo();
     }
 
     virtual BaseElement::SPtr element() { return *m_it; }
@@ -111,9 +111,9 @@ public:
 
     bool end() const override { return m_it==m_end; }
 
-    size_t getOperationsHash() const override {
-        if (m_it == m_end) return typeid(EmptyIterator).hash_code();
-        else return (*m_it)->getOperationsHash();
+    const std::type_info& getTypeInfo() const override {
+        if (m_it == m_end) return typeid(EmptyIterator);
+        else return (*m_it)->getTypeInfo();
     }
 
     virtual BaseElement::SPtr element() { return *m_it; }

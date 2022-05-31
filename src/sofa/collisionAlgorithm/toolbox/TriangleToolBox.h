@@ -17,7 +17,7 @@ public:
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    static BaseProximity::SPtr project(type::Vector3 P, BaseElement::SPtr elmt) {
+    static BaseProximity::SPtr project(const type::Vector3 & P, BaseElement::SPtr elmt) {
         auto tri = std::static_pointer_cast<TriangleElement>(elmt);
 
         double fact_u,fact_v,fact_w;

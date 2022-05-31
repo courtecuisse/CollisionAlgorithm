@@ -10,7 +10,7 @@ public:
 
     typedef std::shared_ptr<PointElement> SPtr;
 
-    size_t getOperationsHash() const override { return typeid(PointElement).hash_code(); }
+    const std::type_info& getTypeInfo() const override { return typeid(PointElement); }
 
     std::string name() const override { return "PointElement"; }
 

@@ -67,7 +67,7 @@ public:
 
     virtual ElementIterator::SPtr begin(unsigned id = 0) const = 0;
 
-    inline size_t getOperationsHash() const { return begin()->getOperationsHash(); }
+    inline const std::type_info& getTypeInfo() const { return begin()->getTypeInfo(); }
 
     BroadPhase * getBroadPhase() { return m_broadPhase; }
 
@@ -238,7 +238,7 @@ public:
 
     virtual const std::set<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const = 0;
 
-    size_t getOperationsHash() const { return l_geometry->getOperationsHash(); }
+    const std::type_info& getTypeInfo() const { return l_geometry->getTypeInfo(); }
 
 };
 

@@ -130,7 +130,7 @@ public:
         m_Bmin -= m_cellSize * 0.5;
         m_Bmax -= m_cellSize * 0.5;
 
-        auto projectOp = Operations::ProjectOperation::get(l_geometry->begin()->getOperationsHash());
+        auto projectOp = Operations::ProjectOperation::get(l_geometry->getTypeInfo());
 
         for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
         {

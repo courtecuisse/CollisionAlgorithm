@@ -5,67 +5,18 @@
 #include <sofa/collisionAlgorithm/BaseOperation.h>
 #include <sofa/collisionAlgorithm/operations/CreateCenterProximity.h>
 #include <sofa/collisionAlgorithm/operations/Project.h>
+#include <sofa/collisionAlgorithm/proximity/EdgeProximity.h>
 
 namespace sofa::collisionAlgorithm {
 
-class FindClosestProximityAlgorithm : public BaseAlgorithm {
+//Specific operation to find the closest point on a geometry (the code is in the c++ class)
+class FindClosestProximityOperation : public Operations::GenericOperation<FindClosestProximityOperation,//operation type
+                                                                          BaseProximity::SPtr, // default return
+                                                                          BaseProximity::SPtr,ElementIterator::SPtr, Operations::ProjectOperation::FUNC // parameters
+                                                                          > {
 public:
-    SOFA_CLASS(FindClosestProximityAlgorithm, BaseAlgorithm);
 
-    core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
-    core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
-    Data<bool> d_drawCollision ;
-    Data<DetectionOutput> d_output;
-    Data<sofa::type::vector<double> > d_outputDist;
-
-    FindClosestProximityAlgorithm()
-    : l_from(initLink("from", "link to from geometry"))
-    , l_dest(initLink("dest", "link to dest geometry"))
-    , d_drawCollision (initData(&d_drawCollision, true, "drawcollision", "draw collision"))
-    , d_output(initData(&d_output,"output", "output of the collision detection"))
-    , d_outputDist(initData(&d_outputDist,"outputDist", "Distance of the outpu pair of detections"))    
-    {}
-
-    void draw(const core::visual::VisualParams* vparams) {
-        if (! vparams->displayFlags().getShowCollisionModels() && ! d_drawCollision.getValue()) return;
-        glDisable(GL_LIGHTING);
-        glColor4f(0,1,0,1);
-
-        glBegin(GL_LINES);
-        DetectionOutput output = d_output.getValue() ;
-        for (unsigned i=0;i<output.size();i++) {
-            glVertex3dv(output[i].first->getPosition().data());
-            glVertex3dv(output[i].second->getPosition().data());
-        }
-        glEnd();
-    }
-
-    void doDetection() {
-        if (l_from == NULL) return;
-        if (l_dest == NULL) return;
-
-        DetectionOutput & output = *d_output.beginEdit();
-        output.clear();
-
-        Operations::CreateCenterProximityOperation::FUNC createProximityOp = Operations::CreateCenterProximityOperation::get(l_from.get());
-        Operations::ProjectOperation::FUNC projectOp = (l_dest->getBroadPhase()) ? Operations::ProjectOperation::get(l_dest->getBroadPhase()) : Operations::ProjectOperation::get(l_dest.get());
-
-        for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
-            auto pfrom = createProximityOp(itfrom->element());
-            if (pfrom == nullptr) continue;
-
-            ElementIterator::SPtr itdest = (l_dest->getBroadPhase()) ? broadPhaseIterator(pfrom, l_dest->getBroadPhase()) : l_dest->begin();
-
-            auto pdest = doFindClosestProx(pfrom,itdest,projectOp);
-            if (pdest == nullptr) continue;
-
-            output.push_back(PairDetection(pfrom,pdest));
-        }
-
-        d_output.endEdit();
-    }
-
-    BaseProximity::SPtr doFindClosestProx(BaseProximity::SPtr prox, ElementIterator::SPtr itdest, Operations::ProjectOperation::FUNC projectOp) {
+    static BaseProximity::SPtr doFindClosestProx(BaseProximity::SPtr prox, ElementIterator::SPtr itdest, Operations::ProjectOperation::FUNC projectOp) {
         double min_dist = std::numeric_limits<double>::max();
         BaseProximity::SPtr res = NULL;
 
@@ -79,10 +30,7 @@ public:
             if (pdest == NULL) continue;
 
             double d = (P - pdest->getPosition()).norm();
-
             if (d < min_dist) {
-                if (! acceptFilter(prox,pdest)) continue;
-
                 res = pdest;
                 min_dist = d;
             }
@@ -245,9 +193,77 @@ public:
             }
         }
 
-        std::cout << "SELECTED = " << selectedElements.size() << std::endl;
         return ElementIterator::SPtr(new TDefaultElementIteratorPtr(selectedElements));
     }
+
+    BaseProximity::SPtr defaultFunc(BaseProximity::SPtr prox,ElementIterator::SPtr itdest,Operations::ProjectOperation::FUNC projectOp) const override {
+        return doFindClosestProx(prox,itdest,projectOp);
+    }
+
+};
+
+class FindClosestProximityAlgorithm : public BaseAlgorithm {
+public:
+    SOFA_CLASS(FindClosestProximityAlgorithm, BaseAlgorithm);
+
+    core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_from;
+    core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
+    Data<bool> d_drawCollision ;
+    Data<DetectionOutput> d_output;
+    Data<sofa::type::vector<double> > d_outputDist;
+
+    FindClosestProximityAlgorithm()
+    : l_from(initLink("from", "link to from geometry"))
+    , l_dest(initLink("dest", "link to dest geometry"))
+    , d_drawCollision (initData(&d_drawCollision, true, "drawcollision", "draw collision"))
+    , d_output(initData(&d_output,"output", "output of the collision detection"))
+    , d_outputDist(initData(&d_outputDist,"outputDist", "Distance of the outpu pair of detections"))    
+    {}
+
+    void draw(const core::visual::VisualParams* vparams) {
+        if (! vparams->displayFlags().getShowCollisionModels() && ! d_drawCollision.getValue()) return;
+        glDisable(GL_LIGHTING);
+        glColor4f(0,1,0,1);
+
+        glBegin(GL_LINES);
+        DetectionOutput output = d_output.getValue() ;
+        for (unsigned i=0;i<output.size();i++) {
+            glVertex3dv(output[i].first->getPosition().data());
+            glVertex3dv(output[i].second->getPosition().data());
+        }
+        glEnd();
+    }
+
+    void doDetection() {
+        if (l_from == NULL) return;
+        if (l_dest == NULL) return;
+
+        DetectionOutput & output = *d_output.beginEdit();
+        output.clear();
+
+        const std::type_info & type_dest = (l_dest->getBroadPhase()) ? l_dest->getBroadPhase()->getTypeInfo() : l_dest->getTypeInfo();
+
+        auto createProximityOp = Operations::CreateCenterProximityOperation::get(l_from->getTypeInfo());
+        auto findClosestProxOp = FindClosestProximityOperation::get(type_dest);
+        auto projectOp = Operations::ProjectOperation::get(type_dest);
+
+        for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
+            auto pfrom = createProximityOp(itfrom->element());
+            if (pfrom == nullptr) continue;
+
+            ElementIterator::SPtr itdest = (l_dest->getBroadPhase()) ?
+                                           FindClosestProximityOperation::broadPhaseIterator(pfrom, l_dest->getBroadPhase()) :
+                                           l_dest->begin();
+
+            auto pdest = findClosestProxOp(pfrom,itdest,projectOp);
+            if (pdest == nullptr) continue;
+
+            output.push_back(PairDetection(pfrom,pdest));
+        }
+
+        d_output.endEdit();
+    }
+
 };
 
 }

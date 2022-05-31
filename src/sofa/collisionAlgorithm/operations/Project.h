@@ -6,17 +6,19 @@
 
 namespace sofa::collisionAlgorithm::Operations {
 
-class ProjectOperation : public GenericOperation<ProjectOperation, std::function<BaseProximity::SPtr(type::Vector3 , BaseElement::SPtr)> > {
+
+
+class ProjectOperation : public GenericOperation<ProjectOperation,//Type of the operation
+                                                 BaseProximity::SPtr,//Default return type
+                                                 const type::Vector3 & , BaseElement::SPtr//Parameters
+                                                 > {
 public:
 
-    using Inherit = GenericOperation;
-
-    Inherit::FUNC getDefault() const override {
-        return [=](type::Vector3 , BaseElement::SPtr elmt) -> BaseProximity::SPtr {
-            std::cerr << "ERROR no ProjectOperation registered for "  << elmt->name() << std::endl;
-            return NULL;
-        };
+    BaseProximity::SPtr defaultFunc(const type::Vector3 & , BaseElement::SPtr e) const override {
+        std::cerr << "ERROR the operation ProjectOperation is not registered with for hash = " << sofa::helper::NameDecoder::decodeClassName(e->getTypeInfo()) << std::endl;
+        return NULL;
     }
+
 };
 
 }

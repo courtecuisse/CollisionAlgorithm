@@ -30,7 +30,7 @@ public:
         }
     };
 
-    size_t getOperationsHash() const override { return typeid(TetrahedronElement).hash_code(); }
+    const std::type_info& getTypeInfo() const override { return typeid(TetrahedronElement); }
 
     std::string name() const override { return "TetrahedronElement"; }
 

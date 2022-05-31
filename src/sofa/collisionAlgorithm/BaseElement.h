@@ -60,7 +60,7 @@ public:
 
     virtual void draw(const core::visual::VisualParams * vparams) = 0;
 
-    virtual size_t getOperationsHash() const = 0;
+    virtual const std::type_info& getTypeInfo() const = 0;
 
     virtual std::string name() const = 0;
 

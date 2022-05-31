@@ -17,7 +17,7 @@ public:
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    static BaseProximity::SPtr project(type::Vector3 P, BaseElement::SPtr elmt) {
+    static BaseProximity::SPtr project(const type::Vector3 & P, BaseElement::SPtr elmt) {
         auto tetra = std::static_pointer_cast<TetrahedronElement>(elmt);
 
         double fact[4];

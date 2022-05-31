@@ -13,7 +13,7 @@ public:
 
     inline BaseProximity::SPtr getP1() const { return pointElements()[1]->getP0(); }
 
-    size_t getOperationsHash() const override { return typeid(EdgeElement).hash_code(); }
+    const std::type_info& getTypeInfo() const override { return typeid(EdgeElement); }
 
     std::string name() const override { return "EdgeElement"; }
 
