@@ -11,36 +11,33 @@ public:
     friend CHILD;
 
     typedef DEFAULT_RETURN (*FUNC)(PARAMS...);
+//    typedef std::pair<const std::type_info &,const std::type_info &> KEY_MAP; // <RETURN,TYPE>
+    typedef std::pair<size_t,size_t> KEY_MAP; // <RETURN,TYPE>
 
     template<class RESTYPE = DEFAULT_RETURN>
     static RESTYPE (*get(const std::type_info & id)) (PARAMS...) {
         typedef RESTYPE (*function_type)(PARAMS...);
 
+        KEY_MAP key(typeid(RESTYPE).hash_code(),id.hash_code());
+
         //size_t id = itelmt->getTypeInfo();
-        auto it_type = getSingleton()->m_map.find(id.hash_code());
-        if (it_type == getSingleton()->m_map.end()) return &GenericOperation::t_defaultFunc<RESTYPE>;
+        auto it_type = getSingleton()->m_map.find(key);
+        if (it_type == getSingleton()->m_map.cend()) return &GenericOperation::t_defaultFunc<RESTYPE>;
 
-        auto it_res = it_type->second.find(typeid(RESTYPE).hash_code());
-        if (it_res == it_type->second.end()) return &GenericOperation::t_defaultFunc<RESTYPE>;
-
-
-        return *((function_type*) &it_res->second);
+        return *((function_type*) &it_type->second);
     }
 
     template<class ELMT,class RES_TYPE = DEFAULT_RETURN>
     static int register_func(RES_TYPE (*f)(PARAMS...)) {
-        size_t hash_type = typeid(ELMT).hash_code();
-        size_t hash_res = typeid(RES_TYPE).hash_code();
+        KEY_MAP key(typeid(RES_TYPE).hash_code(),typeid(ELMT).hash_code());
 
-        std::map<size_t,void*> & map_type = getSingleton()->m_map[hash_type];
-
-        auto it_res = map_type.find(hash_res);
-        if (it_res != map_type.cend()) {
-            std::cerr << "createCenterPointProximity with operation " << sofa::helper::NameDecoder::decodeClassName(typeid(ELMT)) << " with return " << sofa::helper::NameDecoder::decodeClassName(typeid(RES_TYPE)) << " already in the factory" << std::endl;
+        auto it = getSingleton()->m_map.find(key);
+        if (it != getSingleton()->m_map.cend()) {
+            std::cerr << sofa::helper::NameDecoder::decodeClassName(typeid(CHILD)) << " with operation " << sofa::helper::NameDecoder::decodeClassName(typeid(ELMT)) << " with return " << sofa::helper::NameDecoder::decodeClassName(typeid(RES_TYPE)) << " already in the factory" << std::endl;
             return 1;
         }
 
-        map_type[hash_res] = (void*) f;
+        getSingleton()->m_map[key] = (void*) f;
 
         return 0;
     }
@@ -48,7 +45,7 @@ public:
     virtual DEFAULT_RETURN defaultFunc(PARAMS...) const = 0;
 
 private:
-    std::map<size_t,std::map<size_t,void*>> m_map;
+    std::map<KEY_MAP,void*> m_map;
 
     static GenericOperation * getSingleton() {
         static GenericOperation * m_singleton = NULL;
@@ -67,42 +64,56 @@ private:
 
 
 
-template<typename CHILD, class TFUNC>
+template<typename CHILD, class DEFAULT_RETURN, class... PARAMS>
 class GenericOperation2 {
+public:
     friend CHILD;
 
-public:
+    typedef DEFAULT_RETURN (*FUNC)(PARAMS...);
+    typedef std::tuple<size_t,size_t,size_t> KEY_MAP; // <RETURN,TYPE1,TYPE2>
 
-    typedef TFUNC FUNC;
+    template<class RESTYPE = DEFAULT_RETURN>
+    static RESTYPE (*get(const std::type_info & id1, const std::type_info & id2)) (PARAMS...) {
+        typedef RESTYPE (*function_type)(PARAMS...);
 
-    static FUNC get(size_t id1, size_t id2 /*const ElementIterator::SPtr itelmt1,const ElementIterator::SPtr itelmt2*/) {
-//        size_t id = (itelmt1->getTypeInfo()&(0xFFFFFFFF00000000)) | (itelmt2->getTypeInfo()&0x00000000FFFFFFFF);
-//        size_t id = itelmt1->getTypeInfo() * itelmt1->getTypeInfo() + itelmt2->getTypeInfo();
-        size_t id = id1 * id1 + id2;
-        auto it = getSingleton()->m_map.find(id);
-        if (it == getSingleton()->m_map.end()) return getSingleton()->getDefault();
-        return it->second;
+        KEY_MAP key(typeid(RESTYPE).hash_code(),id1.hash_code(),id2.hash_code());
+
+        //size_t id = itelmt->getTypeInfo();
+        auto it = getSingleton()->m_map.find(key);
+        if (it == getSingleton()->m_map.cend()) return &GenericOperation2::t_defaultFunc<RESTYPE>;
+
+        return *((function_type*) &it->second);
     }
 
-    template<class ELMT1,class ELMT2>
+    template<class ELMT1,class ELMT2,class RES_TYPE = DEFAULT_RETURN>
     static int register_func(FUNC f) {
-//        size_t id = (typeid(ELMT1).hash_code()&(0xFFFFFFFF00000000)) | (typeid(ELMT2).hash_code()&0x00000000FFFFFFFF);
-        size_t id = typeid(ELMT1).hash_code() * typeid(ELMT1).hash_code() + typeid(ELMT2).hash_code();
-        auto it = getSingleton()->m_map.find(id);
-        if (it != getSingleton()->m_map.end()) std::cerr << "Intersect with operation " << id << " already in the factory" << std::endl;
-        getSingleton()->m_map[id] = f;
+        KEY_MAP key(typeid(ELMT1).hash_code(),typeid(ELMT2).hash_code(),typeid(RES_TYPE).hash_code());
+
+        auto it = getSingleton()->m_map.find(key);
+        if (it != getSingleton()->m_map.cend()) {
+            std::cerr << sofa::helper::NameDecoder::decodeClassName(typeid(CHILD)) << " with operation2 " << sofa::helper::NameDecoder::decodeClassName(typeid(ELMT1)) << "," << sofa::helper::NameDecoder::decodeClassName(typeid(ELMT2)) << " with return " << sofa::helper::NameDecoder::decodeClassName(typeid(RES_TYPE)) << " already in the factory" << std::endl;
+            return 1;
+        }
+
+        getSingleton()->m_map[key] = (void*) f;
+
         return 0;
     }
 
-    virtual FUNC getDefault() const = 0;
+    virtual DEFAULT_RETURN defaultFunc(PARAMS...) const = 0;
 
 private:
-    std::map<size_t,FUNC> m_map;
+    std::map<KEY_MAP,void*> m_map;
 
     static GenericOperation2 * getSingleton() {
         static GenericOperation2 * m_singleton = NULL;
         if (m_singleton == NULL) m_singleton = new CHILD();
         return m_singleton;
+    }
+
+    template<class RESTYPE>
+    static RESTYPE t_defaultFunc(PARAMS... params) {
+        return getSingleton()->defaultFunc(params...);
     }
 
     //No construction of the is is allowed

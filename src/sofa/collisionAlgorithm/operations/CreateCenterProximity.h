@@ -16,6 +16,7 @@ public:
     BaseProximity::SPtr defaultFunc(BaseElement::SPtr) const override {
         return NULL;
     }
+
 };
 
 }
