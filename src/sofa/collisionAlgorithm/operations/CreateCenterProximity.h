@@ -17,6 +17,10 @@ public:
         return NULL;
     }
 
+    void notFound(const std::type_info & id) const override {
+        std::cerr << "ERROR the operation CreateCenterProximityOperation is not registered with for type = " << sofa::helper::NameDecoder::decodeFullName(id) << std::endl;
+    }
+
 };
 
 }

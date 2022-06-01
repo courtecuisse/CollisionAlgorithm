@@ -200,6 +200,8 @@ public:
         return doFindClosestProx(prox,itdest,projectOp);
     }
 
+    void notFound(const std::type_info & ) const override {}
+
 };
 
 class FindClosestProximityAlgorithm : public BaseAlgorithm {

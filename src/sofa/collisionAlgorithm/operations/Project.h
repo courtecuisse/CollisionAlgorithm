@@ -14,9 +14,12 @@ class ProjectOperation : public GenericOperation<ProjectOperation,//Type of the 
                                                  > {
 public:
 
-    BaseProximity::SPtr defaultFunc(const type::Vector3 & , BaseElement::SPtr e) const override {
-        std::cerr << "ERROR the operation ProjectOperation is not registered with for hash = " << sofa::helper::NameDecoder::decodeClassName(e->getTypeInfo()) << std::endl;
+    BaseProximity::SPtr defaultFunc(const type::Vector3 & , BaseElement::SPtr ) const override {
         return NULL;
+    }
+
+    void notFound(const std::type_info & id) const override {
+        std::cerr << "ERROR the operation ProjectOperation is not registered with for type = " << sofa::helper::NameDecoder::decodeFullName(id) << std::endl;
     }
 
 };
