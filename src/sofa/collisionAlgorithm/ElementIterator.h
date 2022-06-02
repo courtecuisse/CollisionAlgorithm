@@ -77,8 +77,8 @@ public:
 
     bool end() const override { return m_it==m_end; }
 
-    size_t getTypeInfo() const override {
-        if (m_it == m_end) return typeid(EmptyIterator).hash_code();
+    const std::type_info& getTypeInfo() const override {
+        if (m_it == m_end) return typeid(EmptyIterator);
         else return (*m_it)->getTypeInfo();
     }
 
