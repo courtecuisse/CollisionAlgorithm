@@ -10,16 +10,13 @@ namespace sofa::collisionAlgorithm::toolbox {
 class TriangleToolBox {
 public:
 
-    static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
-        auto tri = std::static_pointer_cast<TriangleElement>(elmt);
+    static BaseProximity::SPtr createCenterProximity(TriangleElement::SPtr tri) {
         return TriangleProximity::create(tri, 1.0/3.0,1.0/3.0,1.0/3.0);
     }
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    static BaseProximity::SPtr project(const type::Vector3 & P, BaseElement::SPtr elmt) {
-        auto tri = std::static_pointer_cast<TriangleElement>(elmt);
-
+    static BaseProximity::SPtr project(const type::Vector3 & P, TriangleElement::SPtr tri) {
         double fact_u,fact_v,fact_w;
         projectOnTriangle(P,tri->getTriangleInfo(),fact_u,fact_v,fact_w);
         return TriangleProximity::create(tri, fact_u,fact_v,fact_w);

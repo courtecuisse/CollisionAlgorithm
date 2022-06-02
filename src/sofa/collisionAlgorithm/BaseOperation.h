@@ -2,8 +2,43 @@
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/helper/NameDecoder.h>
+#include <memory>
 
 namespace sofa::collisionAlgorithm::Operations {
+
+template<class A,class B>
+class REAL_TYPE_CHECK {
+public:
+    static inline void doCheck() {
+        static_assert((std::is_base_of<A, B>::value), "Invalid type in registered function");
+    }
+};
+
+template<class A,class B>
+class REAL_TYPE_CHECK<typename std::shared_ptr<A>, typename std::shared_ptr<B>> {
+public:
+    static inline void doCheck() {
+        static_assert((std::is_base_of<A, B>::value), "Invalid type in registered function");
+    }
+};
+
+
+
+template <typename First_A, typename... A>
+struct CAST_PARAMS {
+    template <typename First_B, typename... B>
+    struct AS {
+        static void doCheck() { CAST_PARAMS<A...>::template AS<B...>::doCheck(); }
+    };
+};
+
+template <typename A>
+struct CAST_PARAMS<A> {
+    template <typename B>
+    struct AS {
+        static void doCheck() { REAL_TYPE_CHECK<A,B>::doCheck(); }
+    };
+};
 
 template<typename CHILD, class RETURN_TYPE, class... PARAMS>
 class GenericOperation {
@@ -11,8 +46,6 @@ public:
     friend CHILD;
 
     typedef RETURN_TYPE (*FUNC)(PARAMS...);
-//    typedef std::pair<const std::type_info &,const std::type_info &> KEY_MAP; // <RETURN,TYPE>
-//    typedef std::pair<size_t,size_t> KEY_MAP; // <RETURN,TYPE>
     typedef size_t KEY_MAP; // <RETURN,TYPE>
 
     static RETURN_TYPE (*get(const std::type_info & id)) (PARAMS...) {
@@ -30,9 +63,13 @@ public:
         return *((function_type*) &it_type->second);
     }
 
-    template<class ELMT>
-    static int register_func(FUNC f) {
+
+
+    template<class ELMT, class... PARAMS_TYPED>
+    static int register_func(RETURN_TYPE (*f)(PARAMS_TYPED...)) {
         KEY_MAP key = typeid(ELMT).hash_code();
+
+        CAST_PARAMS<PARAMS...>::template AS<PARAMS_TYPED...>::doCheck();
 
         auto it = getSingleton()->m_map.find(key);
         if (it != getSingleton()->m_map.cend()) {
@@ -44,6 +81,11 @@ public:
 
         return 0;
     }
+
+//    template <typename ...PARAMS_TYPED>
+//    inline RETURN_TYPE cast_all(RETURN_TYPE (*fun)(PARAMS_TYPED...), PARAMS...as){
+//        fun(static_cast<PARAMS_TYPED>(as)...);
+//    }
 
     virtual RETURN_TYPE defaultFunc(PARAMS...) const = 0;
 

@@ -49,9 +49,9 @@ public:
 
     void next() override {}
 
-    BaseElement::SPtr element() override { return NULL; }
+    BaseElement::SPtr element() override { return BaseElement::SPtr(NULL); }
 
-    const BaseElement::SPtr element() const override { return NULL; }
+    const BaseElement::SPtr element() const override { return BaseElement::SPtr(NULL); }
 
     const std::type_info& getTypeInfo() const override {
         return typeid(EmptyIterator);

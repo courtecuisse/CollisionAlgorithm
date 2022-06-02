@@ -10,16 +10,13 @@ namespace sofa::collisionAlgorithm::toolbox {
 class TetrahedronToolBox {
 public:
 
-    static BaseProximity::SPtr createCenterProximity(BaseElement::SPtr elmt) {
-        auto tetra = std::static_pointer_cast<TetrahedronElement>(elmt);
+    static BaseProximity::SPtr createCenterProximity(TetrahedronElement::SPtr tetra) {
         return TetrahedronProximity::create(tetra, 1.0/4.0,1.0/4.0,1.0/4.0,1.0/4.0);
     }
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    static BaseProximity::SPtr project(const type::Vector3 & P, BaseElement::SPtr elmt) {
-        auto tetra = std::static_pointer_cast<TetrahedronElement>(elmt);
-
+    static BaseProximity::SPtr project(const type::Vector3 & P, TetrahedronElement::SPtr tetra) {
         double fact[4];
         projectOnTetra(P, tetra->getTetrahedronInfo(),fact[0],fact[1],fact[2],fact[3]);
         return TetrahedronProximity::create(tetra, fact[0],fact[1],fact[2],fact[3]);

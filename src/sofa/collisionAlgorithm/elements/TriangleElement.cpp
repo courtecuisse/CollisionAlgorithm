@@ -20,7 +20,7 @@ TriangleElement::SPtr TriangleElement::create(BaseProximity::SPtr prox0, BasePro
 
 TriangleElement::SPtr TriangleElement::create(PointElement::SPtr p0, PointElement::SPtr p1, PointElement::SPtr p2,
                                               EdgeElement::SPtr edge0, EdgeElement::SPtr edge1, EdgeElement::SPtr edge2) {
-    auto res = std::shared_ptr<TriangleElement>(new TriangleElement());
+    auto res = TriangleElement::SPtr(new TriangleElement());
 
     res->m_pointElements.insert(p0);
     res->m_pointElements.insert(p1);

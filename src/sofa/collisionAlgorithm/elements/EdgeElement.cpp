@@ -7,7 +7,7 @@
 namespace sofa::collisionAlgorithm {
 
 EdgeElement::SPtr EdgeElement::create(PointElement::SPtr p0, PointElement::SPtr p1) {
-    EdgeElement::SPtr res = std::shared_ptr<EdgeElement>(new EdgeElement());
+    EdgeElement::SPtr res = EdgeElement::SPtr(new EdgeElement());
 
     res->m_pointElements.insert(p0);
     res->m_pointElements.insert(p1);

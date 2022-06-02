@@ -10,7 +10,7 @@ TetrahedronElement::SPtr TetrahedronElement::create(PointElement::SPtr p0,PointE
                                                     EdgeElement::SPtr e0, EdgeElement::SPtr e1, EdgeElement::SPtr e2, EdgeElement::SPtr e3,EdgeElement::SPtr e4,EdgeElement::SPtr e5,
                                                     TriangleElement::SPtr tri0, TriangleElement::SPtr tri1, TriangleElement::SPtr tri2, TriangleElement::SPtr tri3) {
 
-    TetrahedronElement::SPtr res = std::shared_ptr<TetrahedronElement>(new TetrahedronElement());
+    TetrahedronElement::SPtr res = TetrahedronElement::SPtr(new TetrahedronElement());
 
     res->m_pointElements.insert(p0);
     res->m_pointElements.insert(p1);
