@@ -62,6 +62,7 @@ public:
         return TetrahedronProximity::SPtr(new TetrahedronProximity(tetra,f0,f1,f2,f3));
     }
 
+    const std::type_info& getTypeInfo() const override { return typeid(TetrahedronProximity); }
 
 protected:
     TetrahedronElement::SPtr m_elmt;

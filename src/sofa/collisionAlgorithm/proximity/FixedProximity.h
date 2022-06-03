@@ -27,6 +27,7 @@ public:
 
   virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::linearalgebra::BaseVector* lambda) const {}
 
+  const std::type_info& getTypeInfo() const override { return typeid(FixedProximity); }
 
 private:
   Vec3d m_position;

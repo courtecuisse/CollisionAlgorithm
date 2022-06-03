@@ -60,6 +60,8 @@ public:
 //        }
 //    }
 
+    const std::type_info& getTypeInfo() const override { return typeid(MechanicalProximity<DataTypes>); }
+
 
 
 protected:

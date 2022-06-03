@@ -32,6 +32,8 @@ public:
         }
     }
 
+    const std::type_info& getTypeInfo() const override { return typeid(MultiProximity); }
+
 protected:
     std::vector<BaseProximity::SPtr> m_proximities;
 };

@@ -28,11 +28,12 @@ public:
 
     virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::linearalgebra::BaseVector* lambda) const = 0;
 
+    virtual const std::type_info& getTypeInfo() const = 0;
+
     template<class PROXIMITY,class... ARGS>
     static inline typename PROXIMITY::SPtr create(ARGS... args) {
         return typename PROXIMITY::SPtr(new PROXIMITY(args...));
     }
-
 };
 
 /*!

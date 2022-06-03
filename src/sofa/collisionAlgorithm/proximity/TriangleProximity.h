@@ -56,6 +56,8 @@ public:
         return TriangleProximity::SPtr(new TriangleProximity(tri,f0,f1,f2));
     }
 
+    const std::type_info& getTypeInfo() const override { return typeid(TriangleProximity); }
+
 protected:
     TriangleElement::SPtr m_elmt;
     double m_f0,m_f1,m_f2;

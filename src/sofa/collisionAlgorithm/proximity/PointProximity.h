@@ -31,6 +31,8 @@ public:
         return p->getP0();
     }
 
+    const std::type_info& getTypeInfo() const override { return typeid(PointProximity); }
+
 protected:
     PointElement::SPtr m_elmt;
 };

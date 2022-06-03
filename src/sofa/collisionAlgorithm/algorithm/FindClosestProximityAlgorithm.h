@@ -12,32 +12,13 @@ namespace sofa::collisionAlgorithm {
 //Specific operation to find the closest point on a geometry (the code is in the c++ class)
 class FindClosestProximityOperation : public Operations::GenericOperation<FindClosestProximityOperation,//operation type
                                                                           BaseProximity::SPtr, // default return
-                                                                          BaseProximity::SPtr,ElementIterator::SPtr, Operations::ProjectOperation::FUNC // parameters
+                                                                          BaseProximity::SPtr,ElementIterator::SPtr, Operations::ProjectOperation::FUNC, std::function<bool(const BaseProximity::SPtr&,const BaseProximity::SPtr&)> // parameters
                                                                           > {
 public:
 
-    static BaseProximity::SPtr doFindClosestProx(BaseProximity::SPtr prox, ElementIterator::SPtr itdest, Operations::ProjectOperation::FUNC projectOp) {
-        double min_dist = std::numeric_limits<double>::max();
-        BaseProximity::SPtr res = NULL;
+    typedef std::function<bool(const BaseProximity::SPtr&,const BaseProximity::SPtr&)> FILTER;
 
-        type::Vector3 P = prox->getPosition();
-
-        for (; ! itdest->end();itdest++) {
-            auto edest = itdest->element();
-            if (edest == nullptr) continue;
-
-            BaseProximity::SPtr pdest = projectOp(prox->getPosition(),edest);
-            if (pdest == NULL) continue;
-
-            double d = (P - pdest->getPosition()).norm();
-            if (d < min_dist) {
-                res = pdest;
-                min_dist = d;
-            }
-        }
-
-        return res;
-    }
+    static bool defaultFilter(const BaseProximity::SPtr&,const BaseProximity::SPtr&) { return true; }
 
     static ElementIterator::SPtr broadPhaseIterator(BaseProximity::SPtr prox, BroadPhase * broadphase) {
         //old params : type::Vec3i cbox, std::set<BaseProximity::Index> & selectElements, int d
@@ -196,12 +177,30 @@ public:
         return ElementIterator::SPtr(new TDefaultElementIteratorPtr(selectedElements));
     }
 
-    BaseProximity::SPtr defaultFunc(BaseProximity::SPtr prox,ElementIterator::SPtr itdest,Operations::ProjectOperation::FUNC projectOp) const override {
-        return doFindClosestProx(prox,itdest,projectOp);
+    BaseProximity::SPtr defaultFunc(BaseProximity::SPtr prox, ElementIterator::SPtr itdest, Operations::ProjectOperation::FUNC projectOp,FILTER f) const override {
+        double min_dist = std::numeric_limits<double>::max();
+        BaseProximity::SPtr res = NULL;
+
+        type::Vector3 P = prox->getPosition();
+
+        for (; ! itdest->end();itdest++) {
+            auto edest = itdest->element();
+            if (edest == nullptr) continue;
+
+            BaseProximity::SPtr pdest = projectOp(prox->getPosition(),edest);
+            if (pdest == NULL) continue;
+
+            if (! f(prox,pdest)) continue;
+
+            double d = (P - pdest->getPosition()).norm();
+            if (d < min_dist) {
+                res = pdest;
+                min_dist = d;
+            }
+        }
+
+        return res;
     }
-
-    void notFound(const std::type_info & ) const override {}
-
 };
 
 class FindClosestProximityAlgorithm : public BaseAlgorithm {
@@ -245,11 +244,13 @@ public:
 
         const std::type_info & type_dest = (l_dest->getBroadPhase()) ? l_dest->getBroadPhase()->getTypeInfo() : l_dest->getTypeInfo();
 
-        auto createProximityOp = Operations::CreateCenterProximityOperation::get(l_from->getTypeInfo());
+        auto itfrom = l_from->pointBegin();
+
+        auto createProximityOp = Operations::CreateCenterProximityOperation::get(itfrom->getTypeInfo());
         auto findClosestProxOp = FindClosestProximityOperation::get(type_dest);
         auto projectOp = Operations::ProjectOperation::get(type_dest);
 
-        for (auto itfrom=l_from->begin();itfrom!=l_from->end();itfrom++) {
+        for (;itfrom!=l_from->end();itfrom++) {
             auto pfrom = createProximityOp(itfrom->element());
             if (pfrom == nullptr) continue;
 
@@ -257,7 +258,7 @@ public:
                                            FindClosestProximityOperation::broadPhaseIterator(pfrom, l_dest->getBroadPhase()) :
                                            l_dest->begin();
 
-            auto pdest = findClosestProxOp(pfrom,itdest,projectOp);
+            auto pdest = findClosestProxOp(pfrom,itdest,projectOp,std::bind(&FindClosestProximityAlgorithm::acceptFilter,this,std::placeholders::_1,std::placeholders::_2));
             if (pdest == nullptr) continue;
 
             output.push_back(PairDetection(pfrom,pdest));

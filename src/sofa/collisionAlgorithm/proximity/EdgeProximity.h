@@ -41,6 +41,8 @@ public:
         return EdgeProximity::SPtr(new EdgeProximity(sptr,f0,f1));
     }
 
+    const std::type_info& getTypeInfo() const override { return typeid(EdgeProximity); }
+
 protected:
     EdgeElement::SPtr m_elmt;
     double m_f0,m_f1;
