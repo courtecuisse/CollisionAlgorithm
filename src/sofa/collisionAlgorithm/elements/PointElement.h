@@ -1,65 +1,53 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/BaseElement.h>
-#include <sofa/collisionAlgorithm/proximity/PointProximity.h>
+#include <sofa/gl/gl.h>
 
 namespace sofa::collisionAlgorithm {
-
-class PointElement;
-
-//class PointProximityCreator {
-//public:
-//    virtual BaseProximity::SPtr createProximity(const PointElement * elmt) = 0;
-
-//};
 
 class PointElement : public BaseElement {
 public:
 
     typedef std::shared_ptr<PointElement> SPtr;
-    typedef std::function<BaseProximity::SPtr(const PointElement * elmt)> ProximityCreatorFunc;
 
-    PointElement(BaseProximity::SPtr prox)
-    : m_point(prox){
-        f_createProximity = [=](const PointElement * elmt) -> BaseProximity::SPtr {
-            return BaseProximity::create<PointProximity>(elmt->getP0());
-        };
-
-        getControlProximities().insert(prox);
-    }
-
-    size_t getOperationsHash() const override { return typeid(PointElement).hash_code(); }
+    const std::type_info& getTypeInfo() const override { return typeid(PointElement); }
 
     std::string name() const override { return "PointElement"; }
 
-    inline BaseProximity::SPtr createProximity() const {
-        return f_createProximity(this);
-    }
+    inline BaseProximity::SPtr getP0() const { return m_prox; }
 
-    inline BaseProximity::SPtr getP0() const { return m_point; }
+    void update() override {}
 
-    void getSubElements(std::set<BaseElement::SPtr> & subElem) const override {}
-
-//    void getControlProximities(std::vector<BaseProximity::SPtr> & res) const override {
-//        res.push_back(m_point);
-//    }
-
-    void draw(const core::visual::VisualParams * /*vparams*/) override
-	{
-        type::Vector3 p0 = m_point->getPosition();
+    void draw(const core::visual::VisualParams * /*vparams*/) override {
+        type::Vector3 p0 = m_prox->getPosition();
 
         glBegin(GL_POINT);
             glVertex3dv(p0.data());
         glEnd();
     }
 
-    void setCreateProximity(ProximityCreatorFunc f) {
-        f_createProximity = f;
-    }
+    ElementContainer<TriangleElement> & triangleAround() { return m_triangleAround; }
+
+    static SPtr create(BaseProximity::SPtr prox);
+
+    const ElementContainer<PointElement> & pointElements() const override { return ElementContainer<PointElement>::empty(); }
+
+    const ElementContainer<EdgeElement> & edgeElements() const override { return ElementContainer<EdgeElement>::empty(); }
+
+    const ElementContainer<TriangleElement> & triangleElements() const override { return ElementContainer<TriangleElement>::empty(); }
+
+    const ElementContainer<TetrahedronElement> & tetrahedronElements() const override { return ElementContainer<TetrahedronElement>::empty(); }
 
 private:
-    BaseProximity::SPtr m_point;
-    ProximityCreatorFunc f_createProximity;
+    PointElement(BaseProximity::SPtr prox) : m_prox(prox) {}
+
+    BaseProximity::SPtr m_prox;
+    ElementContainer<TriangleElement> m_triangleAround;
+
+//    ElementContainer<PointElement> m_pointElements;
+//    ElementContainer<EdgeElement> m_edgeElements;
+//    ElementContainer<TriangleElement> m_triangleElements;
+//    ElementContainer<TetrahedronElement> m_tetrahedronElements;
 };
 
 

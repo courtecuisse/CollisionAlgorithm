@@ -1,135 +1,72 @@
 #pragma once
 
 #include <sofa/collisionAlgorithm/BaseProximity.h>
+#include <sofa/core/visual/VisualParams.h>
 
 namespace sofa::collisionAlgorithm {
 
-//class ProximityCreator {
-//public:
-//    virtual type::Vector3 getPosition(unsigned eid) = 0;
-//};
+class PointElement;
+class EdgeElement;
+class TriangleElement;
+class TetrahedronElement;
 
-class ControlPoints {
+template<class ELMT>
+class ElementContainer {
 public:
+    typedef typename std::shared_ptr<ELMT> SPtr;
 
-    void insert(const ControlPoints & cp) {
-        if ((m_points.size()==0) && (cp.m_points.size()>0)) m_points.push_back(cp.m_points[0]);
+    typedef typename std::vector<SPtr>::const_iterator const_iterator;
 
-        for (unsigned i=0;i<cp.m_points.size();i++) {
-            unsigned count = 0;
-            for (unsigned j=0;j<m_points.size();j++) {
-                if (m_points[j] == cp.m_points[i]) /*return*/ count++;
-            }
-            if (count > 0) continue;
+    void insert(SPtr e) {
+        for (unsigned i=0;i<m_data.size();i++)
+            if (e == m_data[i]) return;
 
-            m_points.push_back(cp.m_points[i]);
-        }
+        m_data.push_back(e);
     }
 
-    void insert(BaseProximity::SPtr prox) {
-        for (unsigned i=0; i<m_points.size(); i++) {
-            if (m_points[i] == prox) return;
+    inline SPtr operator[](unsigned i) { return m_data[i]; }
 
-            m_points.push_back(prox);
-        }
-        if (m_points.size()==0) m_points.push_back(prox);
-    }
+    inline const SPtr operator[](unsigned i) const { return m_data[i]; }
 
-    void insert(std::vector<BaseProximity::SPtr> points) {
-        if ((m_points.size()==0) && (points.size()>0)) m_points.push_back(points[0]);
+    inline void clear() { m_data.clear(); }
 
-        for (unsigned i=0; i<points.size(); i++) {
-            unsigned count = 0;
-            for (unsigned j=0; j<m_points.size(); j++) {
-                if (m_points[j] == points[i]) /*return*/ count++;
-            }
-            if (count > 0) continue;
-            m_points.push_back(points[i]);
-        }
-    }
+    inline unsigned size() const { return m_data.size(); }
 
-    BaseProximity::SPtr operator[] (int i) const {
-        return m_points[i];
-    }
+    inline const_iterator cbegin() const { return m_data.cbegin(); }
 
-    std::vector<BaseProximity::SPtr> & getProximities() {
-        return m_points;
+    inline const_iterator cend() const { return m_data.cend(); }
+
+    static inline const ElementContainer & empty() {
+        static ElementContainer s_empty;
+        return s_empty;
     }
 
 private:
-    std::vector<BaseProximity::SPtr> m_points;
+    std::vector<SPtr> m_data;
 };
-
-
 
 class BaseElement {
 public:
 
     typedef std::shared_ptr<BaseElement> SPtr;
 
-//    virtual unsigned id() = 0;
+    virtual const ElementContainer<PointElement> & pointElements() const = 0;//{ return m_pointElements; }
 
-    template<typename CAST>
-    inline CAST * element_cast() {
-        return (CAST*)this;
-    }
+    virtual const ElementContainer<EdgeElement> & edgeElements() const = 0;//{ return m_edgeElements; }
 
-    template<typename CAST>
-    inline const CAST * element_cast() const {
-        return (CAST*)this;
-    }
+    virtual const ElementContainer<TriangleElement> & triangleElements() const = 0;//{ return m_triangleElements; }
 
-    /*virtual*/ ControlPoints & getControlProximities() {
-        return m_controlPoints;
-    }
-
-    virtual void getSubElements(std::set<BaseElement::SPtr> & subElem) const = 0;
+    virtual const ElementContainer<TetrahedronElement> & tetrahedronElements() const = 0;//{ return m_tetrahedronElements; }
 
     virtual void draw(const core::visual::VisualParams * vparams) = 0;
 
-    virtual size_t getOperationsHash() const = 0;
+    virtual const std::type_info& getTypeInfo() const = 0;
 
     virtual std::string name() const = 0;
 
-    template<class ELEMENT,class... ARGS>
-    static inline typename ELEMENT::SPtr create(ARGS... args) {
-        return typename ELEMENT::SPtr(new ELEMENT(args...));
-    }
-
-private:
-    ControlPoints m_controlPoints;
+    virtual void update() = 0;
 
 };
 
-class ElementCast {
-public:
-    ElementCast(BaseElement* e) : m_element(e) {}
-
-    template <typename CAST>
-    inline operator CAST * () {
-        return (CAST *) m_element;
-    }
-
-private:
-    BaseElement* m_element;
-};
-
-//template<class TProxCreatorFunc>
-//class TBaseElement : public BaseElement {
-//public:
-//    typedef TProxCreatorFunc ProxCreatorFunc;
-
-//    TBaseElement(unsigned id, TProxCreatorFunc f) : m_eid(id), m_createProxFunc(f) {}
-
-//    inline void setProximityCreator(ProxCreatorFunc f) { m_createProxFunc = f; }
-
-//    unsigned id() override {
-//        return m_eid;
-//    }
-
-//protected:
-//    unsigned m_eid;
-//    ProxCreatorFunc m_createProxFunc;
-//};
 
 }

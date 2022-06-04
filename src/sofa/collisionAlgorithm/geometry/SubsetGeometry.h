@@ -2,13 +2,9 @@
 
 #include <sofa/collisionAlgorithm/BaseGeometry.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
-#include <sofa/collisionAlgorithm/elements/PointElement.h>
 #include <sofa/collisionAlgorithm/toolbox/PointToolBox.h>
-#include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
 
-namespace sofa {
-
-namespace collisionAlgorithm {
+namespace sofa::collisionAlgorithm {
 
 template<class DataTypes>
 class SubsetGeometry : public TBaseGeometry<DataTypes> {
@@ -23,9 +19,8 @@ public:
 
     SOFA_CLASS(GEOMETRY,Inherit);
 
-    Data<type::vector<int> > d_indices;
-
     core::objectmodel::SingleLink<GEOMETRY,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+    Data<type::vector<int> > d_indices;
 
     SubsetGeometry()
       : l_geometry(initLink("wholeGeometry", "link to topology"))
@@ -65,18 +60,11 @@ public:
     void prepareDetection() override {}
 
     ElementIterator::SPtr begin(unsigned id = 0) const override {
-        return pointBegin(id);
-    }
-
-    inline ElementIterator::SPtr pointBegin(unsigned id = 0) const {
         return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_elements,id));
     }
 
-
 private:
-    std::vector<BaseElement *> m_elements;
+    std::vector<BaseElement::SPtr> m_elements;
 };
-
-}
 
 }

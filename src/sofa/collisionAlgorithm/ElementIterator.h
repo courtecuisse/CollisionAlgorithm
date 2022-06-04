@@ -19,30 +19,26 @@ public:
 
     virtual void next() = 0;
 
-    virtual BaseElement * element() = 0;
+    virtual BaseElement::SPtr element() = 0;
 
-    virtual const BaseElement * element() const = 0;
+    virtual const BaseElement::SPtr element() const = 0;
 
-    virtual size_t getOperationsHash() const = 0;
-
-    inline ElementCast element_cast() {
-        return ElementCast(element());
-    }
+    virtual const std::type_info& getTypeInfo() const = 0;
 
     ///returns a new EmptyIterator
     static inline ElementIterator::SPtr empty();
 
 };
 
-static inline bool operator != (ElementIterator::SPtr it, const BaseGeometry * /*geo*/) {
+static inline bool operator != (ElementIterator::SPtr & it, const BaseGeometry * /*geo*/) {
     return ! it->end();
 }
 
-static inline void operator ++ (ElementIterator::SPtr it) {
+static inline void operator ++ (ElementIterator::SPtr & it) {
     return it->next();
 }
 
-static inline void operator ++ (ElementIterator::SPtr it, int /*NB*/) {
+static inline void operator ++ (ElementIterator::SPtr & it, int /*NB*/) {
 //    for (int i=0;i<NB;i++)
         it->next();
 }
@@ -53,12 +49,12 @@ public:
 
     void next() override {}
 
-    BaseElement * element() override { return NULL; }
+    BaseElement::SPtr element() override { return BaseElement::SPtr(NULL); }
 
-    const BaseElement * element() const override { return NULL; }
+    const BaseElement::SPtr element() const override { return BaseElement::SPtr(NULL); }
 
-    size_t getOperationsHash() const override {
-        return typeid(EmptyIterator).hash_code();
+    const std::type_info& getTypeInfo() const override {
+        return typeid(EmptyIterator);
     }
 };
 
@@ -81,14 +77,14 @@ public:
 
     bool end() const override { return m_it==m_end; }
 
-    size_t getOperationsHash() const override {
-        if (m_it == m_end) return typeid(EmptyIterator).hash_code();
-        else return (*m_it)->getOperationsHash();
+    const std::type_info& getTypeInfo() const override {
+        if (m_it == m_end) return typeid(EmptyIterator);
+        else return (*m_it)->getTypeInfo();
     }
 
-    virtual BaseElement* element() { return m_it->get(); }
+    virtual BaseElement::SPtr element() { return *m_it; }
 
-    virtual const BaseElement* element() const { return m_it->get(); }
+    virtual const BaseElement::SPtr element() const { return *m_it; }
 
 private:
     typename CONTAINER::const_iterator m_it;
@@ -115,14 +111,14 @@ public:
 
     bool end() const override { return m_it==m_end; }
 
-    size_t getOperationsHash() const override {
-        if (m_it == m_end) return typeid(EmptyIterator).hash_code();
-        else return (*m_it)->getOperationsHash();
+    const std::type_info& getTypeInfo() const override {
+        if (m_it == m_end) return typeid(EmptyIterator);
+        else return (*m_it)->getTypeInfo();
     }
 
-    virtual BaseElement * element() { return *m_it; }
+    virtual BaseElement::SPtr element() { return *m_it; }
 
-    virtual const BaseElement * element() const { return *m_it; }
+    virtual const BaseElement::SPtr element() const { return *m_it; }
 
 private:
     typename CONTAINER::const_iterator m_it;

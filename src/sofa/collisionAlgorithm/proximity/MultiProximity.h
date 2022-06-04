@@ -6,6 +6,9 @@ namespace sofa::collisionAlgorithm {
 
 class MultiProximity : public BaseProximity {
 public:
+
+    typedef std::shared_ptr<MultiProximity> SPtr;
+
     MultiProximity(std::vector<BaseProximity::SPtr> & prox)
     : m_proximities(prox){}
 
@@ -29,11 +32,7 @@ public:
         }
     }
 
-    virtual sofa::type::Vector3 getNormal() const {
-        sofa::type::Vector3 N(0,0,0);
-        for (unsigned i=0;i<m_proximities.size();i++) N+=m_proximities[i]->getNormal();
-        return N*1.0/m_proximities.size();
-    }
+    const std::type_info& getTypeInfo() const override { return typeid(MultiProximity); }
 
 protected:
     std::vector<BaseProximity::SPtr> m_proximities;

@@ -5,11 +5,7 @@
 #include <sofa/collisionAlgorithm/DataDetectionOutput.h>
 #include <sofa/collisionAlgorithm/CollisionPipeline.h>
 
-namespace sofa
-{
-
-namespace collisionAlgorithm
-{
+namespace sofa::collisionAlgorithm {
 
 /*!
  * \class BaseAlgorithm
@@ -21,6 +17,8 @@ class BaseAlgorithm : public CollisionAlgorithm
 public :
 
     SOFA_ABSTRACT_CLASS(BaseAlgorithm, sofa::core::objectmodel::BaseObject);
+
+    typedef std::function<bool(const BaseProximity::SPtr&,const BaseProximity::SPtr&)> FilterFUNC;
 
     /*!
      * \brief The BaseFilter class provides an interface to create proximity filter components
@@ -68,9 +66,9 @@ public :
      * \param pdest : destination proximity
      * \return True if all filters accept proximities, otherwise False
      */
-    bool acceptFilter(const PairDetection & d) const {
+    bool acceptFilter(const BaseProximity::SPtr & p1,const BaseProximity::SPtr & p2) {
         for (unsigned i=0;i<m_filters.size();i++) {
-            if (! m_filters[i]->accept(d.first,d.second)) return false;
+            if (! m_filters[i]->accept(p1,p2)) return false;
         }
         return true;
     }
@@ -79,12 +77,14 @@ public :
         m_filters.push_back(f);
     }
 
+    FilterFUNC getFilterFunc() {
+        return std::bind(&BaseAlgorithm::acceptFilter,this,std::placeholders::_1,std::placeholders::_2);
+    }
+
 protected:
 
 
     sofa::type::vector<BaseFilter::SPtr> m_filters;
 };
-
-}
 
 }

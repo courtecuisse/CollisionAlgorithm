@@ -3,25 +3,23 @@
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/collisionAlgorithm/toolbox/TriangleToolBox.h>
 #include <sofa/collisionAlgorithm/elements/TetrahedronElement.h>
+#include <sofa/collisionAlgorithm/proximity/TetrahedronProximity.h>
 
 namespace sofa::collisionAlgorithm::toolbox {
 
 class TetrahedronToolBox {
 public:
 
-    static BaseProximity::SPtr createCenterProximity(BaseElement* elmt) {
-        TetrahedronElement * tetra = elmt->element_cast<TetrahedronElement>();
-        return tetra->createProximity(1.0/4.0,1.0/4.0,1.0/4.0,1.0/4.0);
+    static BaseProximity::SPtr createCenterProximity(TetrahedronElement::SPtr tetra) {
+        return TetrahedronProximity::create(tetra, 1.0/4.0,1.0/4.0,1.0/4.0,1.0/4.0);
     }
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    static BaseProximity::SPtr project(type::Vector3 P, BaseElement* elmt) {
-        TetrahedronElement * tetra = elmt->element_cast<TetrahedronElement>();
-
+    static BaseProximity::SPtr project(const type::Vector3 & P, TetrahedronElement::SPtr tetra) {
         double fact[4];
         projectOnTetra(P, tetra->getTetrahedronInfo(),fact[0],fact[1],fact[2],fact[3]);
-        return tetra->createProximity(fact[0],fact[1],fact[2],fact[3]);
+        return TetrahedronProximity::create(tetra, fact[0],fact[1],fact[2],fact[3]);
     }
 
 

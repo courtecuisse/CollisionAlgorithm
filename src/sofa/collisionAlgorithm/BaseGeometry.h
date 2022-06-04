@@ -3,11 +3,16 @@
 #include <sofa/collisionAlgorithm/CollisionPipeline.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
-#include <sofa/collisionAlgorithm/proximity/TopologyProximity.h>
+#include <sofa/collisionAlgorithm/proximity/MechanicalProximity.h>
 #include <sofa/collisionAlgorithm/ElementIterator.h>
 #include <sofa/gl/gl.h>
+#include <sofa/collisionAlgorithm/elements/PointElement.h>
+#include <sofa/collisionAlgorithm/elements/EdgeElement.h>
+#include <sofa/collisionAlgorithm/elements/TriangleElement.h>
+#include <sofa/collisionAlgorithm/elements/TetrahedronElement.h>
 
 namespace sofa ::collisionAlgorithm {
+
 
 /*!
  * \brief The BaseGeometry class is an abstract class defining a basic geometry
@@ -15,6 +20,36 @@ namespace sofa ::collisionAlgorithm {
  */
 class BaseGeometry : public CollisionComponent {
 public:
+
+    class BroadPhase : public sofa::core::objectmodel::BaseObject {
+    public:
+
+        SOFA_ABSTRACT_CLASS(BroadPhase,sofa::core::objectmodel::BaseObject);
+
+        core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+
+        BroadPhase()
+        : l_geometry(initLink("geometry", "link to geometry")) {
+            l_geometry.setPath("@.");
+        }
+
+        void init() {
+            if (l_geometry != NULL) l_geometry->setBroadPhase(this);
+        }
+
+        virtual type::Vec3i getNbox() = 0;
+
+        virtual type::Vec3i getBoxCoord(const type::Vector3 & P) const = 0;
+
+        virtual const std::set<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const = 0;
+
+        const std::type_info& getTypeInfo() const { return l_geometry->getTypeInfo(); }
+
+        virtual void initBroadPhase() = 0;
+
+        virtual void updateBroadPhase() = 0;
+
+    };
 
     SOFA_ABSTRACT_CLASS(BaseGeometry,CollisionComponent);
 
@@ -25,11 +60,45 @@ public:
     BaseGeometry()
     : d_color(initData(&d_color, sofa::type::RGBAColor(1,0,1,1), "color", "Color of the collision model"))
     , d_drawScaleNormal(initData(&d_drawScaleNormal, 1.0, "drawScaleNormal", "Color of the collision model"))
-    , d_draw(initData(&d_draw, true, "draw", "draw")) {
+    , d_draw(initData(&d_draw, true, "draw", "draw"))
+    , m_broadPhase(NULL) {
         this->f_listening.setValue(true);
     }
 
+    void init() {
+        m_pointElements.clear();
+        m_edgeElements.clear();
+        m_triangleElements.clear();
+        m_tetrahedronElements.clear();
+
+        buildPointElements();
+        buildEdgeElements();
+        buildTriangleElements();
+        buildTetrahedronElements();
+        prepareDetection();
+    }
+
+    virtual void buildPointElements() {}
+
+    virtual void buildEdgeElements() {}
+
+    virtual void buildTriangleElements() {}
+
+    virtual void buildTetrahedronElements() {}
+
+    virtual void prepareDetection() {
+        if (m_broadPhase) m_broadPhase->updateBroadPhase();
+        for (unsigned i=0;i<m_pointElements.size();i++) m_pointElements[i]->update();
+        for (unsigned i=0;i<m_edgeElements.size();i++) m_edgeElements[i]->update();
+        for (unsigned i=0;i<m_triangleElements.size();i++) m_triangleElements[i]->update();
+        for (unsigned i=0;i<m_tetrahedronElements.size();i++) m_tetrahedronElements[i]->update();
+    }
+
     virtual ElementIterator::SPtr begin(unsigned id = 0) const = 0;
+
+    inline const std::type_info& getTypeInfo() const { return begin()->getTypeInfo(); }
+
+    BroadPhase * getBroadPhase() { return m_broadPhase; }
 
     inline const BaseGeometry * end() const { return this; }
 
@@ -46,33 +115,55 @@ public:
         glColor4f(color[0],color[1],color[2],color[3]);
         for (auto it = begin();it != end(); it++) {
             it->element()->draw(vparams);
-        }
-
-        if (! vparams->displayFlags().getShowNormals()) return;
-        double scale = d_drawScaleNormal.getValue();
-        if (scale == 0.0) return;
-        for (auto it = begin();it != end(); it++) {
-            std::vector<BaseProximity::SPtr> res = it->element()->getControlProximities().getProximities();
-//            it->element()->getControlProximities(res);
-            for (unsigned i=0;i<res.size();i++) {
-                BaseProximity::SPtr center = res[i];
-
-                vparams->drawTool()->drawArrow(
-                    center->getPosition(),
-                    center->getPosition() + center->getNormal() * scale,
-                    scale * 0.1,
-                    color);
-            }
-        }
+        }        
     }
 
+    inline ElementIterator::SPtr pointBegin(unsigned id = 0) const {
+        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_pointElements,id));
+    }
+
+    inline ElementIterator::SPtr edgeBegin(unsigned id = 0) const {
+        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_edgeElements,id));
+    }
+
+    inline ElementIterator::SPtr triangleBegin(unsigned id = 0) const {
+        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_triangleElements,id));
+    }
+
+    inline ElementIterator::SPtr tetrahedronBegin(unsigned id = 0) const {
+        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_tetrahedronElements,id));
+    }
+
+    void setBroadPhase(BroadPhase * b) {
+        m_broadPhase = b;
+        this->addSlave(m_broadPhase);
+        m_broadPhase->initBroadPhase();
+    }
+
+protected:
+
+    virtual ElementContainer<PointElement> & pointElements() { return m_pointElements; }
+
+    virtual ElementContainer<EdgeElement> & edgeElements() { return m_edgeElements; }
+
+    virtual ElementContainer<TriangleElement> & triangleElements() { return m_triangleElements; }
+
+    virtual ElementContainer<TetrahedronElement> & tetrahedronElements() { return m_tetrahedronElements; }
+
+private:
+
+    ElementContainer<PointElement> m_pointElements;
+    ElementContainer<EdgeElement> m_edgeElements;
+    ElementContainer<TriangleElement> m_triangleElements;
+    ElementContainer<TetrahedronElement> m_tetrahedronElements;
+
+    BroadPhase * m_broadPhase;
 };
 
 template<class DataTypes>
 class TBaseGeometry : public BaseGeometry {
 public:
 
-    typedef typename TopologyProximity<DataTypes>::SPtr PROXIMITY;
     typedef typename DataTypes::VecCoord VecCoord;
     typedef typename DataTypes::Coord Coord;
     typedef typename DataTypes::Real Real;
@@ -85,7 +176,7 @@ public:
     typedef core::objectmodel::Data< MatrixDeriv >     DataMatrixDeriv;
     typedef sofa::core::behavior::MechanicalState<DataTypes> State;
 
-    SOFA_CLASS(SOFA_TEMPLATE(TBaseGeometry,DataTypes),BaseGeometry);
+    SOFA_ABSTRACT_CLASS(SOFA_TEMPLATE(TBaseGeometry,DataTypes),BaseGeometry);
 
     core::objectmodel::SingleLink<TBaseGeometry<DataTypes>,State,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_state;
 
@@ -98,29 +189,34 @@ public:
 //        }
     }
 
-    void init() {
-        this->m_topoProx.clear();
-        for (unsigned j=0; j<this->getState()->getSize(); j++) {
-//            m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(l_state, j));
-             m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
-        }
-    }
+
+
+//    virtual void buildTopologyProximity() {
+//        this->m_topoProx.clear();
+//        for (unsigned j=0; j<this->getState()->getSize(); j++) {
+////            m_topoProx.push_back(TBaseProximity<DataTypes>::template create<TopologyProximity<DataTypes>>(l_state, j));
+//             m_topoProx.push_back(BaseProximity::create<TopologyProximity<DataTypes>>(l_state, j));
+//        }
+//    }
+
+
+
 
     inline sofa::core::behavior::MechanicalState<DataTypes> * getState() const {
         return l_state.get();
     }
 
-    inline std::vector<typename TopologyProximity<DataTypes>::SPtr> & getTopoProx(){
-        return m_topoProx;
-    }
+//    inline std::vector<typename TopologyProximity<DataTypes>::SPtr> & getTopoProx(){
+//        return m_topoProx;
+//    }
 
-    inline typename TopologyProximity<DataTypes>::SPtr getTopoProxIdx(unsigned i){
-        return m_topoProx[i];
-    }
+//    inline typename TopologyProximity<DataTypes>::SPtr getTopoProxIdx(unsigned i){
+//        return m_topoProx[i];
+//    }
 
 //	inline std::vector<BaseElement::SPtr > getBaseElements() = 0;
 
-    inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const {
+    inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::linearalgebra::BaseVector* lambda) const {
         auto res = sofa::helper::write(*resId[this->getState()].write());
         const typename DataTypes::MatrixDeriv& j = cParams->readJ(this->getState())->getValue();
         auto rowIt = j.readLine(cid_global+cid_local);
@@ -150,13 +246,9 @@ public:
         return DataTypes::Name();
     }
 
-
-
-
-protected:
-    std::vector<typename TopologyProximity<DataTypes>::SPtr> m_topoProx;
-
 };
+
+
 
 }
 

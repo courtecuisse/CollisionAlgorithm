@@ -2,21 +2,20 @@
 
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/collisionAlgorithm/elements/PointElement.h>
+#include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 
 namespace sofa::collisionAlgorithm::toolbox {
 
 class PointToolBox {
 public:
 
-    static BaseProximity::SPtr createCenterProximity(BaseElement* elmt) {
-        auto point = elmt->element_cast<PointElement>();
-        return point->createProximity();
+    static BaseProximity::SPtr createCenterProximity(PointElement::SPtr point) {
+        return PointProximity::create(point);
     }
 
 
-    static BaseProximity::SPtr project(const type::Vector3 & /*P*/, BaseElement* elmt) {
-        auto point = elmt->element_cast<PointElement>();
-        return point->createProximity();
+    static BaseProximity::SPtr project(const type::Vector3 & /*P*/, PointElement::SPtr point) {
+        return PointProximity::create(point);
     }
 
 

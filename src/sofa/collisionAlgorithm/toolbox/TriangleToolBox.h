@@ -3,25 +3,23 @@
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/collisionAlgorithm/toolbox/EdgeToolBox.h>
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
+#include <sofa/collisionAlgorithm/proximity/TriangleProximity.h>
 
 namespace sofa::collisionAlgorithm::toolbox {
 
 class TriangleToolBox {
 public:
 
-    static BaseProximity::SPtr createCenterProximity(BaseElement* elmt) {
-        TriangleElement * tri = elmt->element_cast<TriangleElement>();
-        return tri->createProximity(1.0/3.0,1.0/3.0,1.0/3.0);
+    static BaseProximity::SPtr createCenterProximity(TriangleElement::SPtr tri) {
+        return TriangleProximity::create(tri, 1.0/3.0,1.0/3.0,1.0/3.0);
     }
 
     //Barycentric coordinates are computed according to
     //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-    static BaseProximity::SPtr project(type::Vector3 P, BaseElement* elmt) {
-        TriangleElement * tri = elmt->element_cast<TriangleElement>();
-
+    static BaseProximity::SPtr project(const type::Vector3 & P, TriangleElement::SPtr tri) {
         double fact_u,fact_v,fact_w;
         projectOnTriangle(P,tri->getTriangleInfo(),fact_u,fact_v,fact_w);
-        return tri->createProximity(fact_u,fact_v,fact_w);
+        return TriangleProximity::create(tri, fact_u,fact_v,fact_w);
     }
 
 

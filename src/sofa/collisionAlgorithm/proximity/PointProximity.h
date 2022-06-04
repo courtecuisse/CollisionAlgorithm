@@ -1,42 +1,40 @@
 ﻿#pragma once
 
-#include <sofa/collisionAlgorithm/BaseProximity.h>
+#include <sofa/collisionAlgorithm/elements/PointElement.h>
 
 namespace sofa::collisionAlgorithm {
 
 class PointProximity : public BaseProximity {
 public:
 
-    PointProximity(BaseProximity::SPtr prox)
-    : m_p0(prox) {}
+    typedef std::shared_ptr<PointProximity> SPtr;
+
+    PointProximity(PointElement::SPtr elmt)
+    : m_elmt(elmt) {}
 
     void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
-        m_p0->buildJacobianConstraint(cId,dir,fact,constraintId);
+        m_elmt->getP0()->buildJacobianConstraint(cId,dir,fact,constraintId);
     }
-
-//    void addContributions(MatrixDerivRowIterator & c_it, const sofa::type::Vector3 & N,double fact) const override {
-//        c_it.addCol(m_p0, N * fact);
-//    }
 
     /// return proximiy position in a vector3
     sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
-        return m_p0->getPosition(v);
+        return m_elmt->getP0()->getPosition(v);
     }
 
-    BaseProximity::SPtr getProx() const {
-        return m_p0;
+    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::linearalgebra::BaseVector* lambda) const override {
+        m_elmt->getP0()->storeLambda(cParams,res,cid_global,cid_local,lambda);
     }
 
-    sofa::type::Vector3 getNormal() const override {
-        return m_p0->getNormal();
+    PointElement::SPtr element() { return m_elmt; }
+
+    static BaseProximity::SPtr create(const PointElement::SPtr & p) {
+        return p->getP0();
     }
 
-    void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::defaulttype::BaseVector* lambda) const override {
-        m_p0->storeLambda(cParams,res,cid_global,cid_local,lambda);
-    }
+    const std::type_info& getTypeInfo() const override { return typeid(PointProximity); }
 
 protected:
-    BaseProximity::SPtr m_p0;
+    PointElement::SPtr m_elmt;
 };
 
 }
