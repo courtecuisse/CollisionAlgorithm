@@ -54,8 +54,14 @@ public:
     typedef RETURN_TYPE (*FUNC)(PARAMS...);
     typedef size_t KEY_MAP; // <RETURN,TYPE>
 
-    static inline RETURN_TYPE (*get(const std::type_info & id)) (PARAMS...) {
-        typedef RETURN_TYPE (*function_type)(PARAMS...);
+    template<class MY_RETURN_TYPE = RETURN_TYPE, class T>
+    static inline MY_RETURN_TYPE (*get(T obj)) (PARAMS...) {
+        return get<MY_RETURN_TYPE>(obj->getTypeInfo());
+    }
+
+    template<class MY_RETURN_TYPE = RETURN_TYPE>
+    static inline MY_RETURN_TYPE (*get(const std::type_info & id)) (PARAMS...) {
+        typedef MY_RETURN_TYPE (*function_type)(PARAMS...);
 
         KEY_MAP key = id.hash_code();
 
@@ -68,8 +74,6 @@ public:
 
         return *((function_type*) &it_type->second);
     }
-
-
 
     template<class ELMT, class... PARAMS_TYPED>
     static int register_func(RETURN_TYPE (*f)(PARAMS_TYPED...)) {
@@ -101,8 +105,15 @@ private:
         return m_singleton;
     }
 
+
     static inline RETURN_TYPE t_defaultFunc(PARAMS... params) {
         return getSingleton()->defaultFunc(params...);
+    }
+
+    template<class MY_RETURN_TYPE>
+    static inline MY_RETURN_TYPE t_defaultFunc(PARAMS... ) {
+        std::cerr << "ERROR THERE IS NO DEFAULT FUNCTION FOR THIS RETURN TYPE. Good luck !" << std::endl;
+        return MY_RETURN_TYPE();
     }
 
     //No construction of the is is allowed
@@ -119,8 +130,14 @@ public:
     typedef RETURN_TYPE (*FUNC)(PARAMS...);
     typedef std::pair<size_t,size_t> KEY_MAP; // <RETURN,TYPE1,TYPE2>
 
-    static inline RETURN_TYPE (*get(const std::type_info & id1, const std::type_info & id2)) (PARAMS...) {
-        typedef RETURN_TYPE (*function_type)(PARAMS...);
+    template<class MY_RETURN_TYPE = RETURN_TYPE, class T1, class T2>
+    static inline MY_RETURN_TYPE (*get(T1 obj1,T2 obj2)) (PARAMS...) {
+        return get<MY_RETURN_TYPE>(obj1->getTypeInfo(),obj2->getTypeInfo());
+    }
+
+    template<class MY_RETURN_TYPE = RETURN_TYPE>
+    static inline MY_RETURN_TYPE (*get(const std::type_info & id1, const std::type_info & id2)) (PARAMS...) {
+        typedef MY_RETURN_TYPE (*function_type)(PARAMS...);
 
         KEY_MAP key(id1.hash_code(),id2.hash_code());
 
@@ -166,6 +183,11 @@ private:
 
     static RETURN_TYPE t_defaultFunc(PARAMS... params) {
         return getSingleton()->defaultFunc(params...);
+    }
+
+    template<class MY_RETURN_TYPE>
+    static inline MY_RETURN_TYPE t_defaultFunc(PARAMS... ) {
+        std::cerr << "ERROR THERE IS NO DEFAULT FUNCTION FOR THIS RETURN TYPE. Good luck !" << std::endl;
     }
 
     //No construction of the is is allowed

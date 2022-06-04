@@ -8,11 +8,10 @@ namespace sofa
 namespace collisionAlgorithm
 {
 
-typedef std::pair<BaseProximity::SPtr,BaseProximity::SPtr> PairDetection;
-
+template<class FIRST = BaseProximity,class SECOND = BaseProximity>
 class DetectionOutput {
 public:
-    typedef std::pair<BaseProximity::SPtr,BaseProximity::SPtr> PairDetection;
+    typedef std::pair<typename FIRST::SPtr,typename SECOND::SPtr> PairDetection;
 
     friend std::ostream& operator<<(std::ostream& os, const DetectionOutput& t)  {
         os << t.m_output.size() << ":" ;
@@ -30,11 +29,11 @@ public:
         m_output.clear();
     }
 
-    sofa::type::vector<PairDetection>::const_iterator begin() const {
+    typename sofa::type::vector<PairDetection>::const_iterator begin() const {
         return m_output.begin();
     }
 
-    sofa::type::vector<PairDetection>::const_iterator end() const {
+    typename sofa::type::vector<PairDetection>::const_iterator end() const {
         return m_output.begin();
     }
 
@@ -42,11 +41,7 @@ public:
         return m_output.size();
     }
 
-    inline void push_back(const PairDetection & d) {
-        m_output.push_back(d);
-    }
-
-    inline void add(BaseProximity::SPtr p1, BaseProximity::SPtr p2) {
+    inline void add(const typename FIRST::SPtr & p1,const typename SECOND::SPtr & p2) {
         if (p1 == NULL) return;
         if (p2 == NULL) return;
         m_output.push_back(PairDetection(p1,p2));
@@ -135,7 +130,7 @@ struct DetectionOutputTypeInfo
 };
 
 template<>
-struct DataTypeInfo< collisionAlgorithm::DetectionOutput > : public DetectionOutputTypeInfo< collisionAlgorithm::DetectionOutput >
+struct DataTypeInfo< collisionAlgorithm::DetectionOutput<collisionAlgorithm::BaseProximity::SPtr, collisionAlgorithm::BaseProximity::SPtr> > : public DetectionOutputTypeInfo< collisionAlgorithm::DetectionOutput<collisionAlgorithm::BaseProximity::SPtr, collisionAlgorithm::BaseProximity::SPtr> >
 {
     static std::string name() { std::ostringstream o; o << "DetectionOutput"; return o.str(); }
 };
