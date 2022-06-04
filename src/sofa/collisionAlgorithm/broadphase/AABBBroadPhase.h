@@ -8,10 +8,10 @@
 
 namespace sofa::collisionAlgorithm {
 
-class AABBBroadPhase : public BroadPhase {
+class AABBBroadPhase : public BaseGeometry::BroadPhase {
 public:
 
-    SOFA_CLASS(AABBBroadPhase,BroadPhase);
+    SOFA_CLASS(AABBBroadPhase,BaseGeometry::BroadPhase);
 
     Data<type::Vec3i> d_nbox;
     Data<bool> d_static;
@@ -39,19 +39,16 @@ public:
         }
     }
 
-    void prepareDetection() override {
-        if (l_geometry == NULL) return;
+    void initBroadPhase() override {
+        doUpdate();
+    }
 
+    void updateBroadPhase() override {
         if(d_static.getValue()) return;
-
-        updateBroadPhase();
+        doUpdate();
     }
 
-    void init() {
-        updateBroadPhase();
-    }
-
-    void updateBroadPhase() {
+    inline void doUpdate() {
         sofa::core::behavior::BaseMechanicalState * mstate = l_geometry->getState();
 
         m_Bmin = type::Vector3(mstate->getPX(0),mstate->getPY(0),mstate->getPZ(0));

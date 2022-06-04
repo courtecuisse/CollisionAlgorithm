@@ -16,7 +16,7 @@ class FindClosestProximityOperation : public Operations::GenericOperation<FindCl
                                                                           > {
 public:
 
-    static ElementIterator::SPtr broadPhaseIterator(BaseProximity::SPtr prox, BroadPhase * broadphase) {
+    static ElementIterator::SPtr broadPhaseIterator(BaseProximity::SPtr prox, BaseGeometry::BroadPhase * broadphase) {
         //old params : type::Vec3i cbox, std::set<BaseProximity::Index> & selectElements, int d
         type::Vec3i nbox = broadphase->getNbox();
 

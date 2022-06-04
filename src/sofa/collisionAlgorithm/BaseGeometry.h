@@ -13,7 +13,6 @@
 
 namespace sofa ::collisionAlgorithm {
 
-class BroadPhase;
 
 /*!
  * \brief The BaseGeometry class is an abstract class defining a basic geometry
@@ -21,7 +20,36 @@ class BroadPhase;
  */
 class BaseGeometry : public CollisionComponent {
 public:
-    friend class BroadPhase;
+
+    class BroadPhase : public sofa::core::objectmodel::BaseObject {
+    public:
+
+        SOFA_ABSTRACT_CLASS(BroadPhase,sofa::core::objectmodel::BaseObject);
+
+        core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
+
+        BroadPhase()
+        : l_geometry(initLink("geometry", "link to geometry")) {
+            l_geometry.setPath("@.");
+        }
+
+        void init() {
+            if (l_geometry != NULL) l_geometry->setBroadPhase(this);
+        }
+
+        virtual type::Vec3i getNbox() = 0;
+
+        virtual type::Vec3i getBoxCoord(const type::Vector3 & P) const = 0;
+
+        virtual const std::set<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const = 0;
+
+        const std::type_info& getTypeInfo() const { return l_geometry->getTypeInfo(); }
+
+        virtual void initBroadPhase() = 0;
+
+        virtual void updateBroadPhase() = 0;
+
+    };
 
     SOFA_ABSTRACT_CLASS(BaseGeometry,CollisionComponent);
 
@@ -59,6 +87,7 @@ public:
     virtual void buildTetrahedronElements() {}
 
     virtual void prepareDetection() {
+        if (m_broadPhase) m_broadPhase->updateBroadPhase();
         for (unsigned i=0;i<m_pointElements.size();i++) m_pointElements[i]->update();
         for (unsigned i=0;i<m_edgeElements.size();i++) m_edgeElements[i]->update();
         for (unsigned i=0;i<m_triangleElements.size();i++) m_triangleElements[i]->update();
@@ -103,6 +132,12 @@ public:
 
     inline ElementIterator::SPtr tetrahedronBegin(unsigned id = 0) const {
         return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_tetrahedronElements,id));
+    }
+
+    void setBroadPhase(BroadPhase * b) {
+        m_broadPhase = b;
+        this->addSlave(m_broadPhase);
+        m_broadPhase->initBroadPhase();
     }
 
 protected:
@@ -213,34 +248,7 @@ public:
 
 };
 
-class BroadPhase : public CollisionComponent {
-public:
 
-    SOFA_ABSTRACT_CLASS(BroadPhase,CollisionComponent);
-
-    core::objectmodel::SingleLink<BroadPhase,BaseGeometry,BaseLink::FLAG_STRONGLINK|BaseLink::FLAG_STOREPATH> l_geometry;
-
-    BroadPhase()
-    : l_geometry(initLink("geometry", "link to geometry")) {
-        l_geometry.setPath("@.");
-    }
-
-    void init() {
-        if (l_geometry != NULL) {
-            l_geometry->m_broadPhase = this;
-            l_geometry->addSlave(this);
-        }
-    }
-
-    virtual type::Vec3i getNbox() = 0;
-
-    virtual type::Vec3i getBoxCoord(const type::Vector3 & P) const = 0;
-
-    virtual const std::set<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const = 0;
-
-    const std::type_info& getTypeInfo() const { return l_geometry->getTypeInfo(); }
-
-};
 
 }
 
