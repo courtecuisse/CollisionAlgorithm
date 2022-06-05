@@ -24,9 +24,9 @@ public:
         m_data.push_back(e);
     }
 
-    inline SPtr operator[](unsigned i) { return m_data[i]; }
+    inline SPtr & operator[](unsigned i) { return m_data[i]; }
 
-    inline const SPtr operator[](unsigned i) const { return m_data[i]; }
+    inline const SPtr & operator[](unsigned i) const { return m_data[i]; }
 
     inline void clear() { m_data.clear(); }
 

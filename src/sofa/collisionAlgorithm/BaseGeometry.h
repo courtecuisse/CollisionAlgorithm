@@ -3,7 +3,6 @@
 #include <sofa/collisionAlgorithm/CollisionPipeline.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/collisionAlgorithm/BaseProximity.h>
-#include <sofa/collisionAlgorithm/proximity/MechanicalProximity.h>
 #include <sofa/collisionAlgorithm/ElementIterator.h>
 #include <sofa/gl/gl.h>
 #include <sofa/collisionAlgorithm/elements/PointElement.h>
@@ -87,11 +86,12 @@ public:
     virtual void buildTetrahedronElements() {}
 
     virtual void prepareDetection() {
-        if (m_broadPhase) m_broadPhase->updateBroadPhase();
         for (unsigned i=0;i<m_pointElements.size();i++) m_pointElements[i]->update();
         for (unsigned i=0;i<m_edgeElements.size();i++) m_edgeElements[i]->update();
         for (unsigned i=0;i<m_triangleElements.size();i++) m_triangleElements[i]->update();
         for (unsigned i=0;i<m_tetrahedronElements.size();i++) m_tetrahedronElements[i]->update();
+
+        if (m_broadPhase) m_broadPhase->updateBroadPhase();
     }
 
     virtual ElementIterator::SPtr begin(unsigned id = 0) const = 0;
@@ -102,7 +102,9 @@ public:
 
     inline const BaseGeometry * end() const { return this; }
 
-    virtual sofa::core::behavior::BaseMechanicalState * getState() const = 0;
+    virtual unsigned getSize() const = 0;
+
+    virtual type::Vector3 getPosition(unsigned pid, core::VecCoordId v = core::VecCoordId::position()) const = 0;
 
     void draw(const core::visual::VisualParams * vparams) override {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
@@ -139,8 +141,6 @@ public:
         this->addSlave(m_broadPhase);
         m_broadPhase->initBroadPhase();
     }
-
-protected:
 
     virtual ElementContainer<PointElement> & pointElements() { return m_pointElements; }
 
@@ -199,6 +199,15 @@ public:
 //        }
 //    }
 
+    unsigned getSize() const override {
+        return l_state->getSize();
+    }
+
+    sofa::type::Vector3 getPosition(unsigned pid, core::VecCoordId v = core::VecCoordId::position()) const override {
+        const helper::ReadAccessor<DataVecCoord> & pos = l_state->read(v);
+        return pos[pid];
+
+    }
 
 
 

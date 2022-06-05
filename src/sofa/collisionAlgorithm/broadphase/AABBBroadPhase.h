@@ -49,14 +49,12 @@ public:
     }
 
     inline void doUpdate() {
-        sofa::core::behavior::BaseMechanicalState * mstate = l_geometry->getState();
-
-        m_Bmin = type::Vector3(mstate->getPX(0),mstate->getPY(0),mstate->getPZ(0));
+        m_Bmin = l_geometry->getPosition(0);
         m_Bmax = m_Bmin;
 
         //updates bounding box area
-        for (unsigned j=1;j<mstate->getSize();j++) {
-            type::Vector3 pos(mstate->getPX(j),mstate->getPY(j),mstate->getPZ(j));
+        for (unsigned j=1;j<l_geometry->getSize();j++) {
+            type::Vector3 pos = l_geometry->getPosition(j);
 
             for (int i = 0 ; i < 3 ; i++) {
                 if (pos[i] > m_Bmax[i])

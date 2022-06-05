@@ -22,14 +22,14 @@ public:
         type::Vec3d P0,P1,P2;
         type::Vec3d N;
 
-        void update(const type::Vec3d & e0, const type::Vec3d & e1,const type::Vec3d & e2) {
-            P0 = e0;
-            P1 = e1;
-            P2 = e2;
+        void update(const type::Vec3d & p0, const type::Vec3d & p1,const type::Vec3d & p2) {
+            P0 = p0;
+            P1 = p1;
+            P2 = p2;
 
             v0 = P1 - P0;
             v1 = P2 - P0;
-            N=cross(v0,v1);
+            N=cross(v1,v0);
             area = N.norm()/2;
             N.normalize();
 
