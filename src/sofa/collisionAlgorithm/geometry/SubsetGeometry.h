@@ -60,7 +60,7 @@ public:
     void prepareDetection() override {}
 
     ElementIterator::SPtr begin(unsigned id = 0) const override {
-        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_elements,id));
+        return ElementIterator::SPtr(new TDefaultElementIterator_ref(m_elements,id));
     }
 
 private:

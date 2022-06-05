@@ -170,13 +170,13 @@ public:
             }
         }
 
-        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(selectedElements));
+        return ElementIterator::SPtr(new TDefaultElementIterator_copy(selectedElements));
     }
 
     BaseProximity::SPtr defaultFunc(const BaseProximity::SPtr & prox, BaseGeometry * geometry, Operations::ProjectOperation::FUNC projectOp,BaseAlgorithm::FilterFUNC filter) const override {
-        ElementIterator::SPtr itdest = (geometry->getBroadPhase()) ?
-                                       FindClosestProximityOperation::broadPhaseIterator(prox, geometry->getBroadPhase()) :
-                                       geometry->begin();
+        const ElementIterator::SPtr & itdest = (geometry->getBroadPhase()) ?
+                                               FindClosestProximityOperation::broadPhaseIterator(prox, geometry->getBroadPhase()) :
+                                               geometry->begin();
 
         return doFindClosesPoint(prox, itdest, projectOp, filter);
     }
@@ -216,14 +216,14 @@ public:
     core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
     Data<bool> d_drawCollision ;
     Data<DetectionOutput<BaseProximity,BaseProximity> > d_output;
-    Data<sofa::type::vector<double> > d_outputDist;
+//    Data<sofa::type::vector<double> > d_outputDist;
 
     FindClosestProximityAlgorithm()
     : l_from(initLink("from", "link to from geometry"))
     , l_dest(initLink("dest", "link to dest geometry"))
     , d_drawCollision (initData(&d_drawCollision, true, "drawcollision", "draw collision"))
     , d_output(initData(&d_output,"output", "output of the collision detection"))
-    , d_outputDist(initData(&d_outputDist,"outputDist", "Distance of the outpu pair of detections"))    
+//    , d_outputDist(initData(&d_outputDist,"outputDist", "Distance of the outpu pair of detections"))
     {}
 
     void draw(const core::visual::VisualParams* vparams) {

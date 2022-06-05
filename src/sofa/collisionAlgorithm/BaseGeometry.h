@@ -119,19 +119,19 @@ public:
     }
 
     inline ElementIterator::SPtr pointBegin(unsigned id = 0) const {
-        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_pointElements,id));
+        return ElementIterator::SPtr(new TDefaultElementIterator_ref(m_pointElements,id));
     }
 
     inline ElementIterator::SPtr edgeBegin(unsigned id = 0) const {
-        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_edgeElements,id));
+        return ElementIterator::SPtr(new TDefaultElementIterator_ref(m_edgeElements,id));
     }
 
     inline ElementIterator::SPtr triangleBegin(unsigned id = 0) const {
-        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_triangleElements,id));
+        return ElementIterator::SPtr(new TDefaultElementIterator_ref(m_triangleElements,id));
     }
 
     inline ElementIterator::SPtr tetrahedronBegin(unsigned id = 0) const {
-        return ElementIterator::SPtr(new TDefaultElementIteratorPtr(m_tetrahedronElements,id));
+        return ElementIterator::SPtr(new TDefaultElementIterator_ref(m_tetrahedronElements,id));
     }
 
     void setBroadPhase(BroadPhase * b) {

@@ -21,7 +21,7 @@ public:
 
     virtual BaseElement::SPtr element() = 0;
 
-    virtual const BaseElement::SPtr element() const = 0;
+    virtual const BaseElement::SPtr & element() const = 0;
 
     virtual const std::type_info& getTypeInfo() const = 0;
 
@@ -45,34 +45,37 @@ static inline void operator ++ (ElementIterator::SPtr & it, int /*NB*/) {
 
 class EmptyIterator : public ElementIterator {
 public:
+    friend class ElementIterator;
+
     bool end() const override { return true; }
 
     void next() override {}
 
-    BaseElement::SPtr element() override { return BaseElement::SPtr(NULL); }
+    BaseElement::SPtr element() override { return m_empty_element; }
 
-    const BaseElement::SPtr element() const override { return BaseElement::SPtr(NULL); }
+    const BaseElement::SPtr & element() const override { return m_empty_element; }
 
     const std::type_info& getTypeInfo() const override {
         return typeid(EmptyIterator);
     }
-};
 
-template<class CONTAINER>
-class TDefaultElementIteratorSPtr : public ElementIterator {
-public:
-    TDefaultElementIteratorSPtr(const CONTAINER & c,unsigned id=0) {
-//        m_it = c.cbegin() + id;
-        m_end = c.cend();
-
-        auto it = c.cbegin();
-        for (unsigned i=0; i<id; i++) {
-            if (it == m_end) break;
-            it++;
-        }
-        m_it = it;
+    ///returns a new EmptyIterator
+    static inline ElementIterator::SPtr get() {
+        static EmptyIterator::SPtr s_empty = NULL;
+        if (s_empty==NULL) s_empty=ElementIterator::SPtr(new EmptyIterator());
+        return s_empty;
     }
 
+private:
+    EmptyIterator() : m_empty_element(NULL) {}
+
+    BaseElement::SPtr m_empty_element;
+};
+
+
+template<class CONTAINER>
+class TDefaultElementIterator : public ElementIterator {
+public:
     void next() override { m_it++; }
 
     bool end() const override { return m_it==m_end; }
@@ -84,49 +87,48 @@ public:
 
     virtual BaseElement::SPtr element() { return *m_it; }
 
-    virtual const BaseElement::SPtr element() const { return *m_it; }
+    virtual const BaseElement::SPtr & element() const { return *m_it; }
 
-private:
+protected:
     typename CONTAINER::const_iterator m_it;
     typename CONTAINER::const_iterator m_end;
 };
 
 
 template<class CONTAINER>
-class TDefaultElementIteratorPtr : public ElementIterator {
+class TDefaultElementIterator_copy : public TDefaultElementIterator<CONTAINER> {
 public:
-    TDefaultElementIteratorPtr(const CONTAINER & c,unsigned id=0) {
-//        m_it = c.cbegin() + id;
-        m_end = c.cend();
+    TDefaultElementIterator_copy(const CONTAINER & c,unsigned id=0)
+    : m_container(c) {
+        this->m_it = m_container.cbegin();
+        this->m_end = m_container.cend();
 
-        auto it = c.cbegin();
-        for (unsigned i=0; i<id; i++) {
-            if (it == m_end) break;
-            it++;
+        while (id>0 && ! this->end()) {
+            this->next();
+            id--;
         }
-        m_it = it;
     }
-
-    void next() override { m_it++; }
-
-    bool end() const override { return m_it==m_end; }
-
-    const std::type_info& getTypeInfo() const override {
-        if (m_it == m_end) return typeid(EmptyIterator);
-        else return (*m_it)->getTypeInfo();
-    }
-
-    virtual BaseElement::SPtr element() { return *m_it; }
-
-    virtual const BaseElement::SPtr element() const { return *m_it; }
 
 private:
-    typename CONTAINER::const_iterator m_it;
-    typename CONTAINER::const_iterator m_end;
+    const CONTAINER m_container;
+};
+
+template<class CONTAINER>
+class TDefaultElementIterator_ref : public TDefaultElementIterator<CONTAINER> {
+public:
+    TDefaultElementIterator_ref(const CONTAINER & c,unsigned id=0) {
+        this->m_it = c.cbegin();
+        this->m_end = c.cend();
+
+        while (id>0 && ! this->end()) {
+            this->next();
+            id--;
+        }
+    }
 };
 
 ElementIterator::SPtr ElementIterator::empty(){
-    return SPtr(new EmptyIterator());
+    return EmptyIterator::get();
 }
 
 }
