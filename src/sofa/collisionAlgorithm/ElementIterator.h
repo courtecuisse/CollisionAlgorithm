@@ -21,7 +21,7 @@ public:
 
     virtual BaseElement::SPtr element() = 0;
 
-    virtual const BaseElement::SPtr & element() const = 0;
+    virtual const BaseElement::SPtr element() const = 0;
 
     virtual const std::type_info& getTypeInfo() const = 0;
 
@@ -53,7 +53,7 @@ public:
 
     BaseElement::SPtr element() override { return m_empty_element; }
 
-    const BaseElement::SPtr & element() const override { return m_empty_element; }
+    const BaseElement::SPtr element() const override { return m_empty_element; }
 
     const std::type_info& getTypeInfo() const override {
         return typeid(EmptyIterator);
@@ -85,9 +85,9 @@ public:
         else return (*m_it)->getTypeInfo();
     }
 
-    virtual BaseElement::SPtr element() { return *m_it; }
+    inline BaseElement::SPtr element() override { return *m_it; }
 
-    virtual const BaseElement::SPtr & element() const { return *m_it; }
+    inline const BaseElement::SPtr element() const override { return *m_it; }
 
 protected:
     typename CONTAINER::const_iterator m_it;

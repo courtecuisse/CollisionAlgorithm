@@ -27,9 +27,9 @@ public:
 
         //project the box in the bounding box of the object
         //search with the closest box in bbox
-        cbox[0] = std::max(0,std::min(nbox[0]-1,cbox[0]));
-        cbox[1] = std::max(0,std::min(nbox[1]-1,cbox[1]));
-        cbox[2] = std::max(0,std::min(nbox[2]-1,cbox[2]));
+        cbox[0] = std::max(0,std::min(nbox[0],cbox[0]));
+        cbox[1] = std::max(0,std::min(nbox[1],cbox[1]));
+        cbox[2] = std::max(0,std::min(nbox[2],cbox[2]));
 
         int max = 0;
         for (int i = 0 ; i < 3 ; i++) {
