@@ -105,15 +105,11 @@ private:
         return m_singleton;
     }
 
-
-    static inline RETURN_TYPE t_defaultFunc(PARAMS... params) {
-        return getSingleton()->defaultFunc(params...);
-    }
-
     template<class MY_RETURN_TYPE>
-    static inline MY_RETURN_TYPE t_defaultFunc(PARAMS... ) {
-        std::cerr << "ERROR THERE IS NO DEFAULT FUNCTION FOR THIS RETURN TYPE. Good luck !" << std::endl;
-        return MY_RETURN_TYPE();
+    static inline MY_RETURN_TYPE t_defaultFunc(PARAMS... params) {
+        const RETURN_TYPE & res = getSingleton()->defaultFunc(params...);
+        const MY_RETURN_TYPE * res_typed = (MY_RETURN_TYPE*) &res;
+        return *res_typed;
     }
 
     //No construction of the is is allowed
@@ -181,13 +177,11 @@ private:
         return m_singleton;
     }
 
-    static RETURN_TYPE t_defaultFunc(PARAMS... params) {
-        return getSingleton()->defaultFunc(params...);
-    }
-
     template<class MY_RETURN_TYPE>
-    static inline MY_RETURN_TYPE t_defaultFunc(PARAMS... ) {
-        std::cerr << "ERROR THERE IS NO DEFAULT FUNCTION FOR THIS RETURN TYPE. Good luck !" << std::endl;
+    static inline MY_RETURN_TYPE t_defaultFunc(PARAMS... params) {
+        const RETURN_TYPE & res = getSingleton()->defaultFunc(params...);
+        const MY_RETURN_TYPE * res_typed = (MY_RETURN_TYPE*) &res;
+        return *res_typed;
     }
 
     //No construction of the is is allowed
