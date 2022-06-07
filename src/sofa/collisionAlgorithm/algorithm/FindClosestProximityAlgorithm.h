@@ -31,27 +31,29 @@ public:
         cbox[1] = std::max(0,std::min(nbox[1],cbox[1]));
         cbox[2] = std::max(0,std::min(nbox[2],cbox[2]));
 
-        int max = 0;
-        for (int i = 0 ; i < 3 ; i++) {
-            max = std::max (max, cbox[i]) ;
-            max = std::max (max, nbox[i]-cbox[i]) ;
-        }
+//        int max = 0;
+//        for (int i = 0 ; i < 3 ; i++) {
+//            max = std::max (max, cbox[i]) ;
+//            max = std::max (max, nbox[i]-cbox[i]) ;
+//        }
 
         std::set<BaseElement::SPtr> selectedElements;
 
-        for (int d=0; selectedElements.empty() && d<max;d++) {
+        for (int d=0; selectedElements.empty();d++) {
             {
                 int i=-d;
-                if (cbox[0]+i >= 0 && cbox[0]+i < nbox[0])
+                if (cbox[0]+i >= 0 && cbox[0]+i <= nbox[0])
                 {
                     for (int j=-d; j <= d; j++)
                     {
-                        if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
+                        if (cbox[1]+j < 0 || cbox[1]+j > nbox[1])
                             continue;
+
                         for (int k=-d;k<=d;k++)
                         {
-                            if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
+                            if (cbox[2]+k < 0 || cbox[2]+k > nbox[2])
                                 continue;
+
 
                             const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
                             selectedElements.insert(elmts.cbegin(),elmts.cend());
@@ -65,16 +67,16 @@ public:
 
             {
                 int i=d;
-                if (cbox[0]+i >= 0 && cbox[0]+i < nbox[0])
+                if (cbox[0]+i >= 0 && cbox[0]+i <= nbox[0])
                 {
                     for (int j=-d;j<=d;j++)
                     {
-                        if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
+                        if (cbox[1]+j < 0 || cbox[1]+j > nbox[1])
                             continue;
 
                         for (int k=-d;k<=d;k++)
                         {
-                            if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
+                            if (cbox[2]+k < 0 || cbox[2]+k > nbox[2])
                                 continue;
 
                             const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
@@ -87,16 +89,16 @@ public:
 
             {
                 int j=-d;
-                if (cbox[1]+j >= 0 && cbox[1]+j < nbox[1])
+                if (cbox[1]+j >= 0 && cbox[1]+j <= nbox[1])
                 {
                     for (int i=-d+1;i<d;i++)
                     {
-                        if (cbox[0]+i < 0 || cbox[0]+i >= nbox[0])
+                        if (cbox[0]+i < 0 || cbox[0]+i > nbox[0])
                             continue;
 
                         for (int k=-d;k<=d;k++)
                         {
-                            if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
+                            if (cbox[2]+k < 0 || cbox[2]+k > nbox[2])
                                 continue;
 
                             const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
@@ -108,16 +110,16 @@ public:
 
             {
                 int j=d;
-                if (cbox[1]+j >= 0 && cbox[1]+j < nbox[1])
+                if (cbox[1]+j >= 0 && cbox[1]+j <= nbox[1])
                 {
                     for (int i=-d+1;i<d;i++)
                     {
-                        if (cbox[0]+i < 0 || cbox[0]+i >= nbox[0])
+                        if (cbox[0]+i < 0 || cbox[0]+i > nbox[0])
                             continue;
 
                         for (int k=-d;k<=d;k++)
                         {
-                            if (cbox[2]+k < 0 || cbox[2]+k >= nbox[2])
+                            if (cbox[2]+k < 0 || cbox[2]+k > nbox[2])
                                 continue;
 
                             const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
@@ -129,16 +131,16 @@ public:
 
             {
                 int k=-d;
-                if (cbox[2]+k >= 0 && cbox[2]+k < nbox[2])
+                if (cbox[2]+k >= 0 && cbox[2]+k <= nbox[2])
                 {
                     for (int i=-d+1;i<d;i++)
                     {
-                        if (cbox[0]+i < 0 || cbox[0]+i >= nbox[0])
+                        if (cbox[0]+i < 0 || cbox[0]+i > nbox[0])
                             continue;
 
                         for (int j=-d+1;j<d;j++)
                         {
-                            if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
+                            if (cbox[1]+j < 0 || cbox[1]+j > nbox[1])
                                 continue;
 
                             const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);
@@ -150,16 +152,16 @@ public:
 
             {
                 int k=d;
-                if (cbox[2]+k >= 0 && cbox[2]+k < nbox[2])
+                if (cbox[2]+k >= 0 && cbox[2]+k <= nbox[2])
                 {
                     for (int i=-d+1;i<d;i++)
                     {
-                        if (cbox[0]+i < 0 || cbox[0]+i >= nbox[0])
+                        if (cbox[0]+i < 0 || cbox[0]+i > nbox[0])
                             continue;
 
                         for (int j=-d+1;j<d;j++)
                         {
-                            if (cbox[1]+j < 0 || cbox[1]+j >= nbox[1])
+                            if (cbox[1]+j < 0 || cbox[1]+j > nbox[1])
                                 continue;
 
                             const std::set<BaseElement::SPtr> & elmts = broadphase->getElementSet(cbox[0] + i,cbox[1] + j,cbox[2] + k);

@@ -265,6 +265,10 @@ public:
         return m_Bmax;
     }
 
+    inline const type::Vector3 & getCellSize() const {
+        return m_cellSize;
+    }
+
     //compute the box where is P
     type::Vec3i getBoxCoord(const type::Vector3 & P) const override {
         return type::Vec3i((P[0] - m_Bmin[0])/m_cellSize[0],

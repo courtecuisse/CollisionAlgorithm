@@ -108,6 +108,7 @@ public:
 
     void draw(const core::visual::VisualParams * vparams) override {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
+
         if (! d_draw.getValue()) return;
         type::RGBAColor color = d_color.getValue();
 
