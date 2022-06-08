@@ -26,7 +26,7 @@ public:
         l_topology.setPath("@.");
     }
 
-    void buildEdgeElements() override {        
+    virtual void buildEdgeElements() override {
         for (unsigned i=0;i<this->l_topology->getNbEdges();i++) {
             auto edge = this->l_topology->getEdge(i);
 

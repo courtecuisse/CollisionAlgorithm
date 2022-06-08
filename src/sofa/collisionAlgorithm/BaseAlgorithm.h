@@ -81,6 +81,11 @@ public :
         return std::bind(&BaseAlgorithm::acceptFilter,this,std::placeholders::_1,std::placeholders::_2);
     }
 
+	static FilterFUNC getDefaultFilterFunc()
+	{
+		return [](const BaseProximity::SPtr&,const BaseProximity::SPtr&) { return true; };
+	}
+
 protected:
 
 
