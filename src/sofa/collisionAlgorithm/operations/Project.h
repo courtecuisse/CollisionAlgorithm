@@ -3,19 +3,26 @@
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/collisionAlgorithm/BaseOperation.h>
 #include <sofa/collisionAlgorithm/elements/PointElement.h>
+#include <limits.h>
 
-namespace sofa::collisionAlgorithm::Operations {
+namespace sofa::collisionAlgorithm::Operations::Project {
 
+struct Result {
+    Result() {}
+    Result(double d,const BaseProximity::SPtr & p) : distance(d), prox(p) {}
 
+    double distance;
+    BaseProximity::SPtr prox;
+};
 
-class ProjectOperation : public GenericOperation<ProjectOperation,//Type of the operation
-                                                 BaseProximity::SPtr,//Default return type
-                                                 const type::Vector3 & , BaseElement::SPtr//Parameters
-                                                 > {
+class Operation : public GenericOperation<Operation,//Type of the operation
+                                          Result,//Default return type
+                                          const type::Vector3 & , const BaseElement::SPtr & //Parameters
+                                          > {
 public:
 
-    BaseProximity::SPtr defaultFunc(const type::Vector3 & , BaseElement::SPtr ) const override {
-        return NULL;
+    Result defaultFunc(const type::Vector3 & , const BaseElement::SPtr & ) const override {
+        return Result(std::numeric_limits<double>::max(),NULL);
     }
 
     void notFound(const std::type_info & id) const override {
@@ -23,6 +30,8 @@ public:
     }
 
 };
+
+typedef Operation::FUNC FUNC;
 
 }
 

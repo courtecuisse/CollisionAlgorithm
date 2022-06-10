@@ -5,15 +5,17 @@
 #include <sofa/collisionAlgorithm/elements/EdgeElement.h>
 #include <sofa/collisionAlgorithm/proximity/MultiProximity.h>
 
-namespace sofa::collisionAlgorithm::Operations {
+namespace sofa::collisionAlgorithm::Operations::CreateCenterProximity {
 
-class CreateCenterProximityOperation : public GenericOperation<CreateCenterProximityOperation, //type of operation
-                                                               BaseProximity::SPtr, //Default return type
-                                                               BaseElement::SPtr //Parameters
-                                                              > {
+typedef BaseProximity::SPtr Result;
+
+class Operation : public GenericOperation<Operation, //type of operation
+                                          Result, //Default return type
+                                          const BaseElement::SPtr &//Parameters
+                                          > {
 public:
 
-    BaseProximity::SPtr defaultFunc(BaseElement::SPtr) const override {
+    BaseProximity::SPtr defaultFunc(const BaseElement::SPtr &) const override {
         return NULL;
     }
 
@@ -22,6 +24,8 @@ public:
     }
 
 };
+
+typedef Operation::FUNC FUNC;
 
 }
 

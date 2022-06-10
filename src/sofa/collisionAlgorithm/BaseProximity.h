@@ -34,6 +34,11 @@ public:
     static inline typename PROXIMITY::SPtr create(ARGS... args) {
         return typename PROXIMITY::SPtr(new PROXIMITY(args...));
     }
+
+    virtual bool isNormalized() const = 0;
+
+    virtual void normalize() = 0;
+
 };
 
 }

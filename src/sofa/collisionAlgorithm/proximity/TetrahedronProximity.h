@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include <sofa/collisionAlgorithm/elements/TetrahedronElement.h>
+#include <sofa/collisionAlgorithm/toolbox/TriangleToolBox.h>
+#include <sofa/collisionAlgorithm/toolbox/TetrahedronToolBox.h>
 
 namespace sofa::collisionAlgorithm {
 
@@ -9,7 +11,7 @@ public:
 
     typedef std::shared_ptr<TetrahedronProximity> SPtr;
 
-    TetrahedronProximity(TetrahedronElement::SPtr elmt, double f0,double f1,double f2,double f3)
+    TetrahedronProximity(const TetrahedronElement::SPtr & elmt, double f0,double f1,double f2,double f3)
     : m_elmt(elmt), m_f0(f0), m_f1(f1), m_f2(f2), m_f3(f3){}
 
 
@@ -32,14 +34,6 @@ public:
 
     }
 
-//    std::vector<BaseProximity::SPtr> getProx() const {
-//      return {m_p0,m_p1,m_p2,m_p3};
-//    }
-
-//	std::vector<double> getBaryCoord() const {
-//		return {m_f0,m_f1,m_f2,m_f3};
-//	}
-
     /// return proximiy position in a vector3
     sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
         return m_elmt->getP0()->getPosition(v) * m_f0 +
@@ -58,11 +52,36 @@ public:
     TetrahedronElement::SPtr element() { return m_elmt; }
 
 
-    static BaseProximity::SPtr create(TetrahedronElement::SPtr & tetra, double f0,double f1,double f2,double f3) {
+    static TetrahedronProximity::SPtr create(const TetrahedronElement::SPtr & tetra, double f0,double f1,double f2,double f3) {
         return TetrahedronProximity::SPtr(new TetrahedronProximity(tetra,f0,f1,f2,f3));
     }
 
     const std::type_info& getTypeInfo() const override { return typeid(TetrahedronProximity); }
+
+    double f0() { return m_f0; }
+
+    double f1() { return m_f1; }
+
+    double f2() { return m_f2; }
+
+    double f3() { return m_f3; }
+
+    bool isNormalized() const override {
+//        if (m_f0+m_f1+m_f2+m_f3 != 1.0) return false;
+
+        return m_f0>=0 && m_f0<=1 &&
+               m_f1>=0 && m_f1<=1 &&
+               m_f2>=0 && m_f2<=1 &&
+               m_f3>=0 && m_f3<=1;
+    }
+
+    void normalize() override {
+        toolbox::TetrahedronToolBox::normalize(m_elmt->getP0()->getPosition(),
+                                               m_elmt->getP1()->getPosition(),
+                                               m_elmt->getP2()->getPosition(),
+                                               m_elmt->getP3()->getPosition(),
+                                               m_f0,m_f1,m_f2,m_f3);
+    }
 
 protected:
     TetrahedronElement::SPtr m_elmt;

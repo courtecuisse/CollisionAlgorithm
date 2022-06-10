@@ -29,6 +29,10 @@ public:
 
   const std::type_info& getTypeInfo() const override { return typeid(FixedProximity); }
 
+  bool isNormalized() const override { return true; }
+
+  void normalize() override {}
+
 private:
   Vec3d m_position;
   Vec3d m_normal;

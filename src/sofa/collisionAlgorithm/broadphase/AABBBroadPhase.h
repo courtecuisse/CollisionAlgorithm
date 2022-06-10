@@ -125,7 +125,7 @@ public:
         m_Bmin -= m_cellSize * 0.5;
         m_Bmax -= m_cellSize * 0.5;
 
-        auto projectOp = Operations::ProjectOperation::get(l_geometry);
+        auto projectOp = Operations::Project::Operation::get(l_geometry);
 
         for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
         {
@@ -168,9 +168,10 @@ public:
                         P[1] += j*m_cellSize[1];
                         P[2] += k*m_cellSize[2];
 
-                        BaseProximity::SPtr prox = projectOp(P,elmt);
+                        BaseProximity::SPtr prox = projectOp(P,elmt).prox;
                         if (prox == NULL) continue;
 
+                        prox->normalize();
                         type::Vector3 D = prox->getPosition()-P;
 
                         if ((fabs(D[0])<=m_cellSize[0]*0.5) &&

@@ -30,9 +30,9 @@ public:
         glEnd();
     }
 
-    static SPtr create(PointElement::SPtr point0, PointElement::SPtr point1);
+    static SPtr create(const PointElement::SPtr & point0, const PointElement::SPtr & point1);
 
-    static SPtr create(BaseProximity::SPtr p0,BaseProximity::SPtr p1);
+    static SPtr create(const BaseProximity::SPtr & p0,const BaseProximity::SPtr & p1);
 
     const ElementContainer<PointElement> & pointElements() const override { return m_pointElements; }
 

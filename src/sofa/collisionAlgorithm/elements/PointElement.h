@@ -28,7 +28,7 @@ public:
 
     ElementContainer<TriangleElement> & triangleAround() { return m_triangleAround; }
 
-    static SPtr create(BaseProximity::SPtr prox);
+    static SPtr create(const BaseProximity::SPtr & prox);
 
     const ElementContainer<PointElement> & pointElements() const override { return ElementContainer<PointElement>::empty(); }
 

@@ -43,6 +43,24 @@ public:
 
     const std::type_info& getTypeInfo() const override { return typeid(EdgeProximity); }
 
+    double f0() const { return m_f0; }
+
+    double f1() const { return m_f1; }
+
+    bool isNormalized() const override {
+//        if (m_f0+m_f1 != 1.0) return false;
+
+        return m_f0>=0 && m_f0<=1 &&
+               m_f1>=0 && m_f1<=1;
+    }
+
+    void normalize() override {
+        if (m_f1<0.0) m_f1 = 0.0;
+        else if (m_f1>1.0) m_f1 = 1.0;
+
+        m_f0 = 1.0-m_f1;
+    }
+
 protected:
     EdgeElement::SPtr m_elmt;
     double m_f0,m_f1;

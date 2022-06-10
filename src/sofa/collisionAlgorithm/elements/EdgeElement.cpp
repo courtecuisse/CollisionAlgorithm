@@ -6,7 +6,7 @@
 
 namespace sofa::collisionAlgorithm {
 
-EdgeElement::SPtr EdgeElement::create(PointElement::SPtr p0, PointElement::SPtr p1) {
+EdgeElement::SPtr EdgeElement::create(const PointElement::SPtr & p0, const PointElement::SPtr & p1) {
     EdgeElement::SPtr res = EdgeElement::SPtr(new EdgeElement());
 
     res->m_pointElements.insert(p0);
@@ -17,7 +17,7 @@ EdgeElement::SPtr EdgeElement::create(PointElement::SPtr p0, PointElement::SPtr 
     return res;
 }
 
-EdgeElement::SPtr EdgeElement::create(BaseProximity::SPtr p0,BaseProximity::SPtr p1) {
+EdgeElement::SPtr EdgeElement::create(const BaseProximity::SPtr & p0,const BaseProximity::SPtr & p1) {
     return EdgeElement::create(PointElement::create(p0),
                                PointElement::create(p1));
 }

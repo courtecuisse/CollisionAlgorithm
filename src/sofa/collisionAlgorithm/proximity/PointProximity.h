@@ -33,6 +33,10 @@ public:
 
     const std::type_info& getTypeInfo() const override { return typeid(PointProximity); }
 
+    bool isNormalized() const override { return true; }
+
+    void normalize() override {}
+
 protected:
     PointElement::SPtr m_elmt;
 };

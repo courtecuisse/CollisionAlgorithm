@@ -71,6 +71,10 @@ public:
         }
     }
 
+    bool isNormalized() const override { return true; }
+
+    void normalize() override {}
+
 protected:
     TBaseGeometry<DataTypes> * m_geometry;
     unsigned m_pid;

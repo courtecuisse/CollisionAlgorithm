@@ -2,15 +2,16 @@
 
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
+#include <sofa/collisionAlgorithm/toolbox/TriangleToolBox.h>
 
 namespace sofa::collisionAlgorithm {
 
-class TriangleProximity : public BaseProximity{
+class TriangleProximity : public BaseProximity {
 public:
 
     typedef std::shared_ptr<TriangleProximity> SPtr;
 
-    TriangleProximity(TriangleElement::SPtr elmt, double f0,double f1,double f2)
+    TriangleProximity(const TriangleElement::SPtr & elmt, double f0,double f1,double f2)
     : m_elmt(elmt), m_f0(f0), m_f1(f1), m_f2(f2){}
 
 
@@ -52,11 +53,26 @@ public:
 
     double f2() { return m_f2; }
 
-    static BaseProximity::SPtr create(TriangleElement::SPtr & tri, double f0,double f1,double f2) {
+    static TriangleProximity::SPtr create(const TriangleElement::SPtr & tri, double f0,double f1,double f2) {
         return TriangleProximity::SPtr(new TriangleProximity(tri,f0,f1,f2));
     }
 
     const std::type_info& getTypeInfo() const override { return typeid(TriangleProximity); }
+
+    bool isNormalized() const override {
+//        if (m_f0+m_f1+m_f2 != 1.0) return false;
+
+        return m_f0>=0 && m_f0<=1 &&
+               m_f1>=0 && m_f1<=1 &&
+               m_f2>=0 && m_f2<=1;
+    }
+
+    void normalize() override {
+        toolbox::TriangleToolBox::normalize(m_elmt->getP0()->getPosition(),
+                                            m_elmt->getP1()->getPosition(),
+                                            m_elmt->getP2()->getPosition(),
+                                            m_f0,m_f1,m_f2);
+    }
 
 protected:
     TriangleElement::SPtr m_elmt;

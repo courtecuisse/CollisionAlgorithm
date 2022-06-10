@@ -29,6 +29,28 @@ public:
     }
 };
 
+template<class A,class B>
+class REAL_TYPE_CHECK<typename std::shared_ptr<A> &, typename std::shared_ptr<B> &> {
+public:
+    static inline void doCheck() {
+        using A_type = std::remove_pointer_t<A>;
+        using B_type = std::remove_pointer_t<B>;
+
+        static_assert((std::is_base_of<A_type, B_type>::value), "Invalid type in registered function");
+    }
+};
+
+template<class A,class B>
+class REAL_TYPE_CHECK<const typename std::shared_ptr<A> &,const  typename std::shared_ptr<B> &> {
+public:
+    static inline void doCheck() {
+        using A_type = std::remove_pointer_t<A>;
+        using B_type = std::remove_pointer_t<B>;
+
+        static_assert((std::is_base_of<A_type, B_type>::value), "Invalid type in registered function");
+    }
+};
+
 
 template <typename First_A, typename... A>
 struct CAST_PARAMS {
@@ -54,14 +76,13 @@ public:
     typedef RETURN_TYPE (*FUNC)(PARAMS...);
     typedef size_t KEY_MAP; // <RETURN,TYPE>
 
-    template<class MY_RETURN_TYPE = RETURN_TYPE, class T>
-    static inline MY_RETURN_TYPE (*get(T obj)) (PARAMS...) {
-        return get<MY_RETURN_TYPE>(obj->getTypeInfo());
+    template<class T>
+    static inline RETURN_TYPE (*get(T obj)) (PARAMS...) {
+        return get(obj->getTypeInfo());
     }
 
-    template<class MY_RETURN_TYPE = RETURN_TYPE>
-    static inline MY_RETURN_TYPE (*get(const std::type_info & id)) (PARAMS...) {
-        typedef MY_RETURN_TYPE (*function_type)(PARAMS...);
+    static inline RETURN_TYPE (*get(const std::type_info & id)) (PARAMS...) {
+        typedef RETURN_TYPE (*function_type)(PARAMS...);
 
         KEY_MAP key = id.hash_code();
 
@@ -105,11 +126,8 @@ private:
         return m_singleton;
     }
 
-    template<class MY_RETURN_TYPE>
-    static inline MY_RETURN_TYPE t_defaultFunc(PARAMS... params) {
-        const RETURN_TYPE & res = getSingleton()->defaultFunc(params...);
-        const MY_RETURN_TYPE * res_typed = (MY_RETURN_TYPE*) &res;
-        return *res_typed;
+    static inline RETURN_TYPE t_defaultFunc(PARAMS... params) {
+        return getSingleton()->defaultFunc(params...);
     }
 
     //No construction of the is is allowed
@@ -126,14 +144,13 @@ public:
     typedef RETURN_TYPE (*FUNC)(PARAMS...);
     typedef std::pair<size_t,size_t> KEY_MAP; // <RETURN,TYPE1,TYPE2>
 
-    template<class MY_RETURN_TYPE = RETURN_TYPE, class T1, class T2>
-    static inline MY_RETURN_TYPE (*get(T1 obj1,T2 obj2)) (PARAMS...) {
-        return get<MY_RETURN_TYPE>(obj1->getTypeInfo(),obj2->getTypeInfo());
+    template<class T1,class T2>
+    static inline RETURN_TYPE (*get(T1 obj1,T2 obj2)) (PARAMS...) {
+        return get(obj1->getTypeInfo(),obj2->getTypeInfo());
     }
 
-    template<class MY_RETURN_TYPE = RETURN_TYPE>
-    static inline MY_RETURN_TYPE (*get(const std::type_info & id1, const std::type_info & id2)) (PARAMS...) {
-        typedef MY_RETURN_TYPE (*function_type)(PARAMS...);
+    static inline RETURN_TYPE (*get(const std::type_info & id1, const std::type_info & id2)) (PARAMS...) {
+        typedef RETURN_TYPE (*function_type)(PARAMS...);
 
         KEY_MAP key(id1.hash_code(),id2.hash_code());
 
@@ -177,11 +194,8 @@ private:
         return m_singleton;
     }
 
-    template<class MY_RETURN_TYPE>
-    static inline MY_RETURN_TYPE t_defaultFunc(PARAMS... params) {
-        const RETURN_TYPE & res = getSingleton()->defaultFunc(params...);
-        const MY_RETURN_TYPE * res_typed = (MY_RETURN_TYPE*) &res;
-        return *res_typed;
+    static inline RETURN_TYPE t_defaultFunc(PARAMS... params) {
+        return getSingleton()->defaultFunc(params...);
     }
 
     //No construction of the is is allowed

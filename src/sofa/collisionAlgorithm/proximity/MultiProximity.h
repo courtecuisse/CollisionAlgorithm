@@ -34,6 +34,10 @@ public:
 
     const std::type_info& getTypeInfo() const override { return typeid(MultiProximity); }
 
+    bool isNormalized() const override { return true; }
+
+    void normalize() override {}
+
 protected:
     std::vector<BaseProximity::SPtr> m_proximities;
 };

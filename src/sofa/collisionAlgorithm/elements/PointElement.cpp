@@ -6,7 +6,7 @@
 
 namespace sofa::collisionAlgorithm {
 
-PointElement::SPtr PointElement::create(BaseProximity::SPtr prox) {
+PointElement::SPtr PointElement::create(const BaseProximity::SPtr &prox) {
     return PointElement::SPtr(new PointElement(prox));
 }
 
