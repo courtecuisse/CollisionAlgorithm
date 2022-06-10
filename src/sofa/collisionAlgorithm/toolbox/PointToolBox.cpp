@@ -1,5 +1,3 @@
-#pragma once
-
 #include <sofa/collisionAlgorithm/toolbox/PointToolBox.h>
 #include <sofa/collisionAlgorithm/proximity/PointProximity.h>
 
