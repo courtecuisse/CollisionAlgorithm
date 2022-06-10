@@ -10,6 +10,7 @@ namespace sofa::collisionAlgorithm {
 template<class DataTypes>
 class TetrahedronGeometry : public TriangleGeometry<DataTypes> {
 public:
+
     typedef DataTypes TDataTypes;
     typedef TetrahedronElement ELEMENT;
     typedef TetrahedronGeometry<DataTypes> GEOMETRY;
@@ -17,6 +18,8 @@ public:
     typedef typename DataTypes::VecCoord VecCoord;
     typedef core::objectmodel::Data< VecCoord >        DataVecCoord;
     typedef std::function<BaseProximity::SPtr(const TetrahedronElement * elmt,double f0,double f1,double f2,double f3)> ProximityCreatorFunc;
+
+    SOFA_CLASS(GEOMETRY,Inherit);
 
     void buildTetrahedronElements() override {
         for (unsigned i=0;i<this->l_topology->getNbTetrahedra();i++) {

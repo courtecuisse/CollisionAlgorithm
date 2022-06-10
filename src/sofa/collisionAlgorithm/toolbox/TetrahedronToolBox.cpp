@@ -50,44 +50,44 @@ bool TetrahedronToolBox::isInTetra(const type::Vec3d & P, const TetrahedronEleme
 
 void TetrahedronToolBox::normalize(const type::Vec3d & P0, const type::Vec3d & P1, const type::Vec3d & P2, const type::Vec3d & P3, double & f0,double & f1, double & f2,double & f3) {
     if(f0<0) {
-//        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2)+(P3*f3);
+        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2)+(P3*f3);
 
-//        TriangleElement::TriangleInfo tinfo;
-//        tinfo.update(P1,P2,P3);
-//        toolbox::TriangleToolBox::projectOnTriangle(P, tinfo, f1,f2,f3);
+        TriangleElement::TriangleInfo tinfo;
+        tinfo.update(P1,P2,P3);
+        toolbox::TriangleToolBox::projectOnTriangle(P, tinfo, f1,f2,f3);
 
         f0 = 0;
         toolbox::TriangleToolBox::normalize(P1,P2,P3,
                                             f1,f2,f3);
     } else if(f1<0) {
-//        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2)+(P3*f3);
+        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2)+(P3*f3);
 
-//        TriangleElement::TriangleInfo tinfo;
-//        tinfo.update(P0,P2,P3);
+        TriangleElement::TriangleInfo tinfo;
+        tinfo.update(P0,P2,P3);
 
-//        toolbox::TriangleToolBox::projectOnTriangle(P, tinfo,f0,f2,f3);
+        toolbox::TriangleToolBox::projectOnTriangle(P, tinfo,f0,f2,f3);
 
         f1 = 0;
         toolbox::TriangleToolBox::normalize(P0,P2,P3,
                                             f0,f2,f3);
     } else if(f2<0) {
-//        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2)+(P3*f3);
+        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2)+(P3*f3);
 
-//        TriangleElement::TriangleInfo tinfo;
-//        tinfo.update(P0,P1,P3);
+        TriangleElement::TriangleInfo tinfo;
+        tinfo.update(P0,P1,P3);
 
-//        toolbox::TriangleToolBox::projectOnTriangle(P, tinfo,f0,f1,f3);
+        toolbox::TriangleToolBox::projectOnTriangle(P, tinfo,f0,f1,f3);
 
         f2 = 0;
         toolbox::TriangleToolBox::normalize(P0,P1,P3,
                                             f0,f1,f3);
     } else if(f3<0) {
-//        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2)+(P3*f3);
+        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2)+(P3*f3);
 
-//        TriangleElement::TriangleInfo tinfo;
-//        tinfo.update(P0,P1,P2);
+        TriangleElement::TriangleInfo tinfo;
+        tinfo.update(P0,P1,P2);
 
-//        toolbox::TriangleToolBox::projectOnTriangle(P, tinfo,f0,f1,f2);
+        toolbox::TriangleToolBox::projectOnTriangle(P, tinfo,f0,f1,f2);
 
         f3 = 0;
         toolbox::TriangleToolBox::normalize(P0,P1,P2,

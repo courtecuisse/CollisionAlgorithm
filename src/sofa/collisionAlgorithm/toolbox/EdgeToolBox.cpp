@@ -33,6 +33,7 @@ void EdgeToolBox::normalize(const type::Vec3d & P0, const type::Vec3d & P1,
                       double & f0,double & f1) {
 
     type::Vector3 P = (P0*f0)+(P1*f1);
+
     toolbox::EdgeToolBox::projectOnEdge(P,
                                         P0, P1,
                                         f0, f1);

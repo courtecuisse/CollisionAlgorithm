@@ -53,28 +53,28 @@ bool TriangleToolBox::isInTriangle(const type::Vec3d & P, const TriangleElement:
 
 void TriangleToolBox::normalize(const type::Vec3d & P0, const type::Vec3d & P1, const type::Vec3d & P2, double & f0,double & f1, double & f2) {
     if (f0<0) {
-//        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2);
+        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2);
 
-//        toolbox::EdgeToolBox::projectOnEdge(P,
-//                                            P1, P2,
-//                                            f1, f2);
+        toolbox::EdgeToolBox::projectOnEdge(P,
+                                            P1, P2,
+                                            f1, f2);
 
         f0=0;
         toolbox::EdgeToolBox::normalize(P1,P2,f1,f2);
     } else if (f1<0) {
-//        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2);
+        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2);
 
-//        toolbox::EdgeToolBox::projectOnEdge(P,
-//                                            P0, P2,
-//                                            f0, f2);
+        toolbox::EdgeToolBox::projectOnEdge(P,
+                                            P0, P2,
+                                            f0, f2);
         f1=0;
         toolbox::EdgeToolBox::normalize(P0,P2,f0,f2);
     } else if (f2<0) {
-//        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2);
+        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2);
 
-//        toolbox::EdgeToolBox::projectOnEdge(P,
-//                                            P0, P1,
-//                                            f0, f1);
+        toolbox::EdgeToolBox::projectOnEdge(P,
+                                            P0, P1,
+                                            f0, f1);
         f2=0;
         toolbox::EdgeToolBox::normalize(P0,P1,f0,f1);
     }
