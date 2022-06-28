@@ -41,6 +41,11 @@ public:
         return EdgeProximity::SPtr(new EdgeProximity(sptr,f0,f1));
     }
 
+	virtual BaseProximity::SPtr copy() override
+	{
+		return EdgeProximity::create(m_elmt,m_f0,m_f1);
+	}
+
     const std::type_info& getTypeInfo() const override { return typeid(EdgeProximity); }
 
     double f0() const { return m_f0; }

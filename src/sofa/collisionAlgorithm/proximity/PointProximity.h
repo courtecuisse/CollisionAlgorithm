@@ -31,6 +31,11 @@ public:
         return p->getP0();
     }
 
+	virtual BaseProximity::SPtr copy() override
+	{
+		return PointProximity::create(m_elmt);
+	}
+
     const std::type_info& getTypeInfo() const override { return typeid(PointProximity); }
 
     bool isNormalized() const override { return true; }

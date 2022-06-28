@@ -15,7 +15,7 @@ Operations::Project::Result TriangleToolBox::project(const type::Vector3 & P, co
     projectOnTriangle(P,tri->getTriangleInfo(),fact_u,fact_v,fact_w);
 
     TriangleProximity::SPtr prox = TriangleProximity::create(tri, fact_u,fact_v,fact_w);
-    TriangleProximity::SPtr prox_normalized = TriangleProximity::create(tri, fact_u, fact_v, fact_w);
+    BaseProximity::SPtr prox_normalized = prox->copy();
     prox_normalized->normalize();
 
     double dist = (prox_normalized->getPosition() - P).norm();

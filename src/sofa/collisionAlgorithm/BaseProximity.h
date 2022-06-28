@@ -35,6 +35,8 @@ public:
         return typename PROXIMITY::SPtr(new PROXIMITY(args...));
     }
 
+	virtual SPtr copy() = 0;
+
     virtual bool isNormalized() const = 0;
 
     virtual void normalize() = 0;

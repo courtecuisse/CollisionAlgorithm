@@ -29,6 +29,11 @@ public:
 
   const std::type_info& getTypeInfo() const override { return typeid(FixedProximity); }
 
+	virtual BaseProximity::SPtr copy() override
+	{
+		return SPtr(new FixedProximity(m_position,m_normal));
+	}
+
   bool isNormalized() const override { return true; }
 
   void normalize() override {}

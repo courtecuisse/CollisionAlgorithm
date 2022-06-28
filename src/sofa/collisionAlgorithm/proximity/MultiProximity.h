@@ -34,6 +34,11 @@ public:
 
     const std::type_info& getTypeInfo() const override { return typeid(MultiProximity); }
 
+	virtual BaseProximity::SPtr copy() override
+	{
+		return SPtr(new MultiProximity(m_proximities));
+	}
+
     bool isNormalized() const override { return true; }
 
     void normalize() override {}

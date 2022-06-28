@@ -56,6 +56,11 @@ public:
         return TetrahedronProximity::SPtr(new TetrahedronProximity(tetra,f0,f1,f2,f3));
     }
 
+	virtual BaseProximity::SPtr copy() override
+	{
+		return TetrahedronProximity::create(m_elmt,m_f0,m_f1,m_f2,m_f3);
+	}
+
     const std::type_info& getTypeInfo() const override { return typeid(TetrahedronProximity); }
 
     double f0() { return m_f0; }

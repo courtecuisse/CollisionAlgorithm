@@ -57,6 +57,11 @@ public:
         return TriangleProximity::SPtr(new TriangleProximity(tri,f0,f1,f2));
     }
 
+	virtual BaseProximity::SPtr copy() override
+	{
+		return TriangleProximity::create(m_elmt,m_f0,m_f1,m_f2);
+	}
+
     const std::type_info& getTypeInfo() const override { return typeid(TriangleProximity); }
 
     bool isNormalized() const override {

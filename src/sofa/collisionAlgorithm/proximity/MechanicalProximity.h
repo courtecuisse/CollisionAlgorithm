@@ -71,6 +71,11 @@ public:
         }
     }
 
+	virtual BaseProximity::SPtr copy() override
+	{
+		return SPtr(new MechanicalProximity(m_geometry,m_pid));
+	}
+
     bool isNormalized() const override { return true; }
 
     void normalize() override {}

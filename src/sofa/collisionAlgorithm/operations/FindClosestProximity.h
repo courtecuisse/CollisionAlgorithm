@@ -196,12 +196,17 @@ private:
             if (edest == nullptr) continue;
 
             Operations::Project::Result result = projectOp(prox->getPosition(),edest);
+
             if (result.prox == NULL) continue;
 
-            if (! filter(prox,result.prox)) continue;
-
             if (result.distance< min_dist) {
-                res = result.prox;
+				auto normalizedProx = result.prox->copy();
+				normalizedProx->normalize();
+
+				if (! filter(prox,normalizedProx)) continue;
+
+
+				res = normalizedProx;
                 min_dist = result.distance;
             }
         }
