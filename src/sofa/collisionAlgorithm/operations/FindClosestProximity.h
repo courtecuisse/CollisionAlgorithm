@@ -206,7 +206,7 @@ private:
 				if (! filter(prox,normalizedProx)) continue;
 
 
-				res = normalizedProx;
+				res = result.prox;
                 min_dist = result.distance;
             }
         }
