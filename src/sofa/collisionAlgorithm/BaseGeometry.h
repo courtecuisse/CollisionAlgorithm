@@ -248,14 +248,6 @@ public:
         return sofa::core::objectmodel::BaseObject::canCreate(obj, context, arg);
     }
 
-    virtual std::string getTemplateName() const override {
-        return templateName(this);
-    }
-
-    static std::string templateName(const TBaseGeometry<DataTypes>* = NULL) {
-        return DataTypes::Name();
-    }
-
 };
 
 
