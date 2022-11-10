@@ -15,18 +15,24 @@ namespace sofa::collisionAlgorithm {
  */
 class BaseElement;
 
-class BaseProximity {
+class BaseBaseProximity  {
 public:
-    typedef std::shared_ptr<BaseProximity> SPtr;
-
-    virtual ~BaseProximity() = default;
+    typedef std::shared_ptr<BaseBaseProximity> SPtr;
 
     /// return proximiy position in a vector3
     virtual sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
 
-    virtual void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const = 0;
+    virtual void buildJacobianConstraint(core::MultiMatrixDerivId , const sofa::type::vector<sofa::type::Vector3> & , double , Index ) const = 0;
 
-    virtual void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::linearalgebra::BaseVector* lambda) const = 0;
+    virtual void storeLambda(const core::ConstraintParams* , core::MultiVecDerivId , Index , Index , const sofa::linearalgebra::BaseVector* ) const = 0;
+
+};
+
+class BaseProximity : public virtual BaseBaseProximity {
+public:
+    typedef std::shared_ptr<BaseProximity> SPtr;
+
+    virtual ~BaseProximity() = default;
 
     virtual const std::type_info& getTypeInfo() const = 0;
 
@@ -40,6 +46,12 @@ public:
     virtual bool isNormalized() const = 0;
 
     virtual void normalize() = 0;
+
+    virtual sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {}
+
+    virtual void buildJacobianConstraint(core::MultiMatrixDerivId , const sofa::type::vector<sofa::type::Vector3> & , double , Index ) const override {}
+
+    virtual void storeLambda(const core::ConstraintParams* , core::MultiVecDerivId , Index , Index , const sofa::linearalgebra::BaseVector* ) const override {}
 
 };
 
