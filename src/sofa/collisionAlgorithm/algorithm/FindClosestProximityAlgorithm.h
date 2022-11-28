@@ -48,7 +48,7 @@ public:
         auto & output = *d_output.beginEdit();
         output.clear();
 
-        auto itfrom = l_from->pointBegin();
+        auto itfrom = l_from->begin();
 
         auto createProximityOp = Operations::CreateCenterProximity::Operation::get(itfrom->getTypeInfo());
         auto findClosestProxOp = Operations::FindClosestProximity::Operation::get(l_dest);
