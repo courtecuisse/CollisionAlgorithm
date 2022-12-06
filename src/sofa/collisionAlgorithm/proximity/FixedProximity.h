@@ -18,6 +18,10 @@ public:
     return m_position;
   }
 
+  virtual Vec3d getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const {
+    return Vec3d(0,0,0);
+  }
+
   /// return normal in a vector3
   virtual Vec3d getNormal() const {
     return m_normal;

@@ -106,6 +106,8 @@ public:
 
     virtual type::Vector3 getPosition(unsigned pid, core::VecCoordId v = core::VecCoordId::position()) const = 0;
 
+    virtual type::Vector3 getVelocity(unsigned pid, core::VecDerivId v = core::VecDerivId::velocity()) const = 0;
+
     void draw(const core::visual::VisualParams * vparams) override {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
 
@@ -207,6 +209,12 @@ public:
     sofa::type::Vector3 getPosition(unsigned pid, core::VecCoordId v = core::VecCoordId::position()) const override {
         const helper::ReadAccessor<DataVecCoord> & pos = l_state->read(v);
         return pos[pid];
+
+    }
+
+    sofa::type::Vector3 getVelocity(unsigned pid, core::VecDerivId v = core::VecDerivId::velocity()) const override {
+        const helper::ReadAccessor<DataVecDeriv> & vel = l_state->read(v);
+        return vel[pid];
 
     }
 

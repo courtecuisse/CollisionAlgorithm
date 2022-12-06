@@ -39,6 +39,12 @@ public:
                m_elmt->getP2()->getPosition(v) * m_f2;
     }
 
+    sofa::type::Vec3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const {
+        return m_elmt->getP0()->getVelocity(v) * m_f0 +
+               m_elmt->getP1()->getVelocity(v) * m_f1 +
+               m_elmt->getP2()->getVelocity(v) * m_f2;
+    }
+
     void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId res, Index cid_global, Index cid_local, const sofa::linearalgebra::BaseVector* lambda) const override {
         m_elmt->getP0()->storeLambda(cParams,res,cid_global,cid_local,lambda);
         m_elmt->getP1()->storeLambda(cParams,res,cid_global,cid_local,lambda);

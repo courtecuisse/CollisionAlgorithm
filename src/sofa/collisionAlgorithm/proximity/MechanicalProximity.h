@@ -42,6 +42,10 @@ public:
         return m_geometry->getPosition(m_pid,v);
     }
 
+    sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const {
+        return m_geometry->getVelocity(m_pid,v);
+    }
+
     unsigned getPId() const {
         return m_pid;
     }

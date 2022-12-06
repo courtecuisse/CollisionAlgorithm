@@ -19,6 +19,12 @@ public:
         return P*1.0/m_proximities.size();
     }
 
+    sofa::type::Vector3 getVelocity(core::VecDerivId v) const {
+        sofa::type::Vector3 P(0,0,0);
+        for (unsigned i=0;i<m_proximities.size();i++) P+=m_proximities[i]->getVelocity(v);
+        return P*1.0/m_proximities.size();
+    }
+
     void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
         fact *= 1.0/m_proximities.size();
         for (unsigned i=0;i<m_proximities.size();i++) {

@@ -22,6 +22,8 @@ public:
     /// return proximiy position in a vector3
     virtual sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const = 0;
 
+    virtual sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const = 0;
+
     virtual void buildJacobianConstraint(core::MultiMatrixDerivId , const sofa::type::vector<sofa::type::Vector3> & , double , Index ) const = 0;
 
     virtual void storeLambda(const core::ConstraintParams* , core::MultiVecDerivId , Index , Index , const sofa::linearalgebra::BaseVector* ) const = 0;
@@ -48,6 +50,8 @@ public:
     virtual void normalize() = 0;
 
     virtual sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {}
+
+    virtual sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {}
 
     virtual void buildJacobianConstraint(core::MultiMatrixDerivId , const sofa::type::vector<sofa::type::Vector3> & , double , Index ) const override {}
 
