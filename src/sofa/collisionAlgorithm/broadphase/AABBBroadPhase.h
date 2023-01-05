@@ -174,9 +174,9 @@ public:
                         prox->normalize();
                         type::Vector3 D = prox->getPosition()-P;
 
-                        if ((fabs(D[0])<=m_cellSize[0]*0.5) &&
-                            (fabs(D[1])<=m_cellSize[1]*0.5) &&
-                            (fabs(D[2])<=m_cellSize[2]*0.5)) {
+                        if ((fabs(D[0])<=m_cellSize[0]*0.6) &&
+                            (fabs(D[1])<=m_cellSize[1]*0.6) &&
+                            (fabs(D[2])<=m_cellSize[2]*0.6)) {
 
                             m_indexedElement[key].insert(elmt);
                         }
