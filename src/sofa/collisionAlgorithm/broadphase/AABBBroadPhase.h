@@ -49,10 +49,12 @@ public:
     }
 
     inline void doUpdate() {
+        sofa::helper::AdvancedTimer::stepBegin("========================= AABBBroadPhase do update =========================");
         m_Bmin = l_geometry->getPosition(0);
         m_Bmax = m_Bmin;
 
         //updates bounding box area
+        sofa::helper::AdvancedTimer::stepBegin("========================= BBox area update in AABBBroadPhase do update =========================");
         for (unsigned j=1;j<l_geometry->getSize();j++) {
             type::Vector3 pos = l_geometry->getPosition(j);
 
@@ -71,6 +73,7 @@ public:
     //        if (pos[1]>m_Bmax[1]) m_Bmax[1] = pos[1];
     //        if (pos[2]>m_Bmax[2]) m_Bmax[2] = pos[2];
         }
+        sofa::helper::AdvancedTimer::stepEnd("========================= BBox area update in AABBBroadPhase do update =========================");
 
         //fixes cell size
         for (int i = 0 ; i < 3 ; i++) {
@@ -116,7 +119,9 @@ public:
     //    else
     //        m_nbox[2] = d_nbox.getValue()[2] + 1;
 
+        sofa::helper::AdvancedTimer::stepBegin("========================= CLEAR MAP =========================");
         m_indexedElement.clear();
+        sofa::helper::AdvancedTimer::stepEnd("========================= CLEAR MAP =========================");
 
         m_offset[0] = m_nbox[1]*m_nbox[2];
         m_offset[1] = m_nbox[2];
@@ -127,6 +132,7 @@ public:
 
         auto projectOp = Operations::Project::Operation::get(l_geometry);
 
+        sofa::helper::AdvancedTimer::stepBegin("========================= Elements rangés dans boites in AABB doUpdate =========================");
         for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
         {
             BaseElement::SPtr elmt = it->element();
@@ -168,7 +174,9 @@ public:
                         P[1] += j*m_cellSize[1];
                         P[2] += k*m_cellSize[2];
 
+                        sofa::helper::AdvancedTimer::stepBegin("========================= Project from AABB doUpdate =========================");
                         BaseProximity::SPtr prox = projectOp(P,elmt).prox;
+                        sofa::helper::AdvancedTimer::stepEnd("========================= Project from AABB doUpdate =========================");
                         if (prox == NULL) continue;
 
                         prox->normalize();
@@ -178,12 +186,16 @@ public:
                             (fabs(D[1])<=m_cellSize[1]*0.6) &&
                             (fabs(D[2])<=m_cellSize[2]*0.6)) {
 
+                            sofa::helper::AdvancedTimer::stepBegin("========================= Adding elem asociated to key in MAP =========================");
                             m_indexedElement[key].insert(elmt);
+                            sofa::helper::AdvancedTimer::stepEnd("========================= Adding elem asociated to key in MAP =========================");
                         }
                     }
                 }
             }
         }
+        sofa::helper::AdvancedTimer::stepEnd("========================= Elements rangés dans boites in AABB doUpdate =========================");
+        sofa::helper::AdvancedTimer::stepEnd("========================= AABBBroadPhase do update =========================");
     }
 
     void draw(const core::visual::VisualParams * vparams) {
@@ -292,6 +304,133 @@ public:
     type::Vec3i getNbox() override {
         return d_nbox.getValue();
     }
+
+    void updateElemInBoxes() {
+        for (auto it = l_geometry->begin(); it != l_geometry->end(); it++) {
+            BaseElement::SPtr elmt = it->element();
+
+            std::set<unsigned int> boxKey;
+            bool sameBox = 1;
+            for (auto it = elmt->pointElements().cbegin(); it!= elmt->pointElements().cend(); it++) {
+                type::Vec3i boxCoord = getBoxCoord((*it)->getP0()->getPosition());
+                boxKey.insert(getKey(boxCoord[0],boxCoord[1],boxCoord[2]));
+            }
+
+            // If all the points of the element are located in the same cell
+            if (boxKey.size() == 1) {
+                unsigned key = *boxKey.begin();
+                m_indexedElement[key].insert(elmt);
+            }
+
+            // Otherwise, test triangle-cell overlap between the element and the cells contained in its bounding box
+            else {
+                for (unsigned j=0; j<boxKey.size(); j++) {
+                    unsigned key = *std::next(boxKey.begin(),j);
+                    m_indexedElement[key].insert(elmt);
+                }
+                multipleCells(elmt,boxKey);
+            }
+        }
+    }
+
+
+    // /// Based on Akenine-Möller, T. (2001). "Fast 3D Triangle-Box Overlap Testing".
+    // /// and      https://gist.github.com/yomotsu/d845f21e2e1eb49f647f
+    void multipleCells(BaseElement::SPtr elmt, std::set<unsigned int> & boxKey) {
+        type::BoundingBox bbox;
+
+        for (auto it = elmt->pointElements().cbegin(); it!= elmt->pointElements().cend(); it++) {
+            bbox.include((*it)->getP0()->getPosition());
+        }
+
+        const type::Vector3 & minbox = bbox.minBBox();
+        const type::Vector3 & maxbox = bbox.maxBBox();
+
+        type::Vec3i cminbox(0,0,0);
+        type::Vec3i cmaxbox(0,0,0);
+
+        for (int i = 0 ; i < 3 ; i++) {
+            cmaxbox[i] = ceil((maxbox[i] - m_Bmin[i])/m_cellSize[i]);
+            cminbox[i] = floor((minbox[i] - m_Bmin[i])/m_cellSize[i]); //second m_Bmax was Bmin => bug ?
+        }
+
+
+
+        for (int i=cminbox[0];i<cmaxbox[0];i++)
+        {
+            unsigned key_i = i*m_offset[0];
+
+            for (int j=cminbox[1];j<cmaxbox[1];j++)
+            {
+                unsigned key_j = j*m_offset[1];
+
+                for (int k=cminbox[2];k<cmaxbox[2];k++)
+                {
+                    unsigned key = key_i + key_j + k;
+                    if (std::find(boxKey.begin(), boxKey.end(), key) != boxKey.end()) //no need to process this cell if it has already been registered from the vertices
+                        continue;
+
+                    type::Vec3d bMaxCell = m_Bmin;
+                    bMaxCell[0] += (i+1)*m_cellSize[0];
+                    bMaxCell[1] += (j+1)*m_cellSize[1];
+                    bMaxCell[2] += (k+1)*m_cellSize[2];
+                    type::Vec3d cellCenter = m_Bmin + m_cellSize*0.5;
+                    cellCenter[0] += i*m_cellSize[0];
+                    cellCenter[1] += j*m_cellSize[1];
+                    cellCenter[2] += k*m_cellSize[2];
+                    type::Vec3d extents = bMaxCell - cellCenter;
+
+                    for (auto it = elmt->triangleElements().cbegin(); it!= elmt->triangleElements().cend(); it++)
+                    {
+                        // Axes related to the cell's normals
+                        type::Vec3d e0(1,0,0);
+                        type::Vec3d e1(0,1,0);
+                        type::Vec3d e2(0,0,1);
+
+                        type::Vec3d v0 = (*it)->getP0()->getPosition() - cellCenter;
+                        type::Vec3d v1 = (*it)->getP1()->getPosition() - cellCenter;
+                        type::Vec3d v2 = (*it)->getP2()->getPosition() - cellCenter;
+
+                        type::Vec3d f0 = v1 - v0;
+                        type::Vec3d f1 = v2 - v1;
+                        type::Vec3d f2 = v0 - v2;
+
+                        // Axes orthogonal to triangle's edges
+                        type::Vec3d a00 = cross(e0,f0);
+                        type::Vec3d a01 = cross(e0,f1);
+                        type::Vec3d a02 = cross(e0,f2);
+                        type::Vec3d a10 = cross(e1,f0);
+                        type::Vec3d a11 = cross(e1,f1);
+                        type::Vec3d a12 = cross(e1,f2);
+                        type::Vec3d a20 = cross(e2,f0);
+                        type::Vec3d a21 = cross(e2,f1);
+                        type::Vec3d a22 = cross(e2,f2);
+
+
+                        bool test_CellNormals = testCellNormals(v0,v1,v2,extents);
+                        if (!test_CellNormals) break; // an axis provides no overlap --> this triangle does not intersect the cell, test another one
+
+                        // TODO : other tests on the remaining axes
+
+                    }
+
+
+                }
+            }
+        }
+    }
+
+    bool testCellNormals(type::Vec3d v0, type::Vec3d v1, type::Vec3d v2, type::Vec3d extents) {
+        if (std::max(std::max(v0[0],v1[0]),v2[0])<-extents[0] || std::min(std::min(v0[0],v1[0]),v2[0])>extents[0]) return false;
+
+        if (std::max(std::max(v0[1],v1[1]),v2[1])<-extents[1] || std::min(std::min(v0[1],v1[1]),v2[1])>extents[1]) return false;
+
+        if (std::max(std::max(v0[2],v1[2]),v2[2])<-extents[2] || std::min(std::min(v0[2],v1[2]),v2[2])>extents[2]) return false;
+
+        return true;
+
+    }
+
 
 protected:
     type::Vector3 m_Bmin,m_Bmax,m_cellSize;
