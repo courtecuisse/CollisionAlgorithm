@@ -130,9 +130,12 @@ public:
         m_Bmin -= m_cellSize * 0.5;
         m_Bmax -= m_cellSize * 0.5;
 
-        auto projectOp = Operations::Project::Operation::get(l_geometry);
 
         sofa::helper::AdvancedTimer::stepBegin("========================= Elements rangés dans boites in AABB doUpdate =========================");
+//        updateElemInBoxes();
+
+        auto projectOp = Operations::Project::Operation::get(l_geometry);
+
         for (auto it = l_geometry->begin(); it != l_geometry->end(); it++)
         {
             BaseElement::SPtr elmt = it->element();
@@ -394,6 +397,7 @@ public:
                         type::Vec3d f0 = v1 - v0;
                         type::Vec3d f1 = v2 - v1;
                         type::Vec3d f2 = v0 - v2;
+                        std::vector<type::Vec3d> f = {f0,f1,f2};
 
                         // Axes orthogonal to triangle's edges
                         type::Vec3d a00 = cross(e0,f0);
@@ -405,22 +409,39 @@ public:
                         type::Vec3d a20 = cross(e2,f0);
                         type::Vec3d a21 = cross(e2,f1);
                         type::Vec3d a22 = cross(e2,f2);
+                        std::vector<std::vector<type::Vec3d>> a = {{a00,a01,a02},
+                                                                   {a10,a11,a12},
+                                                                   {a20,a21,a22}};
 
 
+                        // /// 3 tests, for 3 categories of axes /// //
+                        // Test1
                         bool test_CellNormals = testCellNormals(v0,v1,v2,extents);
-                        if (!test_CellNormals) break; // an axis provides no overlap --> this triangle does not intersect the cell, test another one
+                        if (!test_CellNormals) continue; // an axis provides no overlap --> this triangle does not intersect the cell, test another one
 
-                        // TODO : other tests on the remaining axes
+                        // Test 2
+                        type::Vec3d triNormal = cross(f1,f0).normalized();
+                        double constant = dot(triNormal,(*it)->getP0()->getPosition());
+                        double r = extents[0]*std::abs(triNormal(0)) + extents[1]*std::abs(triNormal[1]) + extents[2]*std::abs(triNormal[2]);
+                        double center2planeDist = dot(triNormal,cellCenter) - constant;
+                        bool test_triangleNormal = (std::abs(center2planeDist) <= r); // true in case of an overlap, false otherwise
+                        if (!test_triangleNormal) continue;
 
+                        // Test 3
+                        bool test_CrossProdAxes = testCrossProdAxes(a,extents,f,v0,v1,v2);
+                        if (!test_CrossProdAxes) continue;
+
+
+                        // We get here iff all tests indicated an overlap between the triangle and the cell (ie: all tests returned true)
+                        m_indexedElement[key].insert(elmt);
+                        break;
                     }
-
-
                 }
             }
         }
     }
 
-    bool testCellNormals(type::Vec3d v0, type::Vec3d v1, type::Vec3d v2, type::Vec3d extents) {
+    bool testCellNormals(type::Vec3d & v0, type::Vec3d & v1, type::Vec3d & v2, type::Vec3d & extents) {
         if (std::max(std::max(v0[0],v1[0]),v2[0])<-extents[0] || std::min(std::min(v0[0],v1[0]),v2[0])>extents[0]) return false;
 
         if (std::max(std::max(v0[1],v1[1]),v2[1])<-extents[1] || std::min(std::min(v0[1],v1[1]),v2[1])>extents[1]) return false;
@@ -428,7 +449,45 @@ public:
         if (std::max(std::max(v0[2],v1[2]),v2[2])<-extents[2] || std::min(std::min(v0[2],v1[2]),v2[2])>extents[2]) return false;
 
         return true;
+    }
 
+
+    bool testCrossProdAxes(std::vector<std::vector<type::Vec3d>> & a,
+                           type::Vec3d & extents,
+                           std::vector<type::Vec3d> & f,
+                           type::Vec3d & v0, type::Vec3d & v1, type::Vec3d & v2)
+    {
+        unsigned idx_1, idx_2;
+        bool test_crossProd;
+        for (unsigned j=0; j<a.size(); j++) {
+            for (unsigned i=0; i<a[j].size(); i++) {
+                idx_1 = (j != 0) ? 0 : 1;
+                idx_2 = (j != 2) ? 2 : 1;
+                test_crossProd = testCrossProdSingleAxe(extents[idx_1], extents[idx_2],
+                                                        f[i][idx_2], f[i][idx_1],
+                                                        a[j][i],
+                                                        v0, v1, v2);
+                if (!test_crossProd) return false;
+            }
+        }
+        return true;
+    }
+
+
+    bool testCrossProdSingleAxe(double extents0, double extents1,
+                                double f0, double f1,
+                                type::Vec3d & a,
+                                type::Vec3d & v0, type::Vec3d & v1, type::Vec3d & v2)
+    {
+        double p0 = dot(v0,a);
+        double p1 = dot(v1,a);
+        double p2 = dot(v2,a);
+
+        double r = extents0*std::abs(f0) + extents1*std::abs(f1);
+
+        if (std::max(-std::max(std::max(p0,p1),p2), std::min(std::min(p0,p1),p2)) > r) return false; // no overlap detected
+
+        return true;
     }
 
 
