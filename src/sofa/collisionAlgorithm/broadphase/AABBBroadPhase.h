@@ -310,6 +310,7 @@ public:
 
     void updateElemInBoxes() {
         for (auto it = l_geometry->begin(); it != l_geometry->end(); it++) {
+            sofa::helper::AdvancedTimer::stepBegin("========================= Geometry elements visited in updatElemInBoxes =========================");
             BaseElement::SPtr elmt = it->element();
 
             std::set<unsigned int> boxKey;
@@ -321,18 +322,26 @@ public:
 
             // If all the points of the element are located in the same cell
             if (boxKey.size() == 1) {
+                sofa::helper::AdvancedTimer::stepBegin("========================= INSERT IN MAP IN 1 SINGLE CELL =========================");
                 unsigned key = *boxKey.begin();
                 m_indexedElement[key].insert(elmt);
+                sofa::helper::AdvancedTimer::stepEnd("========================= INSERT IN MAP IN 1 SINGLE CELL =========================");
             }
 
             // Otherwise, test triangle-cell overlap between the element and the cells contained in its bounding box
             else {
-                for (unsigned j=0; j<boxKey.size(); j++) {
-                    unsigned key = *std::next(boxKey.begin(),j);
+                sofa::helper::AdvancedTimer::stepBegin("========================= INSERT IN MAP IN SEVERAL CELLS FROM POINTS =========================");
+                std::set<unsigned int>::iterator it;
+                for (it=boxKey.begin(); it!=boxKey.end(); it++) {
+                    unsigned key = *it;
                     m_indexedElement[key].insert(elmt);
                 }
+                sofa::helper::AdvancedTimer::stepEnd("========================= INSERT IN MAP IN SEVERAL CELLS FROM POINTS =========================");
+                sofa::helper::AdvancedTimer::stepBegin("========================= multipleCells test =========================");
                 multipleCells(elmt,boxKey);
+                sofa::helper::AdvancedTimer::stepEnd("========================= multipleCells test =========================");
             }
+            sofa::helper::AdvancedTimer::stepEnd("========================= Geometry elements visited in updatElemInBoxes =========================");
         }
     }
 
@@ -433,7 +442,9 @@ public:
 
 
                         // We get here iff all tests indicated an overlap between the triangle and the cell (ie: all tests returned true)
+                        sofa::helper::AdvancedTimer::stepBegin("========================= INSERT IN MAP AFTER ALL THE TESTS =========================");
                         m_indexedElement[key].insert(elmt);
+                        sofa::helper::AdvancedTimer::stepEnd("========================= INSERT IN MAP AFTER ALL THE TESTS =========================");
                         break;
                     }
                 }
