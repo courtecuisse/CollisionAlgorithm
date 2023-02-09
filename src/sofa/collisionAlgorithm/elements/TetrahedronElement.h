@@ -41,7 +41,13 @@ public:
                        getP3()->getPosition());
     }
 
-    inline const TetraInfo & getTetrahedronInfo() const { return m_tinfo; }
+    inline const TetraInfo & getTetrahedronInfo() {
+        if (m_isDirty) {
+           update();
+           setDirty(false);
+        }
+        return m_tinfo;
+    }
 
     inline BaseProximity::SPtr getP0() const { return this->pointElements()[0]->getP0(); }
 
@@ -50,6 +56,7 @@ public:
     inline BaseProximity::SPtr getP2() const { return this->pointElements()[2]->getP0(); }
 
     inline BaseProximity::SPtr getP3() const { return this->pointElements()[3]->getP0(); }
+
 
     void draw(const core::visual::VisualParams * vparams) override {
         type::Vector3 p0 = getP0()->getPosition();

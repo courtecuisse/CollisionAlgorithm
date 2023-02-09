@@ -66,6 +66,13 @@ public:
 
     virtual void update() = 0;
 
+    void setDirty(bool b) {m_isDirty = b;}
+
+    bool isDirty() {return m_isDirty;}
+
+protected:
+    bool m_isDirty;
+
 };
 
 

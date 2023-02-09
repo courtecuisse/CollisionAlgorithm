@@ -57,7 +57,13 @@ public:
                        getP2()->getPosition());
     }
 
-    inline const TriangleInfo & getTriangleInfo() const { return m_tinfo; }
+    inline const TriangleInfo & getTriangleInfo() {
+        if (m_isDirty) {
+            update();
+            setDirty(false);
+        }
+        return m_tinfo;
+    }
 
     inline BaseProximity::SPtr getP0() const { return this->pointElements()[0]->getP0(); }
 

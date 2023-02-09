@@ -86,12 +86,15 @@ public:
     virtual void buildTetrahedronElements() {}
 
     virtual void prepareDetection() {
-        for (unsigned i=0;i<m_pointElements.size();i++) m_pointElements[i]->update();
-        for (unsigned i=0;i<m_edgeElements.size();i++) m_edgeElements[i]->update();
-        for (unsigned i=0;i<m_triangleElements.size();i++) m_triangleElements[i]->update();
-        for (unsigned i=0;i<m_tetrahedronElements.size();i++) m_tetrahedronElements[i]->update();
+        std::string timerName =std::string("Timer for ") + typeid(*this).name();
+        sofa::helper::AdvancedTimer::stepBegin(timerName.c_str());
+        for (unsigned i=0;i<m_pointElements.size();i++) m_pointElements[i]->setDirty(true);
+        for (unsigned i=0;i<m_edgeElements.size();i++) m_edgeElements[i]->setDirty(true);
+        for (unsigned i=0;i<m_triangleElements.size();i++) m_triangleElements[i]->setDirty(true);
+        for (unsigned i=0;i<m_tetrahedronElements.size();i++) m_tetrahedronElements[i]->setDirty(true);
 
         if (m_broadPhase) m_broadPhase->updateBroadPhase();
+        sofa::helper::AdvancedTimer::stepEnd(timerName.c_str());
     }
 
     virtual ElementIterator::SPtr begin(unsigned id = 0) const = 0;
