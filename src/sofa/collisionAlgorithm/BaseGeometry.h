@@ -5,6 +5,7 @@
 #include <sofa/collisionAlgorithm/BaseProximity.h>
 #include <sofa/collisionAlgorithm/ElementIterator.h>
 #include <sofa/gl/gl.h>
+#include <sofa/helper/AdvancedTimer.h>
 #include <sofa/collisionAlgorithm/elements/PointElement.h>
 #include <sofa/collisionAlgorithm/elements/EdgeElement.h>
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
