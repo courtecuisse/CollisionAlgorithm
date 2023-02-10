@@ -5,6 +5,7 @@
 #include <sofa/collisionAlgorithm/BaseAlgorithm.h>
 #include <sofa/collisionAlgorithm/operations/Project.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
+#include <thread>
 
 namespace sofa::collisionAlgorithm {
 
@@ -16,13 +17,15 @@ public:
     Data<type::Vec3i> d_nbox;
     Data<bool> d_static;
     Data<int> d_method;
+    Data<int> d_thread;
 
     core::objectmodel::DataCallback c_nbox;
 
     BaseAABBBroadPhase()
     : d_nbox(initData(&d_nbox, type::Vec3i(8,8,8),"nbox", "number of bbox"))
     , d_static(initData(&d_static, false,"isStatic", "Optimization: object is not moving in the scene"))
-    , d_method(initData(&d_method, 0,"method", "chosen method to determine the boxes containing the elements")){
+    , d_method(initData(&d_method, 0,"method", "chosen method to determine the boxes containing the elements"))
+    , d_thread(initData(&d_thread, 4,"thread","Number of threads")){
         c_nbox.addInputs({&d_nbox});
         c_nbox.addCallback(std::bind(&BaseAABBBroadPhase::updateBroadPhase,this));
     }
@@ -172,9 +175,7 @@ public:
                         P[1] += j*m_cellSize[1];
                         P[2] += k*m_cellSize[2];
 
-                        sofa::helper::AdvancedTimer::stepBegin("========================= Project from AABB doUpdate =========================");
                         BaseProximity::SPtr prox = projectOp(P,elmt).prox;
-                        sofa::helper::AdvancedTimer::stepEnd("========================= Project from AABB doUpdate =========================");
                         if (prox == NULL) continue;
 
                         prox->normalize();
@@ -184,9 +185,7 @@ public:
                             (fabs(D[1])<=m_cellSize[1]*0.6) &&
                             (fabs(D[2])<=m_cellSize[2]*0.6)) {
 
-                            sofa::helper::AdvancedTimer::stepBegin("========================= Adding elem asociated to key in MAP =========================");
                             addElement(i, j, k, elmt);
-                            sofa::helper::AdvancedTimer::stepEnd("========================= Adding elem asociated to key in MAP =========================");
                         }
                     }
                 }
@@ -198,7 +197,6 @@ public:
     // Method 1 to put elements into the right cells
     void boxTriangleSAT() {
         for (auto it = l_geometry->begin(); it != l_geometry->end(); it++) {
-            sofa::helper::AdvancedTimer::stepBegin("========================= Geometry elements visited in updatElemInBoxes =========================");
             BaseElement::SPtr elmt = it->element();
 
             std::set<type::Vec3i> boxKey;
@@ -221,11 +219,8 @@ public:
                     type::Vec3i key = *it;
                     addElement(key[0],key[1],key[2],elmt);
                 }
-                sofa::helper::AdvancedTimer::stepBegin("========================= multipleCells test =========================");
                 multipleCells(elmt,boxKey);
-                sofa::helper::AdvancedTimer::stepEnd("========================= multipleCells test =========================");
             }
-            sofa::helper::AdvancedTimer::stepEnd("========================= Geometry elements visited in updatElemInBoxes =========================");
         }
     }
 
@@ -380,41 +375,92 @@ public:
     }
 
 
+    typedef struct {
+        int i,j,k;
+        BaseElement::SPtr elmt;
+    } ELMT_THREAD;
+
+
     // Method 2 to put elements into the right cells
     void bboxIntersection() {
-        for (auto it = l_geometry->begin(); it != l_geometry->end(); it++) {
-            BaseElement::SPtr elmt = it->element();
+//        auto thread_worker = [&] (int start, int end, unsigned tid) {
+//            std::vector<ELMT_THREAD> & data = m_data[tid];
+//            auto it = l_geometry->begin(start);
 
-            type::BoundingBox bbox;
+            for (auto it = l_geometry->begin(); it != l_geometry->end(); it++) { //while (start<end) {
+                sofa::helper::AdvancedTimer::stepBegin("========================= BBox =========================");
+                BaseElement::SPtr elmt = it->element();
+                type::BoundingBox bbox;
 
-            for (auto it = elmt->pointElements().cbegin(); it!= elmt->pointElements().cend(); it++) {
-                bbox.include((*it)->getP0()->getPosition());
-            }
+                for (auto it = elmt->pointElements().cbegin(); it!= elmt->pointElements().cend(); it++) {
+                    bbox.include((*it)->getP0()->getPosition());
+                }
+                sofa::helper::AdvancedTimer::stepEnd("========================= BBox =========================");
 
-            const type::Vector3 & minbox = bbox.minBBox();
-            const type::Vector3 & maxbox = bbox.maxBBox();
+                sofa::helper::AdvancedTimer::stepBegin("========================= insert elem =========================");
 
-            type::Vec3i cminbox(0,0,0);
-            type::Vec3i cmaxbox(0,0,0);
+                const type::Vector3 & minbox = bbox.minBBox();
+                const type::Vector3 & maxbox = bbox.maxBBox();
 
-            for (int i = 0 ; i < 3 ; i++) {
-                cmaxbox[i] = ceil((maxbox[i] - m_Bmin[i])/m_cellSize[i]);
-                cminbox[i] = floor((minbox[i] - m_Bmin[i])/m_cellSize[i]); //second m_Bmax was Bmin => bug ?
-            }
+                type::Vec3i cminbox(0,0,0);
+                type::Vec3i cmaxbox(0,0,0);
 
-            for (int i=cminbox[0];i<cmaxbox[0];i++)
-            {
-                for (int j=cminbox[1];j<cmaxbox[1];j++)
+                for (int i = 0 ; i < 3 ; i++) {
+                    cmaxbox[i] = ceil((maxbox[i] - m_Bmin[i])/m_cellSize[i]);
+                    cminbox[i] = floor((minbox[i] - m_Bmin[i])/m_cellSize[i]); //second m_Bmax was Bmin => bug ?
+                }
+
+                for (int i=cminbox[0];i<cmaxbox[0];i++)
                 {
-                    for (int k=cminbox[2];k<cmaxbox[2];k++)
+                    for (int j=cminbox[1];j<cmaxbox[1];j++)
                     {
-                        sofa::helper::AdvancedTimer::stepBegin("========================= Adding elem asociated to key in MAP =========================");
-                        addElement(i, j, k, elmt);
-                        sofa::helper::AdvancedTimer::stepEnd("========================= Adding elem asociated to key in MAP =========================");
+                        for (int k=cminbox[2];k<cmaxbox[2];k++)
+                        {
+                            addElement(i, j, k, elmt);
+//                            ELMT_THREAD d;
+//                            d.i = i;
+//                            d.j = j;
+//                            d.k = k;;
+//                            d.elmt = elmt;
+//                            data.push_back(d);
+                        }
                     }
                 }
+
+//                it++;
+//                start++;
+                sofa::helper::AdvancedTimer::stepEnd("========================= insert elem =========================");
             }
-        }
+//        };
+
+
+
+
+//        const int size = l_geometry->getSize();
+//        int NBTHREAD = d_thread.getValue();
+//        int NBLOCS=(size+NBTHREAD-1)/NBTHREAD;
+//        int start = 0;
+//        std::vector<std::thread> threads(NBTHREAD);
+//        m_data.clear();
+//        m_data.resize(NBTHREAD);
+
+//        for (int t=0;t<NBTHREAD;t++) {
+//            int end = std::min(start+NBLOCS,size-1);
+//            threads[t]=std::thread(thread_worker, start, end, t);
+////            thread_worker(start,end,m_data[t]);
+//            start=end;
+//        }
+//        for (int t=0;t<NBTHREAD;t++) threads[t].join();
+
+//        for (int t=0;t<NBTHREAD;t++) {
+//            for (unsigned i=0;i<m_data[t].size();i++) {
+//                auto & d = m_data[t][i];
+//                addElement(d.i, d.j, d.k, d.elmt);
+//            }
+//        }
+
+
+
     }
 
 
@@ -492,6 +538,7 @@ public:
 protected:
     type::Vector3 m_Bmin,m_Bmax,m_cellSize;
     type::Vec3i m_nbox;
+    std::vector<std::vector<ELMT_THREAD> > m_data;
 };
 
 

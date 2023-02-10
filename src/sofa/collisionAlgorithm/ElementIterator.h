@@ -98,7 +98,7 @@ protected:
 template<class CONTAINER>
 class TDefaultElementIterator_copy : public TDefaultElementIterator<CONTAINER> {
 public:
-    TDefaultElementIterator_copy(const CONTAINER & c,unsigned id=0)
+    TDefaultElementIterator_copy(const CONTAINER & c,int id=0)
     : m_container(c) {
         this->m_it = m_container.cbegin();
         this->m_end = m_container.cend();
@@ -116,7 +116,7 @@ private:
 template<class CONTAINER>
 class TDefaultElementIterator_ref : public TDefaultElementIterator<CONTAINER> {
 public:
-    TDefaultElementIterator_ref(const CONTAINER & c,unsigned id=0) {
+    TDefaultElementIterator_ref(const CONTAINER & c,int id=0) {
         this->m_it = c.cbegin();
         this->m_end = c.cend();
 
