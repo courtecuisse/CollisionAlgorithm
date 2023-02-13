@@ -13,6 +13,7 @@
 #include <sofa/core/topology/BaseMeshTopology.h>
 #include <sofa/collisionAlgorithm/BaseElement.h>
 #include <sofa/simulation/Node.h>
+#include <sofa/helper/AdvancedTimer.h>
 
 namespace sofa ::collisionAlgorithm {
 
@@ -65,7 +66,9 @@ public:
 
         void processObject(simulation::Node*, core::objectmodel::BaseObject* obj) {
             if (CollisionAlgorithm * component = dynamic_cast<CollisionAlgorithm *>(obj)) {
+                sofa::helper::AdvancedTimer::stepBegin(":::::::::::::::::::::::: Do detection ::::::::::::::::::::::::");
                 component->doDetection();
+                sofa::helper::AdvancedTimer::stepEnd(":::::::::::::::::::::::: Do detection ::::::::::::::::::::::::");
             }
         }
 
@@ -79,11 +82,15 @@ public:
     void handleEvent(sofa::core::objectmodel::Event *event) {
         if (! dynamic_cast<sofa::simulation::AnimateBeginEvent*>(event)) return;
 
+        sofa::helper::AdvancedTimer::stepBegin("=========================Visitor component =========================");
         UpdateComponentVisitor v_comp;
         v_comp.execute(this->getContext());
+        sofa::helper::AdvancedTimer::stepEnd("=========================Visitor component =========================");
 
+        sofa::helper::AdvancedTimer::stepBegin("=========================Visitor algo =========================");
         UpdateAlgorithmVisitor v_algo;
         v_algo.execute(this->getContext());
+        sofa::helper::AdvancedTimer::stepEnd("=========================Visitor algo =========================");
     }
 
 };

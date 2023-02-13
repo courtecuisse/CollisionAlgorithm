@@ -25,7 +25,7 @@ public:
     : d_nbox(initData(&d_nbox, type::Vec3i(8,8,8),"nbox", "number of bbox"))
     , d_static(initData(&d_static, false,"isStatic", "Optimization: object is not moving in the scene"))
     , d_method(initData(&d_method, 0,"method", "chosen method to determine the boxes containing the elements"))
-    , d_thread(initData(&d_thread, 4,"thread","Number of threads")){
+    , d_thread(initData(&d_thread, 8,"thread","Number of threads")){
         c_nbox.addInputs({&d_nbox});
         c_nbox.addCallback(std::bind(&BaseAABBBroadPhase::updateBroadPhase,this));
     }
@@ -383,17 +383,17 @@ public:
 
     // Method 2 to put elements into the right cells
     void bboxIntersection() {
-//        auto thread_worker = [&] (int start, int end, unsigned tid) {
-//            std::vector<ELMT_THREAD> & data = m_data[tid];
-//            auto it = l_geometry->begin(start);
+        auto thread_worker = [&] (int start, int end, unsigned tid) {
+            auto it = l_geometry->begin(start);
 
-            for (auto it = l_geometry->begin(); it != l_geometry->end(); it++) { //while (start<end) {
+            while (start<end) {
+
                 sofa::helper::AdvancedTimer::stepBegin("========================= BBox =========================");
                 BaseElement::SPtr elmt = it->element();
                 type::BoundingBox bbox;
 
-                for (auto it = elmt->pointElements().cbegin(); it!= elmt->pointElements().cend(); it++) {
-                    bbox.include((*it)->getP0()->getPosition());
+                for (auto it_p = elmt->pointElements().cbegin(); it_p!= elmt->pointElements().cend(); it_p++) {
+                    bbox.include((*it_p)->getP0()->getPosition());
                 }
                 sofa::helper::AdvancedTimer::stepEnd("========================= BBox =========================");
 
@@ -416,50 +416,51 @@ public:
                     {
                         for (int k=cminbox[2];k<cmaxbox[2];k++)
                         {
-                            addElement(i, j, k, elmt);
-//                            ELMT_THREAD d;
-//                            d.i = i;
-//                            d.j = j;
-//                            d.k = k;;
-//                            d.elmt = elmt;
-//                            data.push_back(d);
+                            ELMT_THREAD d;
+                            d.i = i;
+                            d.j = j;
+                            d.k = k;
+                            d.elmt = elmt;
+                            m_data[tid].push_back(d);
                         }
                     }
                 }
 
-//                it++;
-//                start++;
+                it++;
+                start++;
                 sofa::helper::AdvancedTimer::stepEnd("========================= insert elem =========================");
             }
-//        };
+        };
 
 
+        int size;
+        if (l_geometry->tetrahedronElements().size()) size = l_geometry->tetrahedronElements().size();
+        else if (l_geometry->triangleElements().size()) size = l_geometry->triangleElements().size();
+        else if (l_geometry->edgeElements().size()) size = l_geometry->edgeElements().size();
+        else size = l_geometry->pointElements().size();
 
+        int NBTHREAD = d_thread.getValue();
+        int NBLOCS=(size+NBTHREAD-1)/NBTHREAD;
+        int start = 0;
+        std::vector<std::thread> threads(NBTHREAD);
 
-//        const int size = l_geometry->getSize();
-//        int NBTHREAD = d_thread.getValue();
-//        int NBLOCS=(size+NBTHREAD-1)/NBTHREAD;
-//        int start = 0;
-//        std::vector<std::thread> threads(NBTHREAD);
-//        m_data.clear();
-//        m_data.resize(NBTHREAD);
+        m_data.clear();
+        m_data.resize(NBTHREAD);
 
-//        for (int t=0;t<NBTHREAD;t++) {
-//            int end = std::min(start+NBLOCS,size-1);
-//            threads[t]=std::thread(thread_worker, start, end, t);
-////            thread_worker(start,end,m_data[t]);
-//            start=end;
-//        }
-//        for (int t=0;t<NBTHREAD;t++) threads[t].join();
+        for (int t=0;t<NBTHREAD;t++) {
+            int end = std::min(start+NBLOCS,size-1);
+            threads[t]=std::thread(thread_worker, start, end, t);
+//            thread_worker(start,end,m_data[t]);
+            start=end;
+        }
+        for (int t=0;t<NBTHREAD;t++) threads[t].join();
 
-//        for (int t=0;t<NBTHREAD;t++) {
-//            for (unsigned i=0;i<m_data[t].size();i++) {
-//                auto & d = m_data[t][i];
-//                addElement(d.i, d.j, d.k, d.elmt);
-//            }
-//        }
-
-
+        for (int t=0;t<NBTHREAD;t++) {
+            for (unsigned i=0;i<m_data[t].size();i++) {
+                auto & d = m_data[t][i];
+                addElement(d.i, d.j, d.k, d.elmt);
+            }
+        }
 
     }
 
