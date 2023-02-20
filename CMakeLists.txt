@@ -31,7 +31,7 @@ file(GLOB_RECURSE DEPRECATED_FILES
 
 find_package(SofaFramework REQUIRED)
 find_package(Sofa.GL REQUIRED)
-find_package(Sofa.SimulationCore REQUIRED)
+find_package(Sofa.Simulation.Core REQUIRED)
 
 find_package( Eigen3 REQUIRED )
 include_directories(${EIGEN3_INCLUDE_DIR})
@@ -44,7 +44,7 @@ set_source_files_properties(${IGNORED_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADER_FILES} ${SCENES_FILES} ${IGNORED_FILES} ${DEPRECATED_FILES} ${README_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DPLUGIN_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\"")
 target_link_libraries(${PROJECT_NAME}
-    Sofa.SimulationCore
+    Sofa.Simulation.Core
     Sofa.GL
 )
 
