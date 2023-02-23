@@ -382,7 +382,7 @@ public:
 
 
     // Method 2 to put elements into the right cells
-    void bboxIntersection() {
+    virtual void bboxIntersection() {
         auto thread_worker = [&] (int start, int end, unsigned tid) {
             auto it = l_geometry->begin(start);
 
