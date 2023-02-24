@@ -15,6 +15,8 @@ public:
 
     FullAABBBroadPhase() {}
 
+    void updateData() override {}
+
     const std::set<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const override {
         if (m_indexedElement[i][j][k].size() == 0) {
             static std::set<BaseElement::SPtr> empty;

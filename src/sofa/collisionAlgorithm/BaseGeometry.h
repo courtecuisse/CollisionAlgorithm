@@ -10,6 +10,8 @@
 #include <sofa/collisionAlgorithm/elements/EdgeElement.h>
 #include <sofa/collisionAlgorithm/elements/TriangleElement.h>
 #include <sofa/collisionAlgorithm/elements/TetrahedronElement.h>
+#include <sofa/collisionAlgorithm/InternalData.h>
+
 
 namespace sofa ::collisionAlgorithm {
 
@@ -49,6 +51,20 @@ public:
 
         virtual void updateBroadPhase() = 0;
 
+    };
+
+
+    template<class ELEM, class DATA>
+    class ElemInternalData : public InternalDataContainer::InternalData
+    {
+    public:
+        ElemInternalData() = default;
+        virtual ~ElemInternalData() = default;
+
+        virtual DATA& getData() { return m_data; }
+
+    private:
+        DATA m_data;
     };
 
     SOFA_ABSTRACT_CLASS(BaseGeometry,CollisionComponent);
@@ -157,6 +173,10 @@ public:
 
     virtual ElementContainer<TetrahedronElement> & tetrahedronElements() { return m_tetrahedronElements; }
 
+
+    virtual InternalDataContainer & internalData() { return m_internalData; }
+
+
 private:
 
     ElementContainer<PointElement> m_pointElements;
@@ -165,6 +185,8 @@ private:
     ElementContainer<TetrahedronElement> m_tetrahedronElements;
 
     BroadPhase * m_broadPhase;
+    InternalDataContainer m_internalData;
+
 };
 
 template<class DataTypes>

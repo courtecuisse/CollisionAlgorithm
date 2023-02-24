@@ -34,6 +34,8 @@ public:
 
     virtual void addElement(int i, int j, int k, BaseElement::SPtr elmt) = 0;
 
+    virtual void updateData() = 0;
+
 
 
     type::BoundingBox getBBox() const {
@@ -104,6 +106,7 @@ public:
         m_Bmin -= m_cellSize * 0.5;
         m_Bmax -= m_cellSize * 0.5;
 
+        updateData();
 
         sofa::helper::AdvancedTimer::stepBegin("========================= Elements rangés dans boites in AABB doUpdate =========================");
         updateElemInBoxes();

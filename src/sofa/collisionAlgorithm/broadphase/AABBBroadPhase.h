@@ -15,6 +15,11 @@ public:
 
     AABBBroadPhase() {}
 
+    void updateData() override {
+        m_offset[0] = m_nbox[1]*m_nbox[2];
+        m_offset[1] = m_nbox[2];
+    }
+
     const std::set<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const override {
         auto it = m_indexedElement.find(getKey(i,j,k));
         if (it == m_indexedElement.end()) {
