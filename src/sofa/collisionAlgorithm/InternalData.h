@@ -20,9 +20,14 @@ public:
 
     class InternalData {
     public:
-        InternalData() = default;
+        InternalData() : m_dirty(true) {};
         virtual ~InternalData() = default;
 
+		virtual void setDirty( bool _dirty) { m_dirty = _dirty; };
+		virtual bool isDirty() { return m_dirty; };
+
+	private:
+		bool m_dirty;
     };
 
     InternalDataContainer() = default;

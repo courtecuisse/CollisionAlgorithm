@@ -54,18 +54,6 @@ public:
     };
 
 
-    template<class ELEM, class DATA>
-    class ElemInternalData : public InternalDataContainer::InternalData
-    {
-    public:
-        ElemInternalData() = default;
-        virtual ~ElemInternalData() = default;
-
-        virtual DATA& getData() { return m_data; }
-
-    private:
-        DATA m_data;
-    };
 
     SOFA_ABSTRACT_CLASS(BaseGeometry,CollisionComponent);
 
@@ -103,7 +91,7 @@ public:
     virtual void buildTetrahedronElements() {}
 
     virtual void prepareDetection() {
-        std::string timerName =std::string("Timer for ") + typeid(*this).name();
+        std::string timerName = std::string("Timer for ") + typeid(*this).name();
         sofa::helper::AdvancedTimer::stepBegin(timerName.c_str());
         for (unsigned i=0;i<m_pointElements.size();i++) m_pointElements[i]->setDirty(true);
         for (unsigned i=0;i<m_edgeElements.size();i++) m_edgeElements[i]->setDirty(true);
@@ -111,8 +99,13 @@ public:
         for (unsigned i=0;i<m_tetrahedronElements.size();i++) m_tetrahedronElements[i]->setDirty(true);
 
         if (m_broadPhase) m_broadPhase->updateBroadPhase();
-        sofa::helper::AdvancedTimer::stepEnd(timerName.c_str());
-    }
+
+		auto &  ID = internalData();
+		for( auto it = ID.cbegin(); it != ID.cend(); it++)
+			it->second->setDirty(true);
+
+		sofa::helper::AdvancedTimer::stepEnd(timerName.c_str());
+	}
 
     virtual ElementIterator::SPtr begin(unsigned id = 0) const = 0;
 
