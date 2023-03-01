@@ -108,6 +108,10 @@ public:
 
         updateData();
 
+        if (m_Bmin == m_Bmax) {
+            return;
+        }
+
         sofa::helper::AdvancedTimer::stepBegin("========================= Elements rangés dans boites in AABB doUpdate =========================");
         updateElemInBoxes();
 
