@@ -63,13 +63,10 @@ public:
 
             m_internalData[hash] = std::shared_ptr<InternalData>(ptr);
 
-            std::cout<<"CREATE"<<std::endl;
-
             return ptr;
 
 
         }
-        std::cout<<"GET"<<std::endl;
 
         return reinterpret_cast<CLASS*>(it->second.get());
     }

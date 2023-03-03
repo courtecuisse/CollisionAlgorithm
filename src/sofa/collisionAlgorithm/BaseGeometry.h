@@ -92,7 +92,7 @@ public:
 
     virtual void prepareDetection() {
         std::string timerName = std::string("Timer for ") + typeid(*this).name();
-        sofa::helper::AdvancedTimer::stepBegin(timerName.c_str());
+//        sofa::helper::AdvancedTimer::stepBegin(timerName.c_str());
         for (unsigned i=0;i<m_pointElements.size();i++) m_pointElements[i]->setDirty(true);
         for (unsigned i=0;i<m_edgeElements.size();i++) m_edgeElements[i]->setDirty(true);
         for (unsigned i=0;i<m_triangleElements.size();i++) m_triangleElements[i]->setDirty(true);
@@ -104,7 +104,7 @@ public:
 		for( auto it = ID.cbegin(); it != ID.cend(); it++)
 			it->second->setDirty(true);
 
-		sofa::helper::AdvancedTimer::stepEnd(timerName.c_str());
+//		sofa::helper::AdvancedTimer::stepEnd(timerName.c_str());
 	}
 
     virtual ElementIterator::SPtr begin(unsigned id = 0) const = 0;

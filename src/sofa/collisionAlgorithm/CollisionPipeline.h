@@ -66,9 +66,9 @@ public:
 
         void processObject(simulation::Node*, core::objectmodel::BaseObject* obj) {
             if (CollisionAlgorithm * component = dynamic_cast<CollisionAlgorithm *>(obj)) {
-                sofa::helper::AdvancedTimer::stepBegin(":::::::::::::::::::::::: Do detection ::::::::::::::::::::::::");
+//                sofa::helper::AdvancedTimer::stepBegin(":::::::::::::::::::::::: Do detection ::::::::::::::::::::::::");
                 component->doDetection();
-                sofa::helper::AdvancedTimer::stepEnd(":::::::::::::::::::::::: Do detection ::::::::::::::::::::::::");
+//                sofa::helper::AdvancedTimer::stepEnd(":::::::::::::::::::::::: Do detection ::::::::::::::::::::::::");
             }
         }
 
