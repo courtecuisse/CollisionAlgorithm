@@ -17,6 +17,7 @@ public:
     core::objectmodel::SingleLink<FindClosestProximityAlgorithm,BaseGeometry,BaseLink::FLAG_STOREPATH|BaseLink::FLAG_STRONGLINK> l_dest;
     Data<bool> d_drawCollision ;
     Data<DetectionOutput<BaseProximity,BaseProximity> > d_output;
+    Data<bool> d_projective ;
 //    Data<sofa::type::vector<double> > d_outputDist;
 
     FindClosestProximityAlgorithm()
@@ -24,6 +25,7 @@ public:
     , l_dest(initLink("dest", "link to dest geometry"))
     , d_drawCollision (initData(&d_drawCollision, true, "drawcollision", "draw collision"))
     , d_output(initData(&d_output,"output", "output of the collision detection"))
+    , d_projective(initData(&d_projective, false,"projective", "projection of closest prox onto from element"))
 //    , d_outputDist(initData(&d_outputDist,"outputDist", "Distance of the outpu pair of detections"))
     {}
 
@@ -53,6 +55,7 @@ public:
         auto createProximityOp = Operations::CreateCenterProximity::Operation::get(itfrom->getTypeInfo());
         auto findClosestProxOp = Operations::FindClosestProximity::Operation::get(l_dest);
         auto projectOp = Operations::Project::Operation::get(l_dest);
+        auto projectFromOp = Operations::Project::Operation::get(l_from);
 
         for (;itfrom!=l_from->end();itfrom++) {
             auto pfrom = createProximityOp(itfrom->element());
@@ -62,7 +65,17 @@ public:
             if (pdest == nullptr) continue;
             pdest->normalize();
 
-            output.add(pfrom,pdest);
+
+            if (d_projective.getValue()) {
+                auto pfromProj = projectFromOp(pdest->getPosition(),itfrom->element()).prox;
+                if (pfromProj == nullptr) continue;
+                pfromProj->normalize();
+
+                output.add(pfromProj,pdest);
+            } else {
+                output.add(pfrom,pdest);
+            }
+
         }
 
         d_output.endEdit();
