@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.1)
-project(CollisionAlgorithm)
+cmake_minimum_required(VERSION 3.12)
+project(CollisionAlgorithm VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
@@ -29,12 +29,9 @@ file(GLOB_RECURSE DEPRECATED_FILES
     "deprecated/*.cpp"
 )
 
-find_package(SofaFramework REQUIRED)
-find_package(Sofa.GL REQUIRED)
 find_package(Sofa.Simulation.Core REQUIRED)
+find_package(Sofa.GL REQUIRED)
 
-find_package( Eigen3 REQUIRED )
-include_directories(${EIGEN3_INCLUDE_DIR})
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/ignored")
 #include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deprecated")
@@ -49,7 +46,12 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 ## Install rules for the library and headers; CMake package configurations files
-set(${PROJECT_NAME}_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src")
-target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${${PROJECT_NAME}_INCLUDE_DIRS}>")
-target_include_directories(${PROJECT_NAME} PUBLIC "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
-sofa_create_package_with_targets(PACKAGE_NAME ${PROJECT_NAME} PACKAGE_VERSION 0.1 TARGETS ${PROJECT_NAME} INCLUDE_INSTALL_DIR ${${PROJECT_NAME}_INCLUDE_DIRS})
+sofa_create_package_with_targets(
+    PACKAGE_NAME ${PROJECT_NAME}
+    PACKAGE_VERSION ${PROJECT_VERSION}
+    TARGETS ${PROJECT_NAME} AUTO_SET_TARGET_PROPERTIES
+    INCLUDE_SOURCE_DIR "src"
+    INCLUDE_INSTALL_DIR ${PROJECT_NAME}
+    EXAMPLE_INSTALL_DIR "examples"
+    RELOCATABLE "plugins"
+)
