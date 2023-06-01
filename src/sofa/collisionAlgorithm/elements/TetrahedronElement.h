@@ -59,10 +59,10 @@ public:
 
 
     void draw(const core::visual::VisualParams * vparams) override {
-        type::Vector3 p0 = getP0()->getPosition();
-        type::Vector3 p1 = getP1()->getPosition();
-        type::Vector3 p2 = getP2()->getPosition();
-        type::Vector3 p3 = getP3()->getPosition();
+        type::Vec3 p0 = getP0()->getPosition();
+        type::Vec3 p1 = getP1()->getPosition();
+        type::Vec3 p2 = getP2()->getPosition();
+        type::Vec3 p3 = getP3()->getPosition();
 
         if (vparams->displayFlags().getShowWireFrame()) {
             glBegin(GL_LINES);

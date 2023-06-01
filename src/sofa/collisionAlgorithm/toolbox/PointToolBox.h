@@ -12,7 +12,7 @@ public:
 
     static Operations::CreateCenterProximity::Result createCenterProximity(const PointElement::SPtr & point);
 
-    static Operations::Project::Result project(const type::Vector3 & P, const PointElement::SPtr & point);
+    static Operations::Project::Result project(const type::Vec3 & P, const PointElement::SPtr & point);
 
 };
 

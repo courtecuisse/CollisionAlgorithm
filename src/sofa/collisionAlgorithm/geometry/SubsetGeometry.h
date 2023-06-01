@@ -28,7 +28,7 @@ public:
     {
       l_geometry.setPath("@.");
     }
-//    type::Vector3 getPosition(unsigned pid) override {
+//    type::Vec3 getPosition(unsigned pid) override {
 //        const helper::ReadAccessor<DataVecCoord> & pos = this->getState()->read(core::VecCoordId::position());
 //        return pos[pid];
 //    }

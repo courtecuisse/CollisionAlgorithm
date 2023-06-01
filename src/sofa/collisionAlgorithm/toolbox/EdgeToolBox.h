@@ -12,7 +12,7 @@ public:
 
     static Operations::CreateCenterProximity::Result createCenterProximity(const EdgeElement::SPtr & edge);
 
-    static Operations::Project::Result project(const type::Vector3 & P, const EdgeElement::SPtr & edge);
+    static Operations::Project::Result project(const type::Vec3 & P, const EdgeElement::SPtr & edge);
 
     static void projectOnEdge(const type::Vec3d & projP, const type::Vec3d & e1, const type::Vec3d & e2, double & fact_u, double & fact_v);
 

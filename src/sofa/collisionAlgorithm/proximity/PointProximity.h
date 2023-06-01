@@ -12,16 +12,16 @@ public:
     PointProximity(PointElement::SPtr elmt)
     : m_elmt(elmt) {}
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vec3> & dir, double fact, Index constraintId) const override {
         m_elmt->getP0()->buildJacobianConstraint(cId,dir,fact,constraintId);
     }
 
-    /// return proximiy position in a vector3
-    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
+    /// return proximiy position in a Vec3
+    sofa::type::Vec3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
         return m_elmt->getP0()->getPosition(v);
     }
 
-    sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const {
+    sofa::type::Vec3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const {
         return m_elmt->getP0()->getVelocity(v);
     }
 

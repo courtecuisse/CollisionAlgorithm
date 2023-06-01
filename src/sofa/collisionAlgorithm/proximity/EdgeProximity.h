@@ -13,25 +13,25 @@ public:
     EdgeProximity(EdgeElement::SPtr elmt,double f0,double f1)
     : m_elmt(elmt), m_f0(f0), m_f1(f1) {}
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
-        sofa::type::vector<sofa::type::Vector3> N1;
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vec3> & dir, double fact, Index constraintId) const override {
+        sofa::type::vector<sofa::type::Vec3> N1;
         for (unsigned i=0;i<dir.size();i++) N1.push_back(dir[i]*m_f0);
         m_elmt->getP0()->buildJacobianConstraint(cId,N1,fact,constraintId);
 
-        sofa::type::vector<sofa::type::Vector3> N2;
+        sofa::type::vector<sofa::type::Vec3> N2;
         for (unsigned i=0;i<dir.size();i++) N2.push_back(dir[i]*m_f1);
         m_elmt->getP1()->buildJacobianConstraint(cId,N2,fact,constraintId);
     }
 
 
-    /// return proximiy position in a vector3
-    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
+    /// return proximiy position in a Vec3
+    sofa::type::Vec3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const override {
         return m_elmt->getP0()->getPosition(v) * m_f0 +
                m_elmt->getP1()->getPosition(v) * m_f1;
     }
 
-    /// return proximiy velocity in a vector3
-    sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
+    /// return proximiy velocity in a Vec3
+    sofa::type::Vec3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const override {
         return m_elmt->getP0()->getVelocity(v) * m_f0 +
                m_elmt->getP1()->getVelocity(v) * m_f1;
     }

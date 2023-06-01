@@ -22,7 +22,7 @@ public:
         type::Vec3i nbox = broadphase->getNbox();
 
         //take the first broad phase...
-        type::Vector3 P = prox->getPosition();
+        type::Vec3 P = prox->getPosition();
 
         type::Vec3i cbox = broadphase->getBoxCoord(P);
 
@@ -189,7 +189,7 @@ private:
         double min_dist = std::numeric_limits<double>::max();
         BaseProximity::SPtr res = NULL;
 
-//        type::Vector3 P = prox->getPosition();
+//        type::Vec3 P = prox->getPosition();
 
         for (; ! itdest->end();itdest++) {
             auto edest = itdest->element();

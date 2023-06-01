@@ -68,7 +68,7 @@ public:
         //updates bounding box area
 //        sofa::helper::AdvancedTimer::stepBegin("========================= BBox area update in AABBBroadPhase do update =========================");
         for (unsigned j=1;j<l_geometry->getSize();j++) {
-            type::Vector3 pos = l_geometry->getPosition(j);
+            type::Vec3 pos = l_geometry->getPosition(j);
 
             for (int i = 0 ; i < 3 ; i++) {
                 if (pos[i] > m_Bmax[i])
@@ -120,20 +120,20 @@ public:
     }
 
 
-    inline const type::Vector3 & getMin() const {
+    inline const type::Vec3 & getMin() const {
         return m_Bmin;
     }
 
-    inline const type::Vector3 & getMax() const {
+    inline const type::Vec3 & getMax() const {
         return m_Bmax;
     }
 
-    inline const type::Vector3 & getCellSize() const {
+    inline const type::Vec3 & getCellSize() const {
         return m_cellSize;
     }
 
     //compute the box where is P
-    type::Vec3i getBoxCoord(const type::Vector3 & P) const override {
+    type::Vec3i getBoxCoord(const type::Vec3 & P) const override {
         return type::Vec3i((P[0] - m_Bmin[0])/m_cellSize[0],
                            (P[1] - m_Bmin[1])/m_cellSize[1],
                            (P[2] - m_Bmin[2])/m_cellSize[2]);
@@ -159,8 +159,8 @@ public:
                 bbox.include((*it)->getP0()->getPosition());
             }
 
-            const type::Vector3 & minbox = bbox.minBBox();
-            const type::Vector3 & maxbox = bbox.maxBBox();
+            const type::Vec3 & minbox = bbox.minBBox();
+            const type::Vec3 & maxbox = bbox.maxBBox();
 
             type::Vec3i cminbox(0,0,0);
             type::Vec3i cmaxbox(0,0,0);
@@ -176,7 +176,7 @@ public:
                 {
                     for (int k=cminbox[2];k<cmaxbox[2];k++)
                     {
-                        type::Vector3 P = m_Bmin + m_cellSize*0.5;
+                        type::Vec3 P = m_Bmin + m_cellSize*0.5;
 
                         P[0] += i*m_cellSize[0];
                         P[1] += j*m_cellSize[1];
@@ -186,7 +186,7 @@ public:
                         if (prox == NULL) continue;
 
                         prox->normalize();
-                        type::Vector3 D = prox->getPosition()-P;
+                        type::Vec3 D = prox->getPosition()-P;
 
                         if ((fabs(D[0])<=m_cellSize[0]*0.6) &&
                             (fabs(D[1])<=m_cellSize[1]*0.6) &&
@@ -241,8 +241,8 @@ public:
             bbox.include((*it)->getP0()->getPosition());
         }
 
-        const type::Vector3 & minbox = bbox.minBBox();
-        const type::Vector3 & maxbox = bbox.maxBBox();
+        const type::Vec3 & minbox = bbox.minBBox();
+        const type::Vec3 & maxbox = bbox.maxBBox();
 
         type::Vec3i cminbox(0,0,0);
         type::Vec3i cmaxbox(0,0,0);
@@ -406,8 +406,8 @@ public:
 
                 sofa::helper::AdvancedTimer::stepBegin("========================= insert elem =========================");
 
-                const type::Vector3 & minbox = bbox.minBBox();
-                const type::Vector3 & maxbox = bbox.maxBBox();
+                const type::Vec3 & minbox = bbox.minBBox();
+                const type::Vec3 & maxbox = bbox.maxBBox();
 
                 type::Vec3i cminbox(0,0,0);
                 type::Vec3i cmaxbox(0,0,0);
@@ -544,7 +544,7 @@ public:
 
 
 protected:
-    type::Vector3 m_Bmin,m_Bmax,m_cellSize;
+    type::Vec3 m_Bmin,m_Bmax,m_cellSize;
     type::Vec3i m_nbox;
     std::vector<std::vector<ELMT_THREAD> > m_data;
 };
