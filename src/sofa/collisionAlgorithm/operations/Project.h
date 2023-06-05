@@ -17,11 +17,11 @@ struct Result {
 
 class Operation : public GenericOperation<Operation,//Type of the operation
                                           Result,//Default return type
-                                          const type::Vector3 & , const BaseElement::SPtr & //Parameters
+                                          const type::Vec3 & , const BaseElement::SPtr & //Parameters
                                           > {
 public:
 
-    Result defaultFunc(const type::Vector3 & , const BaseElement::SPtr & ) const override {
+    Result defaultFunc(const type::Vec3 & , const BaseElement::SPtr & ) const override {
         return Result(std::numeric_limits<double>::max(),NULL);
     }
 

@@ -10,7 +10,7 @@ Operations::CreateCenterProximity::Result TriangleToolBox::createCenterProximity
 
 //Barycentric coordinates are computed according to
 //http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
-Operations::Project::Result TriangleToolBox::project(const type::Vector3 & P, const TriangleElement::SPtr & tri) {
+Operations::Project::Result TriangleToolBox::project(const type::Vec3 & P, const TriangleElement::SPtr & tri) {
     double fact_u,fact_v,fact_w;
     projectOnTriangle(P,tri->getTriangleInfo(),fact_u,fact_v,fact_w);
 
@@ -53,7 +53,7 @@ bool TriangleToolBox::isInTriangle(const type::Vec3d & P, const TriangleElement:
 
 void TriangleToolBox::normalize(const type::Vec3d & P0, const type::Vec3d & P1, const type::Vec3d & P2, double & f0,double & f1, double & f2) {
     if (f0<0) {
-        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2);
+        type::Vec3 P = (P0*f0)+(P1*f1)+(P2*f2);
 
         toolbox::EdgeToolBox::projectOnEdge(P,
                                             P1, P2,
@@ -62,7 +62,7 @@ void TriangleToolBox::normalize(const type::Vec3d & P0, const type::Vec3d & P1, 
         f0=0;
         toolbox::EdgeToolBox::normalize(P1,P2,f1,f2);
     } else if (f1<0) {
-        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2);
+        type::Vec3 P = (P0*f0)+(P1*f1)+(P2*f2);
 
         toolbox::EdgeToolBox::projectOnEdge(P,
                                             P0, P2,
@@ -70,7 +70,7 @@ void TriangleToolBox::normalize(const type::Vec3d & P0, const type::Vec3d & P1, 
         f1=0;
         toolbox::EdgeToolBox::normalize(P0,P2,f0,f2);
     } else if (f2<0) {
-        type::Vector3 P = (P0*f0)+(P1*f1)+(P2*f2);
+        type::Vec3 P = (P0*f0)+(P1*f1)+(P2*f2);
 
         toolbox::EdgeToolBox::projectOnEdge(P,
                                             P0, P1,

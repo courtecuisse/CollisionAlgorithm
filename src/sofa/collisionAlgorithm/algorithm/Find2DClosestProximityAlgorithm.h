@@ -59,7 +59,7 @@ public:
 
 
     //Project 3d to 2d
-    sofa::type::Vector2 project(const type::Vector3 & p) const {
+    sofa::type::Vector2 project(const type::Vec3 & p) const {
 
         const sofa::type::Mat3x4d & P = d_projectionMatrix.getValue();
 
@@ -77,7 +77,7 @@ public:
         double min_dist = std::numeric_limits<double>::max();
         BaseProximity::SPtr res = NULL;
 
-        type::Vector3 P = prox->getPosition();
+        type::Vec3 P = prox->getPosition();
         Operations::Project::Operation::FUNC projectOp = Operations::Project::Operation::get(itdest->getTypeInfo());
 
         for (; !itdest->end(); itdest++) {

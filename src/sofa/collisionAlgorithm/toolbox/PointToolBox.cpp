@@ -7,7 +7,7 @@ Operations::CreateCenterProximity::Result PointToolBox::createCenterProximity(co
     return point->getP0();
 }
 
-Operations::Project::Result PointToolBox::project(const type::Vector3 & P, const PointElement::SPtr & point) {
+Operations::Project::Result PointToolBox::project(const type::Vec3 & P, const PointElement::SPtr & point) {
     double dist = (P-point->getP0()->getPosition()).norm();
     BaseProximity::SPtr prox = point->getP0();
 

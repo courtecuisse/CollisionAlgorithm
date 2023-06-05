@@ -41,7 +41,7 @@ public:
 
         virtual type::Vec3i getNbox() = 0;
 
-        virtual type::Vec3i getBoxCoord(const type::Vector3 & P) const = 0;
+        virtual type::Vec3i getBoxCoord(const type::Vec3 & P) const = 0;
 
         virtual const std::set<BaseElement::SPtr> & getElementSet(unsigned i, unsigned j, unsigned k) const = 0;
 
@@ -117,9 +117,9 @@ public:
 
     virtual unsigned getSize() const = 0;
 
-    virtual type::Vector3 getPosition(unsigned pid, core::VecCoordId v = core::VecCoordId::position()) const = 0;
+    virtual type::Vec3 getPosition(unsigned pid, core::VecCoordId v = core::VecCoordId::position()) const = 0;
 
-    virtual type::Vector3 getVelocity(unsigned pid, core::VecDerivId v = core::VecDerivId::velocity()) const = 0;
+    virtual type::Vec3 getVelocity(unsigned pid, core::VecDerivId v = core::VecDerivId::velocity()) const = 0;
 
     void draw(const core::visual::VisualParams * vparams) override {
         if (! vparams->displayFlags().getShowCollisionModels()) return;
@@ -225,13 +225,13 @@ public:
         return l_state->getSize();
     }
 
-    sofa::type::Vector3 getPosition(unsigned pid, core::VecCoordId v = core::VecCoordId::position()) const override {
+    sofa::type::Vec3 getPosition(unsigned pid, core::VecCoordId v = core::VecCoordId::position()) const override {
         const helper::ReadAccessor<DataVecCoord> & pos = l_state->read(v);
         return pos[pid];
 
     }
 
-    sofa::type::Vector3 getVelocity(unsigned pid, core::VecDerivId v = core::VecDerivId::velocity()) const override {
+    sofa::type::Vec3 getVelocity(unsigned pid, core::VecDerivId v = core::VecDerivId::velocity()) const override {
         const helper::ReadAccessor<DataVecDeriv> & vel = l_state->read(v);
         return vel[pid];
 

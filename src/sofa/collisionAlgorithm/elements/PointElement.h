@@ -19,7 +19,7 @@ public:
     void update() override {}
 
     void draw(const core::visual::VisualParams * /*vparams*/) override {
-        type::Vector3 p0 = m_prox->getPosition();
+        type::Vec3 p0 = m_prox->getPosition();
 
         glBegin(GL_POINT);
             glVertex3dv(p0.data());

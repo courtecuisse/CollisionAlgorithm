@@ -12,20 +12,20 @@ public:
     MultiProximity(std::vector<BaseProximity::SPtr> & prox)
     : m_proximities(prox){}
 
-    /// return proximiy position in a vector3
-    sofa::type::Vector3 getPosition(core::VecCoordId v) const {
-        sofa::type::Vector3 P(0,0,0);
+    /// return proximiy position in a Vec3
+    sofa::type::Vec3 getPosition(core::VecCoordId v) const {
+        sofa::type::Vec3 P(0,0,0);
         for (unsigned i=0;i<m_proximities.size();i++) P+=m_proximities[i]->getPosition(v);
         return P*1.0/m_proximities.size();
     }
 
-    sofa::type::Vector3 getVelocity(core::VecDerivId v) const {
-        sofa::type::Vector3 P(0,0,0);
+    sofa::type::Vec3 getVelocity(core::VecDerivId v) const {
+        sofa::type::Vec3 P(0,0,0);
         for (unsigned i=0;i<m_proximities.size();i++) P+=m_proximities[i]->getVelocity(v);
         return P*1.0/m_proximities.size();
     }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vec3> & dir, double fact, Index constraintId) const override {
         fact *= 1.0/m_proximities.size();
         for (unsigned i=0;i<m_proximities.size();i++) {
             m_proximities[i]->buildJacobianConstraint(cId,dir,fact,constraintId);

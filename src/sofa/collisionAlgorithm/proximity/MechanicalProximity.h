@@ -33,16 +33,16 @@ public:
         return m_geometry;
     }
 
-    void addContributions(MatrixDerivRowIterator & c_it, const sofa::type::Vector3 & N,double fact) const {
+    void addContributions(MatrixDerivRowIterator & c_it, const sofa::type::Vec3 & N,double fact) const {
         c_it.addCol(m_pid, N * fact);
     }
 
-    /// return proximiy position in a vector3
-    sofa::type::Vector3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
+    /// return proximiy position in a Vec3
+    sofa::type::Vec3 getPosition(core::VecCoordId v = core::VecCoordId::position()) const {
         return m_geometry->getPosition(m_pid,v);
     }
 
-    sofa::type::Vector3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const {
+    sofa::type::Vec3 getVelocity(core::VecDerivId v = core::VecDerivId::velocity()) const {
         return m_geometry->getVelocity(m_pid,v);
     }
 
@@ -52,7 +52,7 @@ public:
 
     const std::type_info& getTypeInfo() const override { return typeid(MechanicalProximity<DataTypes>); }
 
-    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vector3> & dir, double fact, Index constraintId) const override {
+    void buildJacobianConstraint(core::MultiMatrixDerivId cId, const sofa::type::vector<sofa::type::Vec3> & dir, double fact, Index constraintId) const override {
         DataMatrixDeriv & c1_d = *cId[m_geometry->getState()].write();
         MatrixDeriv & c1 = *c1_d.beginEdit();
 
