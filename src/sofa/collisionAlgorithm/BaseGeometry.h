@@ -254,14 +254,9 @@ public:
 //	inline std::vector<BaseElement::SPtr > getBaseElements() = 0;
 
     inline void storeLambda(const core::ConstraintParams* cParams, core::MultiVecDerivId resId, Index cid_global, Index cid_local, const sofa::linearalgebra::BaseVector* lambda) const {
-        auto res = sofa::helper::write(*resId[this->getState()].write());
+        auto res = sofa::helper::getWriteAccessor(*resId[this->getState()].write());
         const typename DataTypes::MatrixDeriv& j = cParams->readJ(this->getState())->getValue();
-        auto rowIt = j.readLine(cid_global+cid_local);
-        const double f = lambda->element(cid_global+cid_local);
-        for (auto colIt = rowIt.begin(), colItEnd = rowIt.end(); colIt != colItEnd; ++colIt)
-        {
-            res[colIt.index()] += colIt.val() * f;
-        }
+        j.multTransposeBaseVector(res, lambda );
     }
 
 
