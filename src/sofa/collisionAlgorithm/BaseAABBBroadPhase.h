@@ -207,7 +207,7 @@ public:
             BaseElement::SPtr elmt = it->element();
 
             std::set<type::Vec3i> boxKey;
-            bool sameBox = 1;
+//            bool sameBox = 1;
             for (auto it = elmt->pointElements().cbegin(); it!= elmt->pointElements().cend(); it++) {
                 type::Vec3i boxCoord = getBoxCoord((*it)->getP0()->getPosition());
                 boxKey.insert(boxCoord);
